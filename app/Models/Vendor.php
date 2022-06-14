@@ -45,14 +45,14 @@ class Vendor extends Model implements HasMedia, HasReviews
         10 => 'tattoo artists',
         11 => 'microblading specialist',
         12 => 'massage therapist'
-
     ];
 
     protected $fillable = [
     	'name', 'email', 'status', 'verified',
     	'phone', 'about', 'whatsapp', 'twitter',
         'instagram', 'snapchat', 'type', 'working_days',
-        'working_hours',
+        'working_hours', 'website_url', 'known_url', 'tax_number',
+        'cat_number', 'reg_number'
     ];
 
     /**
