@@ -32,7 +32,6 @@ use Illuminate\Validation\Rule;
  * @bodyParam address.lng number Longitude. Example: 62.659898
  * @bodyParam address.type integer required Address type (see address types returned in api data). Example: 3
  */
-
 class VendorRequest extends FormRequest
 {
     /**
@@ -42,7 +41,7 @@ class VendorRequest extends FormRequest
      */
     public function authorize()
     {
-        if ( ! $this->user()) {
+        if (!$this->user()) {
             return false;
         }
 
@@ -75,6 +74,11 @@ class VendorRequest extends FormRequest
             'twitter' => 'nullable|string|max:200',
             'instagram' => 'nullable|string|max:200',
             'snapchat' => 'nullable|string|max:200',
+            'website_url' => 'sometimes|nullable|string|max:200',
+            'known_url' => 'sometimes|nullable|string|max:200',
+            'tax_number' => 'sometimes|nullable|string|max:200',
+            'cat_number' => 'sometimes|nullable|string|max:200',
+            'reg_number' => 'sometimes|nullable|string|max:200',
             'type' => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
             'working_days' => 'nullable|string',
             'working_hours' => 'nullable|string',
@@ -97,8 +101,8 @@ class VendorRequest extends FormRequest
 
             $rules['verified'] = 'required|boolean';
             $rules['status'] = 'required|in:0,1';
-            
-        } elseif ( ! is_numeric($id)) {
+
+        } elseif (!is_numeric($id)) {
             // Api vendor registration
             // $rules = array_merge($rules, [
             //     'specialty_ids' => 'required|array|min:1',

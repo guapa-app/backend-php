@@ -91,6 +91,18 @@ class Vendor extends Resource
                 ->displayUsingLabels()
                 ->required(),
 
+            Text::make(__('tax_number'), 'tax_number')
+                ->nullable()
+                ->showOnIndex(false),
+
+            Text::make(__('cat_number'), 'cat_number')
+                ->nullable()
+                ->showOnIndex(false),
+
+            Text::make(__('reg_number'), 'reg_number')
+                ->nullable()
+                ->showOnIndex(false),
+
             Boolean::make(__('verified'), 'verified')
                 ->default(false),
 
@@ -158,6 +170,14 @@ class Vendor extends Resource
             Url::make(__('snapchat'), 'snapchat')->showOnIndex(false),
 
             Url::make(__('snapchat'), 'snapchat')->showOnIndex(false),
+
+            Url::make(__('website_url'), 'website_url')
+                ->nullable()
+                ->showOnIndex(false),
+
+            Url::make(__('known_url'), 'known_url')
+                ->nullable()
+                ->showOnIndex(false),
         ];
     }
 

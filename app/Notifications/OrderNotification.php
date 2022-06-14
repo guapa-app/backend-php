@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Notifications\Channels\WhatsappChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -43,7 +44,7 @@ class OrderNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database'];
+        return ['fcm', 'database', WhatsappChannel::class];
     }
 
     /**
@@ -55,7 +56,15 @@ class OrderNotification extends Notification
         return [
             'order_id' => $this->order->id,
             'summary' => $this->getSummary(),
-            'type' => 'new-order',
+            'type' => $this->orderType(),
+        ];
+    }
+
+    public function toWhatsapp($notifiable): array
+    {
+        return [
+            'message' => urlencode(config('app.name') . ": \n" . $this->getSummary()),
+            'phones' => [$notifiable->phone],
         ];
     }
 
@@ -76,7 +85,7 @@ class OrderNotification extends Notification
             'icon' => '',
             'click_action' => ''
         ])->data([
-            'type' => 'new-order',
+            'type' => $this->orderType(),
             'summary' => $this->getSummary(),
             'order_id' => $this->order->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
@@ -87,5 +96,17 @@ class OrderNotification extends Notification
     public function getSummary(): string
     {
         return 'لديك طلب جديد رقم ' . $this->order->id;
+    }
+
+    private function orderType(): string
+    {
+        $type = 'new-';
+        $this->order->loadMissing('items');
+        foreach ($this->order->items as $item) {
+            if ($item->appointment != null) {
+                return $type . 'consultation';
+            }
+        }
+        return $type . 'order';
     }
 }
