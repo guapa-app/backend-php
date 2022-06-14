@@ -1,0 +1,326 @@
+@font-face {
+    font-family: Bahji;
+    src: url("/landing/css/fonts/Bahij_TheSansArabic-SemiBold.ttf");
+}
+*,html,body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Bahji,SansSerif;
+
+}
+h2,p{
+    font-family: Bahji,SansSerif;
+}
+body{overflow-x: hidden;}
+/* section headerr bannner*/
+#header-banner{
+    background-color:rgba(239, 239, 242, 1) !important;
+
+}
+.banner{
+    height: 700px;
+
+    background: url("/landing/img/header_background.png") fixed no-repeat center ;
+    background-size: cover;
+    border-radius: 0 0 0 30%;
+
+}
+#header-banner .content-logo{
+    text-align: center;
+    margin-top: 60px;
+}
+#header-banner .content-logo .logo-text h2{
+    color: rgba(255, 255, 255, 1);
+    margin-bottom: 10px;
+}
+#header-banner .content-logo .logo-text p{
+    color: rgba(255, 255, 255, 0.6);
+
+}
+.p-5 {
+    padding: 8rem!important;
+}
+/* testimonials */
+#testimonials{
+    padding: 30px;
+    background-color:rgba(239, 239, 242, 1);
+
+}
+.testimonials-text{
+    text-align: center;
+    margin-top: 150px;
+
+}
+ .testimonials-text h2{
+    font-size: 35px;
+    color: rgba(54, 53, 96, 1);
+}
+ .testimonials-text p{
+    font-size: 17px;
+    color: rgba(54, 53, 96, 1);
+}
+
+ /* cards*/
+
+
+
+
+.card {
+    background-color: #fff;
+    padding: 15px;
+    border: none;
+   text-align: center;
+    margin-top: 10px;
+    height: 280px;
+    width: 90% !important;
+    margin-right: 15px;
+}
+.card .user-about span,p{
+    color: rgba(54, 53, 96, 1);
+
+}
+.d-flex .fa-star{
+    color: #f4c150;
+}
+
+.slick-slide {
+    z-index: 0 !important;
+}
+.slick-slide img {
+    display: inline-block;
+    text-align: center;
+}
+.slick-slide {
+    width: 240px !important;
+    margin: 15px !important;
+}
+.slick-dotted.slick-slider {
+    margin-bottom: 30px;
+    margin-top: 100px;
+}
+.slick-track{
+    opacity: 1;
+    width: 8000px !important;
+    transform: translate3d(0px, 0px, 0px);
+}
+.slick-arrow{
+    display: none !important;
+}
+.slick-dots li.slick-active{
+    border: 2px solid black;
+    border-radius: 50%;
+    line-height: 50%;
+    /* margin-top: 67px; */
+    /* padding: 10px; */
+    width: 24px;
+    height: 24px;
+}
+
+/* services*/
+
+#services{
+    padding: 70px 0;
+}
+#services .service-motto h2{
+    margin-top: 100px;
+    color: rgba(255, 139, 133, 1);
+}
+#services .service-motto p{
+    color: rgba(54, 53, 96, 1);
+    font-weight: 700;
+    margin: 20px 0;
+}
+#services .service-item{
+    text-align: center;
+    margin-top: 25px;
+}
+#services .service-item img{
+    width: 200px;
+    height: 200px;
+}
+#services .service-item p{
+    margin-top: 15px;
+    font-weight: 500;
+    color: rgba(54, 53, 96, 1);
+}
+
+/*benefits*/
+#benefits{
+    background-color: rgba(54, 53, 96, 1);
+    height: auto;
+}
+#benefits .app-photo img{
+    width: 690px;
+    margin-right:15px ;
+}
+#benefits .benefits-text{
+    margin-top: 30px;
+
+    margin-left: 100px;
+}
+#benefits .benefits-text h2 {
+    font-size: 40px;
+
+    text-align: right;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.7);
+}
+#benefits .benefits-text .benefit-item{
+    margin-bottom: 15px;
+
+
+}
+#benefits .benefits-text .benefit-item img{
+    margin-left: 15px;
+}
+#benefits .benefits-text .benefit-item p{
+    color: rgba(255, 255, 255, 0.6);
+    width: 60%;
+    text-align: right;
+    margin-top: 30px;
+}
+
+/*Recommend*/
+
+#recommend{
+    padding: 40px 0 ;
+    background-color: rgba(255, 213, 211, 1);
+}
+#recommend .text-recommend{
+    margin-top: 80px;
+    text-align: right;
+}
+#recommend .text-recommend h2{
+    color: rgba(54, 53, 96, 1);
+    margin-right: 10px;
+
+}
+#recommend .text-recommend p{
+    color: rgba(54, 53, 96, 1);
+    font-weight: 500;
+    margin-top: 20px;
+    margin-right: 10px;
+
+}
+#recommend .downloads-app{
+    justify-content: flex-end;
+}
+/* footer */
+#footer{
+    background-color: rgba(54, 53, 96, 1);
+    padding: 15px;
+}
+#footer .social-media{
+    margin-top: 15px;
+}
+#footer .social-media a {
+
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+#footer .social-media a img{
+    margin-left: 10px;
+}
+#footer p{
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 15px;
+}
+#footer i{
+    margin-left: 15px;
+}
+@media only screen and (max-width: 800px) {
+    body,html{
+        overflow-x:hidden ;
+    }
+
+    .mobile-img{
+        text-align: center;
+    }
+    .mobile-img img{
+        width: 50%;
+    }
+    .logo-1{
+        margin: 15px 0;
+    }
+    .logo-2{
+        margin-bottom: 15px;
+    }
+    #benefits  .app-photo{
+        text-align: center;
+    }
+    #benefits .app-photo img {
+        width: 300px;
+        margin-right: 15px;
+    }
+    #benefits .benefits-text {
+        margin-top: 30px;
+        margin-left: 0px;
+    }
+    #benefits .benefits-text h2 {
+        font-size: 28px;
+        text-align: center;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    #recommend .img-recommend{
+        text-align: center;
+    }
+    #recommend .img-recommend img{
+        width: 60%;
+    }
+    #recommend .downloads-app {
+        justify-content: center;
+    }
+    #recommend .downloads-app .google-play{
+        width: 110px;
+    }
+    #recommend .downloads-app .apple{
+        width: 120px;
+    }
+    #recommend .text-recommend {
+        margin-top: 30px;
+        text-align: center;
+    }
+     #footer{
+         text-align: center;
+     }
+     #footer .social-media{
+         justify-content: center;
+     }
+    #benefits .benefits-text .benefit-item img {
+        width: 24%;
+        margin-left: 15px;
+        height: 24%;
+        margin-top: 20px;
+    }
+}
+/*
+}*/
+
+@media only screen and (max-width: 480px){
+    html{
+        overflow-x: hidden;
+    }
+    .testimonials-text {
+        text-align: center;
+        margin-top: 14px;
+    }
+    .testimonials-text h2 {
+        font-size: 19px;
+        margin: 20px 0;
+        color: rgba(54, 53, 96, 1);
+    }
+    .testimonials-text p {
+        font-size: 16px;
+        color: rgba(54, 53, 96, 1);
+    }
+    #benefits .benefits-text .benefit-item img {
+        width: 24%;
+        margin-left: 15px;
+        height: 24%;
+        margin-top: 20px;
+    }
+
+}

@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Repositories\Eloquent;
+
+use Illuminate\Database\Eloquent\Model;
+use App\Contracts\Repositories\AddressRepositoryInterface;
+use App\Repositories\Eloquent\EloquentRepository;
+use App\Models\Address;
+
+/**
+ * Address repository
+ */
+class AddressRepository extends EloquentRepository implements AddressRepositoryInterface
+{
+	/**
+	 * Items per page for pagination
+	 * @var integer
+	 */
+	public $perPage = 10;
+
+	/**
+	 * Construct an instance of the repo
+	 * @param \App\Models\Address $model
+	 */
+	public function __construct(Address $model)
+	{
+		parent::__construct($model);
+	}
+}

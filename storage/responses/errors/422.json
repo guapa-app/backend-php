@@ -1,0 +1,1 @@
+{"message":"The given data was invalid.","errors":{"firstname":["The firstname field is required."],"email":["The email has already been taken."],"phone":["The phone has already been taken."]}}
