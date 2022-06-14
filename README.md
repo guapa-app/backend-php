@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ![Cosmo Laravel Backend](./public/landing/img/Logo-2.png)
 
 Backend Made by cooperation between [Nozom](https://nozom.io) and [AQuadic](https://aquadic.com)
