@@ -32,6 +32,7 @@ class WhatsappChannel
     public function sendMessage($phone, $message): bool
     {
         try {
+            if (config('app.debug')) info('Sending message to ' . $phone);
             $data = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . config('aqwhatsapp.api_token'),
