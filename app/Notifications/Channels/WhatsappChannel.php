@@ -20,7 +20,7 @@ class WhatsappChannel
         $message = $notification->toWhatsapp($notifiable);
 
         foreach ($message['phones'] as $phone) {
-            $this->sendMessage($phone, $message['message']);
+            $this->sendMessage($this->preparePhoneNumber($phone), $message['message']);
         }
     }
 
@@ -34,12 +34,11 @@ class WhatsappChannel
         try {
             $data = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer 3|CMgNF8eZYdUoKQ2dcb9FtBthImeXEPOZoKEC2sV4',
+                'Authorization' => 'Bearer ' . config('aqwhatsapp.api_token'),
             ])
                 ->timeout(5)
                 ->post("http://whatsapp.aq-apps.xyz/api/send-message", [
-                    'session_uuid' => '96852687-2f24-417b-afca-83d5771aabfc',
-                    'session_token' => '$2b$10$BXfKoLMQaSGKW8oZond5w.wA_iwABxeIWJeUooglwp3GEYUEMR412',
+                    'session_uuid' => config('aqwhatsapp.session_uuid'),
                     'phone' => $phone,
                     'message' => $message,
                     'schedule_at' => now(),
@@ -51,5 +50,14 @@ class WhatsappChannel
             unset($e);
             return false;
         }
+    }
+
+    private function preparePhoneNumber(string $phone): string
+    {
+        if ($phone[0] === '0') {
+            $phone = substr($phone, 1);
+        }
+
+        return '966' . $phone;
     }
 }
