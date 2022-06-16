@@ -35,6 +35,7 @@ class WhatsappChannel
             $data = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . config('aqwhatsapp.api_token'),
+                'Accept' => 'application/json',
             ])
                 ->timeout(5)
                 ->post("http://whatsapp.aq-apps.xyz/api/send-message", [
