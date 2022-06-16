@@ -5,6 +5,7 @@ namespace App\Notifications\Channels;
 use Exception;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class WhatsappChannel
 {
@@ -56,15 +57,15 @@ class WhatsappChannel
 
     private function preparePhoneNumber(string $phone): string
     {
-        if ($phone[0] === '+') {
+        if (Str::startsWith($phone, '+')) {
             $phone = substr($phone, 1);
         }
 
-        if ($phone[0] === '966') {
+        if (Str::startsWith($phone, '966')) {
             $phone = substr($phone, 3);
         }
 
-        if ($phone[0] === '0') {
+        if (Str::startsWith($phone, '0')) {
             $phone = substr($phone, 1);
         }
 
