@@ -206,14 +206,14 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function orders_order(): HasMany
     {
         return $this->hasMany(Order::class)->whereHas('items', function ($q) {
-            $q->where('items.appointment', null);
+            $q->where('appointment', null);
         });
     }
 
     public function orders_consultations(): HasMany
     {
         return $this->hasMany(Order::class)->whereHas('items', function ($q) {
-            $q->where('items.appointment', '!=', null);
+            $q->where('appointment', '!=', null);
         });
     }
 
