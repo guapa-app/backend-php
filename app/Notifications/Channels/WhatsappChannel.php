@@ -56,6 +56,14 @@ class WhatsappChannel
 
     private function preparePhoneNumber(string $phone): string
     {
+        if ($phone[0] === '+') {
+            $phone = substr($phone, 1);
+        }
+
+        if ($phone[0] === '966') {
+            $phone = substr($phone, 3);
+        }
+
         if ($phone[0] === '0') {
             $phone = substr($phone, 1);
         }
