@@ -70,7 +70,7 @@ class OrderNotification extends Notification
 
     public function getWhatsappMessage(): string
     {
-        $this->order->loadMissing('items.products');
+        $this->order->loadMissing('items.product');
 
         $message = "------------------------" .
             "فريق قوابا يشعركم بوجود طلب جديد ارجو التحقق من مركز الطلبات في التطبيق\n" .
