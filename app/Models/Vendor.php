@@ -203,6 +203,20 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(Order::class);
     }
 
+    public function orders_order(): HasMany
+    {
+        return $this->hasMany(Order::class)->whereHas('items', function ($q) {
+            $q->where('appointment_id', null);
+        });
+    }
+
+    public function orders_consultations(): HasMany
+    {
+        return $this->hasMany(Order::class)->whereHas('items', function ($q) {
+            $q->where('appointment_id', '!=', null);
+        });
+    }
+
     public function staff(): BelongsToMany
     {
     	return $this->belongsToMany(User::class)
@@ -337,7 +351,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function scopeWithSingleRelations(Builder $query): Builder
     {
     	$query->with('logo', 'staff', 'specialties', 'workDays', 'appointments');
-        $query->withCount('products', 'offers', 'services');
+        $query->withCount('products', 'offers', 'services', 'orders_order', 'orders_consultations');
         return $query;
     }
 }
