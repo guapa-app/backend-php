@@ -63,7 +63,7 @@ class OrderNotification extends Notification
     public function toWhatsapp($notifiable): array
     {
         return [
-            'message' => urlencode(config('app.name') . ": \n" . $this->getSummary()),
+            'message' => config('app.name') . ": \n" . $this->getSummary(),
             'phones' => [$notifiable->phone],
         ];
     }
