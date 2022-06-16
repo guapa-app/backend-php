@@ -63,9 +63,34 @@ class OrderNotification extends Notification
     public function toWhatsapp($notifiable): array
     {
         return [
-            'message' => config('app.name') . ": \n" . $this->getSummary(),
+            'message' => $this->getWhatsappMessage(),
             'phones' => [$notifiable->phone],
         ];
+    }
+
+    public function getWhatsappMessage(): string
+    {
+        $this->order->loadMissing('items.products');
+
+        $message = "------------------------" .
+            "فريق قوابا يشعركم بوجود طلب جديد ارجو التحقق من مركز الطلبات في التطبيق\n" .
+            "------------------------\n" .
+            "نوع الطلب: " . $this->orderType() . "\n" .
+            "الاسم: " . $this->user->name . "\n" .
+            "الرقم: " . $this->user->phone . "\n";
+
+        if ($this->orderType() == 'new-order') {
+            $message .= "------------------------\n" .
+                "المنتجات: \n";
+            foreach ($this->order->items as $item) {
+                $message .= $item->product->name . " - " . $item->quantity . "-" . $item->amount . "\n";
+            }
+        }
+
+        $message .= "------------------------\n" .
+            "قوابا";
+
+        return $message;
     }
 
     /**
