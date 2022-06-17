@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Notifications\Channels\WhatsappChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -43,7 +44,7 @@ class OrderUpdatedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database'];
+        return ['fcm', 'database', WhatsappChannel::class];
     }
 
     /**
@@ -57,6 +58,28 @@ class OrderUpdatedNotification extends Notification
             'summary' => $this->getSummary(),
             'type' => $this->orderType(),
         ];
+    }
+
+    public function toWhatsapp($notifiable): array
+    {
+        return [
+            'message' => $this->getWhatsappMessage(),
+            'phones' => [$notifiable->phone],
+        ];
+    }
+
+    public function getWhatsappMessage(): string
+    {
+        $this->order->loadMissing('vendor');
+
+        return "------------------------\n" .
+            "فريق قوابا يشعركم بوجود تحديث علي طلبكم ارجو التحقق من مركز الطلبات في التطبيق\n" .
+            "------------------------\n" .
+            "نوع الطلب: " . $this->orderType() . "\n" .
+            "رقم الطلب: " . $this->order->id . "\n" .
+            "التاجر: " . $this->order->vendor->name . "\n" .
+            "------------------------\n" .
+            "قوابا";
     }
 
     /**

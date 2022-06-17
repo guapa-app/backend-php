@@ -72,7 +72,7 @@ class OrderNotification extends Notification
     {
         $this->order->loadMissing('items.product');
 
-        $message = "------------------------" .
+        $message = "------------------------\n" .
             "فريق قوابا يشعركم بوجود طلب جديد ارجو التحقق من مركز الطلبات في التطبيق\n" .
             "------------------------\n" .
             "نوع الطلب: " . $this->orderType() . "\n" .
