@@ -31,7 +31,7 @@ deploy-dev-server:       # This job runs in the build & deploy to dev server
   - chmod 644 ~/.ssh/known_hosts
   
   script:
-  - ssh $SSH_USER@$DEV_VM_IPADDRESS "hostname && cd /var/www/guapa.com.sa/cosmo_laravel/ && git stash && git pull origin development && composer install --prefer-dist -q -o && php artisan migrate && vendor/bin/phpunit"
+  - ssh $SSH_USER@$DEV_VM_IPADDRESS "hostname && cd /var/www/guapa.com.sa/cosmo_laravel/ && git stash && git pull origin development && composer install --prefer-dist -q -o && php artisan migrate --force && vendor/bin/phpunit"
 
   after_script:
     - echo "Finished Successfully"
