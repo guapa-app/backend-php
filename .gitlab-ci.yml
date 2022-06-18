@@ -24,7 +24,7 @@ deploy-dev-server:       # This job runs in the build & deploy to dev server
   before_script:
   - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' 
   - eval $(ssh-agent -s)
-  - echo "$DEV_SERVER_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - echo "${DEV_SERVER_SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add -
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   - ssh-keyscan $DEV_VM_IPADDRESS >> ~/.ssh/known_hosts
