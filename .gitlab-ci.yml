@@ -16,19 +16,8 @@
 image: lorisleiva/laravel-docker:latest
 
 stages:
-  #  Testing Project Bunldes
-  - Test Project Files & Libs
   # Deploy afet validating to dev server
   - Deploying to Dev Server
-
-unit_test:
-  stage: Test Project Files & Libs
-  script:
-    - cp .env.example .env
-    - composer install
-    - php artisan key:generate
-    - php artisan migrate
-    - vendor/bin/phpunit
 
 deploy-dev-server:       # This job runs in the build & deploy to dev server
   stage: Deploying to Dev Server
