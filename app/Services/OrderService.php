@@ -156,7 +156,7 @@ class OrderService {
 				$q->select('product_id')->from('order_items')->where('order_id', $order->id);
 			})->pluck('vendor_id')->toArray();
 
-			if (!$user->hasAnyVendor($authorizedVendorIds)) {
+			if (!$user->hasAnyVendor(array_merge($authorizedVendorIds, [$order->vendor_id]))) {
 				$error = 'You are not authorized to ' . str_replace('ed', '', $status) . ' this order';
 			}
 		}
