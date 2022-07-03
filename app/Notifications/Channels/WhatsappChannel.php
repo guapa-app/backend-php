@@ -40,7 +40,7 @@ class WhatsappChannel
                 'Accept' => 'application/json',
             ])
                 ->timeout(5)
-                ->post("http://whatsapp.aq-apps.xyz/api/send-message", [
+                ->post("https://whatsapp.aq-apps.xyz/api/send-message", [
                     'session_uuid' => config('aqwhatsapp.session_uuid'),
                     'phone' => $phone,
                     'message' => $message,
