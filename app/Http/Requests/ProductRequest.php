@@ -38,10 +38,9 @@ class ProductRequest extends FormRequest
     {
         $inputs = parent::validationData();
 
-        $price = $inputs['price'];
-
-        if (!preg_match('[^0-9]', $price))
+        if (array_key_exists('price', $inputs) && !preg_match('[^0-9]', $inputs['price'])) {
             $inputs['price'] = (float)$this->ArtoEnNumeric($price);
+        }
 
         return $inputs;
     }
