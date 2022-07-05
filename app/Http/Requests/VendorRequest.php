@@ -54,6 +54,25 @@ class VendorRequest extends FormRequest
     }
 
     /**
+     * Handle data to be validated from the request.
+     * @return array
+     */
+    public function validationData(): array
+    {
+        $inputs = parent::validationData();
+
+        $siteKeys = ['twitter', 'instagram', 'snapchat', 'website_url', 'known_url']; // 'whatsapp',
+
+        foreach ($siteKeys as $key) {
+            if (array_key_exists($key, $inputs) && !empty($inputs[$key]) && !\Str::startsWith('http', $inputs[$key])) {
+                $inputs[$key] = 'https://' . $inputs[$key];
+            }
+        }
+
+        return $inputs;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
