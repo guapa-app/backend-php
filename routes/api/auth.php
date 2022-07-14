@@ -13,4 +13,5 @@ Route::post('verify-otp', 'AuthController@verifySinchOtp')->name('auth.verify-ot
 Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('logout', 'AuthController@logout')->name('auth.logout');
     Route::get('user', 'AuthController@user');
+    Route::delete('delete', 'AuthController@deleteAccount')->name('auth.delete');
 });

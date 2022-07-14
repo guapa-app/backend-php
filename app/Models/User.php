@@ -63,6 +63,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable
         'phone_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     /**
