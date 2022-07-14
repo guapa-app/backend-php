@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Order;
+use App\Models\UserVendor;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
@@ -26,7 +28,7 @@ class UserService
 
 	/**
 	 * Create new user with relations
-	 * 
+	 *
 	 * @param  array  $data
 	 * @return \App\Models\User
 	 */
@@ -113,6 +115,21 @@ class UserService
 
 		return $user;
 	}
+
+    public function deleteAccount($id)
+    {
+        $vendors = UserVendor::query()->where('user_id', $id)->pluck('vendor_id');
+
+        $hasOrders = Order::query()->whereIn('vendor_id', $vendors)
+            ->where('status', 'Accepted')
+            ->exists();
+
+        if ($hasOrders) abort(403, __('api.vendor_has_active_orders'));
+
+        UserVendor::query()->where('user_id', $id)->delete();
+
+        $this->userRepository->getOne($id)->update(['deleted_at' => now()]);
+    }
 
 	public function updatePhoto(UserProfile $profile, array $data): UserProfile
 	{

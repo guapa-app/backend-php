@@ -151,6 +151,14 @@ class AuthController extends BaseApiController
             ], 401);
         }
 
+        if ($user->deleted_at != null) {
+            // User is trying to login with account deleted.
+            return response()->json([
+                'message' => __('api.account_deleted'),
+                'deleted_at' => $user->deleted_at,
+            ], 401);
+        }
+
         $user->loadProfileFields();
         $user->append('user_vendors_ids');
 
@@ -297,6 +305,22 @@ class AuthController extends BaseApiController
         }
 
         return response()->json($responseBody);
+    }
+
+    /**
+     * Delete Account
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteAccount(Request $request)
+    {
+        $this->userService->deleteAccount($this->user->getKey());
+        $this->logout($request);
+
+        return response()->json([
+            'message' => __('api.account_deleted'),
+        ]);
     }
 
     /**

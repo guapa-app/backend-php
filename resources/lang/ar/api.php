@@ -17,4 +17,6 @@ return [
     'address_required' => 'العنوان اجباري لحجز منتج',
     'appointment_required' => 'يجب اختيار حجز و ميعاد حجز لحجز اجراء',
     'appointment_reserved' => 'هذا الميعاد محجوز مسبقا',
+    'vendor_has_active_orders' => 'البائع لديه طلبات نشطة',
+    'account_deleted' => 'تم مسح هذا الحساب',
 ];

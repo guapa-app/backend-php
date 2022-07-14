@@ -17,4 +17,6 @@ return [
     'address_required' => 'Address is required to order a product',
     'appointment_required' => 'Please provide appointment id and date to book a procedure',
     'appointment_reserved' => 'This appointment is already reserved',
+    'vendor_has_active_orders' => 'Vendor has active orders',
+    'account_deleted' => 'This account is deleted.',
 ];
