@@ -121,7 +121,7 @@ class UserService
         $vendors = UserVendor::query()->where('user_id', $id)->pluck('vendor_id');
 
         $hasOrders = Order::query()->whereIn('vendor_id', $vendors)
-            ->where('status', 'Accepted')
+            ->where('status', 'Pending')
             ->exists();
 
         if ($hasOrders) abort(403, __('api.vendor_has_active_orders'));
