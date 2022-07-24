@@ -28,7 +28,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable
      */
     public const STATUS_ACTIVE = 'Active';
     public const STATUS_CLOSED = 'Closed';
-    public const STATUS_DELETED = 'Deleted';
+    public const STATUS_DELETED = 'Delete';
 
     /**
      * The attributes that are mass assignable.
