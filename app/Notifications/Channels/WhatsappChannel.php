@@ -21,7 +21,9 @@ class WhatsappChannel
         $message = $notification->toWhatsapp($notifiable);
 
         foreach ($message['phones'] as $phone) {
-            $this->sendMessage($this->preparePhoneNumber($phone), $message['message']);
+            if (filled($phone)) {
+                $this->sendMessage($this->preparePhoneNumber($phone), $message['message']);
+            }
         }
     }
 
