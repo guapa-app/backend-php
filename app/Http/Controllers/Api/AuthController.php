@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
@@ -151,11 +152,10 @@ class AuthController extends BaseApiController
             ], 401);
         }
 
-        if ($user->deleted_at != null) {
+        if ($user->status == User::STATUS_DELETED) {
             // User is trying to login with account deleted.
             return response()->json([
                 'message' => __('api.account_deleted'),
-                'deleted_at' => $user->deleted_at,
             ], 401);
         }
 
@@ -181,6 +181,14 @@ class AuthController extends BaseApiController
     public function user()
     {
         $this->user->loadProfileFields();
+
+        if ($this->user->status == User::STATUS_DELETED) {
+            // User is trying to login with account deleted.
+            return response()->json([
+                'message' => __('api.account_deleted'),
+            ], 401);
+        }
+
         $this->user->append('user_vendors_ids');
         return response()->json($this->user);
     }

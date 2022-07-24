@@ -28,6 +28,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable
      */
     public const STATUS_ACTIVE = 'Active';
     public const STATUS_CLOSED = 'Closed';
+    public const STATUS_DELETED = 'Deleted';
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +64,6 @@ class User extends Authenticatable implements Listable, FcmNotifiable
         'phone_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     /**

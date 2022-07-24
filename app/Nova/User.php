@@ -50,7 +50,7 @@ class User extends Resource
 
     public static function indexQuery(NovaRequest $request, $query): Builder
     {
-        $query->with(['profile'])->withoutGlobalScope(SoftDeletes::class);
+        $query->with(['profile']);
         return parent::indexQuery($request, $query);
     }
 
