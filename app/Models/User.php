@@ -11,7 +11,6 @@ use Hamedov\Favorites\HasFavorites;
 use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -22,7 +21,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable
 {
     use HasFactory, Notifiable, HasApiTokens, HasRoles,
         ListableTrait, HasFavorites, FcmNotifiableTrait,
-        Messageable, SoftDeletes;
+        Messageable;
 
     /**
      * User account statuses

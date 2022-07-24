@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
@@ -49,7 +50,7 @@ class User extends Resource
 
     public static function indexQuery(NovaRequest $request, $query): Builder
     {
-        $query->with(['profile'])->withTrashed();
+        $query->with(['profile'])->withoutGlobalScope(SoftDeletes::class);
         return parent::indexQuery($request, $query);
     }
 
