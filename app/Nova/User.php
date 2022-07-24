@@ -118,7 +118,7 @@ class User extends Resource
 
             Select::make(__('status'), 'status')
                 ->options([
-                    \App\Models\User::STATUS_ACTIVE => '✔ active',
+                    \App\Models\User::STATUS_ACTIVE => '✔️active',
                     \App\Models\User::STATUS_CLOSED => '❌ disabled',
                     \App\Models\User::STATUS_DELETED => '🗑️ deleted',
                 ])
