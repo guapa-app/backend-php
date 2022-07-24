@@ -128,7 +128,9 @@ class UserService
 
         UserVendor::query()->where('user_id', $id)->delete();
 
-        $this->userRepository->getOne($id)->update(['deleted_at' => now()]);
+        $user = $this->userRepository->getOne($id);
+        $user->forceFill(['deleted_at' => now()]);
+        $user->save();
     }
 
 	public function updatePhoto(UserProfile $profile, array $data): UserProfile
