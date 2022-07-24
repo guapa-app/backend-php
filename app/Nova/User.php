@@ -49,7 +49,7 @@ class User extends Resource
 
     public static function indexQuery(NovaRequest $request, $query): Builder
     {
-        $query->with(['profile']);
+        $query->with(['profile'])->withTrashed();
         return parent::indexQuery($request, $query);
     }
 
