@@ -6,6 +6,7 @@
 .env
 .env.backup
 .phpunit.result.cache
+auth.json
 Homestead.json
 Homestead.yaml
 npm-debug.log
@@ -13,3 +14,9 @@ yarn-error.log
 storage/media-library/
 public/js/admin.js
 public/js/app.js
+/public/build
+.env.production
+/.fleet
+/.idea
+/.vscode
+TODO.md
