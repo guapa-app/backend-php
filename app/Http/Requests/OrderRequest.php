@@ -60,14 +60,20 @@ class OrderRequest extends FormRequest
             return;
         }
 
-        $validator->after(function($validator) {
+        $validator->after(function ($validator) {
             $inputProducts = $this->get('products');
-            $productIds = array_map(function($product) {
+            $productIds = array_map(function ($product) {
                 return $product['id'];
             }, $inputProducts);
 
             // Products require address_id and Services require appointment_date
-            $productsCount = Product::whereIn('id', $productIds)->where('type', 'product')->count();
+            $productQuery = Product::query()->whereIn('id', $productIds)->where('type', 'product');
+
+            $productsCount = $productQuery->count();
+
+            if (count(array_unique($productQuery->pluck('vendor_id')->toArray())) > 1) {
+                $validator->errors()->add('order', __('api.multi_vendors'));
+            }
 
             if ($productsCount > 0 && $this->get('address_id') == null) {
                 $validator->errors()->add('address_id', __('api.address_required'));

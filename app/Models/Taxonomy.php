@@ -14,6 +14,9 @@ class Taxonomy extends BaseTaxonomy implements Listable
 {
 	use ListableTrait, HasRecursiveRelationships;
 
+    protected $fillable = [
+      'fees'
+    ];
 	/**
      * Attributes that can be filtered directly
      * using values from client without any logic
@@ -82,7 +85,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
         if ($request->has('tree')) {
             $query->tree();
         }
-        
+
         return $query;
     }
 

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Http\Requests\CreateResourceRequest;
+use Laravel\Nova\Http\Requests\UpdateResourceRequest;
 
 class Setting extends Resource
 {
@@ -44,11 +46,10 @@ class Setting extends Resource
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
-
-            Text::make('setting_key')->required(),
-            Text::make('setting_value')->required(),
-            Text::make('setting_unit')->required(),
-            Text::make('instructions')->required(),
+            Text::make('key', 'setting_key')->required()->readonly(!is_null($request->resourceId)),
+            Text::make('value', 'setting_value')->required(),
+//            Text::make('unit', 'setting_unit')->required(),
+            Text::make('instructions', 'instructions')->required(),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),

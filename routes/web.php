@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/.well-known/apple-developer-merchantid-domain-association', function () {
+    return view('apple_pay');
+});
+
 Route::get('/', function () {
     return view('landing');
 })->name('landing');

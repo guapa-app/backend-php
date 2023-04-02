@@ -63,10 +63,10 @@ class AuthService {
 		// Check if there are any admin accounts
 		// If not create the default account
 		$admin = $this->adminRepository->getFirst();
-        
+
         $email = config('cosmo.admin_email');
         $password = config('cosmo.admin_password');
-        
+
         if ( ! $admin && isset($email, $password)) {
         	// Create the first admin account
             $admin = $this->adminRepository->create([

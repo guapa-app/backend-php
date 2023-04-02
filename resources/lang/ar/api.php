@@ -19,4 +19,6 @@ return [
     'appointment_reserved' => 'هذا الميعاد محجوز مسبقا',
     'vendor_has_active_orders' => 'البائع لديه طلبات نشطة',
     'account_deleted' => 'تم مسح هذا الحساب',
+    'multi_vendors' => 'لا يمكنك الشراء من اكثر من بائع',
+    'order_status' => 'لا يمكنك إتخاذ هذا الإجراء',
 ];

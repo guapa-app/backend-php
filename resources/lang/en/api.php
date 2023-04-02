@@ -19,4 +19,6 @@ return [
     'appointment_reserved' => 'This appointment is already reserved',
     'vendor_has_active_orders' => 'Vendor has active orders',
     'account_deleted' => 'This account is deleted.',
+    'multi_vendors' => 'You cannot make order from multiple sellers',
+    'order_status' => "You can't do this action",
 ];

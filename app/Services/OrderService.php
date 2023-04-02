@@ -4,13 +4,15 @@ namespace App\Services;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Models\Appointment;
-use App\Models\Offer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\UserVendor;
 use App\Notifications\OrderNotification;
 use App\Notifications\OrderUpdatedNotification;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
@@ -19,96 +21,129 @@ use Illuminate\Support\Facades\Notification;
 class OrderService {
 
 	private $repository;
+	private $payment_service;
 
-	public function __construct(OrderRepositoryInterface $repository)
+    private $product_fees;
+
+    private $taxes_percentage;
+
+    public function __construct(OrderRepositoryInterface $repository, PaymentService $payment_service)
 	{
 		$this->repository = $repository;
+		$this->payment_service = $payment_service;
+        $this->product_fees = Setting::getProductFees();
+        $this->taxes_percentage = Setting::getTaxes();
+        $this->fees = 0;
+        $this->taxes = 0;
 	}
 
-	public function create(array $data): Collection
-	{
-		$productIds = array_map(function($product) {
-            return $product['id'];
-        }, $data['products']);
+    public function create(array $data): Collection
+    {
+        return DB::transaction(function () use ($data) {
 
-        $products = Product::whereIn('id', $productIds)->get();
+            $productIds = array_map(function ($product) {
+                return $product['id'];
+            }, $data['products']);
 
-        // Group products by vendor to create an order for each vendor
-        $keyedProducts = [];
-        foreach ($products as $k => $product) {
-        	$keyedProducts[$product->vendor_id][] = $product;
-        }
+            $products = Product::whereIn('id', $productIds)->get();
 
-        $orders = new Collection;
-        $now = now();
+            $products_titles = $products->implode('title', ' - ');
 
-        foreach ($keyedProducts as $vendorId => $vendorProducts) {
-        	$data['vendor_id'] = $vendorId;
-        	$data['total'] = array_sum(array_map(function($product) use ($data) {
-	        	$inputItem = Arr::first($data['products'], function($value, $key) use ($product) {
-	        		return (int)($value['id']) === $product->id;
-	        	});
+            // Group products by vendor to create an order for each vendor
+            $keyedProducts = [];
+            foreach ($products as $k => $product) {
+                $keyedProducts[$product->vendor_id][] = $product;
+            }
 
-                if($product->offer != null) {
-                    $product['price'] -= ($product['price'] * ($product->offer->discount / 100));
-                    $product['price'] = round($product['price'], 2);
+            $orders = new Collection;
+            $now = now();
+
+            foreach ($keyedProducts as $vendorId => $vendorProducts) {
+                $data['vendor_id'] = $vendorId;
+                $data['total'] = array_sum(array_map(function ($product) use ($data) {
+                    $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
+                        return (int)($value['id']) === $product->id;
+                    });
+
+                    if ($product->offer != null) {
+                        $product['price'] -= ($product['price'] * ($product->offer->discount / 100));
+                        $product['price'] = round($product['price'], 2);
+                    }
+
+                    $final_price = $inputItem['quantity'] * $product['price'];
+
+                    if ($product->type = 'service') {
+                        $product_fees = optional($product->categories()->first())->fees;
+
+                        $this->fees += ($product_fees / 100) * $final_price;
+                    }else{
+                        $this->fees += ($this->product_fees / 100) * $final_price;
+                    }
+
+                    return $final_price;
+                }, $vendorProducts));
+
+                $order = $this->repository->create($data);
+
+                $items = array_map(function ($product) use ($data, $order, $now, $vendorId) {
+                    $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
+                        return (int)($value['id']) === $product->id;
+                    });
+
+                    if (isset($inputItem['appointment'])) {
+                        $appointment = Appointment::find($inputItem['appointment']['id']);
+
+                        if ($appointment->vendor_id != $vendorId) {
+                            $order->delete();
+                            abort(400, 'Invalid appointment selected');
+                        }
+
+                        $inputItem['appointment']['from_time'] = $appointment->from_time;
+                        $inputItem['appointment']['to_time'] = $appointment->to_time;
+                    }
+
+                    return [
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'offer_id' => optional($product->offer)->id,
+                        'amount' => $product->price,
+                        'quantity' => $inputItem['quantity'],
+                        'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
+                        'user_id' => $inputItem['staff_user_id'] ?? null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }, $vendorProducts);
+
+                // Check that provided user ids belong to vendor
+                $userIds = array_filter(array_map(function ($item) {
+                    return $item['user_id'];
+                }, $items));
+
+                if (!$this->checkVendorUsers($vendorId, $userIds)) {
+                    abort(400, 'Invalid staff provided for vendor');
                 }
 
-	        	return $inputItem['quantity'] * $product['price'];
-	        }, $vendorProducts));
+                OrderItem::insert($items);
 
-	        $order = $this->repository->create($data);
+                $order->load('items', 'address', 'user', 'vendor');
 
-	        $items = array_map(function($product) use ($data, $order, $now, $vendorId) {
-	        	$inputItem = Arr::first($data['products'], function($value, $key) use ($product) {
-	        		return (int)($value['id']) === $product->id;
-	        	});
+                Notification::send($order->vendor->staff, new OrderNotification($order));
 
-	        	if (isset($inputItem['appointment'])) {
-	        		$appointment = Appointment::find($inputItem['appointment']['id']);
+                $orders->push($order);
+            }
 
-	        		if ($appointment->vendor_id != $vendorId) {
-	        			$order->delete();
-	        			abort(400, 'Invalid appointment selected');
-	        		}
+            $this->taxes = ($this->taxes_percentage / 100) * $this->fees;
 
-	        		$inputItem['appointment']['from_time'] = $appointment->from_time;
-	        		$inputItem['appointment']['to_time'] = $appointment->to_time;
-	        	}
+            # it 'll be one order at all for one vendor
+            $invoice = $this->payment_service->generateInvoice($orders, $products_titles, $this->fees, $this->taxes);
 
-	        	return [
-					'order_id' => $order->id,
-					'product_id' => $product->id,
-					'offer_id' => optional($product->offer)->id,
-					'amount' => $product->price,
-					'quantity' => $inputItem['quantity'],
-					'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
-					'user_id' => $inputItem['staff_user_id'] ?? null,
-					'created_at' => $now,
-					'updated_at' => $now,
-				];
-	        }, $vendorProducts);
+            # return invoice url with order response
+            $orders->first()["invoice_url"] = $invoice->url;
 
-	        // Check that provided user ids belong to vendor
-	        $userIds = array_filter(array_map(function($item) {
-	        	return $item['user_id'];
-	        }, $items));
-
-	        if (!$this->checkVendorUsers($vendorId, $userIds)) {
-	        	abort(400, 'Invalid staff provided for vendor');
-	        }
-
-	        OrderItem::insert($items);
-
-	        $order->load('items', 'address', 'user', 'vendor');
-
-	        Notification::send($order->vendor->staff, new OrderNotification($order));
-
-	        $orders->push($order);
-        }
-
-        return $orders;
-	}
+            return $orders;
+        });
+    }
 
 	public function checkVendorUsers(int $vendorId, array $userIds): bool
     {
@@ -120,7 +155,8 @@ class OrderService {
 	{
 		$order = $this->repository->getOneOrFail($id);
 		$this->validateStatus($order, $data['status']);
-		$order = $this->repository->update($order, $data);
+        $order = $this->repository->update($order, $data);
+        if ($data['status'] == 'Canceled') $this->payment_service->refund($order);
         Notification::send($order->user, new OrderUpdatedNotification($order));
         return $order;
 	}
@@ -140,21 +176,22 @@ class OrderService {
 	{
 		$user = app('cosmo')->user();
 
-		if ($user->isAdmin()) {
-			return;
-		}
+		if ($user->isAdmin()) return;
 
-		if ($order->status !== 'Pending') {
-			$error = 'This order has been ' . $order->status;
+		if ($order->status !== 'Pending' && $user->id !== $order->user_id) {
+			$error = 'Sorry this order has been ' . $order->status;
 		} elseif ($order->status === $status) {
 			$error = 'The order is already ' . $status;
-		} elseif ($status === 'Canceled' && $order->user_id !== $user->id) {
-			$error = 'You are not authorized to cancel this order';
-		} elseif (in_array($status, ['Accepted', 'Rejected'])) {
+		} elseif ($status === 'Canceled') {
+            if ($order->user_id !== $user->id)
+                $error = 'You are not authorized to cancel this order';
+            if ($order->user_id === $user->id && $order->created_at->addDays(7)->toDateString() < Carbon::today()->toDateString())
+                $error = "You can't cancel order after 7 days";
+        } elseif (in_array($status, ['Accepted', 'Rejected'])) {
 			// This should be an employee of a vendor authorized to accept or reject the order.
-			$authorizedVendorIds = Product::select('vendor_id')->whereIn('id', function($q) use ($order) {
-				$q->select('product_id')->from('order_items')->where('order_id', $order->id);
-			})->pluck('vendor_id')->toArray();
+			$authorizedVendorIds = Product::select('vendor_id')->whereIn('id', function ($q) use ($order) {
+                $q->select('product_id')->from('order_items')->where('order_id', $order->id);
+            })->pluck('vendor_id')->toArray();
 
 			if (!$user->hasAnyVendor(array_merge($authorizedVendorIds, [$order->vendor_id]))) {
 				$error = 'You are not authorized to ' . str_replace('ed', '', $status) . ' this order';

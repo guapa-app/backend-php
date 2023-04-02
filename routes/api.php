@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,6 +46,7 @@ Route::prefix(config('cosmo.api_version'))->group(function () {
     Route::post('devices', 'DeviceController@addDevice')->middleware('auth:api');
     Route::get('pages', 'BaseApiController@pages');
     Route::get('data', 'BaseApiController@data');
+    Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
     // Route::post('email/resend', '\App\Http\Controllers\Auth\VerificationController@resend')
     //     ->name('verification.resend');
 });

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
@@ -58,6 +59,8 @@ class Category extends Resource
                     ->sortable()
                     ->rules('required'),
             ]),
+
+            Number::make(__('fees'), 'fees')->step(0.5)->required()->placeholder('10 %'),
 
             Images::make(__('icon'), config('taxonomies.icon_collection_name', 'taxonomy_icons'))
                 ->temporary(now()->addMinutes(5))

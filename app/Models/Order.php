@@ -15,7 +15,7 @@ class Order extends Model implements Listable
 
     protected $fillable = [
     	'user_id', 'vendor_id', 'address_id', 'total', 'status',
-    	'note', 'name', 'phone',
+    	'note', 'name', 'phone', 'is_used', 'invoice_url'
     ];
 
     /**
@@ -36,6 +36,15 @@ class Order extends Model implements Listable
     ];
 
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            $order->is_used = false;
+        });
+    }
+
     public function user()
     {
     	return $this->belongsTo(User::class);
@@ -54,6 +63,11 @@ class Order extends Model implements Listable
     public function items()
     {
     	return $this->hasMany(OrderItem::class);
+    }
+
+    public function invoice()
+    {
+    	return $this->hasOne(Invoice::class);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
