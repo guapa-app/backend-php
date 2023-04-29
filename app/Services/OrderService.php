@@ -22,10 +22,9 @@ class OrderService {
 
 	private $repository;
 	private $payment_service;
-
     private $product_fees;
-
     private $taxes_percentage;
+    private $is_service = false;
 
     public function __construct(OrderRepositoryInterface $repository, PaymentService $payment_service)
 	{
@@ -72,7 +71,9 @@ class OrderService {
 
                     $final_price = $inputItem['quantity'] * $product['price'];
 
-                    if ($product->type = 'service') {
+                    if ($product->type == 'service') {
+                        $this->is_service = true;
+
                         $product_fees = optional($product->categories()->first())->fees;
 
                         $this->fees += ($product_fees / 100) * $final_price;
@@ -133,13 +134,15 @@ class OrderService {
                 $orders->push($order);
             }
 
-            $this->taxes = ($this->taxes_percentage / 100) * $this->fees;
+            if ($this->is_service) {
+                $this->taxes = ($this->taxes_percentage / 100) * $this->fees;
 
-            # it 'll be one order at all for one vendor
-            $invoice = $this->payment_service->generateInvoice($orders, $products_titles, $this->fees, $this->taxes);
+                # it 'll be one order at all for one vendor
+                $invoice = $this->payment_service->generateInvoice($orders, $products_titles, $this->fees, $this->taxes);
 
-            # return invoice url with order response
-            $orders->first()["invoice_url"] = $invoice->url;
+                # return invoice url with order response
+                $orders->first()["invoice_url"] = $invoice->url;
+            }
 
             return $orders;
         });
@@ -156,7 +159,7 @@ class OrderService {
 		$order = $this->repository->getOneOrFail($id);
 		$this->validateStatus($order, $data['status']);
         $order = $this->repository->update($order, $data);
-        if ($data['status'] == 'Canceled') $this->payment_service->refund($order);
+        if ($data['status'] == 'Canceled' && ($order->invoice != null)) $this->payment_service->refund($order);
         Notification::send($order->user, new OrderUpdatedNotification($order));
         return $order;
 	}

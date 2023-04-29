@@ -278,7 +278,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'image', 'offer', 'offer.image');
+        $query->with('vendor', 'vendor.logo', 'image', 'offer', 'offer.image');
         return $query;
     }
 

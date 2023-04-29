@@ -67,15 +67,23 @@ class OrderRequest extends FormRequest
             }, $inputProducts);
 
             // Products require address_id and Services require appointment_date
-            $productQuery = Product::query()->whereIn('id', $productIds)->where('type', 'product');
+            $productQuery = Product::query()->whereIn('id', $productIds);
 
-            $productsCount = $productQuery->count();
+            $types = $productQuery->pluck('type')->toArray();
+            $is_service = in_array("service", $types);
+            $is_product = in_array("product", $types);
 
-            if (count(array_unique($productQuery->pluck('vendor_id')->toArray())) > 1) {
+            // can't request service and product at same time
+            if ($is_service && $is_product) {
+                $validator->errors()->add('order', __('api.multi_items_type'));
+            }
+
+            // if in requested items is service and services from multi vendors
+            if ((count(array_unique($productQuery->pluck('vendor_id')->toArray())) > 1) && $is_service) {
                 $validator->errors()->add('order', __('api.multi_vendors'));
             }
 
-            if ($productsCount > 0 && $this->get('address_id') == null) {
+            if ($productQuery->where('type', 'product')->count() > 0 && $this->get('address_id') == null) {
                 $validator->errors()->add('address_id', __('api.address_required'));
             }
 

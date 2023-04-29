@@ -28,8 +28,6 @@ class PDFService
 
     function deletePDF($url)
     {
-        Storage::disk('s3')->delete($$url);
-
-        return config('filesystems.disks.s3.url') . "{$filename}";
+        return Storage::disk('s3')->delete($url);
     }
 }

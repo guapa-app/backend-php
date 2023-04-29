@@ -21,4 +21,5 @@ return [
     'account_deleted' => 'This account is deleted.',
     'multi_vendors' => 'You cannot make order from multiple sellers',
     'order_status' => "You can't do this action",
+    'multi_items_type' => "can't request service and product at the same time",
 ];
