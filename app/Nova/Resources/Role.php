@@ -1,30 +1,28 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\Boolean;
-use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
-use Spatie\NovaTranslatable\Translatable;
 
-class Page extends Resource
+class Role extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Page::class;
+    public static $model = \Spatie\Permission\Models\Role::class;
+    public static $displayInNavigation = false;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'id';
+    public static $title = 'name';
 
     /**
      * The columns that should be searched.
@@ -32,7 +30,7 @@ class Page extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'name',
     ];
 
     /**
@@ -46,15 +44,11 @@ class Page extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Translatable::make([
-                Text::make(__('title'), 'title')->required(),
-                Textarea::make(__('content'), 'content')->required(),
-            ]),
+            Text::make(__('guard name'), 'guard_name')->default(config('auth.defaults.guard')),
 
-            Boolean::make(__('published'), 'published')->default(false),
+            Text::make(__('name'), 'name'),
 
-            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+            BelongsToMany::make(__('users'), 'users', User::class),
         ];
     }
 

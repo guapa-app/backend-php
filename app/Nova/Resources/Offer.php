@@ -1,27 +1,24 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
-use Inspheric\Fields\Url;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
-use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Post extends Resource
+class Offer extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Post::class;
+    public static $model = \App\Models\Offer::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -37,14 +34,7 @@ class Post extends Resource
      */
     public static $search = [
         'id',
-        'title',
-        'content',
     ];
-
-    public static function relatableTaxonomies(NovaRequest $request, $query)
-    {
-        return $query->where('type', 'blog_category');
-    }
 
     /**
      * Get the fields displayed by the resource.
@@ -57,39 +47,23 @@ class Post extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            // TODO: Should this be hidden?
-            BelongsTo::make(__('admin'), 'admin', Admin::class)->showCreateRelationButton(),
-
-            BelongsTo::make(__('category'), 'category', Category::class)->showCreateRelationButton(),
-
-
-            Text::make(__('title'), 'title')
-                ->required()
-                ->sortable()
-                ->rules('required', 'max:191'),
-
-            Textarea::make(__('content'), 'content')
-                ->required()
-                ->sortable()
-                ->rules('required'),
-
-            Select::make(__('status'), 'status')
-                ->default(2)
-                ->options(\App\Models\Post::STATUSES)
-                ->displayUsingLabels()
-                ->required(),
-
-            Url::make(__('youtube url'), 'youtube_url')->showOnIndex(false),
-
-            Images::make(__('images'), 'posts') // second parameter is the media collection name
+            Images::make(__('image'), 'offer_images') // second parameter is the media collection name
             ->temporary(now()->addMinutes(5))
+                ->conversionOnIndexView('small') // conversion used to display the image
                 ->rules('required'), // validation rules
 
-            HasMany::make(__('comments'), 'comments'),
+            BelongsTo::make(__('product'), 'product', Product::class)->showCreateRelationButton(),
 
-            DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
+            Text::make(__('title'), 'title')->required(),
+            Textarea::make(__('description'), 'description')->required(),
 
+            Number::make(__('discount'), 'discount')->step(0.01)->required(),
+
+            DateTime::make(__('starts at'), 'starts_at')->required(),
+            DateTime::make(__('expires at'), 'expires_at')->required(),
+
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
     }
 

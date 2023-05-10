@@ -1,23 +1,21 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\MorphTo;
-use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Textarea;
 
-class Review extends Resource
+class History extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Review::class;
+    public static $model = \App\Models\History::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -33,6 +31,7 @@ class Review extends Resource
      */
     public static $search = [
         'id',
+        'details',
     ];
 
     /**
@@ -48,20 +47,13 @@ class Review extends Resource
 
             BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
 
-            MorphTo::make(__('reviewable'), 'reviewable')->types([
-                Vendor::class,
-                Product::class,
-            ]),
+            Textarea::make(__('details'), 'details')
+                ->nullable(),
 
-            Number::make(__('stars'), 'stars')
-                ->step(1)
-                ->required()
-                ->min(0)->max(5),
+            DateTime::make(__('record date'), 'record_date'),
 
-            Textarea::make(__('comment'), 'comment')->required(),
-
-            DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
     }
 

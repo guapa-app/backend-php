@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
-use App\Traits\NovaReadOnly;
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\MorphTo;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 
-class Device extends Resource
+class OrderItem extends Resource
 {
-    use NovaReadOnly;
-
+    use NovaVendorAccess;
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Device::class;
+    public static $model = \App\Models\OrderItem::class;
     public static $displayInNavigation = false;
 
     /**
@@ -38,6 +38,11 @@ class Device extends Resource
         'id',
     ];
 
+    public static function authorizedToCreate(Request $request): bool
+    {
+        return false;
+    }
+
     /**
      * Get the fields displayed by the resource.
      *
@@ -46,22 +51,33 @@ class Device extends Resource
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-            MorphTo::make(__('user'), 'user')->types([
-                User::class,
-            ]),
+            BelongsTo::make(__('order'), 'order', Order::class)->showCreateRelationButton(),
 
-            Text::make(__('guid'), 'guid'),
+            BelongsTo::make(__('product'), 'product', Product::class)->showCreateRelationButton(),
 
-            Textarea::make(__('fcmtoken'), 'fcmtoken'),
+            BelongsTo::make(__('offer'), 'offer', Offer::class)->showCreateRelationButton(),
 
-            Text::make(__('type'), 'type'),
+            Number::make(__('amount'), 'amount')->step(0.001),
 
-            DateTime::make(__('Created at'), 'created_at')->exceptOnForms()->readonly(),
-            DateTime::make(__('Updated at'), 'updated_at')->exceptOnForms()->readonly(),
+            Number::make(__('quantity'), 'quantity')->step(1),
+
+            Text::make(__('appointment'), 'appointment'),
+
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            if (Auth::user()->id != $this->resource->id) {
+                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**
@@ -106,5 +122,15 @@ class Device extends Resource
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public function authorizedToUpdate(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
     }
 }

@@ -1,23 +1,28 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
 
-class OrderItem extends Resource
+class Invoice extends Resource
 {
+    use NovaVendorAccess;
+
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\OrderItem::class;
-    public static $displayInNavigation = false;
+    public static $model = \App\Models\Invoice::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -33,45 +38,58 @@ class OrderItem extends Resource
      */
     public static $search = [
         'id',
+        'invoice_id',
     ];
-
-    public static function authorizedToCreate(Request $request): bool
-    {
-        return false;
-    }
 
     /**
      * Get the fields displayed by the resource.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('order'), 'order', Order::class)->showCreateRelationButton(),
+            BelongsTo::make(__('order'), 'order', Order::class),
 
-            BelongsTo::make(__('product'), 'product', Product::class)->showCreateRelationButton(),
+            Text::make(__('invoice id'), 'invoice_id')->required(),
+            Text::make(__('url'), 'url')->nullable(),
+            Textarea::make(__('description'), 'description')->required(),
+            Number::make(__('amount'), 'amount')->step(0.01)->required(),
+            Text::make(__('currency'), 'currency')->required(),
 
-            BelongsTo::make(__('offer'), 'offer', Offer::class)->showCreateRelationButton(),
-
-            Number::make(__('amount'), 'amount')->step(0.001),
-
-            Number::make(__('quantity'), 'quantity')->step(1),
-
-            Text::make(__('appointment'), 'appointment'),
+            Select::make(__('status'), 'status')
+                ->options([
+                    'Paid' => 'Paid',
+                    'Pending' => 'Pending',
+                    'Refunded' => 'Refunded',
+                    'Initial' => 'Initial',
+                ])
+                ->default('Initial')
+                ->displayUsingLabels()
+                ->required(),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+
         ];
+
+        if (Auth::user()->isVendor()) {
+            if (Auth::user()->id != $this->resource->id) {
+                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**
      * Get the cards available for the request.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function cards(Request $request)
@@ -82,7 +100,7 @@ class OrderItem extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function filters(Request $request)
@@ -93,7 +111,7 @@ class OrderItem extends Resource
     /**
      * Get the lenses available for the resource.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function lenses(Request $request)
@@ -104,12 +122,17 @@ class OrderItem extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public static function authorizedToCreate(Request $request): bool
+    {
+        return false;
     }
 
     public function authorizedToUpdate(Request $request): bool

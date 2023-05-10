@@ -10,12 +10,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends Authenticatable implements Listable
 {
-    use HasFactory, Notifiable, HasApiTokens, HasRoles,
-        ListableTrait;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, HasPermissions, ListableTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +23,7 @@ class Admin extends Authenticatable implements Listable
      * @var array
      */
     protected $fillable = [
+        'vendor_id',
         'name',
         'email',
         'password',
@@ -56,6 +57,16 @@ class Admin extends Authenticatable implements Listable
         return true;
     }
 
+    public function isVendor()
+    {
+        return (bool) $this->vendor_id;
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
     public function getRoleAttribute()
     {
         $role = $this->roles()->first();
@@ -72,11 +83,11 @@ class Admin extends Authenticatable implements Listable
             ->where('collection_name', 'avatars');
     }
 
-    public function scopeApplyFilters(Builder $query, Request $request) : Builder
+    public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');
-        if (is_array($filter))
-        {
+
+        if (is_array($filter)) {
             $request = new Request($filter);
         }
 
@@ -87,8 +98,13 @@ class Admin extends Authenticatable implements Listable
         if ($request->has('role')) {
             $query->role(strtolower($request->get('role')));
         }
-        
+
         return $query;
+    }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('vendor_id', $value);
     }
 
     public function scopeWithListRelations(Builder $query, Request $request) : Builder

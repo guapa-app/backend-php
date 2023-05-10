@@ -1,22 +1,27 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Http\Requests\CreateResourceRequest;
-use Laravel\Nova\Http\Requests\UpdateResourceRequest;
+use Laravel\Nova\Fields\MorphTo;
+use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Textarea;
 
-class Setting extends Resource
+class Review extends Resource
 {
+    use NovaVendorAccess;
+
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Setting::class;
+    public static $model = \App\Models\Review::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -32,8 +37,6 @@ class Setting extends Resource
      */
     public static $search = [
         'id',
-        'setting_key', 'setting_value',
-        'setting_unit', 'instructions',
     ];
 
     /**
@@ -44,16 +47,35 @@ class Setting extends Resource
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
-            Text::make('key', 'setting_key')->required()->readonly(!is_null($request->resourceId)),
-            Text::make('value', 'setting_value')->required(),
-//            Text::make('unit', 'setting_unit')->required(),
-            Text::make('instructions', 'instructions')->required(),
 
-            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+
+            MorphTo::make(__('review for'), 'reviewable')->types([
+                Vendor::class,
+                Product::class,
+            ]),
+
+            Number::make(__('stars'), 'stars')
+                ->step(1)
+                ->required()
+                ->min(0)->max(5),
+
+            Textarea::make(__('comment'), 'comment')->required(),
+
+            DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            if (Auth::user()->id != $this->resource->id) {
+                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**

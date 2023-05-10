@@ -13,6 +13,14 @@ use App\Nova\Metrics\SupportMessageTrend;
 use App\Nova\Metrics\TaxonomyTrend;
 use App\Nova\Metrics\UserTrend;
 use App\Nova\Metrics\VendorTrend;
+use App\Nova\Resources\Admin;
+use App\Nova\Resources\Invoice;
+use App\Nova\Resources\Order;
+use App\Nova\Resources\OrderItem;
+use App\Nova\Resources\Product;
+use App\Nova\Resources\Review;
+use App\Nova\Resources\Vendor;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
@@ -108,5 +116,24 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function register()
     {
         //
+    }
+
+    public function resources()
+    {
+        # list of resources that vendor can access.
+        # every resource use trait NovaVendorAccess and fields array have a check vendor condition.
+        if (Auth::user()->isVendor()) {
+            Nova::resources([
+                Invoice::class,
+                Product::class,
+                Order::class,
+                OrderItem::class,
+                Review::class,
+                Vendor::class,
+                Admin::class,
+            ]);
+        } else {
+            Nova::resourcesIn(app_path('Nova/Resources'));
+        }
     }
 }

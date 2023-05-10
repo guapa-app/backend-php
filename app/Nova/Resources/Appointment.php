@@ -1,38 +1,29 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
+use Michielfb\Time\Time;
 
-class WorkDay extends Resource
+class Appointment extends Resource
 {
-    /**
-     * @array Days Arr
-     */
-    public const days = [
-        0 => 'Sat',
-        1 => 'Sun',
-        2 => 'Mon',
-        3 => 'Tue',
-        4 => 'Wed',
-        5 => 'Thu',
-        6 => 'Fri',
-    ];
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\WorkDay::class;
+    public static $model = \App\Models\Appointment::class;
+    public static $displayInNavigation = false;
+
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'day';
+    public static $title = 'id';
+
     /**
      * The columns that should be searched.
      *
@@ -41,7 +32,6 @@ class WorkDay extends Resource
     public static $search = [
         'id',
     ];
-    public static $displayInNavigation = false;
 
     /**
      * Get the fields displayed by the resource.
@@ -49,16 +39,18 @@ class WorkDay extends Resource
      * @param Request $request
      * @return array
      */
-    public function fields(Request $request): array
+    public function fields(Request $request)
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+            Time::make(__('from time'), 'from_time')
+                ->format('hh:mm A'),
 
-            Select::make(__('day'), 'day')
-                ->displayUsingLabels()
-                ->options(WorkDay::days),
+            Time::make(__('to time'), 'to_time')
+                ->format('hh:mm A'),
+
+            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
         ];
     }
 

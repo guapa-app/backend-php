@@ -1,29 +1,38 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Fields\Select;
 
-class History extends Resource
+class WorkDay extends Resource
 {
+    /**
+     * @array Days Arr
+     */
+    public const days = [
+        0 => 'Sat',
+        1 => 'Sun',
+        2 => 'Mon',
+        3 => 'Tue',
+        4 => 'Wed',
+        5 => 'Thu',
+        6 => 'Fri',
+    ];
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\History::class;
-
+    public static $model = \App\Models\WorkDay::class;
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'id';
-
+    public static $title = 'day';
     /**
      * The columns that should be searched.
      *
@@ -31,8 +40,8 @@ class History extends Resource
      */
     public static $search = [
         'id',
-        'details',
     ];
+    public static $displayInNavigation = false;
 
     /**
      * Get the fields displayed by the resource.
@@ -40,20 +49,16 @@ class History extends Resource
      * @param Request $request
      * @return array
      */
-    public function fields(Request $request)
+    public function fields(Request $request): array
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
 
-            Textarea::make(__('details'), 'details')
-                ->nullable(),
-
-            DateTime::make(__('record date'), 'record_date'),
-
-            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+            Select::make(__('day'), 'day')
+                ->displayUsingLabels()
+                ->options(WorkDay::days),
         ];
     }
 

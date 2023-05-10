@@ -27,4 +27,9 @@ class Invoice extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->whereRelation('order', 'vendor_id', '=', $value);
+    }
 }

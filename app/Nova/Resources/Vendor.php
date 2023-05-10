@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inspheric\Fields\Email;
 use Inspheric\Fields\Url;
 use Laravel\Nova\Fields\BelongsToMany;
@@ -20,6 +22,8 @@ use Laravel\Nova\Panel;
 
 class Vendor extends Resource
 {
+    use NovaVendorAccess;
+
     /**
      * The model the resource corresponds to.
      *
@@ -60,7 +64,7 @@ class Vendor extends Resource
      */
     public function fields(Request $request): array
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
             Images::make(__('logo'), 'logos') // second parameter is the media collection name
@@ -158,6 +162,15 @@ class Vendor extends Resource
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            if (Auth::user()->id != $this->resource->id) {
+                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     public function socialMediaFields(): array

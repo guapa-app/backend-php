@@ -1,29 +1,30 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\MorphTo;
-use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Comment extends Resource
+class SupportMessage extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Comment::class;
+    public static $model = \App\Models\SupportMessage::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'content';
+    public static $title = 'id';
 
     /**
      * The columns that should be searched.
@@ -32,7 +33,7 @@ class Comment extends Resource
      */
     public static $search = [
         'id',
-        'content',
+        'subject', 'body', 'phone'
     ];
 
     /**
@@ -46,17 +47,26 @@ class Comment extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('post'), 'post', Post::class)->showCreateRelationButton(),
+            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
 
-            Textarea::make(__('content'), 'content')
+            Text::make('subject')->required(),
+
+            Text::make('body')->required(),
+
+            PhoneNumber::make(__('phone'), 'phone')
+//                ->resolveUsing(function ($value) {
+//                    return $value;
+//                })
+                ->fillUsing(function (NovaRequest $request, $model, $attribute, $requestAttribute) {
+                    $value = $request[$requestAttribute];
+                    $string = str_replace(' ', '-', $value); // Replaces all spaces with hyphens.
+                    $string = preg_replace('/[^0-9]/', '', $string); // Removes special chars.
+                    $model->{$attribute} = $string;
+                })
                 ->required()
-                ->sortable()
-                ->rules('required'),
+                ->onlyCountries('SA', 'EG'),
 
-            MorphTo::make(__('user'), 'user')->types([
-                Admin::class,
-                User::class,
-            ]),
+            DateTime::make(__('read at'), 'read_at'),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),

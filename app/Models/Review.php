@@ -36,6 +36,15 @@ class Review extends Model
     	return $this->belongsTo(User::class);
     }
 
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->whereHasMorph('reviewable', [Product::class], function (Builder $query) use ($value) {
+            $query->where('vendor_id', $value);
+        })->orWhereHasMorph('reviewable', [Vendor::class], function (Builder $query) use ($value) {
+            $query->where('id', $value);
+        });
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request) : Builder
     {
         $filter = $request->get('filter');
@@ -48,7 +57,7 @@ class Review extends Model
         $query->searchLike($request);
 
         $query->applyDirectFilters($request);
-        
+
         return $query;
     }
 

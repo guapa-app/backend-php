@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;

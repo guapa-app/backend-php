@@ -75,7 +75,7 @@
         <br>
         <p>Administrator Panels</p>
         <a href="/admin">React</a>
-        <a href="/nova-admin">Nova</a>
+        <a href="/admin-panel">Nova</a>
         <br>
         <br>
         <p>Vendors Application</p>

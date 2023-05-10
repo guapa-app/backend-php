@@ -1,21 +1,23 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Michielfb\Time\Time;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
+use Spatie\NovaTranslatable\Translatable;
 
-class Appointment extends Resource
+class Page extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Appointment::class;
-    public static $displayInNavigation = false;
+    public static $model = \App\Models\Page::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -44,13 +46,15 @@ class Appointment extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Time::make(__('from time'), 'from_time')
-                ->format('hh:mm A'),
+            Translatable::make([
+                Text::make(__('title'), 'title')->required(),
+                Textarea::make(__('content'), 'content')->required(),
+            ]),
 
-            Time::make(__('to time'), 'to_time')
-                ->format('hh:mm A'),
+            Boolean::make(__('published'), 'published')->default(false),
 
-            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
     }
 

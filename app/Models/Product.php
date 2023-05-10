@@ -134,6 +134,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             ->where('collection_name', 'products');
     }
 
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('vendor_id', $value);
+    }
+
     public function scopePriceRange($query, $minPrice, $maxPrice)
     {
         if (isset($minPrice)) {

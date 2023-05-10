@@ -1,15 +1,24 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\UnauthorizedException;
+use Laravel\Nova\Exceptions\AuthenticationException;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Password;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\TrashedStatus;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Admin extends Resource
 {
+    use NovaVendorAccess;
     /**
      * The model the resource corresponds to.
      *
@@ -33,21 +42,11 @@ class Admin extends Resource
         'id',
     ];
 
-    /**
-     * Get the fields displayed by the resource.
-     *
-     * @param Request $request
-     * @return array
-     */
+
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
-
-//            Images::make(__('photo'), 'photo') // second parameter is the media collection name
-//    ->temporary(now()->addMinutes(5))
-//            ->conversionOnIndexView('small') // conversion used to display the image
-//            ->rules('required'), // validation rules
 
             Text::make('Name')
                 ->sortable()
@@ -59,6 +58,8 @@ class Admin extends Resource
                 ->creationRules('unique:admins,email')
                 ->updateRules('unique:admins,email,{{resourceId}}'),
 
+            Boolean::make(__('is vendor'), 'vendor')->onlyOnIndex(),
+
             Password::make('Password')
                 ->onlyOnForms()
                 ->creationRules('required', 'string', 'min:8')
@@ -67,6 +68,15 @@ class Admin extends Resource
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            if (Auth::user()->id != $this->resource->id) {
+                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**

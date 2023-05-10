@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
@@ -89,6 +90,20 @@ class Vendor extends Model implements HasMedia, HasReviews
     protected $search_attributes = [
         'name', 'email', 'phone', 'about',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::created(function ($item) {
+            Admin::query()->create([
+                "vendor_id" => $item->id,
+                "name"      => $item->name,
+                "email"     => $item->email,
+                "password"  => Hash::make($item->email),
+            ]);
+        });
+    }
 
     /**
      * Register media collections
@@ -294,6 +309,12 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function hasStaff(User $user)
     {
         return $this->hasUser($user, 'staff');
+    }
+
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('id', $value);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder

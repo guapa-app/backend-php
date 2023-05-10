@@ -1,23 +1,31 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Nova\Actions\ChangeOrderStatus;
+use App\Traits\NovaVendorAccess;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class SupportMessage extends Resource
+class Order extends Resource
 {
+    use NovaVendorAccess;
+
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\SupportMessage::class;
+    public static $model = \App\Models\Order::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -33,8 +41,15 @@ class SupportMessage extends Resource
      */
     public static $search = [
         'id',
-        'subject', 'body', 'phone'
+        'note',
+        'name',
+        'phone',
     ];
+
+    public static function authorizedToCreate(Request $request): bool
+    {
+        return false;
+    }
 
     /**
      * Get the fields displayed by the resource.
@@ -44,14 +59,16 @@ class SupportMessage extends Resource
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+            BelongsTo::make(__('address'), 'address', Address::class)->showCreateRelationButton(),
 
-            Text::make('subject')->required(),
+            Number::make(__('total'), 'total')->step(0.001),
 
-            Text::make('body')->required(),
+            Text::make(__('note'), 'note'),
+
+            Text::make(__('name'), 'name'),
 
             PhoneNumber::make(__('phone'), 'phone')
 //                ->resolveUsing(function ($value) {
@@ -66,11 +83,34 @@ class SupportMessage extends Resource
                 ->required()
                 ->onlyCountries('SA', 'EG'),
 
-            DateTime::make(__('read at'), 'read_at'),
+            Select::make(__('status'), 'status')
+                ->default(2)
+                ->options([
+                    'Pending' => 'Pending',
+                    'Accepted' => 'Accepted',
+                    'Canceled' => 'Canceled',
+                    'Rejected' => 'Rejected',
+                ])
+                ->displayUsingLabels()
+                ->required(),
 
-            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            HasMany::make(__('items'), 'items', OrderItem::class),
+
+            DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            if (Auth::user()->id != $this->resource->id) {
+                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr + [
+                BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+                BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+            ];
     }
 
     /**
@@ -112,8 +152,26 @@ class SupportMessage extends Resource
      * @param Request $request
      * @return array
      */
-    public function actions(Request $request)
+    public function actions(Request $request): array
     {
-        return [];
+        return [
+            ChangeOrderStatus::make()
+                ->canSee(function ($req) {
+                    return true;
+                })
+                ->canRun(function ($req) {
+                    return true;
+                }),
+        ];
+    }
+
+    public function authorizedToUpdate(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
     }
 }
