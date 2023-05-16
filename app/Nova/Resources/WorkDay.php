@@ -1,29 +1,41 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\DateTime;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Password;
-use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Select;
 
-class Admin extends Resource
+class WorkDay extends Resource
 {
+    use NovaVendorAccess;
+    /**
+     * @array Days Arr
+     */
+    public const days = [
+        0 => 'Sat',
+        1 => 'Sun',
+        2 => 'Mon',
+        3 => 'Tue',
+        4 => 'Wed',
+        5 => 'Thu',
+        6 => 'Fri',
+    ];
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Admin::class;
-
+    public static $model = \App\Models\WorkDay::class;
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'name';
-
+    public static $title = 'day';
     /**
      * The columns that should be searched.
      *
@@ -32,6 +44,7 @@ class Admin extends Resource
     public static $search = [
         'id',
     ];
+    public static $displayInNavigation = false;
 
     /**
      * Get the fields displayed by the resource.
@@ -39,34 +52,27 @@ class Admin extends Resource
      * @param Request $request
      * @return array
      */
-    public function fields(Request $request)
+    public function fields(Request $request): array
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-//            Images::make(__('photo'), 'photo') // second parameter is the media collection name
-//    ->temporary(now()->addMinutes(5))
-//            ->conversionOnIndexView('small') // conversion used to display the image
-//            ->rules('required'), // validation rules
+            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
 
-            Text::make('Name')
-                ->sortable()
-                ->rules('required', 'max:255'),
-
-            Text::make('Email')
-                ->sortable()
-                ->rules('required', 'email', 'max:254')
-                ->creationRules('unique:admins,email')
-                ->updateRules('unique:admins,email,{{resourceId}}'),
-
-            Password::make('Password')
-                ->onlyOnForms()
-                ->creationRules('required', 'string', 'min:8')
-                ->updateRules('nullable', 'string', 'min:8'),
-
-            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+            Select::make(__('day'), 'day')
+                ->displayUsingLabels()
+                ->options(WorkDay::days),
         ];
+
+        if (Auth::user()->isVendor()) {
+//            dd($request->isUpdateOrUpdateAttachedRequest() , Auth::user()->vendor_id , $this->resource->vendor_id);
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**

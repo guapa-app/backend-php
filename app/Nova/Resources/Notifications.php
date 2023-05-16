@@ -1,28 +1,32 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaReadOnly;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsToMany;
+use Illuminate\Notifications\DatabaseNotification;
+use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\MorphTo;
+use Laravel\Nova\Fields\Textarea;
 
-class Role extends Resource
+class Notifications extends Resource
 {
+    use NovaReadOnly;
+
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \Spatie\Permission\Models\Role::class;
-    public static $displayInNavigation = false;
+    public static $model = DatabaseNotification::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'name';
+    public static $title = 'id';
 
     /**
      * The columns that should be searched.
@@ -30,7 +34,7 @@ class Role extends Resource
      * @var array
      */
     public static $search = [
-        'name',
+        'id',
     ];
 
     /**
@@ -44,11 +48,20 @@ class Role extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Text::make(__('guard name'), 'guard_name')->default(config('auth.defaults.guard')),
+            MorphTo::make(__('notifiable'), 'notifiable')->types([
+                User::class,
+                Vendor::class,
+            ]),
 
-            Text::make(__('name'), 'name'),
+            Textarea::make(__('type'), 'type')->showOnIndex(true),
 
-            BelongsToMany::make(__('users'), 'users', User::class),
+            Textarea::make(__('data'), 'data')->resolveUsing(function ($value) {
+                return json_encode($value);
+            }),
+
+            DateTime::make(__('read at'), 'read_at'),
+
+            DateTime::make(__('created at'), 'created_at')->sortable()->readonly(),
         ];
     }
 

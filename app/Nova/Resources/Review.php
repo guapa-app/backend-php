@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
@@ -12,6 +14,8 @@ use Laravel\Nova\Fields\Textarea;
 
 class Review extends Resource
 {
+    use NovaVendorAccess;
+
     /**
      * The model the resource corresponds to.
      *
@@ -39,16 +43,15 @@ class Review extends Resource
      * Get the fields displayed by the resource.
      *
      * @param Request $request
-     * @return array
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
             BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
 
-            MorphTo::make(__('reviewable'), 'reviewable')->types([
+            MorphTo::make(__('review for'), 'reviewable')->types([
                 Vendor::class,
                 Product::class,
             ]),
@@ -63,6 +66,27 @@ class Review extends Resource
             DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            switch ($this->resource->reviewable_type) {
+                case "vendor":
+                    $flag = Auth::user()->vendor_id != $this->resource->reviewable->id;
+                    break;
+                case "product":
+                    $flag = Auth::user()->vendor_id != $this->resource->reviewable->vendor_id;
+                    break;
+                default:
+                    $flag = true;
+            }
+
+            if ($request->isUpdateOrUpdateAttachedRequest() && $flag) {
+                abort(redirect('/admin')->with('errors', 'You do not have permission to access this page!'));
+            }
+
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**
@@ -107,5 +131,10 @@ class Review extends Resource
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public function authorizedToUpdate(Request $request)
+    {
+        return !Auth::user()->isVendor();
     }
 }

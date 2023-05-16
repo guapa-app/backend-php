@@ -1,26 +1,21 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
-use App\Traits\NovaReadOnly;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\MorphTo;
-use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 
-class Device extends Resource
+class History extends Resource
 {
-    use NovaReadOnly;
-
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Device::class;
-    public static $displayInNavigation = false;
+    public static $model = \App\Models\History::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -36,6 +31,7 @@ class Device extends Resource
      */
     public static $search = [
         'id',
+        'details',
     ];
 
     /**
@@ -49,18 +45,15 @@ class Device extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            MorphTo::make(__('user'), 'user')->types([
-                User::class,
-            ]),
+            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
 
-            Text::make(__('guid'), 'guid'),
+            Textarea::make(__('details'), 'details')
+                ->nullable(),
 
-            Textarea::make(__('fcmtoken'), 'fcmtoken'),
+            DateTime::make(__('record date'), 'record_date'),
 
-            Text::make(__('type'), 'type'),
-
-            DateTime::make(__('Created at'), 'created_at')->exceptOnForms()->readonly(),
-            DateTime::make(__('Updated at'), 'updated_at')->exceptOnForms()->readonly(),
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
     }
 

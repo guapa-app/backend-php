@@ -38,4 +38,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Offer::class);
     }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->whereRelation('product', 'vendor_id', '=', $value);
+    }
 }

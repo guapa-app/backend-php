@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
@@ -15,6 +18,8 @@ use ZiffMedia\NovaSelectPlus\SelectPlus;
 
 class Product extends Resource
 {
+    use NovaVendorAccess;
+
     /**
      * The model the resource corresponds to.
      *
@@ -47,12 +52,11 @@ class Product extends Resource
      * @param Request $request
      * @return array
      */
+
     public function fields(Request $request): array
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
-
-            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
 
             Text::make(__('title'), 'title')->required(),
             Text::make(__('url'), 'url')->nullable(),
@@ -105,10 +109,24 @@ class Product extends Resource
             ->temporary(now()->addMinutes(5))
                 ->rules('required'), // validation rules
 
+            HasMany::make(__('reviews'), 'reviews', Review::class),
+
+
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
 
         ];
+
+        if (Auth::user()->isVendor()) {
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return array_merge($returned_arr, [
+            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+        ]);
     }
 
     /**

@@ -1,31 +1,33 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
-use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 
-class Offer extends Resource
+class OrderItem extends Resource
 {
+    use NovaVendorAccess;
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Offer::class;
+    public static $model = \App\Models\OrderItem::class;
+    public static $displayInNavigation = false;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'title';
+    public static $title = 'id';
 
     /**
      * The columns that should be searched.
@@ -36,6 +38,11 @@ class Offer extends Resource
         'id',
     ];
 
+    public static function authorizedToCreate(Request $request): bool
+    {
+        return false;
+    }
+
     /**
      * Get the fields displayed by the resource.
      *
@@ -44,27 +51,33 @@ class Offer extends Resource
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Images::make(__('image'), 'offer_images') // second parameter is the media collection name
-            ->temporary(now()->addMinutes(5))
-                ->conversionOnIndexView('small') // conversion used to display the image
-                ->rules('required'), // validation rules
+            BelongsTo::make(__('order'), 'order', Order::class)->showCreateRelationButton(),
 
             BelongsTo::make(__('product'), 'product', Product::class)->showCreateRelationButton(),
 
-            Text::make(__('title'), 'title')->required(),
-            Textarea::make(__('description'), 'description')->required(),
+            BelongsTo::make(__('offer'), 'offer', Offer::class)->showCreateRelationButton(),
 
-            Number::make(__('discount'), 'discount')->step(0.01)->required(),
+            Number::make(__('amount'), 'amount')->step(0.001),
 
-            DateTime::make(__('starts at'), 'starts_at')->required(),
-            DateTime::make(__('expires at'), 'expires_at')->required(),
+            Number::make(__('quantity'), 'quantity')->step(1),
+
+            Text::make(__('appointment'), 'appointment'),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->product->vendor_id) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**
@@ -109,5 +122,15 @@ class Offer extends Resource
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public function authorizedToUpdate(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
     }
 }

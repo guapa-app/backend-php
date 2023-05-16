@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
+use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
-use Spatie\NovaTranslatable\Translatable;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Page extends Resource
+class SupportMessage extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Page::class;
+    public static $model = \App\Models\SupportMessage::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -33,6 +33,7 @@ class Page extends Resource
      */
     public static $search = [
         'id',
+        'subject', 'body', 'phone'
     ];
 
     /**
@@ -46,12 +47,26 @@ class Page extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Translatable::make([
-                Text::make(__('title'), 'title')->required(),
-                Textarea::make(__('content'), 'content')->required(),
-            ]),
+            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
 
-            Boolean::make(__('published'), 'published')->default(false),
+            Text::make('subject')->required(),
+
+            Text::make('body')->required(),
+
+            PhoneNumber::make(__('phone'), 'phone')
+//                ->resolveUsing(function ($value) {
+//                    return $value;
+//                })
+                ->fillUsing(function (NovaRequest $request, $model, $attribute, $requestAttribute) {
+                    $value = $request[$requestAttribute];
+                    $string = str_replace(' ', '-', $value); // Replaces all spaces with hyphens.
+                    $string = preg_replace('/[^0-9]/', '', $string); // Removes special chars.
+                    $model->{$attribute} = $string;
+                })
+                ->required()
+                ->onlyCountries('SA', 'EG'),
+
+            DateTime::make(__('read at'), 'read_at'),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),

@@ -1,34 +1,33 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
-use App\Nova\Actions\ChangeOrderStatus;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Order extends Resource
+class Address extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Order::class;
+    public static $model = \App\Models\Address::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'id';
+    public static $title = 'title';
 
     /**
      * The columns that should be searched.
@@ -37,15 +36,7 @@ class Order extends Resource
      */
     public static $search = [
         'id',
-        'note',
-        'name',
-        'phone',
     ];
-
-    public static function authorizedToCreate(Request $request): bool
-    {
-        return false;
-    }
 
     /**
      * Get the fields displayed by the resource.
@@ -58,17 +49,24 @@ class Order extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+            Text::make(__('title'), 'title')
+                ->sortable()
+                ->rules('required', 'max:191'),
 
-            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+            Text::make(__('address 1'), 'address_1')
+                ->sortable()
+                ->rules('required', 'max:191'),
 
-            BelongsTo::make(__('address'), 'address', Address::class)->showCreateRelationButton(),
+            Text::make(__('address 2'), 'address_2')
+                ->sortable()
+                ->rules('required', 'max:191'),
 
-            Number::make(__('total'), 'total')->step(0.001),
+            BelongsTo::make(__('city'), 'city', City::class)->showCreateRelationButton(),
 
-            Text::make(__('note'), 'note'),
-
-            Text::make(__('name'), 'name'),
+            MorphTo::make(__('addressable'), 'addressable')->types([
+                User::class,
+                Vendor::class,
+            ]),
 
             PhoneNumber::make(__('phone'), 'phone')
 //                ->resolveUsing(function ($value) {
@@ -83,21 +81,18 @@ class Order extends Resource
                 ->required()
                 ->onlyCountries('SA', 'EG'),
 
-            Select::make(__('status'), 'status')
-                ->default(2)
-                ->options([
-                    'Pending' => 'Pending',
-                    'Accepted' => 'Accepted',
-                    'Canceled' => 'Canceled',
-                    'Rejected' => 'Rejected',
-                ])
+            Text::make(__('postal code'), 'postal_code')->required(),
+
+            Select::make(__('type'), 'type')
+                ->options(\App\Models\Address::TYPES)
                 ->displayUsingLabels()
                 ->required(),
 
-            HasMany::make(__('items'), 'items', OrderItem::class),
+            Number::make(__('lat'), 'lat')->step(0.00000001)->required(),
+            Number::make(__('lng'), 'lng')->step(0.00000001)->required(),
 
             DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
         ];
     }
 
@@ -140,26 +135,8 @@ class Order extends Resource
      * @param Request $request
      * @return array
      */
-    public function actions(Request $request): array
+    public function actions(Request $request)
     {
-        return [
-            ChangeOrderStatus::make()
-                ->canSee(function ($req) {
-                    return true;
-                })
-                ->canRun(function ($req) {
-                    return true;
-                }),
-        ];
-    }
-
-    public function authorizedToUpdate(Request $request): bool
-    {
-        return false;
-    }
-
-    public function authorizedToDelete(Request $request): bool
-    {
-        return false;
+        return [];
     }
 }

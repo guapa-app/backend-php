@@ -311,6 +311,12 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasUser($user, 'staff');
     }
 
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('id', $value);
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');

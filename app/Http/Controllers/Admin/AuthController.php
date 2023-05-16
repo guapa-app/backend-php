@@ -15,7 +15,7 @@ class AuthController extends BaseAdminController
         AdminRepositoryInterface $adminRepository)
     {
         parent::__construct();
-        
+
         // Initialize service
         $this->authService = $authService;
         $this->adminRepository = $adminRepository;
@@ -51,11 +51,17 @@ class AuthController extends BaseAdminController
             ], 401);
         }
 
+        $admin = $this->adminRepository->getOne(0, ['email' => $request->get('email')]);
+
+        if ($admin->isVendor()) {
+            return response()->json([
+                'message' => "you are not allowed to access this page "
+            ], 401);
+        }
+
         return response()->json([
             'token' => $token,
-            'data' => $this->adminRepository->getOne(0, [
-                'email' => $request->get('email'),
-            ]),
+            'data' => $admin
         ]);
     }
 

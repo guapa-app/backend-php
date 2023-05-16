@@ -18,11 +18,11 @@ class VendorController extends BaseAdminController
     public function __construct(VendorService $vendorService, VendorRepositoryInterface $vendorRepository)
     {
         parent::__construct();
-        
+
         $this->vendorService = $vendorService;
         $this->vendorRepository = $vendorRepository;
     }
-    
+
 	public function index(Request $request)
 	{
         $vendors = $this->vendorRepository->all($request);

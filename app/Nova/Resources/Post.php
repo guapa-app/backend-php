@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
-use App\Models\Taxonomy;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
+use Inspheric\Fields\Url;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
-use Spatie\NovaTranslatable\Translatable;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Category extends Resource
+class Post extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = Taxonomy::class;
+    public static $model = \App\Models\Post::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -36,8 +36,15 @@ class Category extends Resource
      * @var array
      */
     public static $search = [
+        'id',
         'title',
+        'content',
     ];
+
+    public static function relatableTaxonomies(NovaRequest $request, $query)
+    {
+        return $query->where('type', 'blog_category');
+    }
 
     /**
      * Get the fields displayed by the resource.
@@ -45,41 +52,44 @@ class Category extends Resource
      * @param Request $request
      * @return array
      */
-    public function fields(Request $request): array
+    public function fields(Request $request)
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Translatable::make([
-                Text::make(__('title'), 'title')
-                    ->sortable()
-                    ->rules('required', 'max:191'),
+            // TODO: Should this be hidden?
+            BelongsTo::make(__('admin'), 'admin', Admin::class)->showCreateRelationButton(),
 
-                Textarea::make(__('description'), 'description')
-                    ->sortable()
-                    ->rules('required'),
-            ]),
+            BelongsTo::make(__('category'), 'category', Category::class)->showCreateRelationButton(),
 
-            Number::make(__('fees'), 'fees')->step(0.5)->required()->placeholder('10 %'),
 
-            Images::make(__('icon'), config('taxonomies.icon_collection_name', 'taxonomy_icons'))
-                ->temporary(now()->addMinutes(5))
-                ->conversionOnIndexView('small') // conversion used to display the image
+            Text::make(__('title'), 'title')
+                ->required()
+                ->sortable()
+                ->rules('required', 'max:191'),
+
+            Textarea::make(__('content'), 'content')
+                ->required()
+                ->sortable()
                 ->rules('required'),
 
-            Select::make(__('type'), 'type')
-                ->options([
-                    'category' => 'category',
-                    'specialty' => 'specialty',
-                    'blog_category' => 'blog',
-                ])
+            Select::make(__('status'), 'status')
+                ->default(2)
+                ->options(\App\Models\Post::STATUSES)
                 ->displayUsingLabels()
                 ->required(),
 
-            BelongsTo::make('parent', 'parent', Category::class)->showCreateRelationButton()->nullable(),
+            Url::make(__('youtube url'), 'youtube_url')->showOnIndex(false),
+
+            Images::make(__('images'), 'posts') // second parameter is the media collection name
+            ->temporary(now()->addMinutes(5))
+                ->rules('required'), // validation rules
+
+            HasMany::make(__('comments'), 'comments'),
 
             DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
+
         ];
     }
 
@@ -89,7 +99,7 @@ class Category extends Resource
      * @param Request $request
      * @return array
      */
-    public function cards(Request $request): array
+    public function cards(Request $request)
     {
         return [];
     }
@@ -100,7 +110,7 @@ class Category extends Resource
      * @param Request $request
      * @return array
      */
-    public function filters(Request $request): array
+    public function filters(Request $request)
     {
         return [];
     }
@@ -111,7 +121,7 @@ class Category extends Resource
      * @param Request $request
      * @return array
      */
-    public function lenses(Request $request): array
+    public function lenses(Request $request)
     {
         return [];
     }
@@ -122,7 +132,7 @@ class Category extends Resource
      * @param Request $request
      * @return array
      */
-    public function actions(Request $request): array
+    public function actions(Request $request)
     {
         return [];
     }

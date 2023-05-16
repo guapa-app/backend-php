@@ -70,6 +70,11 @@ class Order extends Model implements Listable
     	return $this->hasOne(Invoice::class);
     }
 
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('vendor_id', $value);
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');

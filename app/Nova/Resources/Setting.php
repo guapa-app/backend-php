@@ -1,25 +1,20 @@
 <?php
 
-namespace App\Nova;
+namespace App\Nova\Resources;
 
-use App\Traits\NovaReadOnly;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\MorphTo;
-use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Fields\Text;
 
-class Notifications extends Resource
+class Setting extends Resource
 {
-    use NovaReadOnly;
-
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = DatabaseNotification::class;
+    public static $model = \App\Models\Setting::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -35,6 +30,8 @@ class Notifications extends Resource
      */
     public static $search = [
         'id',
+        'setting_key', 'setting_value',
+        'setting_unit', 'instructions',
     ];
 
     /**
@@ -47,21 +44,13 @@ class Notifications extends Resource
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
+            Text::make('key', 'setting_key')->required()->readonly(!is_null($request->resourceId)),
+            Text::make('value', 'setting_value')->required(),
+//            Text::make('unit', 'setting_unit')->required(),
+            Text::make('instructions', 'instructions')->required(),
 
-            MorphTo::make(__('notifiable'), 'notifiable')->types([
-                User::class,
-                Vendor::class,
-            ]),
-
-            Textarea::make(__('type'), 'type')->showOnIndex(true),
-
-            Textarea::make(__('data'), 'data')->resolveUsing(function ($value) {
-                return json_encode($value);
-            }),
-
-            DateTime::make(__('read at'), 'read_at'),
-
-            DateTime::make(__('created at'), 'created_at')->sortable()->readonly(),
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
     }
 
