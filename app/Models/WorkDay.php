@@ -19,4 +19,9 @@ class WorkDay extends Model
     {
     	return $this->belongsTo(Vendor::class);
     }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('vendor_id', '=', $value);
+    }
 }

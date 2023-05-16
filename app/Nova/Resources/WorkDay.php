@@ -2,13 +2,16 @@
 
 namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 
 class WorkDay extends Resource
 {
+    use NovaVendorAccess;
     /**
      * @array Days Arr
      */
@@ -51,7 +54,7 @@ class WorkDay extends Resource
      */
     public function fields(Request $request): array
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
             BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
@@ -60,6 +63,16 @@ class WorkDay extends Resource
                 ->displayUsingLabels()
                 ->options(WorkDay::days),
         ];
+
+        if (Auth::user()->isVendor()) {
+//            dd($request->isUpdateOrUpdateAttachedRequest() , Auth::user()->vendor_id , $this->resource->vendor_id);
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**

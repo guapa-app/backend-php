@@ -107,9 +107,6 @@ class Vendor extends Resource
                 ->nullable()
                 ->showOnIndex(false),
 
-            Boolean::make(__('verified'), 'verified')
-                ->default(false),
-
             PhoneNumber::make('phone', 'phone')
 //                ->resolveUsing(function ($value) {
 //                    return $value;
@@ -164,13 +161,15 @@ class Vendor extends Resource
         ];
 
         if (Auth::user()->isVendor()) {
-            if (Auth::user()->id != $this->resource->id) {
-                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->id) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
             }
             return $returned_arr;
         }
 
-        return $returned_arr;
+        return array_merge($returned_arr, [
+            Boolean::make(__('verified'), 'verified')->default(false)
+        ]);
     }
 
     public function socialMediaFields(): array

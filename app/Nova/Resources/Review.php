@@ -43,7 +43,6 @@ class Review extends Resource
      * Get the fields displayed by the resource.
      *
      * @param Request $request
-     * @return array
      */
     public function fields(Request $request)
     {
@@ -69,9 +68,21 @@ class Review extends Resource
         ];
 
         if (Auth::user()->isVendor()) {
-            if (Auth::user()->id != $this->resource->id) {
-                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            switch ($this->resource->reviewable_type) {
+                case "vendor":
+                    $flag = Auth::user()->vendor_id != $this->resource->reviewable->id;
+                    break;
+                case "product":
+                    $flag = Auth::user()->vendor_id != $this->resource->reviewable->vendor_id;
+                    break;
+                default:
+                    $flag = true;
             }
+
+            if ($request->isUpdateOrUpdateAttachedRequest() && $flag) {
+                abort(redirect('/admin')->with('errors', 'You do not have permission to access this page!'));
+            }
+
             return $returned_arr;
         }
 
@@ -120,5 +131,10 @@ class Review extends Resource
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public function authorizedToUpdate(Request $request)
+    {
+        return !Auth::user()->isVendor();
     }
 }

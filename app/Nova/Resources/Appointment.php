@@ -3,6 +3,7 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\ID;
 use Michielfb\Time\Time;
@@ -41,7 +42,7 @@ class Appointment extends Resource
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
             Time::make(__('from time'), 'from_time')
@@ -52,6 +53,15 @@ class Appointment extends Resource
 
             BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
         ];
+
+        if (Auth::user()->isVendor()) {
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return $returned_arr;
     }
 
     /**

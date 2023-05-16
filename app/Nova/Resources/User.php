@@ -2,9 +2,11 @@
 
 namespace App\Nova\Resources;
 
+use App\Traits\NovaVendorAccess;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
@@ -17,6 +19,7 @@ use Laravel\Nova\Panel;
 
 class User extends Resource
 {
+    use NovaVendorAccess;
     /**
      * The model the resource corresponds to.
      *
@@ -49,6 +52,10 @@ class User extends Resource
 
     public static function indexQuery(NovaRequest $request, $query): Builder
     {
+        if (Auth::user()->isVendor()) {
+            return $query->CurrentVendor(Auth::user()->vendor->id);
+        }
+
         $query->with(['profile']);
         return parent::indexQuery($request, $query);
     }
@@ -83,7 +90,7 @@ class User extends Resource
      */
     public function fields(Request $request)
     {
-        return [
+        $returned_arr = [
             ID::make()->sortable(),
 
 //            Images::make(__('photo'), 'photo') // second parameter is the media collection name
@@ -129,15 +136,6 @@ class User extends Resource
                 ->creationRules('required', 'string', 'min:8')
                 ->updateRules('nullable', 'string', 'min:8'),
 
-            Panel::make(__('Profile'), $this->profileFields()),
-
-            MorphMany::make(__('Devices'), 'devices', Device::class),
-
-            MorphMany::make(__('Notifications'), 'notifications', Notifications::class),
-
-            HasMany::make(__('histories'), 'histories'),
-            HasMany::make(__('support messages'), 'support_messages'),
-
             DateTime::make(__('phone verified at'), 'phone_verified_at'),
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
@@ -146,6 +144,21 @@ class User extends Resource
             //userVendors
             //roles
         ];
+
+        if (Auth::user()->isVendor()) {
+            if ($request->isUpdateOrUpdateAttachedRequest() && in_array(Auth::user()->vendor_id, $this->resource->getUserVendorsIdsAttribute())) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+            }
+            return $returned_arr;
+        }
+
+        return array_merge($returned_arr, [
+            Panel::make(__('Profile'), $this->profileFields()),
+            MorphMany::make(__('Devices'), 'devices', Device::class),
+            MorphMany::make(__('Notifications'), 'notifications', Notifications::class),
+            HasMany::make(__('histories'), 'histories'),
+            HasMany::make(__('support messages'), 'support_messages'),
+        ]);
     }
 
     public function profileFields(): array

@@ -58,8 +58,6 @@ class Admin extends Resource
                 ->creationRules('unique:admins,email')
                 ->updateRules('unique:admins,email,{{resourceId}}'),
 
-            Boolean::make(__('is vendor'), 'vendor')->onlyOnIndex(),
-
             Password::make('Password')
                 ->onlyOnForms()
                 ->creationRules('required', 'string', 'min:8')
@@ -70,13 +68,15 @@ class Admin extends Resource
         ];
 
         if (Auth::user()->isVendor()) {
-            if (Auth::user()->id != $this->resource->id) {
-                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->id != $this->resource->id) {
+                abort(redirect('/')->with('error', 'You do not have permission to access this page!'));
             }
             return $returned_arr;
         }
 
-        return $returned_arr;
+        return array_merge($returned_arr, [
+            Boolean::make(__('is vendor'), 'vendor')->onlyOnIndex(),
+        ]);
     }
 
     /**

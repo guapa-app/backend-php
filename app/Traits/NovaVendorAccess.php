@@ -18,7 +18,7 @@ trait NovaVendorAccess
 
     public static function detailQuery(NovaRequest $request, $query)
     {
-        if (Auth::user()->isVendor()) {
+        if (Auth::user()->isVendor() && $request->resource() !== "App\Nova\Resources\Vendor") {
             $query->CurrentVendor(Auth::user()->vendor->id);
         }
 

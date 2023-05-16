@@ -118,15 +118,15 @@ class Product extends Resource
         ];
 
         if (Auth::user()->isVendor()) {
-            if (Auth::user()->id != $this->resource->id) {
-                abort(redirect('/')->with('warning', 'You do not have permission to access this page!'));
+            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
+                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
             }
             return $returned_arr;
         }
 
-        return $returned_arr + [
-                BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
-            ];
+        return array_merge($returned_arr, [
+            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+        ]);
     }
 
     /**
