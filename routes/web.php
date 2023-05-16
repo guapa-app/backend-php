@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,9 @@ Route::get('/.well-known/apple-developer-merchantid-domain-association', functio
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
+
+Route::get('/register', [RegistrationController::class, 'registerForm'])->name('register.form');
+Route::post('/register', [RegistrationController::class, 'register'])->name('register');
 
 Route::get('/navigation', function () {
     return view('welcome');
