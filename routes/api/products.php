@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\ProductController as ApiProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', 'ProductController@index');
-Route::get('/{id}', 'ProductController@single');
+Route::get('/',                                              [ApiProductController::class, 'index']);
+Route::get('/{id}',                                          [ApiProductController::class, 'single']);
 
 Route::group(['middleware' => 'auth:api'], function() {
-	Route::post('/', 'ProductController@create');
-	Route::match(['put', 'patch', 'post'], '/{id}', 'ProductController@update');
-	Route::delete('/{id}', 'ProductController@delete');
+	Route::post('/',                                         [ApiProductController::class, 'create']);
+	Route::match(['put', 'patch', 'post'], '/{id}', [ApiProductController::class, 'update']);
+	Route::delete('/{id}',                                   [ApiProductController::class, 'delete']);
 });
