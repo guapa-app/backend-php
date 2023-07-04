@@ -19,7 +19,7 @@ class AddressController extends BaseApiController
         VendorRepositoryInterface $vendorRepository)
     {
         parent::__construct();
-        
+
         $this->addressRepository = $addressRepository;
         $this->vendorRepository = $vendorRepository;
     }
@@ -29,12 +29,12 @@ class AddressController extends BaseApiController
      *
      * @queryParam addressable_id integer required Addressable entity id. Example: 3
      * @queryParam addressable_type string required Addressable entity type (vendor, user). Example: vendor
-     * 
+     *
      * @responseFile 200 responses/addresses/list.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      * @responseFile 403 scenario="Unauthorized to view addresses for provided entity" responses/errors/403.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
-     * 
+     *
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -62,20 +62,20 @@ class AddressController extends BaseApiController
 
     /**
      * Create Address
-     * 
+     *
      * @responseFile 200 responses/addresses/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 403 scenario="Cannot create address for provided entity" responses/errors/403.json
-     * 
+     *
      * @param  \App\Http\Requests\AddressRequest $request
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
 	public function create(AddressRequest $request)
 	{
         $data = $request->validated();
-        
+
         if ($data['addressable_type'] === 'user' && ((int)$data['addressable_id']) !== auth()->id()) {
             abort(403, 'Cannot create address for provided user');
         } elseif ($data['addressable_type'] === 'vendor') {
@@ -99,17 +99,17 @@ class AddressController extends BaseApiController
      * @responseFile 403 scenario="Not authorized to update address" responses/errors/403.json
      *
      * @urlParam id integer required Address id. Example: 3
-     * 
+     *
      * @param  \App\Http\Requests\AddressRequest $request
      * @param  integer $id
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(AddressRequest $request, $id = 0)
     {
         $address = $this->addressRepository->getOneOrFail($id);
 
-        if ($address->addressable_type === 'user' && $data['addressable_id'] !== auth()->id()) {
+        if ($address->addressable_type === 'user' && $address->addressable_id !== auth()->id()) {
             abort(403, 'Cannot update this address');
         } elseif ($address->addressable_type === 'vendor') {
             $vendor = $this->vendorRepository->getOneOrFail($address->addressable_id);
@@ -130,9 +130,9 @@ class AddressController extends BaseApiController
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      * @responseFile 404 scenario="Not found" responses/errors/404.json
      * @responseFile 403 scenario="Not authorized to delete address" responses/errors/403.json
-     * 
+     *
      * @param  integer $id
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function delete($id = 0)
@@ -141,7 +141,7 @@ class AddressController extends BaseApiController
 
         $address = $this->addressRepository->getOneOrFail($id);
 
-        if ($address->addressable_type === 'user' && $data['addressable_id'] !== auth()->id()) {
+        if ($address->addressable_type === 'user' && $address->addressable_id !== auth()->id()) {
             abort(403, 'Cannot delete this address');
         } elseif ($address->addressable_type === 'vendor') {
             $vendor = $this->vendorRepository->getOneOrFail($address->addressable_id);
@@ -150,9 +150,8 @@ class AddressController extends BaseApiController
             }
         }
 
-
         $ids = $this->addressRepository->delete($id);
 
-        return response()->json($ids);
+        return response()->json(['data' => $ids]);
     }
 }
