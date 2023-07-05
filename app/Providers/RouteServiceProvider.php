@@ -27,7 +27,6 @@ class RouteServiceProvider extends ServiceProvider
      * @var string|null
      */
     protected $namespace = 'App\\Http\\Controllers';
-    protected $apiNamespace = 'App\\Http\\Controllers\\Api';
     protected $adminNamespace = 'App\\Http\\Controllers\\Admin';
 
     /**
@@ -42,17 +41,19 @@ class RouteServiceProvider extends ServiceProvider
         $this->routes(function () {
             Route::prefix('api')
                 ->middleware('api')
-                ->namespace($this->apiNamespace)
-                ->group(base_path('routes/api.php'));
+                ->group(function () {
+                    require base_path('routes/v1/api.php');
+                    require base_path('routes/v2/api.php');
+                });
 
             Route::prefix('admin-api')
                 ->middleware('admin')
                 ->namespace($this->adminNamespace)
-                ->group(base_path('routes/admin.php'));
+                ->group(base_path('routes/v1/admin.php'));
 
             Route::middleware('web')
                 ->namespace($this->namespace)
-                ->group(base_path('routes/web.php'));
+                ->group(base_path('routes/v1/web.php'));
         });
     }
 
