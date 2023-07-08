@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\AddressController as ApiAddressController;
+use App\Http\Controllers\Api\V2\AddressController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api'], function() {
-	Route::get('/',                                         [ApiAddressController::class, 'index']);
-	Route::get('/{id}',                                     [ApiAddressController::class, 'single']);
-	Route::post('/',                                        [ApiAddressController::class, 'create']);
-    Route::match(['put', 'patch', 'post'], '/{id}',[ApiAddressController::class, 'update']);
-    Route::delete('/{id}',                                  [ApiAddressController::class, 'delete']);
+	Route::get('/',                                         [AddressController::class, 'index']);
+	Route::get('/{id}',                                     [AddressController::class, 'single']);
+	Route::post('/',                                        [AddressController::class, 'create']);
+    Route::match(['put', 'patch', 'post'], '/{id}',         [AddressController::class, 'update']);
+    Route::delete('/{id}',                                  [AddressController::class, 'delete']);
 });

@@ -21,7 +21,7 @@ class Address extends Model implements Listable
         6 => 'Primary',
         7 => 'Website',
     ];
-    
+
     protected $fillable = [
     	'addressable_id', 'addressable_type', 'title', 'city_id',
         'postal_code', 'lat', 'lng', 'address_1', 'address_2',
@@ -96,7 +96,7 @@ class Address extends Model implements Listable
             $query->where('addressable_id', (int) $request->get('user_id'));
             $query->where('addressable_type', 'user');
         }
-        
+
         return $query;
     }
 

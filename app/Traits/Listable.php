@@ -2,23 +2,25 @@
 
 namespace App\Traits;
 
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
-trait Listable {
-
-	public function scopeApplyDirectFilters(Builder $query, Request $request): Builder
+trait Listable
+{
+    public function scopeApplyDirectFilters(Builder $query, Request $request): Builder
     {
-    	// Return if no attributes can be filtered directly
+        // Return if no attributes can be filtered directly
         $attributes = $this->getFilterableAttributes();
-    	if ( ! is_array($attributes) || empty($attributes)) {
-    		return $query;
-    	}
+
+        if (!is_array($attributes) || empty($attributes)) {
+            return $query;
+        }
 
         // Add the id by default
         $attributes[] = 'id';
 
         $data = $request->only($attributes);
+
         foreach ($data as $key => $value) {
             $method = is_array($value) ? 'whereIn' : 'where';
             $query->$method($this->getConstraintKey($key), $value);
@@ -30,7 +32,7 @@ trait Listable {
     public function scopeDateRange(Builder $query, ?string $minDate, ?string $maxDate): Builder
     {
         $key = $this->getConstraintKey('created_at');
-        
+
         if (isset($minDate)) {
             $query->whereDate($key, '>=', $minDate);
         }
@@ -51,9 +53,9 @@ trait Listable {
             return $query;
         }
 
-        $query->where(function($q) use ($keyword, $attributes) {
+        $query->where(function ($q) use ($keyword, $attributes) {
             foreach ($attributes as $key) {
-                $q->orWhere($this->getConstraintKey($key), 'LIKE', '%'.$keyword.'%');
+                $q->orWhere($this->getConstraintKey($key), 'LIKE', '%' . $keyword . '%');
             }
         });
 
@@ -70,7 +72,7 @@ trait Listable {
 
     public function getFilterableAttributes(): array
     {
-        if ( ! isset($this->filterable) || ! is_array($this->filterable)) {
+        if (!isset($this->filterable) || !is_array($this->filterable)) {
             return [];
         }
 
@@ -79,8 +81,8 @@ trait Listable {
 
     public function getSearchAttributes(): array
     {
-        if ( ! isset($this->search_attributes) ||
-            ! is_array($this->search_attributes)) {
+        if (!isset($this->search_attributes) ||
+            !is_array($this->search_attributes)) {
             return [];
         }
 
@@ -103,7 +105,7 @@ trait Listable {
     /**
      * Get constraint key based on table name
      * of current model
-     * @param  string $key
+     * @param string $key
      * @return string
      */
     public function getConstraintKey(string $key): string

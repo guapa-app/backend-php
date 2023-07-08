@@ -22,4 +22,16 @@ return [
     'multi_vendors' => 'You cannot make order from multiple sellers',
     'order_status' => "You can't do this action",
     'multi_items_type' => "can't request service and product at the same time",
+
+    'error'                 => 'error',
+    'query_error'           => 'Error. The data could not be sent, please check that the data is correct',
+    'not_found'             => 'Error. This data could not be accessed, please verify that the data is correct',
+    'record_not_found'      => 'Error. This data could not be accessed, please verify that the data is correct',
+    'locale_error'          => 'The selected language is invalid.',
+    'invalid_otp'           => 'Invalid OTP.',
+    'phone_exists'          => 'The phone has already been taken.',
+    'phone_not_exists'      => 'The phone does not exist.',
+    'deleted'               => 'Deleted.',
+    'updated'               => 'Updated.',
+    'created'               => 'Created.',
 ];
