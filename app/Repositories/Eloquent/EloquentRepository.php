@@ -48,7 +48,7 @@ class EloquentRepository implements EloquentRepositoryInterface
      */
     public function all(Request $request): object
     {
-        $perPage = $request->has('perPage') ? $request->get('perPage') : $this->perPage;
+        $perPage = (int)($request->has('perPage') ? $request->get('perPage') : $this->perPage);
 
         if ($perPage > 50) $perPage = 50;
 
@@ -62,7 +62,7 @@ class EloquentRepository implements EloquentRepositoryInterface
             });
 
         if ($request->has('perPage')) {
-            return $query->paginate((int)$perPage ?? $this->perPage);
+            return $query->paginate($perPage);
         } else {
             return $query->get();
         }

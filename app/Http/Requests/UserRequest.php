@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ImageOrArray;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Rules\ImageOrArray;
 
 /**
  * @bodyParam name string Fullname 3 to 100 characters
@@ -24,8 +24,7 @@ use App\Rules\ImageOrArray;
  * @bodyParam password_confirmation string Confirm new password
  * @bodyParam reset_token Reset password token in case of password reset instead of oldpassword
  */
-
-class UserRequest extends FormRequest
+class UserRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -36,12 +35,12 @@ class UserRequest extends FormRequest
     {
         $id = $this->route('id');
         // Only admins can create users using this request
-        if ( ! is_numeric($id) && ! $this->user()->isAdmin()) {
+        if (!is_numeric($id) && !$this->user()->isAdmin()) {
             return false;
         }
 
         // The user can update his own profile only
-        if (is_numeric($id) && ! $this->user()->isAdmin() && $id != $this->user()->id) {
+        if (is_numeric($id) && !$this->user()->isAdmin() && $id != $this->user()->id) {
             return false;
         }
 
@@ -58,43 +57,27 @@ class UserRequest extends FormRequest
         $id = $this->route('id');
 
         $rules = [
-            'name' => 'required|string|min:3|max:100',
-            'email' => [
-                'nullable', 'email', Rule::unique('users'),
-            ],
-            'phone' => 'required|string|min:4|max:20|unique:users,phone',
-            'profile' => 'sometimes|array',
-            'profile.firstname' => 'sometimes|required|string|max:32',
-            'profile.lastname' => 'sometimes|required|string|max:32',
-            'profile.gender' => 'sometimes|required|in:Male,Female,Other',
-            'profile.birth_date' => 'nullable|date|before:today',
-            'profile.about' => 'nullable|string|min:10|max:1024',
-            'profile.photo' => ['nullable', new ImageOrArray(), 'max:10240'],
-
-            // 'address.city_id' => 'required|integer|exists:cities,id',
-            // 'address.address_1' => 'required|string|max:191',
-            // 'address.address_2' => 'nullable|string|max:191',
-            // 'address.postal_code' => 'nullable|string|max:20',
-            // 'address.lat' => 'nullable|numeric',
-            // 'address.lng' => 'nullable|numeric',
-            // 'address.type' => 'required|in:primary|billing|shipping',
-            'password' => 'required|string|min:6|confirmed',
+            'name'                  => 'required|string|min:3|max:100',
+            'email'                 => ['nullable', 'email', Rule::unique('users')],
+            'phone'                 => 'required|string|min:4|max:20|unique:users,phone',
+            'profile'               => 'sometimes|array',
+            'profile.firstname'     => 'sometimes|required|string|max:32',
+            'profile.lastname'      => 'sometimes|required|string|max:32',
+            'profile.gender'        => 'sometimes|required|in:Male,Female,Other',
+            'profile.birth_date'    => 'nullable|date|before:today',
+            'profile.about'         => 'nullable|string|min:10|max:1024',
+            'profile.photo'         => ['nullable', new ImageOrArray(), 'max:10240'],
+            'password'              => 'required|string|min:6|confirmed',
         ];
 
         if (is_numeric($id)) {
             // Updating user
             $rules = array_merge($rules, [
-                'name' => 'sometimes|required|string|min:3|max:100',
-                'email' => [
-                    'nullable', 'email', Rule::unique('users')->ignore($id),
-                ],
-                // 'phone' => 'sometimes|required|string|min:4|max:20|unique:users,phone',
-                // 'address.city_id' => 'sometimes|required|integer|exists:cities,id',
-                // 'address.address_1' => 'sometimes|required|string|max:191',
-                // 'address.type' => 'sometimes|required|in:primary|billing|shipping',
-                'password' => 'sometimes|required|string|min:6|confirmed',
-                'oldpassword' => 'sometimes|string',
-                'reset_token' => 'sometimes|string',
+                'name'              => 'sometimes|required|string|min:3|max:100',
+                'email'             => ['nullable', 'email', Rule::unique('users')->ignore($id)],
+                'password'          => 'sometimes|required|string|min:6|confirmed',
+                'oldpassword'       => 'sometimes|string',
+                'reset_token'       => 'sometimes|string',
             ]);
 
             unset($rules['phone']);
@@ -109,8 +92,6 @@ class UserRequest extends FormRequest
 
     public function messages()
     {
-        return [
-
-        ];
+        return [];
     }
 }

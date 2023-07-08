@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\AddressController as ApiAddressController;
+use App\Http\Requests\AddressListRequest;
 use App\Http\Requests\AddressRequest;
 use Illuminate\Http\Request;
 
 class AddressController extends ApiAddressController
 {
-    public function index(Request $request)
+    public function index(AddressListRequest $request)
     {
         return response()->json(parent::index($request));
     }

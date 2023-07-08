@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Requests\UserRequest;
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Http\Requests\UserRequest;
 use App\Services\UserService;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 /**
  * @group User profile
@@ -14,9 +15,8 @@ class UserController extends BaseApiController
 {
     private $userRepository;
     private $userService;
-    
-    public function __construct(UserRepositoryInterface $userRepository,
-        UserService $userService)
+
+    public function __construct(UserRepositoryInterface $userRepository, UserService $userService)
     {
         parent::__construct();
 
@@ -29,31 +29,31 @@ class UserController extends BaseApiController
      *
      * @authenticated
      * @urlParam id required User id
-     * 
-     * @param  \App\Http\Requests\UserRequest $request
-     * @param  int      $id
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param UserRequest $request
+     * @param int $id
+     * @return Model
      */
     public function update(UserRequest $request, $id)
     {
         $user = $this->userService->update($this->user, $request->validated());
         $user->loadProfileFields();
-	    return response()->json($user);
+        return $user;
     }
 
     /**
      * Get user by id
      *
      * @urlParam id required User id
-     * 
-     * @param  \Illuminate\Http\Request $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Model
      */
     public function single(Request $request, $id)
     {
         $user = $this->userRepository->getOneOrFail($id);
         $user->loadProfileFields();
-    	return response()->json($user);
+        return $user;
     }
 }

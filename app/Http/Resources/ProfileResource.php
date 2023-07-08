@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProfileResource extends JsonResource
@@ -13,10 +14,10 @@ class ProfileResource extends JsonResource
             'firstname'             => (string)$this->firstname,
             'lastname'              => (string)$this->lastname,
             'gender'                => (string)$this->gender,
-            'birth_date'            => $this->birth_date,
+            'birth_date'            => Carbon::parse($this->birth_date)->format('Y-m-d'),
             'about'                 => (string)$this->about,
-            'photo'                 => (string)$this->photo,
-            'settings'              => (array)$this->settings,
+            'settings'              => $this->settings,
+            'photo'                 => PhotoResource::make($this->whenLoaded('photo')),
         ];
     }
 }

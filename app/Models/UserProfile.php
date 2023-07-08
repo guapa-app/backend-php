@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -9,18 +10,17 @@ use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
-use Carbon\Carbon;
 
 class UserProfile extends Model implements HasMedia
 {
-	use InteractsWithMedia;
+    use InteractsWithMedia;
 
-	/**
-	 * Attributes that are mass assignable
-	 * @var array
-	 */
+    /**
+     * Attributes that are mass assignable
+     * @var array
+     */
     protected $fillable = [
-    	'user_id', 'firstname', 'lastname', 'gender',
+        'user_id', 'firstname', 'lastname', 'gender',
         'birth_date', 'about', 'settings',
     ];
 
@@ -42,13 +42,17 @@ class UserProfile extends Model implements HasMedia
         'birth_date',
     ];
 
+    protected $casts = [
+        'settings' => 'array',
+    ];
+
     /**
-     * Modify birth date before save
+     * Modify birthdate before save
      * @param string $value
      */
     public function setBirthDateAttribute($value): void
     {
-        if ( ! empty($value)) {
+        if (!empty($value)) {
             $this->attributes['birth_date'] = Carbon::parse($value)->format('Y-m-d');
         }
     }
@@ -83,20 +87,20 @@ class UserProfile extends Model implements HasMedia
 
     /**
      * Get owner of this profile
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
-    	return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User');
     }
 
     /**
      * User profile photo relationship
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @return MorphOne
      */
     public function photo(): MorphOne
     {
-    	return $this->morphOne('App\Models\Media', 'model')
-    		->where('collection_name', 'avatars');
+        return $this->morphOne('App\Models\Media', 'model')
+            ->where('collection_name', 'avatars');
     }
 }
