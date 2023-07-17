@@ -23,7 +23,7 @@ class Address extends Model implements Listable
     ];
 
     protected $fillable = [
-    	'addressable_id', 'addressable_type', 'title', 'city_id',
+        'addressable_id', 'addressable_type', 'title', 'city_id',
         'postal_code', 'lat', 'lng', 'address_1', 'address_2',
         'type', 'phone',
     ];
@@ -33,12 +33,12 @@ class Address extends Model implements Listable
     ];
 
     protected $search_attributes = [
-        'address_1', 'address_2',
+        'title', 'address_1', 'address_2',
     ];
 
     public function addressable()
     {
-    	return $this->morphTo();
+        return $this->morphTo();
     }
 
     public function city()
@@ -88,12 +88,12 @@ class Address extends Model implements Listable
         $query->applyDirectFilters($request);
 
         if ($request->has('vendor_id')) {
-            $query->where('addressable_id', (int) $request->get('vendor_id'));
+            $query->where('addressable_id', (int)$request->get('vendor_id'));
             $query->where('addressable_type', 'vendor');
         }
 
         if ($request->has('user_id')) {
-            $query->where('addressable_id', (int) $request->get('user_id'));
+            $query->where('addressable_id', (int)$request->get('user_id'));
             $query->where('addressable_type', 'user');
         }
 

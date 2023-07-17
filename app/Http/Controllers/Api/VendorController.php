@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use App\Http\Requests\VendorRequest;
 use App\Contracts\Repositories\VendorRepositoryInterface;
+use App\Http\Requests\VendorRequest;
 use App\Services\VendorService;
+use Illuminate;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 /**
  * @group Vendors
@@ -15,9 +16,8 @@ class VendorController extends BaseApiController
 {
     private $vendorRepository;
     private $vendorService;
-    
-    public function __construct(VendorRepositoryInterface $vendorRepository,
-        VendorService $vendorService)
+
+    public function __construct(VendorRepositoryInterface $vendorRepository, VendorService $vendorService)
     {
         parent::__construct();
 
@@ -40,16 +40,15 @@ class VendorController extends BaseApiController
      * @queryParam lat Filter vendors by location lat and lng. Example: 30.2563
      * @queryParam lng Filter vendors by location lat and lng. Example: 31.9891
      * @queryParam distance maximum distance for location filter in Km. Example: 50
-     * @queryParam page Page number for pagination Example: 2
+     * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
-     * 
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param Request $request
+     * @return Model
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
-        $vendors = $this->vendorRepository->all($request);
-        return response()->json($vendors);
+        return $this->vendorRepository->all($request);
     }
 
     /**
@@ -58,14 +57,13 @@ class VendorController extends BaseApiController
      * @responseFile 200 responses/vendors/create.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
-     * 
-     * @param  \App\Http\Requests\VendorRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param VendorRequest $request
+     * @return Model
      */
-    public function create(VendorRequest $request): JsonResponse
+    public function create(VendorRequest $request)
     {
-        $vendor = $this->vendorService->create($request->validated());
-        return response()->json($vendor);
+        return $this->vendorService->create($request->validated());
     }
 
     /**
@@ -79,15 +77,14 @@ class VendorController extends BaseApiController
      *
      * @authenticated
      * @urlParam id required Vendor id
-     * 
-     * @param  \App\Http\Requests\VendorRequest $request
-     * @param  int      $id
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param VendorRequest $request
+     * @param int $id
+     * @return Model
      */
     public function update(VendorRequest $request, $id)
     {
-        $vendor = $this->vendorService->update($id, $request->validated());
-	    return response()->json($vendor);
+        return $this->vendorService->update($id, $request->validated());
     }
 
     /**
@@ -99,10 +96,10 @@ class VendorController extends BaseApiController
      * @responseFile 404 scenario="Vendor not found" responses/errors/404.json
      *
      * @urlParam id required Vendor id
-     * 
-     * @param  \Illuminate\Http\Request $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param Request $request
+     * @param int $id
+     * @return Model
      */
     public function single(Request $request, $id)
     {
@@ -114,26 +111,24 @@ class VendorController extends BaseApiController
 
         $vendor->about = strip_tags($vendor->about);
 
-    	return response()->json($vendor);
+        return $vendor;
     }
 
     /**
      * Share vendor
-     * 
+     *
      * @responseFile 200 responses/vendors/share.json
      *
      * @urlParam id integer required Vendor id. Example: 1
-     * 
-     * @param  \Illuminate\Http\Request $request
-     * @param  int  $id
-     * @return \Illuminate]Http\JsonResponse
+     *
+     * @param Request $request
+     * @param int $id
+     * @return array
      */
     public function share(Request $request, $id)
     {
-        $sharesCount = $this->vendorService->share((int) $id);
+        $sharesCount = $this->vendorService->share((int)$id);
 
-        return response()->json([
-            'shares_count' => $sharesCount,
-        ]);
+        return ['shares_count' => $sharesCount];
     }
 }

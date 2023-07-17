@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Contracts\HasReviews;
-use App\Contracts\Listable;
 use App\Traits\HasAddresses;
 use App\Traits\Likable;
 use App\Traits\Listable as ListableTrait;
@@ -16,12 +15,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -48,9 +46,14 @@ class Vendor extends Model implements HasMedia, HasReviews
         12 => 'massage therapist'
     ];
 
+    public const STATUSES = [
+        0 => 'closed',
+        1 => 'active',
+    ];
+
     protected $fillable = [
-    	'name', 'email', 'status', 'verified',
-    	'phone', 'about', 'whatsapp', 'twitter',
+        'name', 'email', 'status', 'verified',
+        'phone', 'about', 'whatsapp', 'twitter',
         'instagram', 'snapchat', 'type', 'working_days',
         'working_hours', 'website_url', 'known_url', 'tax_number',
         'cat_number', 'reg_number'
@@ -66,7 +69,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     ];
 
     protected $casts = [
-    	'verified' => 'boolean',
+        'verified' => 'boolean',
     ];
 
     protected $appends = [
@@ -79,7 +82,7 @@ class Vendor extends Model implements HasMedia, HasReviews
      * using values from client without any logic
      * @var array
      */
-    protected $filterable_attributes = [
+    protected $filterable = [
         'status', 'verified',
     ];
 
@@ -98,11 +101,46 @@ class Vendor extends Model implements HasMedia, HasReviews
         self::created(function ($item) {
             Admin::query()->create([
                 "vendor_id" => $item->id,
-                "name"      => $item->name,
-                "email"     => $item->email,
-                "password"  => Hash::make($item->email),
+                "name" => $item->name,
+                "email" => $item->email,
+                "password" => Hash::make($item->email),
             ]);
         });
+    }
+
+    public function getSpecialtyIdsAttribute()
+    {
+        $relations = $this->getRelations();
+        if (!empty($relations['specialties'])) {
+            return $relations['specialties']->pluck('id')->toArray();
+        }
+
+        return [];
+    }
+
+    public function getSharesCountAttribute()
+    {
+        return (int)Redis::hget("vendor:{$this->id}", 'shares_count');
+    }
+
+    public function getViewsCountAttribute()
+    {
+        return (int)Redis::hget("vendor:{$this->id}", 'views_count');
+    }
+
+    public function getWorkDaysAttribute()
+    {
+        $relations = $this->getRelations();
+
+        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
+            return $relations['workDays'];
+        }
+
+        $days = isset($relations['workDays']) ?
+            $relations['workDays']->pluck('day') :
+            [];
+        $this->setRelation('workDays', $days);
+        return $days;
     }
 
     /**
@@ -140,57 +178,22 @@ class Vendor extends Model implements HasMedia, HasReviews
      */
     public function receivesBroadcastNotificationsOn()
     {
-        return 'vendor.'.$this->id;
+        return 'vendor.' . $this->id;
     }
 
     /**
      * Route notifications for the FCM channel.
      * return array of fcm tokens to send the notification to
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param Notification $notification
      *
      * @return array
      */
     public function routeNotificationForFcm(Notification $notification): array
     {
-        return Device::whereIn('user_id', function($query) {
+        return Device::whereIn('user_id', function ($query) {
             $query->select('user_id')->from('user_vendor')->where('vendor_id', $this->id);
         })->where('user_type', 'user')->pluck('fcmtoken')->toArray();
-    }
-
-    public function getSpecialtyIdsAttribute()
-    {
-        $relations = $this->getRelations();
-        if ( ! empty($relations['specialties'])) {
-            return $relations['specialties']->pluck('id')->toArray();
-        }
-
-        return [];
-    }
-
-    public function getSharesCountAttribute()
-    {
-        return (int) Redis::hget("vendor:{$this->id}", 'shares_count');
-    }
-
-    public function getViewsCountAttribute()
-    {
-        return (int) Redis::hget("vendor:{$this->id}", 'views_count');
-    }
-
-    public function getWorkDaysAttribute()
-    {
-        $relations = $this->getRelations();
-
-        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
-            return $relations['workDays'];
-        }
-
-        $days = isset($relations['workDays']) ?
-            $relations['workDays']->pluck('day') :
-            [];
-        $this->setRelation('workDays', $days);
-        return $days;
     }
 
     public function photo()
@@ -200,12 +203,12 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     /**
      * Vendor logo relationship
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @return MorphOne
      */
     public function logo(): MorphOne
     {
-    	return $this->morphOne('App\Models\Media', 'model')
-    		->where('collection_name', 'logos');
+        return $this->morphOne('App\Models\Media', 'model')
+            ->where('collection_name', 'logos');
     }
 
     public function users(): HasMany
@@ -223,8 +226,8 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(Order::class)
             ->where('status', 'Pending')
             ->whereHas('items', function ($q) {
-            $q->where('appointment', null);
-        });
+                $q->where('appointment', null);
+            });
     }
 
     public function orders_consultations(): HasMany
@@ -232,24 +235,24 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(Order::class)
             ->where('status', 'Pending')
             ->whereHas('items', function ($q) {
-            $q->where('appointment', '!=', null);
-        });
+                $q->where('appointment', '!=', null);
+            });
     }
 
     public function staff(): BelongsToMany
     {
-    	return $this->belongsToMany(User::class)
-    		->withPivot('role', 'email')->withTimestamps();
+        return $this->belongsToMany(User::class)
+            ->withPivot('role', 'email')->withTimestamps();
     }
 
     public function managers(): BelongsToMany
     {
-    	return $this->staff()->wherePivot('role', 'manager');
+        return $this->staff()->wherePivot('role', 'manager');
     }
 
     public function doctors(): BelongsToMany
     {
-    	return $this->staff()->wherePivot('role', 'doctor');
+        return $this->staff()->wherePivot('role', 'doctor');
     }
 
     public function specialties()
@@ -290,10 +293,10 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function hasUser(User $user, $role = null)
     {
         return $this->users()->where([
-            'user_id' => $user->id,
-        ])->when($role != null, function($query) use ($role) {
-            $query->where('role', $role);
-        })->first() != null;
+                'user_id' => $user->id,
+            ])->when($role != null, function ($query) use ($role) {
+                $query->where('role', $role);
+            })->first() != null;
     }
 
     public function hasManager(User $user)
@@ -311,7 +314,6 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasUser($user, 'staff');
     }
 
-
     public function scopeCurrentVendor($query, $value)
     {
         return $query->where('id', $value);
@@ -320,6 +322,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');
+
         if (is_array($filter)) {
             $request = new Request($filter);
         }
@@ -331,7 +334,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         $query->applyDirectFilters($request);
 
         if ($request->has('specialty_ids')) {
-            $query->hasAnyTaxonomy((array) $request->get('specialty_ids'));
+            $query->hasAnyTaxonomy((array)$request->get('specialty_ids'));
         }
 
         // Get products nearby specific location by specific distance
@@ -339,15 +342,15 @@ class Vendor extends Model implements HasMedia, HasReviews
             $query->nearBy($request->get('lat'), $request->get('lng'), $request->get('distance'));
         }
 
-        // Only logged in users/admins can use this filter
+        // Only logged-in users/admins can use this filter
         $user = auth()->user();
+
         if ($request->has('user_id') && $user) {
-            $userId = $user->isAdmin() ?
-                (int) $request->get('user_id') :
-                $user->id;
-            $query->whereHas('users', function($q) use ($userId) {
+            $userId = $user->isAdmin() ? (int)$request->get('user_id') : $user->id;
+
+            $query->whereHas('users', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
-            })->when( ! $user->isAdmin(), function($q) {
+            })->when(!$user->isAdmin(), function ($q) {
                 $q->with('addresses');
             });
         }
@@ -369,13 +372,13 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
-    	$query->withCount('users');
+        $query->withCount('users');
         return $query;
     }
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-    	$query->with('logo', 'staff', 'specialties', 'workDays', 'appointments');
+        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments');
         $query->withCount('products', 'offers', 'services', 'orders_order', 'orders_consultations');
         return $query;
     }

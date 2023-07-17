@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\VendorController as ApiVendorController;
+use App\Http\Controllers\Api\V2\VendorController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/',                                                             [ApiVendorController::class, 'index'])->name('list');
-Route::get('/{id}',                                                         [ApiVendorController::class, 'single'])->name('single');
+Route::get('/',                                                             [VendorController::class, 'index'])->name('list');
+Route::get('/{id}',                                                         [VendorController::class, 'single'])->name('single');
 
 Route::group(['middleware' => 'auth:api', 'as' => 'vendors.'], function () {
-    Route::post('/',                                                        [ApiVendorController::class, 'create'])->name('create');
-    Route::match(['put', 'patch', 'post'], '/{id}',                [ApiVendorController::class, 'update'])->name('update');
-    Route::post('/{id}/share',                                              [ApiVendorController::class, 'share'])->name('share');
+    Route::post('/',                                                        [VendorController::class, 'create'])->name('create');
+    Route::match(['put', 'patch', 'post'], '/{id}',                [VendorController::class, 'update'])->name('update');
+    Route::post('/{id}/share',                                              [VendorController::class, 'share'])->name('share');
 });

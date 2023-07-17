@@ -18,7 +18,7 @@ class AddressController extends ApiAddressController
     {
         $index = parent::index($request);
 
-        return (new AddressCollection($index))
+        return AddressCollection::make($index)
             ->additional([
                 "success" => true,
                 'message' => __('api.success'),
@@ -62,6 +62,6 @@ class AddressController extends ApiAddressController
     {
         parent::delete($id);
 
-        return $this->successJsonRes([], __('api.success'));
+        return $this->successJsonRes([], __('api.deleted'));
     }
 }
