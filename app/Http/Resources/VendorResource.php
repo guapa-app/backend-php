@@ -40,12 +40,21 @@ class VendorResource extends JsonResource
             "views_count"                               => (int)$this->views_count,
             "shares_count"                              => (int)$this->shares_count,
 
-            "orders_order_count"                        => (int)$this->orders_order_count,
-            "orders_consultations_count"                => (int)$this->orders_consultations_count,
-
             "is_liked"                                  => (bool)$this->is_liked,
             "specialty_ids"                             => (array)$this->specialty_ids,
             "work_days"                                 => $this->work_days,
+
+            $this->mergeWhen(isset($this->orders_order_count), [
+                "orders_order_count"                        => (int)$this->orders_order_count,
+                "orders_consultations_count"                => (int)$this->orders_consultations_count,
+            ]),
+
+            $this->mergeWhen(isset($this->lat), [
+                "lat"                                       => (double)$this->lat,
+                "lng"                                       => (double)$this->lng,
+                "address_1"                                 => (string)$this->address_1,
+                "distance"                                  => (float)$this->distance,
+            ]),
 
             "staff"                                     => StaffResource::collection($this->whenLoaded('staff')),
             "logo"                                      => MediaResource::make($this->whenLoaded('logo')),
@@ -53,12 +62,6 @@ class VendorResource extends JsonResource
             "specialties"                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
             "appointments"                              => AppointmentResource::collection($this->whenLoaded('appointments')),
 
-            $this->mergeWhen(isset($this->lat), [
-                "lat"                                   => (double)$this->lat,
-                "lng"                                   => (double)$this->lng,
-                "address_1"                             => (string)$this->address_1,
-                "distance"                              => (float)$this->distance,
-            ]),
         ];
     }
 }

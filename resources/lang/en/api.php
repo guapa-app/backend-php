@@ -34,4 +34,9 @@ return [
     'deleted'               => 'Deleted.',
     'updated'               => 'Updated.',
     'created'               => 'Created.',
+
+    'the_offer_expires_in'  => ':countdown',
+    'no_days'               => '',
+    'one_day'               => '1 day',
+    'x_days'                => ':count days',
 ];

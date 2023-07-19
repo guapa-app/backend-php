@@ -55,6 +55,8 @@ class ProductRequest extends FormRequest
         // If the id exists this is an edit request
         $id = $this->route('id');
 
+        dd($id);
+
         $rule_name = $id ? 'nullable' : 'required';
 
         logger("Check product number - $id",
@@ -84,17 +86,17 @@ class ProductRequest extends FormRequest
         ];
 
         // If the user is not an admin, remove the fields updated
-        // only by admin so they won't be available when using
+        // only by admin, so they won't be available when using
         // $request->validated()
         $user = $this->user();
-        if ( $user && ! $user->isAdmin()) {
+        if ($user && !$user->isAdmin()) {
             unset($rules['review']);
             // The user must be member of provided vendor
             $rules['vendor_id'] = [
                 "{$rule_name}", 'integer',
-                Rule::exists('user_vendor')->where(function($query) use ($user) {
+                Rule::exists('user_vendor')->where(function ($query) use ($user) {
                     $query->where('user_id', $user->id);
-                    $query->where('vendor_id', (int) $this->get('vendor_id'));
+                    $query->where('vendor_id', (int)$this->get('vendor_id'));
                 }),
             ];
         }
@@ -103,7 +105,7 @@ class ProductRequest extends FormRequest
         // rule to required fields to validate if exists only
         if (is_numeric($id)) {
             // The admin will always send all parameters
-            if ( $user && ! $user->isAdmin()) {
+            if ($user && !$user->isAdmin()) {
                 foreach ($rules as $key => $value) {
                     $rules[$key] = str_replace("{$rule_name}|", 'sometimes|required|', $value);
                 }
@@ -112,7 +114,7 @@ class ProductRequest extends FormRequest
             // Validate ad media to keep without deletion
             // If not provided all old media will be removed
             // But new media must be provided
-            $rules['keep_media'] = ($id ? "nullable": "required_without:media") . "|array|min:1";
+            $rules['keep_media'] = ($id ? "nullable" : "required_without:media") . "|array|min:1";
             $rules['keep_media.*'] = "{$rule_name}|integer|exists:media,id";
         }
 

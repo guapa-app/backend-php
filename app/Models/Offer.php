@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\Listable;
+use App\Helpers\Common;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
+use Spatie\Image\Exceptions\InvalidManipulation;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -20,24 +22,28 @@ class Offer extends Model implements Listable, HasMedia
     use HasFactory, ListableTrait, InteractsWithMedia;
 
     protected $fillable = [
-    	'product_id', 'discount', 'title', 'description',
-    	'starts_at', 'expires_at',
+        'product_id', 'discount', 'title', 'description',
+        'starts_at', 'expires_at',
     ];
 
     protected $appends = [
-    	'discount_string', 'status',
+        'discount_string', 'status',
     ];
 
     protected $dates = [
-    	'starts_at', 'expires_at',
+        'starts_at', 'expires_at',
     ];
 
     protected $search_attributes = [
-    	'title', 'description',
+        'title', 'description',
     ];
 
     protected $filterable_attributes = [
-    	'product_id',
+        'product_id',
+    ];
+
+    protected $attributes = [
+        'expires_countdown',
     ];
 
     /**
@@ -51,7 +57,9 @@ class Offer extends Model implements Listable, HasMedia
 
     /**
      * Register media conversions
+     * @param BaseMedia|null $media
      * @return void
+     * @throws InvalidManipulation
      */
     public function registerMediaConversions(BaseMedia $media = null): void
     {
@@ -68,45 +76,54 @@ class Offer extends Model implements Listable, HasMedia
             ->performOnCollections('offer_images');
     }
 
+    public function getExpiresCountdownAttribute(): string
+    {
+        $difference = $this->expires_at->diff(now());
+
+        $daysString = Common::getLocalizedUnitString($difference->days, 'day');
+
+        return __('api.the_offer_expires_in', ['countdown' => $daysString]);
+    }
+
     public function getDescriptionAttribute()
     {
-    	return nl2br($this->attributes['description'] ?? '');
+        return nl2br($this->attributes['description'] ?? '');
     }
 
     public function setDescriptionAttribute($value)
     {
-    	$value = str_replace(['<p>', '</p>', '<br>', '<br/>', '<br />'],
-    			['', "\n", "\n", "\n", "\n"], $value);
+        $value = str_replace(['<p>', '</p>', '<br>', '<br/>', '<br />'],
+            ['', "\n", "\n", "\n", "\n"], $value);
 
-    	$this->attributes['description'] = strip_tags($value);
+        $this->attributes['description'] = strip_tags($value);
     }
 
     public function getDiscountStringAttribute()
     {
-    	return $this->discount . '%';
+        return $this->discount . '%';
     }
 
     public function getStatusAttribute()
     {
-    	if ($this->starts_at == null) {
-    		return 'Active';
-    	} elseif (now()->lt($this->starts_at)) {
-    		return 'Incoming';
-    	} elseif (now()->gt($this->expires_at)) {
-    		return 'Expired';
-    	} else {
-    		return 'Active';
-    	}
+        if ($this->starts_at == null) {
+            return 'Active';
+        } elseif (now()->lt($this->starts_at)) {
+            return 'Incoming';
+        } elseif (now()->gt($this->expires_at)) {
+            return 'Expired';
+        } else {
+            return 'Active';
+        }
     }
 
     public function product(): BelongsTo
     {
-    	return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class);
     }
 
     /**
      * Offer image relationship
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @return MorphOne
      */
     public function image(): MorphOne
     {
@@ -116,21 +133,21 @@ class Offer extends Model implements Listable, HasMedia
 
     public function scopeActive($query): Builder
     {
-    	return $query->whereNull('starts_at')
-            ->orWhere(function($q) {
+        return $query->whereNull('starts_at')
+            ->orWhere(function ($q) {
                 $q->whereDate('starts_at', '<=', now())
-    		        ->whereDate('expires_at', '>=', now());
+                    ->whereDate('expires_at', '>=', now());
             });
     }
 
     public function scopeIncoming($query): Builder
     {
-    	return $query->whereDate('starts_at', '>', now());
+        return $query->whereDate('starts_at', '>', now());
     }
 
     public function scopeExpired($query): Builder
     {
-    	return $query->whereDate('expires_at', '<', now());
+        return $query->whereDate('expires_at', '<', now());
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
@@ -147,10 +164,10 @@ class Offer extends Model implements Listable, HasMedia
         $query->applyDirectFilters($request);
 
         if ($request->has('status')) {
-        	$status = $request->get('status');
-        	if (in_array($status, ['active', 'incoming', 'expired'])) {
-        		$query->$status();
-        	}
+            $status = $request->get('status');
+            if (in_array($status, ['active', 'incoming', 'expired'])) {
+                $query->$status();
+            }
         }
 
         return $query;
@@ -174,7 +191,7 @@ class Offer extends Model implements Listable, HasMedia
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-    	$query->with('product', 'image');
+        $query->with('product', 'image');
         return $query;
     }
 }

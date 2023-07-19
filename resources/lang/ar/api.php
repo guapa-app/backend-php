@@ -34,4 +34,9 @@ return [
     'deleted'               => 'تم الحذف.',
     'updated'               => 'تم التحديث.',
     'created'               => 'تم الأضافة.',
+
+    'the_offer_expires_in'  => ':countdown',
+    'no_days'               => 'انتهي',
+    'one_day'               => 'ينتهي بعد يوم واحد',
+    'x_days'                => 'ينتهي بعد :count ايام',
 ];

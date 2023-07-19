@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Requests\ProductRequest;
-use App\Services\ProductService;
 use App\Contracts\Repositories\ProductRepositoryInterface;
+use App\Http\Requests\ProductListRequest;
+use App\Http\Requests\ProductRequest;
+use App\Models\Product;
+use App\Services\ProductService;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @group Products
@@ -13,17 +16,16 @@ use App\Contracts\Repositories\ProductRepositoryInterface;
  */
 class ProductController extends BaseApiController
 {
-	protected $productRepository;
-	protected $productService;
+    protected $productRepository;
+    protected $productService;
 
-	public function __construct(ProductRepositoryInterface $productRepository,
-		ProductService $productService)
-	{
+    public function __construct(ProductRepositoryInterface $productRepository, ProductService $productService)
+    {
         parent::__construct();
 
-		$this->productRepository = $productRepository;
-		$this->productService = $productService;
-	}
+        $this->productRepository = $productRepository;
+        $this->productService = $productService;
+    }
 
     /**
      * Products listing
@@ -44,16 +46,16 @@ class ProductController extends BaseApiController
      * @queryParam lat double Latitude. Example: 30.5666
      * @queryParam lng double Longitude. Example: 31.3229
      * @queryParam distance integer Distance in KM used along with lat and lng. Example: 20
-     * @queryParam page Page number for pagination Example: 2
+     * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param ProductListRequest $request
+     * @return Collection
      */
-    public function index(Request $request)
+    public function index(ProductListRequest $request)
     {
-    	$products = $this->productRepository->all($request);
-    	return response()->json($products);
+        //        dd($products);
+        return $this->productRepository->all($request);
     }
 
     /**
@@ -66,18 +68,18 @@ class ProductController extends BaseApiController
      *
      * @urlParam id required Product id
      *
-     * @param  int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @param int $id
+     * @return Model
      */
     public function single($id)
     {
-    	$product = $this->productRepository->getOneWithRelations((int) $id);
+        $product = $this->productRepository->getOneWithRelations((int)$id);
 
         $product->description = strip_tags($product->description);
 
         $product->vendor->description = strip_tags($product->vendor->description);
 
-    	return response()->json($product);
+        return $product;
     }
 
     /**
@@ -87,15 +89,16 @@ class ProductController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param  \App\Http\Requests\ProductRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param ProductRequest $request
+     * @return Product
      */
     public function create(ProductRequest $request)
     {
-    	$data = $request->validated();
-    	$data['user_id'] = $this->user->id;
-    	$product = $this->productService->create($data);
-    	return response()->json($product);
+        $data = $request->validated();
+
+        $data['user_id'] = $this->user->id;
+
+        return $this->productService->create($data);
     }
 
     /**
@@ -108,33 +111,14 @@ class ProductController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param  int    $id
-     * @param  \App\Http\Requests\ProductRequest $request
+     * @param int $id
+     * @param ProductRequest $request
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return Product
      */
     public function update($id, ProductRequest $request)
     {
-        logger("Check update product number - $id",
-            [
-                'requestall' => $request->all(),
-                'data' => $id,
-            ]
-        );
-
-
-    	$data = $request->validated();
-        logger("Check update order number - $id",
-            [
-                'requestall' => $request->all(),
-                'data' => $data,
-            ]
-        );
-
-
-    	$product = $this->productService->update($id, $data);
-
-    	return response()->json($product);
+        return $this->productService->update($id, $request->validated());
     }
 
     /**
@@ -147,20 +131,14 @@ class ProductController extends BaseApiController
      *
      * @urlParam id required Product id
      *
-     * @param  integer $id
+     * @param integer $id
      *
-     * @return \Illuminat\Http\JsonResponse
-     *
+     * @return int
      */
-    public function delete($id)
+    public function delete(int $id)
     {
-        $productId = (int) $id;
-
         $this->productService->delete($id);
 
-        return response()->json([
-            'message' => __('api.product_deleted'),
-            'id' => $productId,
-        ]);
+        return $id;
     }
 }
