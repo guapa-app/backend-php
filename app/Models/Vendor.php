@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
@@ -28,7 +29,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 class Vendor extends Model implements HasMedia, HasReviews
 {
     use HasFactory, ListableTrait, InteractsWithMedia, Messageable,
-        HasTaxonomies, HasAddresses, Reviewable, Likable, Notifiable;
+        HasTaxonomies, HasAddresses, Reviewable, Likable, Notifiable, SoftDeletes;
 
     public const TYPES = [
         0 => 'hospital',

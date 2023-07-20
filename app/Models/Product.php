@@ -7,6 +7,7 @@ use App\Contracts\Listable;
 use App\Traits\Likable;
 use App\Traits\Listable as ListableTrait;
 use App\Traits\Reviewable;
+use DB;
 use Hamedov\Messenger\Traits\Relatable;
 use Hamedov\Taxonomies\HasTaxonomies;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,8 +15,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -24,11 +25,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 class Product extends Model implements Listable, HasMedia, HasReviews
 {
     use HasFactory, ListableTrait, InteractsWithMedia,
-        HasTaxonomies, Reviewable, Likable, Relatable;
+        HasTaxonomies, Reviewable, Likable, Relatable, SoftDeletes;
 
     protected $fillable = [
-    	'vendor_id', 'title', 'description', 'price',
-    	'status', 'review', 'type', 'terms', 'url'
+        'vendor_id', 'title', 'description', 'price',
+        'status', 'review', 'type', 'terms', 'url'
     ];
 
     protected $appends = [
@@ -84,7 +85,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function getCategoryIdsAttribute()
     {
         $relations = $this->getRelations();
-        if ( ! empty($relations['categories'])) {
+        if (!empty($relations['categories'])) {
             return $relations['categories']->pluck('id')->toArray();
         }
 
@@ -94,7 +95,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function getAddressIdsAttribute()
     {
         $relations = $this->getRelations();
-        if ( ! empty($relations['addresses'])) {
+        if (!empty($relations['addresses'])) {
             return $relations['addresses']->pluck('id')->toArray();
         }
 
@@ -110,7 +111,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function vendor(): BelongsTo
     {
-    	return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Vendor::class);
     }
 
     public function offer(): HasOne
@@ -166,7 +167,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $query->applyDirectFilters($request);
 
         if ($request->has('category_ids')) {
-            $query->hasAnyTaxonomy((array) $request->get('category_ids'));
+            $query->hasAnyTaxonomy((array)$request->get('category_ids'));
         }
 
         // Filter by price range
@@ -175,8 +176,8 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         }
 
         if ($request->has('city_id')) {
-            $cityId = (int) $request->get('city_id');
-            $query->whereHas('addresses', function($q) use ($cityId) {
+            $cityId = (int)$request->get('city_id');
+            $query->whereHas('addresses', function ($q) use ($cityId) {
                 $q->where('city_id', $cityId);
             });
         }
@@ -190,17 +191,17 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         // We need to return only active products owned by active vendors
         // Excluding admins and vendors displaying their own products.
         $currentUserWorksForFilteredVendor = $user && !$user->isAdmin() && $request->has('vendor_id')
-            && $user->hasVendor((int) $request->get('vendor_id'));
+            && $user->hasVendor((int)$request->get('vendor_id'));
         if (
-            ! $currentUserWorksForFilteredVendor &&
+            !$currentUserWorksForFilteredVendor &&
             (!$user || !$user->isAdmin())
         ) {
             $query->active();
         }
 
         if ($request->has('list_type')) {
-            $listType = (string) $request->get('list_type');
-            $status = (string) $request->get('status');
+            $listType = (string)$request->get('list_type');
+            $status = (string)$request->get('status');
             $query->listType($listType, $currentUserWorksForFilteredVendor, $status);
         }
 
@@ -214,7 +215,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             'products.review' => 'Approved',
         ]);
 
-        $query->whereHas('vendor', function($q) {
+        $query->whereHas('vendor', function ($q) {
             $q->where('vendors.status', '1');
             $q->where('vendors.verified', '1');
         });
@@ -224,29 +225,29 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     /**
      * Scope the query to return only products nearby a specific location by specific distance
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  double  $lat
-     * @param  double  $lng
-     * @param  integer $dist
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @param double $lat
+     * @param double $lng
+     * @param integer $dist
+     * @return Builder
      */
     public function scopeNearBy($query, $lat, $lng, $dist = 50)
     {
         $query->select('products.*');
 
-        $query->join('product_addresses', function($join) {
+        $query->join('product_addresses', function ($join) {
             $join->on('products.id', '=', 'product_addresses.product_id');
         });
 
-        if ( ! isset($dist) || (int) $dist < 1) {
+        if (!isset($dist) || (int)$dist < 1) {
             $dist = 50;
         }
 
         $distance_aggregate = "(6371 * acos(cos(radians($lat)) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians($lng)) + sin(radians($lat)) * sin(radians(addresses.lat))))";
 
-        $query->addSelect(\DB::raw($distance_aggregate . ' AS distance'));
+        $query->addSelect(DB::raw($distance_aggregate . ' AS distance'));
 
-        $query->join('addresses', function($join) use ($lat, $lng, $dist) {
+        $query->join('addresses', function ($join) use ($lat, $lng, $dist) {
             $join->on('addresses.id', '=', 'product_addresses.address_id');
         });
 
@@ -261,7 +262,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function scopeListType($query, string $type, bool $userWorksForVendor, string $status)
     {
         if ($type === 'offers') {
-            $query->whereHas('offer', function($q) use ($userWorksForVendor, $status) {
+            $query->whereHas('offer', function ($q) use ($userWorksForVendor, $status) {
                 if (!$userWorksForVendor || $status === 'active') {
                     $q->active();
                 } elseif ($status === 'expired') {
@@ -277,7 +278,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
-    	$query->with('vendor');
+        $query->with('vendor');
         return $query;
     }
 
@@ -294,7 +295,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-    	$query->with([
+        $query->with([
             'vendor', 'vendor.logo', 'offer', 'offer.image',
             'media', 'categories', 'addresses', 'vendor.appointments',
             'vendor.workDays',
