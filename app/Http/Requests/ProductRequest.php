@@ -55,8 +55,6 @@ class ProductRequest extends FormRequest
         // If the id exists this is an edit request
         $id = $this->route('id');
 
-        dd($id);
-
         $rule_name = $id ? 'nullable' : 'required';
 
         logger("Check product number - $id",

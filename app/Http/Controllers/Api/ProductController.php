@@ -54,7 +54,6 @@ class ProductController extends BaseApiController
      */
     public function index(ProductListRequest $request)
     {
-        //        dd($products);
         return $this->productRepository->all($request);
     }
 
