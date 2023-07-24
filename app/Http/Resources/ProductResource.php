@@ -8,6 +8,7 @@ class ProductResource extends JsonResource
 {
     public function toArray($request)
     {
+//        return $this->resource;
         return [
             "id"                                    => $this->id,
             "vendor_id"                             => $this->vendor_id,
@@ -19,13 +20,13 @@ class ProductResource extends JsonResource
             "type"                                  => $this->type,
             "terms"                                 => $this->terms,
             "url"                                   => $this->url,
-            "category_ids"                          => $this->category_ids,
-            "address_ids"                           => $this->address_ids,
             "likes_count"                           => $this->likes_count,
             "is_liked"                              => $this->is_liked,
             "offer"                                 => OfferResource::make($this->whenLoaded('offer')),
             "vendor"                                => VendorResource::make($this->whenLoaded('vendor')),
-            "image"                                 => MediaResource::make($this->whenLoaded('image')),
+            "taxonomies"                            => TaxonomyResource::collection($this->whenLoaded('taxonomies')),
+            "addresses"                             => AddressResource::collection($this->whenLoaded('addresses')),
+            "images"                                => MediaResource::collection($this->whenLoaded('media')),
         ];
     }
 }
