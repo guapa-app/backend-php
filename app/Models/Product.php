@@ -33,7 +33,6 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     ];
 
     protected $appends = [
-        'category_ids', 'address_ids',
         'likes_count', 'is_liked',
     ];
 
@@ -284,7 +283,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'vendor.logo', 'image', 'offer', 'offer.image');
+        $query->with('vendor.logo', 'media', 'offer', 'offer.image', 'taxonomies');
         return $query;
     }
 
@@ -297,7 +296,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     {
         $query->with([
             'vendor', 'vendor.logo', 'offer', 'offer.image',
-            'media', 'categories', 'addresses', 'vendor.appointments',
+            'media', 'taxonomies', 'addresses', 'vendor.appointments',
             'vendor.workDays',
         ]);
 

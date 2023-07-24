@@ -43,7 +43,7 @@ class Offer extends Model implements Listable, HasMedia
     ];
 
     protected $attributes = [
-        'expires_countdown',
+        'expires_countdown','price'
     ];
 
     /**
@@ -83,6 +83,11 @@ class Offer extends Model implements Listable, HasMedia
         $daysString = Common::getLocalizedUnitString($difference->days, 'day');
 
         return __('api.the_offer_expires_in', ['countdown' => $daysString]);
+    }
+
+    public function getPriceAttribute(): float
+    {
+        return round($this->product->price * (1 - ($this->discount / 100)), 1);
     }
 
     public function getDescriptionAttribute()
