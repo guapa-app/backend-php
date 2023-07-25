@@ -31,6 +31,7 @@ Route::prefix("v2")->group(function () {
     Route::prefix('favorites')->group(base_path('routes/v2/api/favorites.php'));
     Route::prefix('addresses')->group(base_path('routes/v2/api/addresses.php'));
     Route::prefix('messaging')->group(base_path('routes/v2/api/messaging.php'));
+    Route::prefix('taxonomies')->group(base_path('routes/v2/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/v2/api/notifications.php'));
 
     Route::post('devices',                  [DeviceController::class, 'addDevice'])->middleware('auth:api');

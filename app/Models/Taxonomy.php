@@ -27,11 +27,20 @@ class Taxonomy extends BaseTaxonomy implements Listable
     ];
 
     /**
+     * Attributes that can be filtered directly
+     * using values from client without any logic
+     * @var array
+     */
+    protected $filterable = [
+        'type'
+    ];
+
+    /**
      * Attributes to be searched using like operator
      * @var array
      */
     protected $search_attributes = [
-        'title', 'description', 'type',
+        'slug', 'title', 'description'
     ];
 
     /**
@@ -96,6 +105,11 @@ class Taxonomy extends BaseTaxonomy implements Listable
     }
 
     public function scopeWithListCounts(Builder $query, Request $request) : Builder
+    {
+        return $query;
+    }
+
+    public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         return $query;
     }

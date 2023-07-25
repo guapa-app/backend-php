@@ -17,12 +17,7 @@ class TaxonomyResource extends JsonResource
             "font_icon"             => (string)$this->font_icon,
             "type"                  => (string)$this->type,
             "parent_id"             => $this->parent_id,
-
-            $this->whenPivotLoaded('taxonomies', [
-                "taxable_id"            => (int)$this->pivot->taxable_id,
-                "taxonomy_id"           => (int)$this->pivot->taxonomy_id,
-                "taxable_type"          => (string)$this->pivot->taxable_type,
-            ]),
+            "icon"                  => MediaResource::make($this->whenLoaded('icon')),
         ];
     }
 }
