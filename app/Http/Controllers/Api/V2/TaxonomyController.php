@@ -21,11 +21,19 @@ class TaxonomyController extends BaseApiController
 
     public function index(Request $request)
     {
-        return TaxonomyCollection::make($this->taxRepository->all($request));
+        return TaxonomyCollection::make($this->taxRepository->all($request))
+            ->additional([
+                "success" => true,
+                'message' => __('api.success'),
+            ]);
     }
 
     public function single($id)
     {
-        return TaxonomyResource::make($this->taxRepository->getOneWithRelations($id));
+        return TaxonomyResource::make($this->taxRepository->getOneWithRelations($id))
+            ->additional([
+                "success" => true,
+                'message' => __('api.success'),
+            ]);
     }
 }
