@@ -15,14 +15,20 @@ abstract class GeneralCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return $this->additional + [
+        return $this->prepareAddiitonal($request) + [
                 'data' => [
                         "items" => $this->collection
                     ] + $this->preparePayload($request),
             ];
     }
 
-    private function preparePayload($request): array
+
+    private function prepareAddiitonal($request)
+    {
+        return $request->has('perPage') ? $this->additional : [];
+    }
+
+    private function preparePayload($request)
     {
         if ($request->has('perPage'))
             $payload =                     [
