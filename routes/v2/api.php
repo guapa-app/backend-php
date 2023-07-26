@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\V2\DataController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,7 +37,7 @@ Route::prefix("v2")->group(function () {
 
     Route::post('devices',                  [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::post('contact',                  [BaseApiController::class, 'contact'])->middleware('auth:api');
-    Route::get('data',                      [BaseApiController::class, 'data']);
+    Route::get('data',                      [DataController::class, 'data']);
     Route::get('pages',                     [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status',   [OrderController::class, 'changeInvoiceStatus']);
 
