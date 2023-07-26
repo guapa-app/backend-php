@@ -7,6 +7,7 @@ use App\Contracts\Repositories\PageRepositoryInterface;
 use App\Contracts\Repositories\SettingRepositoryInterface;
 use App\Contracts\Repositories\SupportMessageRepositoryInterface;
 use App\Contracts\Repositories\TaxRepositoryInterface;
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportMessageRequest;
 use App\Models\Address;
@@ -35,28 +36,30 @@ class BaseApiController extends Controller
         $cityRepository = resolve(CityRepositoryInterface::class);
         $settingRepository = resolve(SettingRepositoryInterface::class);
 
-        $addressTypes = Address::TYPES;
-        $address_types = array_map(function ($v, $k) {
-            return ['id' => $k, 'name' => $v];
-        }, $addressTypes, array_keys($addressTypes));
-
-        $vendorTypes = Vendor::TYPES;
-        $vendor_types = array_map(function ($v, $k) {
-            return ['id' => $k, 'name' => $v];
-        }, $vendorTypes, array_keys($vendorTypes));
-
         return [
             'specialties'           => $taxRepository->getForApiData(['type' => 'specialty']),
             'categories'            => $taxRepository->getForApiData(['type' => 'category']),
             'blog_categories'       => $taxRepository->getForApiData(['type' => 'blog_category']),
-            'address_types'         => $address_types,
-            'vendor_types'          => $vendor_types,
+            'address_types'         => $this->address_types(),
+            'vendor_types'          => $this->vendor_types(),
             'cities'                => $cityRepository->getAll(),
             'settings'              => $settingRepository->getAll(),
             'max_price'             => ceil(Product::max('price')),
             'product_fees'          => Setting::getProductFees(),
             'taxes_percentage'      => Setting::getTaxes(),
         ];
+    }
+
+    public function address_types()
+    {
+        $types = Address::TYPES;
+        return Common::mapIdName($types);
+    }
+
+    public function vendor_types()
+    {
+        $types = Vendor::TYPES;
+        return Common::mapIdName($types);
     }
 
     /**

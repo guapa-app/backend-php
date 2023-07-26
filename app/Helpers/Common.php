@@ -98,4 +98,12 @@ class Common
             return $value;
         }
     }
+
+    public static function mapIdName(array $data) :array
+    {
+        return array_map(function ($v, $k) {
+            return ['id' => $k, 'name' => $v];
+        }, $data, array_keys($data));
+
+    }
 }

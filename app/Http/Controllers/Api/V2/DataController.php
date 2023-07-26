@@ -17,4 +17,14 @@ class DataController extends BaseApiController
                 'message' => __('api.success'),
             ]);
     }
+
+    public function address_types()
+    {
+        return $this->successJsonRes(parent::address_types(), __("api.success"));
+    }
+
+    public function vendor_types()
+    {
+        return $this->successJsonRes(parent::vendor_types(), __("api.success"));
+    }
 }
