@@ -11,6 +11,8 @@ class PDFService
     {
         $invoice = $order->invoice;
 
+        abort_if($order->invoice == null, 405, "There is no invoice for this order");
+
         TCPDF::SetRTL(true);
         TCPDF::AddPage('L', 'A4');
         TCPDF::SetFont('aealarabiya', '', 12);

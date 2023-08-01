@@ -9,8 +9,8 @@ use App\Models\Invoice;
 use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\PDFService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * @group Orders
@@ -42,7 +42,7 @@ class OrderController extends BaseApiController
      * @queryParam perPage Results to fetch per page Example: 15
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return Collection
      */
     public function index(GetOrdersRequest $request)
     {
@@ -54,8 +54,7 @@ class OrderController extends BaseApiController
             abort(403, 'Forbidden');
         }
 
-        $orders = $this->orderRepository->all($request);
-        return response()->json($orders);
+        return $this->orderRepository->all($request);
     }
 
     /**
@@ -70,12 +69,11 @@ class OrderController extends BaseApiController
      * @urlParam id required Order id
      *
      * @param int $id
-     * @return JsonResponse
+     * @return Order
      */
     public function single($id)
     {
-        $order = $this->orderService->getOrderDetails((int)$id);
-        return response()->json($order);
+        return $this->orderService->getOrderDetails((int)$id);
     }
 
     /**
@@ -86,14 +84,13 @@ class OrderController extends BaseApiController
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
      * @param OrderRequest $request
-     * @return JsonResponse
+     * @return Collection
      */
     public function create(OrderRequest $request)
     {
         $data = $request->validated();
         $data['user_id'] = $this->user->id;
-        $orders = $this->orderService->create($data);
-        return response()->json($orders);
+        return $this->orderService->create($data);
     }
 
     /**
@@ -110,23 +107,17 @@ class OrderController extends BaseApiController
      * @param int $id
      * @param OrderRequest $request
      *
-     * @return JsonResponse
+     * @return Order
      */
     public function update($id, Request $request)
     {
         $data = $this->validate($request, [
             'status' => 'required|in:Canceled,Accepted,Rejected',
         ]);
-        logger("Check update order number - $id",
-            [
-                'requestall' => $request->all(),
-                'data' => $data,
-            ]
-        );
 
-        $order = $this->orderService->update((int)$id, $data);
+        $this->logReq("Update order number - $id");
 
-        return response()->json($order);
+        return $this->orderService->update((int)$id, $data);
     }
 
     public function changeInvoiceStatus(Request $request)
@@ -159,6 +150,6 @@ class OrderController extends BaseApiController
 
         logger("Print PDF\n order { $order->id }", ["\norder" => $order]);
 
-        return response()->json($order->invoice_url);
+        return $order->invoice_url;
     }
 }

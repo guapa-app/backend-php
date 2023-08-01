@@ -59,7 +59,7 @@ class OrderService {
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $data['total'] = array_sum(array_map(function ($product) use ($data) {
+                $data['total'] = (double) array_sum(array_map(function ($product) use ($data) {
                     $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
                         return (int)($value['id']) === $product->id;
                     });

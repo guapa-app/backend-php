@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\OrderController as ApiOrderController;
+use App\Http\Controllers\Api\V2\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api'], function() {
-	Route::get('/',                                             [ApiOrderController::class, 'index']);
-	Route::get('/{id}',                                         [ApiOrderController::class, 'single']);
-	Route::post('/',                                            [ApiOrderController::class, 'create']);
-    Route::post('{id}/print-pdf',                               [ApiOrderController::class, 'printPDF']);
-    Route::match(['put', 'patch', 'post'], '/{id}',    [ApiOrderController::class, 'update']);
+	Route::get('/',                                             [OrderController::class, 'index']);
+	Route::get('/{id}',                                         [OrderController::class, 'single']);
+	Route::post('/',                                            [OrderController::class, 'create']);
+    Route::post('{id}/print-pdf',                               [OrderController::class, 'printPDF']);
+    Route::match(['put', 'patch', 'post'], '/{id}',    [OrderController::class, 'update']);
 });

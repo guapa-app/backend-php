@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DeviceRequest;
+use App\Models\Admin;
+use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -11,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Log;
+use function request;
 
 class Controller extends BaseController
 {
@@ -18,13 +21,13 @@ class Controller extends BaseController
 
     /**
      * Current user instance
-     * @var \App\Models\User|\App\Models\Admin|null
+     * @var User|Admin|null
      */
     protected $user;
 
     public function isAdmin()
     {
-    	return $this->user && $this->user->isAdmin();
+        return $this->user && $this->user->isAdmin();
     }
 
     /**
@@ -32,11 +35,11 @@ class Controller extends BaseController
      *
      * @authenticated
      *
-     * @param \App\Http\Requests\DeviceRequest $request
+     * @param DeviceRequest $request
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function addDevice(DeviceRequest $request, UserService $service) : JsonResponse
+    public function addDevice(DeviceRequest $request, UserService $service): JsonResponse
     {
         $data = $request->validated();
         $device = $service->addDevice($this->user, $data);
@@ -44,7 +47,7 @@ class Controller extends BaseController
     }
 
 
-    public function successJsonRes(array $data= [], string $message = "", $status = Response::HTTP_OK): JsonResponse
+    public function successJsonRes(array $data = [], string $message = "", $status = Response::HTTP_OK): JsonResponse
     {
         return response()->json([
             "success" => true,
@@ -53,7 +56,7 @@ class Controller extends BaseController
         ], $status);
     }
 
-    public function errorJsonRes(array $errors= [], string $message = "", $status = Response::HTTP_BAD_REQUEST): JsonResponse
+    public function errorJsonRes(array $errors = [], string $message = "", $status = Response::HTTP_BAD_REQUEST): JsonResponse
     {
         return response()->json([
             "success" => false,
@@ -65,14 +68,14 @@ class Controller extends BaseController
 
     public function logReq($message = "")
     {
-        Log::alert("*** " .
-            \request()->method() .
-            " >-> " . \request()->decodedPath() .
-            " >-> " . \request()->route()->getName() .
-            " *** \n",
+        Log::alert("***" .
+            "\nMessage >-> $message" .
+            "\nReq method >-> " . request()->method() .
+            "\nPath >-> " . request()->decodedPath() .
+            "\nRoute name >-> " . request()->route()->getName() .
+            "\n***",
             [
-                "Request Data >-> " => \request()->all(),
-                "\nMessage >-> " => $message,
+                "\nRequest Data >-> " => request()->all()
             ]);
     }
 }

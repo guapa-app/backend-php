@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FirebaseDynamicLink;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,9 +15,23 @@ class OrderItem extends Model
     	'order_id', 'product_id', 'amount', 'quantity', 'appointment', 'offer_id',
     ];
 
+    protected $appends = [
+        'qr_code_link'
+    ];
+
     public function getAppointmentAttribute($appointment)
     {
         return $appointment == null ? null : json_decode($appointment);
+    }
+
+    public function getQrCodeLinkAttribute()
+    {
+        return FirebaseDynamicLink::create(config('app.url') .
+            "?screen={order_item}" .
+            "&order={$this->order_id}" .
+            "&item={$this->id}" .
+            "&product={$this->product_id}"
+        );
     }
 
     public function order()

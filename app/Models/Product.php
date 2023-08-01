@@ -33,7 +33,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     ];
 
     protected $appends = [
-        'likes_count', 'is_liked',
+        'likes_count', 'is_liked', 'taxonomy_name'
     ];
 
     /**
@@ -79,6 +79,16 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 900, 1500)
             ->performOnCollections('products');
+    }
+
+    public function getTaxonomyNameAttribute()
+    {
+        $relations = $this->getRelations();
+        if (!empty($relations['taxonomies'])) {
+            return $relations['taxonomies'][0]->title;
+        }
+
+        return "";
     }
 
     public function getCategoryIdsAttribute()

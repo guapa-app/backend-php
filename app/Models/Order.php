@@ -4,8 +4,8 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -14,8 +14,8 @@ class Order extends Model implements Listable
     use HasFactory, ListableTrait;
 
     protected $fillable = [
-    	'user_id', 'vendor_id', 'address_id', 'total', 'status',
-    	'note', 'name', 'phone', 'is_used', 'invoice_url'
+        'user_id', 'vendor_id', 'address_id', 'total', 'status',
+        'note', 'name', 'phone', 'is_used', 'invoice_url'
     ];
 
     /**
@@ -35,7 +35,6 @@ class Order extends Model implements Listable
         'name', 'phone',
     ];
 
-
     protected static function boot()
     {
         parent::boot();
@@ -47,7 +46,7 @@ class Order extends Model implements Listable
 
     public function user()
     {
-    	return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function vendor()
@@ -57,17 +56,17 @@ class Order extends Model implements Listable
 
     public function address()
     {
-    	return $this->belongsTo(Address::class);
+        return $this->belongsTo(Address::class);
     }
 
     public function items()
     {
-    	return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class);
     }
 
     public function invoice()
     {
-    	return $this->hasOne(Invoice::class);
+        return $this->hasOne(Invoice::class);
     }
 
     public function scopeCurrentVendor($query, $value)
@@ -90,8 +89,8 @@ class Order extends Model implements Listable
 
         if ($request->hasAny(['products', 'procedures'])) {
             $productType = $request->has('products') ? 'product' : 'service';
-            $query->whereHas('items', function($q) use ($productType) {
-                $q->whereHas('product', function($q2) use ($productType) {
+            $query->whereHas('items', function ($q) use ($productType) {
+                $q->whereHas('product', function ($q2) use ($productType) {
                     $q2->where('type', $productType);
                 });
             });

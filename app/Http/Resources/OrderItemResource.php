@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class OrderItemResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            "id"           => $this->id,
+            "amount"       => (double)$this->amount,
+            "quantity"     => (int)$this->quantity,
+            "order_id"     => $this->order_id,
+            "appointment"  => $this->appointment,
+            "product"      => ProductResource::make($this->whenLoaded('product')),
+            "offer"        => OfferResource::make($this->whenLoaded('offer')),
+            "vendor"       => VendorResource::make($this->whenLoaded('vendor')),
+        ];
+    }
+}

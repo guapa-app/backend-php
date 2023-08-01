@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Models\Product;
 use App\Models\OrderItem;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class OrderRequest extends FormRequest
 {
@@ -27,19 +26,20 @@ class OrderRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'products' => 'required|array|min:1',
-            'products.*' => 'required|array',
-            'products.*.id' => 'required|integer|exists:products,id',
-            'products.*.quantity' => 'required|integer|min:1|max:10000',
-            'products.*.appointment' => 'sometimes|array',
-            'products.*.appointment.id' => 'sometimes|required|integer|exists:appointments,id',
-            'products.*.appointment.date' => 'sometimes|required|date|after_or_equal:today',
-            'products.*.staff_user_id' => 'sometimes|required|integer|exists:users,id',
-            'address_id' => 'sometimes|integer|exists:addresses,id',
-            'note' => 'nullable|string|max:1000',
-            'name' => 'sometimes|required|string|max:60',
-            'phone' => 'sometimes|required|string|max:30',
-            'status' => 'sometimes|string',
+            'note'                              => 'nullable|string|max:1000',
+            'name'                              => 'sometimes|required|string|max:60',
+            'phone'                             => 'sometimes|required|string|max:30',
+            'status'                            => 'sometimes|string',
+            'products'                          => 'required|array|min:1',
+            'address_id'                        => 'sometimes|integer|exists:addresses,id',
+
+            'products.*'                        => 'required|array',
+            'products.*.id'                     => 'required|integer|exists:products,id',
+            'products.*.quantity'               => 'required|integer|min:1|max:10000',
+            'products.*.appointment'            => 'sometimes|array',
+            'products.*.appointment.id'         => 'sometimes|required|integer|exists:appointments,id',
+            'products.*.appointment.date'       => 'sometimes|required|date|after_or_equal:today',
+            'products.*.staff_user_id'          => 'sometimes|required|integer|exists:users,id',
         ];
 
         if ($this->user() && $this->user()->isAdmin()) {

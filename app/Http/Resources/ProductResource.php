@@ -8,20 +8,21 @@ class ProductResource extends JsonResource
 {
     public function toArray($request)
     {
-//        return $this->resource;
         return [
             "id"                                    => $this->id,
             "vendor_id"                             => $this->vendor_id,
-            "title"                                 => $this->title,
-            "description"                           => $this->description,
-            "price"                                 => $this->price,
-            "status"                                => $this->status,
-            "review"                                => $this->review,
-            "type"                                  => $this->type,
-            "terms"                                 => $this->terms,
-            "url"                                   => $this->url,
-            "likes_count"                           => $this->likes_count,
-            "is_liked"                              => $this->is_liked,
+            "title"                                 => (string)$this->title,
+            "description"                           => (string)$this->description,
+            "taxonomy_name"                         => (string)$this->taxonomy_name,
+            "price"                                 => (double)$this->price,
+            "status"                                => (string)$this->status,
+            "review"                                => (string)$this->review,
+            "type"                                  => (string)$this->type,
+            "terms"                                 => (string)$this->terms,
+            "url"                                   => (string)$this->url,
+            "likes_count"                           => (int)$this->likes_count,
+            "is_liked"                              => (boolean)$this->is_liked,
+
             "offer"                                 => OfferResource::make($this->whenLoaded('offer')),
             "vendor"                                => VendorResource::make($this->whenLoaded('vendor')),
             "taxonomies"                            => TaxonomyResource::collection($this->whenLoaded('taxonomies')),
