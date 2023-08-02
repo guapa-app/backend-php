@@ -55,17 +55,17 @@ class ChatMessage extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title' => $this->getSenderName(),
-            'body' => $this->getMessageBody(),
-            'sound' => 'default', // Optional
-            'icon' => '', // Optional
-            'click_action' => '' // Optional
+            'title'         => $this->getSenderName(),
+            'body'          => $this->getMessageBody(),
+            'sound'         => 'default', // Optional
+            'icon'          => '', // Optional
+            'click_action'  => '' // Optional
         ])->data([
-            'type' => 'message',
-            'is_offer' => $this->message->type === 'offer',
-            'message' => $this->message,
-            'resource' => 'conversations',
-            'id' => $this->message->conversation_id,
+            'type'          => 'message',
+            'is_offer'      => $this->message->type === 'offer',
+            'message'       => $this->message,
+            'resource'      => 'conversations',
+            'id'            => $this->message->conversation_id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
@@ -94,12 +94,12 @@ class ChatMessage extends Notification
     public function toArray($notifiable)
     {
         return [
-            'type' => 'message',
+            'type'     => 'message',
             'is_offer' => $this->message->type === 'offer',
-            'message' => $this->message,
+            'message'  => $this->message,
             'resource' => 'conversations',
-            'id' => $this->message->conversation_id,
-            'summary' => $this->getMessageBody(),
+            'id'       => $this->message->conversation_id,
+            'summary'  => $this->getMessageBody(),
         ];
     }
 
@@ -107,7 +107,7 @@ class ChatMessage extends Notification
      * Get the broadcast representation of the notification.
      *
      * @param mixed $notifiable
-     * @return array
+     * @return BroadcastMessage
      */
     public function toBroadcast($notifiable)
     {

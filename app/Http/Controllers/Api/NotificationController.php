@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 /**
  * @group Notifications
@@ -23,20 +21,21 @@ class NotificationController extends BaseApiController
      * @responseFile 200 responses/notifications/list.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @queryParam page Page number for pagination Example: 2
+     * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param Request $request
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return LengthAwarePaginator
      */
     public function index(Request $request)
     {
         $perPage = $request->get('perPage');
         $notifications = $this->user->notifications()->paginate($perPage ?: 15);
 
-        $notifications->getCollection()->transform(function($notification) {
+        $notifications->getCollection()->transform(function ($notification) {
             $data = $notification->data;
+
             if (isset($data['summary'])) {
                 $notification->summary = $data['summary'];
             } else {
@@ -46,7 +45,7 @@ class NotificationController extends BaseApiController
             return $notification;
         });
 
-    	return response()->json($notifications);
+        return $notifications;
     }
 
     /**
@@ -55,17 +54,17 @@ class NotificationController extends BaseApiController
      * @responseFile 200 responses/notifications/list.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @queryParam page Page number for pagination Example: 2
+     * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return LengthAwarePaginator
      */
     public function unread(Request $request)
     {
         $perPage = $request->get('perPage');
         $notifications = $this->user->unreadNotifications()->paginate($perPage ?: 15);
 
-        $notifications->getCollection()->transform(function($notification) {
+        $notifications->getCollection()->transform(function ($notification) {
             $data = $notification->data;
             if (isset($data['summary'])) {
                 $notification->summary = $data['summary'];
@@ -76,7 +75,7 @@ class NotificationController extends BaseApiController
             return $notification;
         });
 
-    	return response()->json($notifications);
+        return $notifications;
     }
 
     /**
@@ -85,13 +84,11 @@ class NotificationController extends BaseApiController
      * @responseFile 200 responses/notifications/unread_count.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return int
      */
     public function unread_count()
     {
-        return response()->json([
-            'count' => $this->user->unreadNotifications()->count(),
-        ]);
+        return $this->user->unreadNotifications()->count();
     }
 
     /**
@@ -100,13 +97,12 @@ class NotificationController extends BaseApiController
      * @responseFile 200 responses/notifications/mark_read.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return int
      */
     public function markAllAsRead()
     {
-    	$now = Carbon::now();
-    	$this->user->unreadNotifications()->update(['read_at' => $now]);
-    	return response()->json(["message" => __('api.success')], 200);
+        return $this->user->unreadNotifications()
+            ->update(['read_at' => Carbon::now()]);
     }
 
     /**
@@ -117,17 +113,16 @@ class NotificationController extends BaseApiController
      * @responseFile 200 responses/notifications/mark_read.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param  integer $notifId
+     * @param string $notification_id
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return int
      */
-    public function markRead($notifId = 0)
+    public function markRead(string $notification_id = "")
     {
-    	$now = Carbon::now();
-    	$this->user->unreadNotifications()->where('id', $notifId)->update([
-            'read_at' => $now,
-        ]);
-
-    	return response()->json(["message" => __('api.success')], 200);
+        return $this->user->unreadNotifications()
+            ->where('id', $notification_id)
+            ->update([
+                'read_at' => Carbon::now()
+            ]);
     }
 }

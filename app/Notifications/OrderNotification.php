@@ -55,8 +55,8 @@ class OrderNotification extends Notification
     {
         return [
             'order_id' => $this->order->id,
-            'summary' => $this->getSummary(),
-            'type' => $this->orderType(),
+            'summary'  => $this->getSummary(),
+            'type'     => $this->orderType(),
         ];
     }
 
@@ -64,7 +64,7 @@ class OrderNotification extends Notification
     {
         return [
             'message' => $this->getWhatsappMessage(),
-            'phones' => [$notifiable->phone],
+            'phones'  => [$notifiable->phone],
         ];
     }
 
@@ -104,15 +104,15 @@ class OrderNotification extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title' => 'New order',
-            'body' => 'New order from ' . $this->user->name . ' #' . $this->order->id,
-            'sound' => 'default',
-            'icon' => '',
-            'click_action' => ''
+            'title'         => 'New order',
+            'body'          => 'New order from ' . $this->user->name . ' #' . $this->order->id,
+            'sound'         => 'default',
+            'icon'          => '',
+            'click_action'  => ''
         ])->data([
-            'type' => $this->orderType(),
-            'summary' => $this->getSummary(),
-            'order_id' => $this->order->id,
+            'type'          => $this->orderType(),
+            'summary'       => $this->getSummary(),
+            'order_id'      => $this->order->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;

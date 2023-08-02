@@ -37,16 +37,16 @@ class WhatsappChannel
         try {
             if (config('app.debug')) info('Sending message to ' . $phone);
             $data = Http::withHeaders([
-                'Content-Type' => 'application/json',
+                'Content-Type'  => 'application/json',
                 'Authorization' => 'Bearer ' . config('aqwhatsapp.api_token'),
-                'Accept' => 'application/json',
+                'Accept'        => 'application/json',
             ])
                 ->timeout(5)
                 ->post("https://whatsapp.aq-apps.xyz/api/send-message", [
                     'session_uuid' => config('aqwhatsapp.session_uuid'),
-                    'phone' => $phone,
-                    'message' => $message,
-                    'schedule_at' => now(),
+                    'phone'        => $phone,
+                    'message'      => $message,
+                    'schedule_at'  => now(),
                 ]);
             if (config('app.debug')) info($data->body());
             return true;

@@ -55,8 +55,8 @@ class OrderUpdatedNotification extends Notification
     {
         return [
             'order_id' => $this->order->id,
-            'summary' => $this->getSummary(),
-            'type' => $this->orderType(),
+            'summary'  => $this->getSummary(),
+            'type'     => $this->orderType(),
         ];
     }
 
@@ -93,15 +93,15 @@ class OrderUpdatedNotification extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title' => 'Update order',
-            'body' => $this->getSummary(),
-            'sound' => 'default',
-            'icon' => '',
-            'click_action' => ''
+            'title'         => 'Update order',
+            'body'          => $this->getSummary(),
+            'sound'         => 'default',
+            'icon'          => '',
+            'click_action'  => ''
         ])->data([
-            'type' => $this->orderType(),
-            'summary' => $this->getSummary(),
-            'order_id' => $this->order->id,
+            'type'          => $this->orderType(),
+            'summary'       => $this->getSummary(),
+            'order_id'      => $this->order->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;

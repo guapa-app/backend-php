@@ -46,8 +46,8 @@ class OfferNotification extends Notification implements ShouldQueue
     {
         return [
             'product_id' => $this->offer->product->id,
-            'summary' => $this->getSummary(),
-            'type' => 'new-offer',
+            'summary'    => $this->getSummary(),
+            'type'       => 'new-offer',
         ];
     }
 
@@ -62,14 +62,14 @@ class OfferNotification extends Notification implements ShouldQueue
     {
         $message = new FcmMessage();
         $message->content([
-            'title' => 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title,
-            'body' => $this->getSummary(),
-            'sound' => 'default', // Optional
-            'icon' => '', // Optional
+            'title'        => 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title,
+            'body'         => $this->getSummary(),
+            'sound'        => 'default', // Optional
+            'icon'         => '', // Optional
             'click_action' => '' // Optional
         ])->data([
-            'type' => 'new-offer',
-            'product_id' => $this->offer->product->id,
+            'type'         => 'new-offer',
+            'product_id'   => $this->offer->product->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
