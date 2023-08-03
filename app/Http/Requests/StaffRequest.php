@@ -4,15 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Rules\ImageOrArray;
 
 /**
  * @bodyParma vendor_id integer required Vendor id to add the staff to.
- * @bodyParam name string required Fullname 3 to 100 characters
+ * @bodyParam name string required Full name 3 to 100 characters
  * @bodyParam email string Email address
  * @bodyParam phone string required Phone number
  * @bodyParam role string required One of manager, doctor
-**/
+ **/
 class StaffRequest extends FormRequest
 {
     /**
@@ -36,22 +35,17 @@ class StaffRequest extends FormRequest
 
         $rules = [
             'vendor_id' => 'required|integer|exists:vendors,id',
-            'name' => 'required|string|min:3|max:100',
-            'email' => [
-                'nullable', 'email', Rule::unique('users'),
-            ],
-            'phone' => 'required|string|min:4|max:30|unique:users,phone',
-            'role' => 'required|string|in:manager,doctor',
+            'name'      => 'required|string|min:3|max:100',
+            'email'     => ['nullable', 'email', Rule::unique('users')],
+            'phone'     => 'required|string|min:4|max:30|unique:users,phone',
+            'role'      => 'required|string|in:manager,doctor',
         ];
 
         if (is_numeric($id)) {
             // Updating vendor staff data
             $rules = array_merge($rules, [
-                'email' => [
-                    'nullable', 'email', Rule::unique('users')->ignore($id),
-                ],
-                'phone' => [
-                    'required', 'string', 'min:4', 'max:30',
+                'email' => ['nullable', 'email', Rule::unique('users')->ignore($id)],
+                'phone' => ['required', 'string', 'min:4', 'max:30',
                     Rule::unique('users')->ignore($id),
                 ],
             ]);
