@@ -28,6 +28,7 @@ class Offer extends Model implements Listable, HasMedia
 
     protected $appends = [
         'discount_string', 'status',
+        'expires_countdown','price'
     ];
 
     protected $dates = [
@@ -40,10 +41,6 @@ class Offer extends Model implements Listable, HasMedia
 
     protected $filterable_attributes = [
         'product_id',
-    ];
-
-    protected $attributes = [
-        'expires_countdown','price'
     ];
 
     /**

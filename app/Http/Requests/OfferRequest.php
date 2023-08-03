@@ -26,7 +26,7 @@ class OfferRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get previous  the validation rules that apply to the request.
      *
      * @return array
      */
@@ -36,11 +36,11 @@ class OfferRequest extends FormRequest
         $id = $this->route('id');
 
         $rules = [
-            'product_id' => 'required|integer|exists:products,id',
-            'discount' => 'required|integer|min:1|max:99',
-            'title' => 'nullable|string|max:200',
-            'description' => 'nullable|max:1000',
-            'image' => ['nullable', new ImageOrArray(), 'max:10240'],
+            'product_id'    => 'required|integer|exists:products,id',
+            'discount'      => 'required|integer|min:1|max:99',
+            'title'         => 'nullable|string|max:200',
+            'description'   => 'nullable|max:1000',
+            'image'         => ['nullable', new ImageOrArray(), 'max:10240'],
         ];
 
         if (is_numeric($id)) {
