@@ -6,6 +6,8 @@ use App\Services\FirebaseDynamicLink;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Hash;
+use function Sodium\randombytes_buf;
 
 class OrderItem extends Model
 {
@@ -16,7 +18,8 @@ class OrderItem extends Model
     ];
 
     protected $appends = [
-        'qr_code_link'
+        'qr_code_link',
+        'coupon_num'
     ];
 
     public function getAppointmentAttribute($appointment)
@@ -32,6 +35,13 @@ class OrderItem extends Model
             "&item={$this->id}" .
             "&product={$this->product_id}"
         );
+    }
+
+    public function getCouponNumAttribute()
+    {
+        return rand(1, 100) . "@$%" . $this->order_id . "#" .
+            rand(1, 100) . "@$%" . $this->id . "#" .
+            rand(1, 100) . "@$%" . $this->product_id . "#";
     }
 
     public function order()

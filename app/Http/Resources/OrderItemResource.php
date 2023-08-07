@@ -10,12 +10,13 @@ class OrderItemResource extends JsonResource
     {
         return [
             "id"           => $this->id,
+            "coupon_num"   => (string)$this->coupon_num,
             "amount"       => (double)$this->amount,
             "quantity"     => (int)$this->quantity,
             "order_id"     => $this->order_id,
             "appointment"  => $this->appointment,
             "product"      => ProductResource::make($this->whenLoaded('product')),
-            "offer"        => OfferResource::make($this->whenLoaded('offer')),
+//            "offer"        => OfferResource::make($this->whenLoaded('offer')),
             "vendor"       => VendorResource::make($this->whenLoaded('vendor')),
         ];
     }

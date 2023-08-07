@@ -83,12 +83,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getTaxonomyNameAttribute()
     {
-        $relations = $this->getRelations();
-        if (!empty($relations['taxonomies'])) {
-            return $relations['taxonomies'][0]->title;
-        }
-
-        return "";
+        return $this->getRelations()['taxonomies'][0]->title ?? "";
     }
 
     public function getCategoryIdsAttribute()

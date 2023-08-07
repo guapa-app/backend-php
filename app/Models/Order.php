@@ -107,7 +107,7 @@ class Order extends Model implements Listable
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items.product.taxonomies', 'items.product.image');
+        $query->with('vendor', 'user', 'address', 'items.product.offer',  'items.product.taxonomies', 'items.product.image');
         return $query;
     }
 
