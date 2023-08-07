@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Str;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Exceptions\ApiException;
+use App\Exceptions\PhoneNotVerifiedException;
 use App\Http\Requests\RegisterRequest;
+use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
-use App\Contracts\Repositories\UserRepositoryInterface;
+use DB;
+use Exception;
+use Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @group Authentication
@@ -21,7 +28,7 @@ class AuthController extends BaseApiController
     private $userRepository;
 
     public function __construct(UserRepositoryInterface $userRepository,
-        AuthService $authService, UserService $userService)
+                                AuthService $authService, UserService $userService)
     {
         parent::__construct();
 
@@ -38,8 +45,8 @@ class AuthController extends BaseApiController
      * @responseFile 200 responses/auth/register.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      *
-     * @param  \App\Http\Requests\RegisterRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param RegisterRequest $request
+     * @return array
      */
     public function register(RegisterRequest $request)
     {
@@ -51,9 +58,9 @@ class AuthController extends BaseApiController
             $grantType = isset($data['firebase_jwt_token']) ? 'firebase_phone' : 'sinch_verify';
             $isFirebase = $grantType === 'firebase_phone';
             $requestPayload = [
-                'grant_type' => $grantType,
+                'grant_type'   => $grantType,
                 'phone_number' => $data['phone'],
-                'scope' => '*',
+                'scope'        => '*',
             ];
 
             if ($isFirebase) {
@@ -66,12 +73,12 @@ class AuthController extends BaseApiController
         }
 
         $userData = [
-            'name' => $data['name'] ?? $data['firstname'] . ' ' . $data['lastname'],
-            'email' => $data['email'] ?? null,
-            'phone' => $data['phone'],
-            'profile' => [
-                'firstname' => $data['firstname'] ?? null,
-                'lastname' => $data['lastname'] ?? null,
+            'name'          => $data['name'] ?? $data['firstname'] . ' ' . $data['lastname'],
+            'email'         => $data['email'] ?? null,
+            'phone'         => $data['phone'],
+            'profile'       => [
+                'firstname'     => $data['firstname'] ?? null,
+                'lastname'      => $data['lastname'] ?? null,
             ],
         ];
 
@@ -82,24 +89,21 @@ class AuthController extends BaseApiController
             $user = $this->userService->create($userData);
         }
 
-        $user->password = \Hash::make($data['password']);
+        $user->password = Hash::make($data['password']);
         $user->save();
 
         if ($token == null) {
             $token = $this->authService->authenticate([
                 'grant_type' => 'password',
-                'username' => $data['email'] ?? null,
-                'password' => $data['password'],
-                'scope' => '*',
+                'username'   => $data['email'] ?? null,
+                'password'   => $data['password'],
+                'scope'      => '*',
             ]);
         }
 
         event(new Registered($user));
 
-        return response()->json([
-            'token' => $token,
-            'user' => $user,
-        ]);
+        return [$token, $user];
     }
 
     /**
@@ -115,57 +119,54 @@ class AuthController extends BaseApiController
      * @bodyParam username string required  Email address or phone number
      * @bodyParam password string required  Password
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return array
      */
     public function login(Request $request)
     {
-    	$this->validate($request, [
-    		'username' => 'required|string',
+        $this->validate($request, [
+            'username' => 'required|string',
             'password' => 'required|max:100',
-    	]);
-
-//        logger("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters - " . $request->get('username') . " " . $request->get('password'));
+        ]);
 
         $token = $this->authService->authenticate([
             'grant_type' => 'password',
-            'username' => $request->get('username'),
-            'password' => $request->get('password'),
-            'guard' => 'api',
-            'scope' => '*',
+            'username'   => $request->get('username'),
+            'password'   => $request->get('password'),
+            'guard'      => 'api',
+            'scope'      => '*',
         ]);
 
-        if ($token == null) {
-            return response()->json([
-                'message' => __('api.invalid_credentials'),
-            ], 401);
-        }
+        $this->checkUserCredentials($token);
 
         $username = $request->get('username');
         $user = $this->userRepository->getByUsername($username);
 
-        if ($user->phone_verified_at == null && strpos($username, '@') === false) {
-            // User is trying to login with phone number, before verification
-            return response()->json([
-                'message' => __('api.phone_not_verified'),
-                'phone_verified' => false,
-            ], 401);
-        }
-
-        if ($user->status == User::STATUS_DELETED) {
-            // User is trying to login with account deleted.
-            return response()->json([
-                'message' => __('api.account_deleted'),
-            ], 401);
-        }
+        $this->checkUserVerified($user->phone_verified_at, $username);
+        $this->checkIfUserDeleted($user->status);
 
         $user->loadProfileFields();
         $user->append('user_vendors_ids');
 
-        return response()->json([
-        	'token' => $token,
-        	'user' => $user,
-        ]);
+        return [$token, $user];
+    }
+
+    private function checkUserCredentials($token)
+    {
+        if ($token == null)
+            throw new ApiException(__('api.invalid_credentials'), 401);
+    }
+
+    private function checkUserVerified($phone_verified_at, $username)
+    {
+        if ($phone_verified_at == null && strpos($username, '@') === false)
+            throw new PhoneNotVerifiedException();
+    }
+
+    private function checkIfUserDeleted($status)
+    {
+        if ($status == User::STATUS_DELETED)
+            throw new ApiException(__('api.account_deleted'), 401);
     }
 
     /**
@@ -176,21 +177,16 @@ class AuthController extends BaseApiController
      * @responseFile 200 responses/auth/current-user.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return User
      */
     public function user()
     {
         $this->user->loadProfileFields();
 
-        if ($this->user->status == User::STATUS_DELETED) {
-            // User is trying to login with account deleted.
-            return response()->json([
-                'message' => __('api.account_deleted'),
-            ], 401);
-        }
+        $this->checkIfUserDeleted($this->user->status);
 
         $this->user->append('user_vendors_ids');
-        return response()->json($this->user);
+        return $this->user;
     }
 
     /**
@@ -211,17 +207,16 @@ class AuthController extends BaseApiController
         ]);
 
         // Get access token from oauth server
-        try {
-            return $this->authService->authenticate([
-                'grant_type' => 'refresh_token',
-                'refresh_token' => $request->get('refresh_token'),
-                'scope' => '*',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => __('api.invalid_refresh_token'),
-            ], 401);
-        }
+        $res =  $this->authService->authenticate([
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $request->get('refresh_token'),
+            'scope' => '*',
+        ]);
+
+        if ($res == null)
+            throw new ApiException(__('api.invalid_refresh_token'), 401);
+
+        return $res;
     }
 
     /**
@@ -230,13 +225,13 @@ class AuthController extends BaseApiController
      * @responseFile 200 responses/auth/logout.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return true
      */
     public function logout(Request $request)
     {
         $this->authService->logout($this->user);
-        return response()->json([], 200);
+        return true;
     }
 
     /**
@@ -253,30 +248,30 @@ class AuthController extends BaseApiController
      * @bodyParam firebase_jwt_token Firebase jwt token (Required if otp is absent)
      * @bodyParam otp string Sinch otp (Required if firebase jwt token is absent)
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return array
      */
     public function verify(Request $request)
     {
         $data = $this->validate($request, [
-            'phone' => 'required|string|max:30',
+            'phone'              => 'required|string|max:30',
+            'otp'                => 'required_without:firebase_jwt_token|string|max:10',
             'firebase_jwt_token' => 'required_without:otp|string|max:2000',
-            'otp' => 'required_without:firebase_jwt_token|string|max:10',
             'for_reset_password' => 'sometimes|required',
         ]);
 
         $user = $this->userRepository->getByPhone($data['phone']);
 
-        if ( ! $user) {
+        if (!$user) {
             abort(404, 'Phone number doesn\'t exist.');
         }
 
         $grantType = isset($data['otp']) ? 'sinch_verify' : 'firebase_phone';
 
         $tokenPayload = [
-            'grant_type' => $grantType,
+            'grant_type'   => $grantType,
             'phone_number' => $data['phone'],
-            'scope' => '*',
+            'scope'        => '*',
         ];
 
         if ($grantType === 'sinch_verify') {
@@ -287,48 +282,41 @@ class AuthController extends BaseApiController
 
         $token = $this->authService->authenticate($tokenPayload);
 
-        if ($token == null) {
-            return response()->json([
-                'message' => __('api.phone_verification_failed'),
-            ], 401);
-        }
+        if ($token == null)
+            throw new ApiException(__('api.phone_verification_failed'), 401);
 
         $user->update(['phone_verified_at' => now()->toDateTimeString()]);
 
         $responseBody = [
-            'user' => $user,
+            'user'  => $user,
             'token' => $token,
         ];
 
         if (isset($data['for_reset_password'])) {
             $resetToken = Str::random(64);
 
-            \DB::table(config('auth.passwords.users.table'))->insert([
-                'email' => $user->email,
-                'token' => $resetToken,
+            DB::table(config('auth.passwords.users.table'))->insert([
+                'email'      => $user->email,
+                'token'      => $resetToken,
                 'created_at' => now(),
             ]);
 
             $responseBody['reset_token'] = $resetToken;
         }
 
-        return response()->json($responseBody);
+        return $responseBody;
     }
 
     /**
      * Delete Account
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return boolean
      */
     public function deleteAccount(Request $request)
     {
         $this->userService->deleteAccount($this->user->getKey());
-        $this->logout($request);
-
-        return response()->json([
-            'message' => __('api.account_deleted'),
-        ]);
+        return $this->logout($request);
     }
 
     /**
@@ -338,8 +326,8 @@ class AuthController extends BaseApiController
      *
      * @bodyParam phone string required Phone number
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
     public function sendSinchOtp(Request $request)
     {
@@ -347,11 +335,7 @@ class AuthController extends BaseApiController
             'phone' => 'required|string|max:40',
         ]);
 
-        $this->authService->sendSinchOtp($data['phone']);
-
-        return response()->json([
-            'message' => __('api.otp_sent'),
-        ]);
+        return $this->authService->sendSinchOtp($data['phone']);
     }
 
     /**
@@ -362,21 +346,17 @@ class AuthController extends BaseApiController
      * @bodyParam phone string required Phone number
      * @bodyParam otp string required Otp from sms
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return boolean
      */
     public function verifySinchOtp(Request $request)
     {
         $data = $this->validate($request, [
             'phone' => 'required|string|max:40',
-            'otp' => 'required|string|max:10',
+            'otp'   => 'required|string|max:10',
         ]);
 
-        $bool = $this->authService->verifySinchOtp($data['phone'], $data['otp']);
-
-        return response()->json([
-            'message' => $bool ? __('api.correct_otp') : __('api.incorrect_otp'),
-        ], $bool ? 200 : 406);
+        return $this->authService->verifySinchOtp($data['phone'], $data['otp']);
     }
 
     /**
@@ -386,9 +366,9 @@ class AuthController extends BaseApiController
      *
      * @bodyParam phone string required Phone number
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
+     * @param Request $request
+     * @return User
+     * @throws ValidationException
      */
     public function checkIfPhoneExist(Request $request)
     {
@@ -396,12 +376,6 @@ class AuthController extends BaseApiController
             'phone' => 'required|string|max:40',
         ]);
 
-        $user = $this->userRepository->getByPhone($data['phone']);
-
-        return response()->json([
-            'message' => $user == null ?
-                __('api.phone_doesnt_exist')
-                : __('api.phone_exist'),
-        ], $user == null ? 422 : 200);
+        return $this->userRepository->getByPhone($data['phone']);
     }
 }

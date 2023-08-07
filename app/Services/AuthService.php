@@ -2,37 +2,39 @@
 
 namespace App\Services;
 
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use App\Contracts\Repositories\AdminRepositoryInterface;
 use App\Models\Admin;
-use GuzzleHttp\Client;
 use DB;
+use Exception;
+use GuzzleHttp\Client;
+use Log;
+use Spatie\Permission\Models\Role;
 
 /**
  * Authentication service
  */
-class AuthService {
+class AuthService
+{
 
-	private $adminRepository;
-	private $tokenUrl;
+    private $adminRepository;
+    private $tokenUrl;
     private $sendOtpUrl = 'https://verificationapi-v1.sinch.com/verification/v1/verifications';
 
-	public function __construct(AdminRepositoryInterface $adminRepository)
-	{
-		$this->adminRepository = $adminRepository;
-		$this->tokenUrl = config('app.url') . '/oauth/token';
-	}
+    public function __construct(AdminRepositoryInterface $adminRepository)
+    {
+        $this->adminRepository = $adminRepository;
+        $this->tokenUrl = config('app.url') . '/oauth/token';
+    }
 
-	public function authenticate(array $data): ?array
-	{
-		$data = array_merge([
+    public function authenticate(array $data): ?array
+    {
+        $data = array_merge([
             'client_id' => config('cosmo.password_client_id'),
             'client_secret' => config('cosmo.password_client_secret'),
             'scope' => '*',
         ], $data);
 
-		$http = new Client;
+        $http = new Client;
 
         try {
             $response = $http->post($this->tokenUrl, [
@@ -41,14 +43,14 @@ class AuthService {
 
             return json_decode((string)$response->getBody(), true);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
-	}
+    }
 
-	public function logout($user): void
-	{
-		// Get user access token
+    public function logout($user): void
+    {
+        // Get user access token
         $accessToken = $user->token();
         // Revoke refresh token token
         DB::table('oauth_refresh_tokens')->where('access_token_id', $accessToken->id)->update([
@@ -56,19 +58,19 @@ class AuthService {
         ]);
         // Revoke access token
         $accessToken->revoke();
-	}
+    }
 
-	public function setupAdminAccount(): Admin
-	{
-		// Check if there are any admin accounts
-		// If not create the default account
-		$admin = $this->adminRepository->getFirst();
+    public function setupAdminAccount(): Admin
+    {
+        // Check if there are any admin accounts
+        // If not create the default account
+        $admin = $this->adminRepository->getFirst();
 
         $email = config('cosmo.admin_email');
         $password = config('cosmo.admin_password');
 
-        if ( ! $admin && isset($email, $password)) {
-        	// Create the first admin account
+        if (!$admin && isset($email, $password)) {
+            // Create the first admin account
             $admin = $this->adminRepository->create([
                 'name' => 'Admin',
                 'email' => $email,
@@ -82,7 +84,7 @@ class AuthService {
                 Role::create(['guard_name' => 'api', 'name' => 'patient']);
                 Role::create(['guard_name' => 'api', 'name' => 'doctor']);
                 Role::create(['guard_name' => 'api', 'name' => 'manager']);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Default roles already created
             }
 
@@ -90,7 +92,7 @@ class AuthService {
         }
 
         return $admin;
-	}
+    }
 
     public function sendSinchOtp(string $phone)
     {
@@ -138,9 +140,9 @@ class AuthService {
             ]);
 
             $result = json_decode((string)$response->getBody(), true);
-            \Log::error(json_encode($result));
+            Log::error(json_encode($result));
             return is_array($result) && isset($result['status']) && $result['status'] === 'SUCCESSFUL';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Report the error or do anything with it
             return false;
         }
