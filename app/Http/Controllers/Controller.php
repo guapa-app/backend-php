@@ -30,23 +30,6 @@ class Controller extends BaseController
         return $this->user && $this->user->isAdmin();
     }
 
-    /**
-     * Add new device
-     *
-     * @authenticated
-     *
-     * @param DeviceRequest $request
-     *
-     * @return JsonResponse
-     */
-    public function addDevice(DeviceRequest $request, UserService $service): JsonResponse
-    {
-        $data = $request->validated();
-        $device = $service->addDevice($this->user, $data);
-        return response()->json($device);
-    }
-
-
     public function successJsonRes(array $data = [], string $message = "", $status = Response::HTTP_OK): JsonResponse
     {
         return response()->json([

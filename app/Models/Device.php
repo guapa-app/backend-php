@@ -7,21 +7,27 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Device extends Model
 {
-	/**
-	 * Mass assignable attributes
-	 * 
-	 * @var array
-	 */
+    /**
+     * Mass assignable attributes
+     *
+     * @var array
+     */
     protected $fillable = [
-    	'user_id', 'user_type', 'guid', 'fcmtoken', 'type',
+        'user_id', 'user_type', 'guid', 'fcmtoken', 'type',
+    ];
+
+    const TYPES = [
+        'android',
+        'ios',
+        'desktop',
     ];
 
     /**
      * Get user for this device
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return MorphTo
      */
-    public function user() : MorphTo
+    public function user(): MorphTo
     {
-    	return $this->morphTo('user');
+        return $this->morphTo('user');
     }
 }
