@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -28,8 +29,8 @@ class FavoriteRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'required|string|in:vendor,product,post',
-            'id' => 'required|integer',
+            'type' => 'required|string|in:' . implode(',', User::FAVORITE_TYPES),
+            'id'   => 'required|integer',
         ];
     }
 }

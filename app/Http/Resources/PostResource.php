@@ -16,6 +16,9 @@ class PostResource extends JsonResource
             'status'      => $this->status,
             'youtube_url' => $this->youtube_url,
 
+            "likes_count"   => $this->likes_count,
+            "is_liked"      => $this->is_liked,
+
             'created_at'  => Carbon::parse($this->created_at)->diffForHumans(),
             'updated_at'  => Carbon::parse($this->updated_at)->diffForHumans(),
 

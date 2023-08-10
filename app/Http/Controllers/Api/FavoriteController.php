@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Http\Requests\FavoriteRequest;
 use App\Services\FavoritesService;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * @group Favorites
@@ -13,14 +14,14 @@ use App\Services\FavoritesService;
  */
 class FavoriteController extends BaseApiController
 {
-	protected $favoritesService;
+    protected $favoritesService;
 
-	public function __construct(FavoritesService $favoritesService)
-	{
+    public function __construct(FavoritesService $favoritesService)
+    {
         parent::__construct();
 
-		$this->favoritesService = $favoritesService;
-	}
+        $this->favoritesService = $favoritesService;
+    }
 
     /**
      * Get favorites
@@ -31,19 +32,16 @@ class FavoriteController extends BaseApiController
      * @responseFile 200 scenario="List favorite products" responses/favorites/list-products.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
      *
-     * @queryParam type Type of favorites to return (product, vendor, post). Example: product
-     * @queryParam page Page number for pagination. Example: 2
+     * @queryParam type of favorites to return (product, vendor, post). Example: product
+     * @queryParam page number for pagination. Example: 2
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return LengthAwarePaginator
      */
     public function index(Request $request)
     {
-    	$favorites = $this->favoritesService->getFavorites(
-            $this->user, $request->all()
-        );
-
-    	return response()->json($favorites);
+        return $this->favoritesService
+            ->getFavorites($this->user, $request->all());
     }
 
     /**
@@ -54,17 +52,14 @@ class FavoriteController extends BaseApiController
      * @responseFile 404 scenario="Invalid id/type" responses/errors/404.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
      *
-     * @param  \App\Http\Requests\FavoriteRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param FavoriteRequest $request
+     * @return Model
      */
     public function create(FavoriteRequest $request)
     {
-    	$data = $request->validated();
-    	$favorite = $this->favoritesService->addFavorite(
-            $this->user, $data['type'], $data['id']
-        );
-
-    	return response()->json($favorite);
+        $data = $request->validated();
+        return $this->favoritesService
+            ->addFavorite($this->user, $data['type'], $data['id']);
     }
 
     /**
@@ -79,19 +74,10 @@ class FavoriteController extends BaseApiController
      *
      * @param string $type
      * @param int $id
-     * @return \Illuminat\Http\JsonResponse
      *
      */
-    public function delete($type, $id): JsonResponse
+    public function delete($type, $id)
     {
-        $this->favoritesService->removeFavorite(
-            $this->user, $type, $id
-        );
-
-        return response()->json([
-            'message' => __('api.favourite_deleted'),
-            'id' => $id,
-            'type' => $type,
-        ]);
+        return $this->favoritesService->removeFavorite($this->user, $type, $id);
     }
 }
