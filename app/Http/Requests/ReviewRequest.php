@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Review;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -30,10 +31,10 @@ class ReviewRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'reviewable_type' => 'required|string|in:vendor,product',
-            'reviewable_id' => 'required|integer',
-            'stars' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string',
+            'reviewable_type' => 'required|string|in:' . implode(',', Review::TYPES),
+            'reviewable_id'   => 'required|integer',
+            'stars'           => 'required|integer|min:1|max:5',
+            'comment'         => 'nullable|string',
         ];
 
         if ($this->user() && $this->user()->isAdmin()) {

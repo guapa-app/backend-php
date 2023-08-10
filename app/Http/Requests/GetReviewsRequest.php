@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Review;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -30,10 +31,10 @@ class GetReviewsRequest extends FormRequest
     public function rules()
     {
         return [
-            'reviewable_type' => 'required|string|in:vendor,product',
-            'reviewable_id' => 'required|integer',
-            'page' => 'sometimes|integer|min:1',
-            'per_page' => 'sometimes|integer|min:5|max:30',
+            'reviewable_type'   => 'required|string|in:' . implode(',', Review::TYPES),
+            'reviewable_id'     => 'required|integer',
+            'page'              => 'sometimes|integer|min:1',
+            'per_page'          => 'sometimes|integer|min:5|max:30',
         ];
     }
 }

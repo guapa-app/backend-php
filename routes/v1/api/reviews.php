@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Api\ReviewController as ApiReviewController;
+use App\Http\Controllers\Api\V1\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api'], function() {
-	Route::get('/',                                        [ApiReviewController::class, 'index']);
-	Route::post('/',                                       [ApiReviewController::class, 'create']);
+	Route::get('/',                                        [ReviewController::class, 'index']);
+	Route::post('/',                                       [ReviewController::class, 'create']);
 });

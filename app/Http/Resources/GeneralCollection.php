@@ -30,7 +30,7 @@ abstract class GeneralCollection extends ResourceCollection
 
     private function preparePayload($request)
     {
-        if ($request->has('perPage'))
+        if ($request->has('perPage') || $request->has('per_page'))
             $payload =                     [
                 'payload' => [
                     'pagination' => [
