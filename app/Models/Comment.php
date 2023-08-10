@@ -7,7 +7,6 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
 class Comment extends Model implements Listable
@@ -15,15 +14,15 @@ class Comment extends Model implements Listable
     use HasFactory, ListableTrait;
 
     protected $fillable = [
-    	'post_id', 'user_id', 'user_type', 'content',
+        'post_id', 'user_id', 'user_type', 'content',
     ];
 
     protected $filterable = [
-    	'post_id', 'user_id', 'user_type',
+        'post_id', 'user_id', 'user_type',
     ];
 
     protected $search_attributes = [
-    	'content',
+        'content',
     ];
 
     public function setContentAttribute($value)
@@ -33,12 +32,12 @@ class Comment extends Model implements Listable
 
     public function user()
     {
-    	return $this->morphTo();
+        return $this->morphTo();
     }
 
     public function post()
     {
-    	return $this->belongsTo(Post::class);
+        return $this->belongsTo(Post::class);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder

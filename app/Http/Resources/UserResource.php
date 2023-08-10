@@ -18,6 +18,11 @@ class UserResource extends JsonResource
             'phone_verified_at'     => (bool)$this->phone_verified_at,
             'role'                  => $this->role,
             'user_vendors_ids'      => $this->user_vendors_ids,
+
+            $this->mergeWhen(!$this->relationLoaded('profile'), [
+                "photo"                        => $this->photo,
+            ]),
+
             'profile'               => ProfileResource::make($this->whenLoaded('profile')),
         ];
     }

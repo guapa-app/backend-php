@@ -26,6 +26,7 @@ return [
     'error'                 => 'error',
     'query_error'           => 'Error. The data could not be sent, please check that the data is correct',
     'not_found'             => 'Error. This data could not be accessed, please verify that the data is correct',
+    'not_allowed'           => 'Error. Unauthorized, this data cannot be accessed',
     'record_not_found'      => 'Error. This data could not be accessed, please verify that the data is correct',
     'locale_error'          => 'The selected language is invalid.',
     'invalid_otp'           => 'Invalid OTP.',
