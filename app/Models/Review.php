@@ -26,6 +26,11 @@ class Review extends Model
     	'comment',
     ];
 
+    const TYPES = [
+        'product',
+        'vendor'
+    ];
+
     public function reviewable()
     {
     	return $this->morphTo();

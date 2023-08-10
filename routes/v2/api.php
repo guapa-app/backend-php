@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Api\V2\DeviceController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\V2\DataController;
 use Illuminate\Support\Facades\Route;
