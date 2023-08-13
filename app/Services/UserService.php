@@ -178,8 +178,9 @@ class UserService
             $token = DB::table(config('auth.passwords.users.table'))
                 ->where([
                     'token' => $data['reset_token'],
-                    'email' => auth()->user()->email,
+                    'email' => auth()->user()->email ?? auth()->user()->phone,
                 ])->first();
+
 
             if (!$token || now()->subMinutes(15)->gt(Carbon::parse($token->created_at))) {
                 throw ValidationException::withMessages([

@@ -296,7 +296,7 @@ class AuthController extends BaseApiController
             $resetToken = Str::random(64);
 
             DB::table(config('auth.passwords.users.table'))->insert([
-                'email'      => $user->email,
+                'email'      => $user->email ?? $user->phone,
                 'token'      => $resetToken,
                 'created_at' => now(),
             ]);
