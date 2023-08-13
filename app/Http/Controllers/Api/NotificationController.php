@@ -113,7 +113,7 @@ class NotificationController extends BaseApiController
      * @responseFile 200 responses/notifications/mark_read.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param string $notification_id
+     * @param $notification_id
      *
      * @return int
      */
