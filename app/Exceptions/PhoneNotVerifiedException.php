@@ -12,7 +12,7 @@ class PhoneNotVerifiedException extends Exception
             "success" => false,
             'phone_verified' => false,
             "message" => __('api.phone_not_verified'),
-            "errors" => __('api.phone_not_verified')
+//            "errors" => __('api.phone_not_verified')
         ], 401);
     }
 }

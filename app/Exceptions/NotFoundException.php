@@ -11,7 +11,7 @@ class NotFoundException extends Exception
         return response()->json([
             "success" => false,
             "message" => __('api.not_found'),
-            "errors" => __('api.not_found')
+//            "errors" => __('api.not_found')
         ], 404);
     }
 }
