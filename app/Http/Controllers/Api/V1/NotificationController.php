@@ -30,7 +30,7 @@ class NotificationController extends ApiNotificationController
 
     public function markRead(string $notification_id = "")
     {
-        parent::markRead();
+        parent::markRead($notification_id);
         return $this->successJsonRes([], __('api.success'));
     }
 }
