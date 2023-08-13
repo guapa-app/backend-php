@@ -11,7 +11,7 @@ class NotAllowedException extends Exception
         return response()->json([
             "success" => false,
             "message" => __('api.not_allowed'),
-            "errors" => __('api.not_allowed')
+//            "errors" => __('api.not_allowed')
         ], 401);
     }
 }
