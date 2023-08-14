@@ -111,11 +111,12 @@ class OrderController extends BaseApiController
      */
     public function update($id, Request $request)
     {
-        $data = $this->validate($request, [
-            'status' => 'required|in:Canceled,Accepted,Rejected',
-        ]);
-
         $this->logReq("Update order number - $id");
+
+        $data = $this->validate($request, [
+            'status' => 'required|in:' . implode(',', Order::AVA_STAT_FOR_UPDATE),
+            'cancellation_reason' => 'required_if:status,Cancel Request',
+        ]);
 
         return $this->orderService->update((int)$id, $data);
     }

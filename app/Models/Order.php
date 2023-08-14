@@ -15,7 +15,7 @@ class Order extends Model implements Listable
 
     protected $fillable = [
         'user_id', 'vendor_id', 'address_id', 'total', 'status',
-        'note', 'name', 'phone', 'is_used', 'invoice_url'
+        'note', 'name', 'phone', 'is_used', 'invoice_url', 'cancellation_reason'
     ];
 
     /**
@@ -33,6 +33,22 @@ class Order extends Model implements Listable
      */
     protected $search_attributes = [
         'name', 'phone',
+    ];
+
+    const STATUSES = [
+        'Pending', #this is default status for order and can't return to it if changed
+        'Accepted',
+        'Rejected',
+        'Cancel Request',
+        'Canceled'
+    ];
+
+    # available statuses for update
+    const AVA_STAT_FOR_UPDATE = [
+        'Accepted',
+        'Rejected',
+        'Cancel Request',
+        'Canceled'
     ];
 
     protected static function boot()

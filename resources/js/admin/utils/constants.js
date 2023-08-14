@@ -27,6 +27,7 @@ export const WeekDays = [
 export const OrderStatuses = [
     {id: 'Pending', name: 'Pending'},
     {id: 'Accepted', name: 'Accepted'},
-    {id: 'Canceled', name: 'Canceled'},
     {id: 'Rejected', name: 'Rejected'},
+    {id: 'Cancel Request', name: 'Cancel Request'},
+    {id: 'Canceled', name: 'Canceled'},
 ]

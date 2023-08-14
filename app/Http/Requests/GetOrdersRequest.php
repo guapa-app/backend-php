@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetOrdersRequest extends FormRequest
@@ -25,10 +26,10 @@ class GetOrdersRequest extends FormRequest
     {
         $rules = [];
 
-        if ( $this->user() && ! $this->user()->isAdmin()) {
+        if ($this->user() && !$this->user()->isAdmin()) {
             $rules = [
                 'vendor_id' => 'sometimes|integer',
-                'status' => 'sometimes|in:Accepted,Pending,Canceled,Rejected',
+                'status'    => 'sometimes|in:' . implode(',', Order::STATUSES),
             ];
         }
 

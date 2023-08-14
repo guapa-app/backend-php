@@ -43,6 +43,7 @@ class OrderRequest extends FormRequest
         ];
 
         if ($this->user() && $this->user()->isAdmin()) {
+            unset($rules['address_id']);
             unset($rules['products']);
             unset($rules['products.*']);
             unset($rules['products.*.id']);
