@@ -79,6 +79,7 @@ class AuthController extends BaseApiController
             'profile'       => [
                 'firstname'     => $data['firstname'] ?? null,
                 'lastname'      => $data['lastname'] ?? null,
+                'gender'        => $data['gender'] ?? null,
             ],
         ];
 
