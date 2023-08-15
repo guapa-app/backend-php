@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\UserProfile;
 use App\Rules\ImageOrArray;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -63,7 +64,7 @@ class UserRequest extends FailedValidationRequest
             'profile'               => 'sometimes|array',
             'profile.firstname'     => 'sometimes|required|string|max:32',
             'profile.lastname'      => 'sometimes|required|string|max:32',
-            'profile.gender'        => 'sometimes|required|in:Male,Female,Other',
+            'profile.gender'        => 'sometimes|required|in:' . implode(',', UserProfile::GENDER),
             'profile.birth_date'    => 'nullable|date|before:today',
             'profile.about'         => 'nullable|string|min:10|max:1024',
             'profile.photo'         => ['nullable', new ImageOrArray(), 'max:10240'],

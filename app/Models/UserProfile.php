@@ -46,6 +46,12 @@ class UserProfile extends Model implements HasMedia
         'settings' => 'array',
     ];
 
+    const GENDER = [
+        'Male',
+        'Female',
+        'Other'
+    ];
+
     /**
      * Modify birthdate before save
      * @param string $value

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\UserProfile;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -34,14 +35,15 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required_without:firstname|string|min:3|max:64',
-            'firstname' => 'required_without:name|string|min:3|max:32',
-            'lastname' => 'required_without:name|string|min:3|max:32',
-            'email' => 'sometimes|required|email|unique:users,email',
-            'phone' => 'required|string|min:6|max:30|unique:users,phone',
-            'firebase_jwt_token' => 'sometimes|required|string',
-            'otp' => 'sometimes|required|string|max:10',
-            'password' => 'required|confirmed|min:6|max:100',
+            'name'                  => 'required_without:firstname|string|min:3|max:64',
+            'firstname'             => 'required_without:name|string|min:3|max:32',
+            'lastname'              => 'required_without:name|string|min:3|max:32',
+            'email'                 => 'sometimes|required|email|unique:users,email',
+            'phone'                 => 'required|string|min:6|max:30|unique:users,phone',
+            'firebase_jwt_token'    => 'sometimes|required|string',
+            'otp'                   => 'sometimes|required|string|max:10',
+            'password'              => 'required|confirmed|min:6|max:100',
+            'gender'                => 'required|string|in:' . implode(',', UserProfile::GENDER),
         ];
     }
 }
