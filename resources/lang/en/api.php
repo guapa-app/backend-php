@@ -40,4 +40,6 @@ return [
     'no_days'               => '',
     'one_day'               => '1 day',
     'x_days'                => ':count days',
+
+    'cancel_used_order_error'                => "You can't cancel this order.",
 ];
