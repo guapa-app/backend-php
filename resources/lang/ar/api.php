@@ -42,4 +42,5 @@ return [
     'x_days'                => 'ينتهي بعد :count ايام',
 
     'cancel_used_order_error'                => 'لا يمكنك إلغاء هذا الطلب.',
+    'cancel_order_error'                => 'لا يمكنك إلغاء الطلب بعد 14 يومًا',
 ];

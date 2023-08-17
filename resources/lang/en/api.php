@@ -42,4 +42,5 @@ return [
     'x_days'                => ':count days',
 
     'cancel_used_order_error'                => "You can't cancel this order.",
+    'cancel_order_error'                     => "You can't cancel order after 14 days",
 ];
