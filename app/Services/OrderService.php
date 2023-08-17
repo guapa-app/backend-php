@@ -175,36 +175,40 @@ class OrderService {
 		return $order;
 	}
 
-	public function validateStatus(Order $order, string $status): void
-	{
-		$user = app('cosmo')->user();
+    public function validateStatus(Order $order, string $status): void
+    {
+        $user = app('cosmo')->user();
 
-		if ($user->isAdmin()) return;
+        if ($user->isAdmin()) return;
 
-		if ($order->status !== 'Pending' && $user->id !== $order->user_id) {
-			$error = 'Sorry this order has been ' . $order->status;
-		} elseif ($order->status === $status) {
-			$error = 'The order is already ' . $status;
-		} elseif ($status === 'Canceled') {
+        if ($order->status !== 'Pending' && $user->id !== $order->user_id) {
+            $error = 'Sorry this order has been ' . $order->status;
+        } elseif ($order->status === $status) {
+            $error = 'The order is already ' . $status;
+        } elseif (($status === 'Cancel Request') || ($status === 'Canceled')) {
+            if ($order->is_used)
+                $error = __('api.cancel_used_order_error');
+
             if ($order->user_id !== $user->id)
                 $error = 'You are not authorized to cancel this order';
-            if ($order->user_id === $user->id && $order->created_at->addDays(7)->toDateString() < Carbon::today()->toDateString())
-                $error = "You can't cancel order after 7 days";
+
+            if ($order->user_id === $user->id && $order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString())
+                $error = __('api.cancel_order_error');
         } elseif (in_array($status, ['Accepted', 'Rejected'])) {
-			// This should be an employee of a vendor authorized to accept or reject the order.
-			$authorizedVendorIds = Product::select('vendor_id')->whereIn('id', function ($q) use ($order) {
+            // This should be an employee of a vendor authorized to accept or reject the order.
+            $authorizedVendorIds = Product::query()->select('vendor_id')->whereIn('id', function ($q) use ($order) {
                 $q->select('product_id')->from('order_items')->where('order_id', $order->id);
             })->pluck('vendor_id')->toArray();
 
-			if (!$user->hasAnyVendor(array_merge($authorizedVendorIds, [$order->vendor_id]))) {
-				$error = 'You are not authorized to ' . str_replace('ed', '', $status) . ' this order';
-			}
-		}
+            if (!$user->hasAnyVendor(array_merge($authorizedVendorIds, [$order->vendor_id]))) {
+                $error = 'You are not authorized to ' . str_replace('ed', '', $status) . ' this order';
+            }
+        }
 
-		if (isset($error)) {
-			throw ValidationException::withMessages([
-				'status' => $error,
-			]);
-		}
-	}
+        if (isset($error)) {
+            throw ValidationException::withMessages([
+                'status' => $error,
+            ]);
+        }
+    }
 }
