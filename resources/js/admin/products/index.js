@@ -56,6 +56,7 @@ export const ProductList = props => (
     <List title="Products" {...props} filters={<ProductFilter />}>
         <Datagrid>
             <TextField source="id" />
+            <TextField source="hash_id" label='Refrance'/>
             <TextField source="title" />
             <ReferenceField label="Vendor" source="vendor_id" reference="vendors">
                 <TextField source="name" />
@@ -170,6 +171,7 @@ export const ProductShow = props => (
     <Show {...props}>
         <TabbedShowLayout>
             <Tab label="Product details">
+                <TextField source="hash_id" label='Refrance'/>
                 <ReferenceField label="Vendor" source="vendor_id" reference="vendors">
                     <TextField source="name" />
                 </ReferenceField>

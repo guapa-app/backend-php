@@ -28,7 +28,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         HasTaxonomies, Reviewable, Likable, Relatable, SoftDeletes;
 
     protected $fillable = [
-        'vendor_id', 'title', 'description', 'price',
+        'hash_id', 'vendor_id', 'title', 'description', 'price',
         'status', 'review', 'type', 'terms', 'url'
     ];
 
@@ -50,7 +50,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      * @var array
      */
     protected $search_attributes = [
-        'title', 'description',
+        'hash_id', 'title', 'description',
     ];
 
     /**
