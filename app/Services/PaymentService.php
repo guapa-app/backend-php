@@ -26,7 +26,8 @@ class PaymentService
         $invoice = Invoice::query()->create([
             'order_id'     => $orders->first()->id,
             'status'       => "initiated",
-            'expired_at'   => Carbon::now()->addDays('5'),
+            'expired_at'   => Carbon::now()->addDays('14'),
+            'taxes'        => (int) $taxes * 100,
             'amount'       => (int)(($fees + $taxes) * 100),
             'description'  => "You will pay the fees and taxes for \n" . $description,
             'currency'     => config("nova.currency"),

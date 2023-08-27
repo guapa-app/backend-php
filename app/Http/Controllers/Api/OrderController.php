@@ -153,4 +153,20 @@ class OrderController extends BaseApiController
 
         return $order->invoice_url;
     }
+
+    public function showInvoice($id)
+    {
+        $order = Order::query()->findOrFail($id);
+
+        if ($order->status != "Accepted")
+            return response()->json(['message' => __('You must pay first.')], 405);
+
+        $invoice = $order->invoice;
+
+        abort_if($order->invoice == null, 405, "There is no invoice for this order");
+
+        $qr_code = (new PDFService)->generateQRCode($invoice);
+
+        return view('invoice', compact('invoice', 'order', 'qr_code'));
+    }
 }

@@ -23,6 +23,21 @@ class Invoice extends Model
         'callback_url',
     ];
 
+    protected $appends = [
+        'vendor_name',
+        'vendor_reg_num',
+    ];
+
+    public function getVendorNameAttribute()
+    {
+        return $this->order->vendor->name;
+    }
+
+    public function getVendorRegNumAttribute()
+    {
+        return $this->order->vendor->reg_number;
+    }
+
     public function order()
     {
         return $this->belongsTo(Order::class);
