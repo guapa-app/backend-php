@@ -1285,6 +1285,28 @@ kbd {
   padding: 12px 0;
 }
 
+.text-in-same-line {
+  white-space: nowrap;
+}
+
+.ar-info {
+  unicode-bidi: embed;
+  direction: rtl;
+}
+
+.invoice-desc {
+   margin-top: 4%;
+   text-align: center;
+}
+
+.invoice-qr-code {
+  width: 35%
+}
+
+.invoice-logo {
+  width: 35%
+}
+
 @media print {
   .cs-hide_print {
     display: none !important;
