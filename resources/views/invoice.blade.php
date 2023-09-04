@@ -185,6 +185,24 @@
                         </table>
                     </div>
                 </div>
+                <div class="cs-note">
+                    <div class="cs-note_left">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M416 221.25V416a48 48 0 01-48 48H144a48 48 0 01-48-48V96a48 48 0 0148-48h98.75a32 32 0 0122.62 9.37l141.26 141.26a32 32 0 019.37 22.62z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><path d="M256 56v120a32 32 0 0032 32h120M176 288h160M176 368h160" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+                    </div>
+                    <div class="cs-note_right">
+                        <p class="cs-mb0"><b class="cs-primary_color cs-bold">Note:</b></p>
+                        <p class="cs-m1">
+                            - The amount paid represents the marketing fees for Guapa’s services. You must complete the payment of the remaining amount of the coupon value to the service provider to receive the service mentioned in the coupon.
+                            <br>- The coupon and the service or product provided within it are subject to the terms of the service provider mentioned on the page of the coupon or product mentioned.
+                            <br>- The terms and conditions of the application, as well as the conditions for return, are applied as mentioned in the General Terms and Conditions and Usage Policies section in the application.
+                        </p>
+                        <p class="cs-m0 ar-info">
+                            - المبلغ المدفوع يمثل الاجور التسويقية لخدمات قوابا. يجب اكمال دفع المبلغ المتبقي من قيمة الكوبون لدئ مزود الخدمة لتلقي الخدمة المذكورة في الكوبون.
+                            <br>- يخضع الكوبون و الخدمة المقدمة فيه او المنتج لشروط مزود الخدمة المذكورة في الصفحة الخاصة بالكوبون او المنتج المذكور.
+                            <br>- يتم تطبيق الشروط و الاحكام الخاصة بالتطبيق و كذلك الشروط الخاصة بالاسترجاع كما هو مذكور في خانة الشروط و الاحكام العامة و سياسات الاستخدام في التطبيق   
+                        </p>
+                    </div>
+                </div><!-- .cs-note -->
                 <div class="cs-invoice_btns cs-hide_print">
                     <button id="download_btn" class="cs-invoice_btn cs-color2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
