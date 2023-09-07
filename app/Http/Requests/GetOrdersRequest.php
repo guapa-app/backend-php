@@ -29,7 +29,8 @@ class GetOrdersRequest extends FormRequest
         if ($this->user() && !$this->user()->isAdmin()) {
             $rules = [
                 'vendor_id' => 'sometimes|integer',
-                'status'    => 'sometimes|in:' . implode(',', Order::STATUSES),
+                'status'    => 'sometimes|array',
+                'status.*'  => 'in:' . implode(',', Order::STATUSES),
             ];
         }
 

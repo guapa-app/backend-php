@@ -21,7 +21,29 @@ class Invoice extends Model
         'logo_url',
         'url',
         'callback_url',
+        'taxes',
     ];
+
+    protected $appends = [
+        'vendor_name',
+        'vendor_reg_num',
+        'amount_without_taxes',
+    ];
+
+    public function getVendorNameAttribute()
+    {
+        return $this->order->vendor->name;
+    }
+
+    public function getVendorRegNumAttribute()
+    {
+        return $this->order->vendor->reg_number;
+    }
+
+    public function getAmountWithoutTaxesAttribute()
+    {
+        return $this->amount - $this->taxes;
+    }
 
     public function order()
     {

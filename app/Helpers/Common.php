@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App;
 use App\Contracts\Repositories\SettingRepositoryInterface;
 use Artisan;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Common helper functions
@@ -105,5 +106,25 @@ class Common
             return ['id' => $k, 'name' => $v];
         }, $data, array_keys($data));
 
+    }
+
+    /**
+     * @param string $model
+     * @param int $length
+     * @return bool|string
+     */
+    public static function generateUniqueHashForModel(string $model, int $length = 20)
+    {
+        // Generate a random string of characters.
+        $hash = str_random($length);
+
+        // Check if the hash already exists in the database.
+        // If the hash exists, generate a new one.
+        if (app($model)->where('hash_id', $hash)->first()) {
+            $hash = self::generateUniqueHashForModel($model, $length);
+        }
+
+        // Return the unique hash ID.
+        return $hash;
     }
 }

@@ -63,4 +63,9 @@ class OrderController extends ApiOrderController
 
         return $this->successJsonRes(["url" => $url], __('api.success'));
     }
+
+    public function showInvoice($id)
+    {
+        return parent::showInvoice($id);
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Services\OrderService;
 use App\Services\PDFService;
 use Illuminate\Http\Request;
@@ -152,5 +153,33 @@ class OrderController extends BaseApiController
         logger("Print PDF\n order { $order->id }", ["\norder" => $order]);
 
         return $order->invoice_url;
+    }
+
+    public function showInvoice($id)
+    {
+        $order = Order::query()->findOrFail($id);
+
+        $cus_name = $order->user->name;
+
+        if ($order->status != "Accepted")
+            return response()->json(['message' => __('You must pay first.')], 405);
+            
+        $invoice = $order->invoice;
+        
+        abort_if($invoice == null, 405, "There is no invoice for this order");
+
+        $vat = Setting::getTaxes();
+
+        $order_items = $order->items->map(function ($item) use ($vat){
+            $product      = $item->product;
+            $arr['name']  = $product->title;
+            $arr['price'] = $product->categories->first()->fees / 100 * $item->amount;
+            $arr['vat']   = $arr['price'] * $vat / 100;
+            $arr['qty']   = $item->quantity;
+            $arr['subtotal_with_vat'] = ($arr['price'] + $arr['vat']) * $arr['qty'];
+            return $arr;
+        });
+                
+        return view('invoice', compact('invoice', 'cus_name', 'order_items', 'vat'));
     }
 }
