@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Spatie\Image\Exceptions\InvalidManipulation;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
@@ -75,8 +76,8 @@ class Offer extends Model implements Listable, HasMedia
 
     public function getExpiresCountdownAttribute(): string
     {
-        $difference = $this->expires_at->diff(now());
-
+        $difference = Carbon::parse($this->expires_at)->diff(now());
+        
         $daysString = Common::getLocalizedUnitString($difference->days, 'day');
 
         return __('api.the_offer_expires_in', ['countdown' => $daysString]);
