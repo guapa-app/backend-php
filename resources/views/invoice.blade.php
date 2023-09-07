@@ -175,7 +175,7 @@
                                         <p class="cs-primary_color cs-bold cs-f16 cs-m0">Total Amount</p>
                                     </td>
                                     <td class="cs-width_2 cs-text_center cs-f16">
-                                        <p class="cs-primary_color cs-bold cs-f16 cs-m0 cs-text_right">{{ round($invoice->amount_format, 2) }} <small>SAR</small></p>
+                                        <p class="cs-primary_color cs-bold cs-f16 cs-m0 cs-text_right">{{ round((float)$invoice->amount_format, 2) }} <small>SAR</small></p>
                                     </td>
                                     <td class="cs-width_5 cs-text_right">
                                         <p class="cs-primary_color cs-bold cs-f16 cs-m0">المبلغ الإجمالي</p>
