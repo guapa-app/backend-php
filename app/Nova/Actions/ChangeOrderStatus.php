@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Notification;
 use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class ChangeOrderStatus extends Action
 {
@@ -36,7 +37,7 @@ class ChangeOrderStatus extends Action
      *
      * @return array
      */
-    public function fields(): array
+    public function fields(NovaRequest $request)
     {
         return [
             Select::make(__('status'), 'status')

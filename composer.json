@@ -1,70 +1,75 @@
 {
     "name": "laravel/laravel",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "The skeleton application for the Laravel framework.",
     "keywords": [
-        "framework",
-        "laravel"
+        "laravel",
+        "framework"
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.1",
-        "benwilkins/laravel-fcm-notification": "^4.0",
+        "php": "^8.0",
+        "benwilkins/laravel-fcm-notification": "dev-l10-compatibility",
         "bissolli/nova-phone-field": "^0.0.4",
-        "codezero/laravel-unique-translation": "^3.4",
-        "ebess/advanced-nova-media-library": "^4.0",
+        "codezero/laravel-unique-translation": "^4.1",
+        "ebess/advanced-nova-media-library": "^4.1",
         "elibyy/tcpdf-laravel": "^10.0",
-        "fideloper/proxy": "^4.2",
-        "fruitcake/laravel-cors": "^2.0",
-        "guzzlehttp/guzzle": "^7.2",
-        "hamedov/laravel-favorites": "4.0",
-        "hamedov/laravel-messenger": "0.4",
-        "hamedov/laravel-taxonomies": "^3.0",
-        "hamedov/passport-grants": "^4.1.3",
-        "inspheric/nova-email-field": "^1.42",
-        "inspheric/nova-url-field": "^1.4",
-        "kreait/firebase-tokens": "^1.11",
-        "laravel/framework": "^10.0",
-        "laravel/helpers": "^1.3",
-        "laravel/nova": "~4.0",
-        "laravel/passport": "^10.0",
-        "laravel/tinker": "^2.7",
-        "lcobucci/jwt": "3.3.1",
-        "league/flysystem-aws-s3-v3": "~3.0",
-        "michielfb/laravel-nova-time-field": "^1.2",
+        "guzzlehttp/guzzle": "^7.8",
+        "hamedov/laravel-favorites": "5.0.0.x-dev",
+        "hamedov/laravel-messenger": "1.0.0.x-dev",
+        "hamedov/passport-grants": "5.0.0.x-dev",
+        "hamedov/laravel-taxonomies": "^4.0",
+        "inspheric/nova-email-field": "^2.0",
+        "inspheric/nova-url-field": "^2.0",
+        "kreait/firebase-tokens": "^4.2",
+        "laravel/framework": "^10.10",
+        "laravel/helpers": "^1.6",
+        "laravel/nova": "^4.0",
+        "laravel/passport": "^11.9",
+        "laravel/tinker": "^2.8",
+        "lcobucci/jwt": "^5.0",
+        "league/flysystem-aws-s3-v3": "^3.15",
+        "michielfb/laravel-nova-time-field": "^2.0",
         "moyasar/moyasar": "^1.1",
-        "predis/predis": "^1.1",
-        "spatie/laravel-medialibrary": "^10.4",
-        "spatie/laravel-permission": "^5.5",
-        "spatie/laravel-translatable": "^4.5",
-        "spatie/nova-translatable": "^3.1",
-        "symfony/cache": "^5.1",
-        "ziffmedia/nova-select-plus": "^1.0"
+        "predis/predis": "^2.2",
+        "spatie/laravel-medialibrary": "^10.12",
+        "spatie/laravel-permission": "^5.11",
+        "spatie/laravel-translatable": "^6.5",
+        "spatie/nova-translatable": "^4.0",
+        "symfony/cache": "^6.3",
+        "ziffmedia/nova-select-plus": "^2.0"
     },
     "require-dev": {
-        "facade/ignition": "^2.3.6",
-        "fzaninotto/faker": "^1.9.1",
-        "knuckleswtf/scribe": "^3.37",
+        "fakerphp/faker": "^1.9.1",
+        "laravel/pint": "^1.0",
+        "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10"
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.1",
+        "spatie/laravel-ignition": "^2.0"
     },
-    "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "dont-discover": []
-        }
-    },
-    "repositories": [
-        {
+    "repositories": {
+        "laravel-fcm-notification": {
+            "type": "vcs",
+            "url": "https://github.com/laravel-shift/laravel-fcm-notification.git"
+        },
+        "laravel-favorites": {
+            "type": "vcs",
+            "url": "https://github.com/ADdora/laravel-favorites.git"
+        },
+        "laravel-messenger": {
+            "type": "vcs",
+            "url": "https://github.com/ADdora/laravel-messenger.git"
+        },
+        "passport-grants": {
+            "type": "vcs",
+            "url": "https://github.com/ADdora/passport-grants.git"
+        },
+        "nova": {
             "type": "composer",
             "url": "https://nova.laravel.com"
         }
-    ],
+    },
     "autoload": {
         "psr-4": {
             "App\\": "app/",
@@ -77,12 +82,13 @@
             "Tests\\": "tests/"
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -90,5 +96,21 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ]
-    }
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

@@ -2,17 +2,7 @@
 
 namespace App\Providers;
 
-use App\Nova\Metrics\CityTrend;
-use App\Nova\Metrics\CommentTrend;
-use App\Nova\Metrics\OfferTrend;
-use App\Nova\Metrics\OrderTrend;
-use App\Nova\Metrics\PostTrend;
-use App\Nova\Metrics\ProductTrend;
-use App\Nova\Metrics\ReviewTrend;
-use App\Nova\Metrics\SupportMessageTrend;
-use App\Nova\Metrics\TaxonomyTrend;
-use App\Nova\Metrics\UserTrend;
-use App\Nova\Metrics\VendorTrend;
+use App\Nova\Dashboards\Main;
 use App\Nova\Resources\Admin;
 use App\Nova\Resources\Appointment;
 use App\Nova\Resources\Invoice;
@@ -70,35 +60,15 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     }
 
     /**
-     * Get the cards that should be displayed on the default Nova dashboard.
-     *
-     * @return array
-     */
-    protected function cards()
-    {
-        return [
-            CityTrend::make()->width('1/2'),
-            CommentTrend::make()->width('1/2'),
-            OfferTrend::make()->width('1/2'),
-            OrderTrend::make()->width('1/2'),
-            PostTrend::make()->width('1/2'),
-            ProductTrend::make()->width('1/2'),
-            ReviewTrend::make()->width('1/2'),
-            SupportMessageTrend::make()->width('1/2'),
-            TaxonomyTrend::make()->width('1/2'),
-            UserTrend::make()->width('1/2'),
-            VendorTrend::make()->width('1/2'),
-        ];
-    }
-
-    /**
      * Get the extra dashboards that should be displayed on the Nova dashboard.
      *
      * @return array
      */
     protected function dashboards()
     {
-        return [];
+        return [
+            new Main(),
+        ];
     }
 
     /**
@@ -126,7 +96,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
         # list of resources that vendor can access.
         # every resource use trait NovaVendorAccess
         # and fields array have a check vendor condition (to prevent access resource from edit page).
-        if (Auth::user()->isVendor()) {
+        if (Auth::user()?->isVendor()) {
             Nova::resources([
                 Invoice::class,
                 Product::class,

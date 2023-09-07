@@ -16,7 +16,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        
     }
 
     /**
@@ -27,20 +26,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Relation::morphMap([
-            'user' => 'App\Models\User',
-            'profile' => 'App\Models\UserProfile',
-            'admin' => 'App\Models\Admin',
-            'media' => 'App\Models\Media',
-            'device' => 'App\Models\Device',
-            'vendor' => 'App\Models\Vendor',
-            'doctor' => 'App\Models\Doctor',
-            'product' => 'App\Models\Product',
-            'offer' => 'App\Models\Offer',
-            'post' => 'App\Models\Post',
-            'comment' => 'App\Models\Comment',
+            'user'       => 'App\Models\User',
+            'profile'    => 'App\Models\UserProfile',
+            'admin'      => 'App\Models\Admin',
+            'media'      => 'App\Models\Media',
+            'device'     => 'App\Models\Device',
+            'vendor'     => 'App\Models\Vendor',
+            'doctor'     => 'App\Models\Doctor',
+            'product'    => 'App\Models\Product',
+            'offer'      => 'App\Models\Offer',
+            'post'       => 'App\Models\Post',
+            'comment'    => 'App\Models\Comment',
         ]);
-
-        Passport::routes();
 
         Passport::tokensExpireIn(Carbon::now()->addDays(30));
 
