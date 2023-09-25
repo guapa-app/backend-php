@@ -34,8 +34,8 @@ class History extends Model implements Listable, HasMedia
         'media',
     ];
 
-    protected $dates = [
-        'record_date',
+    protected $casts = [
+        'record_date' => 'date',
     ];
 
     protected $filterable = [

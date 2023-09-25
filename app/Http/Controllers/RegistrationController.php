@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Exception;
 
-class RegistrationController extends Controller
+class RegistrationController extends BaseApiController
 {
     private $userService;
     private $vendorService;
@@ -24,7 +24,7 @@ class RegistrationController extends Controller
     }
 
     public function registerForm(){
-        return view('register', BaseApiController::data());
+        return view('register', $this->data());
     }
 
     public function register(RegisterVendorRequest $request)
@@ -59,6 +59,7 @@ class RegistrationController extends Controller
             return back()->with('success', __('success'));
 
         } catch (Exception $exception) {
+            $this->logReq($exception->getMessage());
             return back()->with('error', 'something went wrong, please contact support');
         }
     }

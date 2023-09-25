@@ -53,7 +53,7 @@ class Notifications extends Resource
                 Vendor::class,
             ]),
 
-            Textarea::make(__('type'), 'type')->showOnIndex(true),
+            Textarea::make(__('type'), 'type'),
 
             Textarea::make(__('data'), 'data')->resolveUsing(function ($value) {
                 return json_encode($value);

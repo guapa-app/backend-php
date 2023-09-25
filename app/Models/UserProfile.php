@@ -33,17 +33,9 @@ class UserProfile extends Model implements HasMedia
         'media',
     ];
 
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'birth_date',
-    ];
-
     protected $casts = [
-        'settings' => 'array',
+        'settings'   => 'array',
+        'birth_date' => 'date',
     ];
 
     const GENDER = [

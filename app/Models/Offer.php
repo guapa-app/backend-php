@@ -32,16 +32,17 @@ class Offer extends Model implements Listable, HasMedia
         'expires_countdown','price'
     ];
 
-    protected $dates = [
-        'starts_at', 'expires_at',
-    ];
-
     protected $search_attributes = [
         'title', 'description',
     ];
 
     protected $filterable_attributes = [
         'product_id',
+    ];
+
+    protected $casts = [
+        'starts_at'  => 'date',
+        'expires_at' => 'date',
     ];
 
     /**

@@ -102,9 +102,9 @@ class Vendor extends Model implements HasMedia, HasReviews
         self::created(function ($item) {
             Admin::query()->create([
                 "vendor_id" => $item->id,
-                "name" => $item->name,
-                "email" => $item->email,
-                "password" => Hash::make($item->email),
+                "name"      => $item->name,
+                "email"     => $item->email,
+                "password"  => auth()->user()->password,
             ]);
         });
     }
