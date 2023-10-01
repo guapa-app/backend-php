@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
@@ -103,7 +102,7 @@ class Vendor extends Model implements HasMedia, HasReviews
             Admin::query()->create([
                 "vendor_id" => $item->id,
                 "name"      => $item->name,
-                "email"     => $item->email,
+                "email"     => auth()->user()->email,
                 "password"  => auth()->user()->password,
             ]);
         });

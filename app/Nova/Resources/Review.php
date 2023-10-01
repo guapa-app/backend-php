@@ -67,7 +67,7 @@ class Review extends Resource
             DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
         ];
 
-        if (Auth::user()->isVendor()) {
+        if (Auth::user()?->isVendor()) {
             switch ($this->resource->reviewable_type) {
                 case "vendor":
                     $flag = Auth::user()->vendor_id != $this->resource->reviewable->id;
@@ -80,7 +80,7 @@ class Review extends Resource
             }
 
             if ($request->isUpdateOrUpdateAttachedRequest() && $flag) {
-                abort(redirect('/admin')->with('errors', 'You do not have permission to access this page!'));
+                throw new \Exception('You do not have permission to access this page!', 403);
             }
 
             return $returned_arr;
@@ -135,6 +135,6 @@ class Review extends Resource
 
     public function authorizedToUpdate(Request $request)
     {
-        return !Auth::user()->isVendor();
+        return !Auth::user()?->isVendor();
     }
 }

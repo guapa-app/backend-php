@@ -5,16 +5,11 @@ namespace App\Nova\Resources;
 use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\UnauthorizedException;
-use Laravel\Nova\Exceptions\AuthenticationException;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Password;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\TrashedStatus;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Admin extends Resource
 {
@@ -67,9 +62,9 @@ class Admin extends Resource
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
 
-        if (Auth::user()->isVendor()) {
+        if (Auth::user()?->isVendor()) {
             if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->id != $this->resource->id) {
-                abort(redirect('/')->with('error', 'You do not have permission to access this page!'));
+                throw new \Exception('You do not have permission to access this page!', 403);
             }
             return $returned_arr;
         }
@@ -121,5 +116,10 @@ class Admin extends Resource
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public static function authorizedToCreate(Request $request)
+    {
+        return !Auth::user()?->isVendor();
     }
 }

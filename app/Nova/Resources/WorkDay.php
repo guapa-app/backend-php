@@ -64,10 +64,9 @@ class WorkDay extends Resource
                 ->options(WorkDay::days),
         ];
 
-        if (Auth::user()->isVendor()) {
-//            dd($request->isUpdateOrUpdateAttachedRequest() , Auth::user()->vendor_id , $this->resource->vendor_id);
+        if (Auth::user()?->isVendor()) {
             if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
-                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+                throw new \Exception('You do not have permission to access this page!', 403);
             }
             return $returned_arr;
         }

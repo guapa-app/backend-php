@@ -52,7 +52,7 @@ class User extends Resource
 
     public static function indexQuery(NovaRequest $request, $query): Builder
     {
-        if (Auth::user()->isVendor()) {
+        if (Auth::user()?->isVendor()) {
             return $query->CurrentVendor(Auth::user()->vendor->id);
         }
 
@@ -145,9 +145,9 @@ class User extends Resource
             //roles
         ];
 
-        if (Auth::user()->isVendor()) {
-            if ($request->isUpdateOrUpdateAttachedRequest() && in_array(Auth::user()->vendor_id, $this->resource->getUserVendorsIdsAttribute())) {
-                abort(redirect('/')->with('errors', 'You do not have permission to access this page!'));
+        if (Auth::user()?->isVendor()) {
+            if ($request->isUpdateOrUpdateAttachedRequest() && !in_array(Auth::user()->vendor_id, $this->resource->getUserVendorsIdsAttribute())) {
+                throw new \Exception('You do not have permission to access this page!', 403);
             }
             return $returned_arr;
         }
