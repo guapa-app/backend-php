@@ -87,13 +87,13 @@ class AuthController extends ApiAuthController
         $user = parent::checkIfPhoneExist($request);
 
         if ($user == null) {
-            return $this->errorJsonRes([
-                'phone' => [
-                    __('api.phone_doesnt_exist')
-                ]
-            ], __('api.phone_doesnt_exist'), 422);
+            return $this->successJsonRes([
+                "is_phone_exists" => false
+            ], __('api.phone_doesnt_exist'), 200);
         } else {
-            return $this->successJsonRes([], __('api.phone_exist'), 200);
+            return $this->successJsonRes([
+                "is_phone_exists" => true
+            ], __('api.phone_exist'), 200);
         }
     }
 }

@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
 use DB;
-use Exception;
 use Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
@@ -46,7 +45,6 @@ class AuthController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      *
      * @param RegisterRequest $request
-     * @return array
      */
     public function register(RegisterRequest $request)
     {
@@ -121,7 +119,6 @@ class AuthController extends BaseApiController
      * @bodyParam password string required  Password
      *
      * @param Request $request
-     * @return array
      */
     public function login(Request $request)
     {
@@ -178,7 +175,6 @@ class AuthController extends BaseApiController
      * @responseFile 200 responses/auth/current-user.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
      *
-     * @return User
      */
     public function user()
     {
@@ -227,7 +223,6 @@ class AuthController extends BaseApiController
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
      *
      * @param Request $request
-     * @return true
      */
     public function logout(Request $request)
     {
@@ -250,7 +245,6 @@ class AuthController extends BaseApiController
      * @bodyParam otp string Sinch otp (Required if firebase jwt token is absent)
      *
      * @param Request $request
-     * @return array
      */
     public function verify(Request $request)
     {
@@ -312,7 +306,6 @@ class AuthController extends BaseApiController
      * Delete Account
      *
      * @param Request $request
-     * @return boolean
      */
     public function deleteAccount(Request $request)
     {
@@ -328,7 +321,6 @@ class AuthController extends BaseApiController
      * @bodyParam phone string required Phone number
      *
      * @param Request $request
-     * @return JsonResponse
      */
     public function sendSinchOtp(Request $request)
     {
@@ -348,7 +340,6 @@ class AuthController extends BaseApiController
      * @bodyParam otp string required Otp from sms
      *
      * @param Request $request
-     * @return boolean
      */
     public function verifySinchOtp(Request $request)
     {
@@ -368,7 +359,6 @@ class AuthController extends BaseApiController
      * @bodyParam phone string required Phone number
      *
      * @param Request $request
-     * @return User
      * @throws ValidationException
      */
     public function checkIfPhoneExist(Request $request)
