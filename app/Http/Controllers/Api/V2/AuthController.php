@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\VerifyPhoneRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class AuthController extends ApiAuthController
@@ -12,10 +15,10 @@ class AuthController extends ApiAuthController
     public function register(RegisterRequest $request)
     {
         list($token, $user) = parent::register($request);
-
+        
+        $user->access_token = $token;
         return UserResource::make($user)
             ->additional([
-                "token" => $token,
                 "success" => true,
                 'message' => __('api.success'),
             ]);
@@ -24,10 +27,10 @@ class AuthController extends ApiAuthController
     public function login(Request $request)
     {
         list($token, $user) = parent::login($request);
-
+        
+        $user->access_token = $token;
         return UserResource::make($user)
             ->additional([
-                "token" => $token,
                 "success" => true,
                 'message' => __('api.success'),
             ]);
@@ -64,17 +67,56 @@ class AuthController extends ApiAuthController
         return $this->successJsonRes([], __('api.account_deleted'));
     }
 
-    public function sendSinchOtp(Request $request)
+    public function sendSinchOtp(PhoneRequest $request)
     {
-        parent::sendSinchOtp($request);
-        return $this->successJsonRes([], __('api.otp_sent'));
+        try {
+            if (Setting::checkTestingMode() || config('app.env') === 'local') {
+                return $this->successJsonRes([
+                    "is_otp_sent" => true,
+                    "otp" => 1111
+                ], __('api.otp_sent'), 200);
+            }
+
+            parent::sendSinchOtp($request);
+
+            return $this->successJsonRes([
+                "is_otp_sent" => true
+            ], __('api.otp_sent'), 200);
+        } catch (\Throwable $th) {
+            if ($th instanceof \Illuminate\Validation\ValidationException) {
+                throw $th;
+            }
+            $res = json_decode((string)$th->getResponse()?->getBody());
+            if ($th instanceof \GuzzleHttp\Exception\ClientException) {
+                if ($th->getCode() == 402) {
+                    // 402 Not enough credit.
+                } elseif ($th->getCode() == 400) {
+                    // 400 Invalid phone number.
+                    return $this->errorJsonRes([
+                        'phone' => [__('api.invalid_phone')]
+                    ], __('api.otp_not_sent'), 422);
+                }
+            }
+            $this->logReq($res?->message);
+            return $this->successJsonRes([
+                "is_otp_sent" => false
+            ], __('api.contact_support'), 422);
+        }
     }
 
-    public function verifySinchOtp(Request $request)
+    public function verifySinchOtp(VerifyPhoneRequest $request)
     {
+        if (Setting::checkTestingMode() || config('app.env') === 'local') {
+            return $this->successJsonRes([
+                "is_otp_verified" => true
+            ], __('api.correct_otp'), 200);
+        }
+
         $bool = parent::verifySinchOtp($request);
         if ($bool) {
-            return $this->successJsonRes([], __('api.correct_otp'), 200);
+            return $this->successJsonRes([
+                "is_otp_verified" => true
+            ], __('api.correct_otp'), 200);
         } else {
             return $this->errorJsonRes([
                 'otp' => [__('api.incorrect_otp')]

@@ -46,4 +46,13 @@ class Setting extends Model
         ]);
         return $record->setting_value;
     }
+    public static function checkTestingMode()
+    {
+        $record = static::firstOrCreate(['setting_key' => "is_testing_mode_enabled"], [
+            "setting_value" => config('app.env') === 'production' ? false : true,
+            "setting_unit" => 'bool',
+            "instructions" => "this mode is enabled ONLY for testing environment",
+        ]);
+        return $record->setting_value;
+    }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\VerifyPhoneRequest;
 use Illuminate\Http\Request;
 
 class AuthController extends ApiAuthController
@@ -53,13 +55,13 @@ class AuthController extends ApiAuthController
         return response()->json(["message" => __('api.account_deleted')]);
     }
 
-    public function sendSinchOtp(Request $request)
+    public function sendSinchOtp(PhoneRequest $request)
     {
         parent::sendSinchOtp($request);
         return response()->json(["message" => __('api.otp_sent')]);
     }
 
-    public function verifySinchOtp(Request $request)
+    public function verifySinchOtp(VerifyPhoneRequest $request)
     {
         $bool = parent::verifySinchOtp($request);
         if ($bool) {

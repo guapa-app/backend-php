@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Exceptions\ApiException;
 use App\Exceptions\PhoneNotVerifiedException;
+use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\VerifyPhoneRequest;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
@@ -322,11 +324,9 @@ class AuthController extends BaseApiController
      *
      * @param Request $request
      */
-    public function sendSinchOtp(Request $request)
+    public function sendSinchOtp(PhoneRequest $request)
     {
-        $data = $this->validate($request, [
-            'phone' => 'required|string|max:40',
-        ]);
+        $data = $request->validated();
 
         return $this->authService->sendSinchOtp($data['phone']);
     }
@@ -339,14 +339,11 @@ class AuthController extends BaseApiController
      * @bodyParam phone string required Phone number
      * @bodyParam otp string required Otp from sms
      *
-     * @param Request $request
+     * @param VerifyPhoneRequest $request
      */
-    public function verifySinchOtp(Request $request)
+    public function verifySinchOtp(VerifyPhoneRequest $request)
     {
-        $data = $this->validate($request, [
-            'phone' => 'required|string|max:40',
-            'otp'   => 'required|string|max:10',
-        ]);
+        $data = $request->validated();
 
         return $this->authService->verifySinchOtp($data['phone'], $data['otp']);
     }

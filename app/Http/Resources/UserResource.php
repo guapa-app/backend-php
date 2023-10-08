@@ -22,8 +22,12 @@ class UserResource extends JsonResource
             $this->mergeWhen(!$this->relationLoaded('profile'), [
                 "photo"                        => $this->photo,
             ]),
-
+            
             'profile'               => ProfileResource::make($this->whenLoaded('profile')),
+
+            $this->mergeWhen($this->access_token, [
+                'token'                        => $this->access_token,
+            ]),
         ];
     }
 }
