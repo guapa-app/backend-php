@@ -36,6 +36,7 @@ class AuthService
 
         $http = new Client;
 
+        dd($this->tokenUrl, $data);
         try {
             $response = $http->post($this->tokenUrl, [
                 'form_params' => $data,

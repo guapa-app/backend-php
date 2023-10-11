@@ -81,6 +81,17 @@ return [
     */
 
     'locale' => 'en',
+
+    'filament_available_locales' => [
+        // 'ar' => ['dir' => 'rtl','name' => 'Arabic','native' => 'العربية','script' => 'Arab','flag_code' => 'sa',],
+        'en' => ['dir' => 'ltr','name' => 'English','native' => 'English','script' => 'Latn','flag_code' => 'us',],
+    ],
+
+    'powered_by' => [
+        'link' => env('POWERED_BY_LINK', 'https://linkedin.com/in/ahmed-abdelkader-aa30'),
+        'name' => env('POWERED_BY_NAME', 'Ahmed Abdelkader'),
+    ],
+
     'available_locales' => ['en', 'ar'],
 
     /*
@@ -175,6 +186,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\Filament\UserPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
     ],

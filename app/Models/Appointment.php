@@ -12,11 +12,16 @@ class Appointment extends Model
     public $timestamps = false;
 
     protected $fillable = [
-    	'vendor_id', 'from_time', 'to_time',
+        'vendor_id', 'from_time', 'to_time',
     ];
 
     public function vendor()
     {
-    	return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Vendor::class);
+    }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('vendor_id', $value);
     }
 }

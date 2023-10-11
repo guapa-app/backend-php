@@ -14,11 +14,13 @@
         "codezero/laravel-unique-translation": "^4.1",
         "ebess/advanced-nova-media-library": "^4.1",
         "elibyy/tcpdf-laravel": "^10.0",
+        "filament/filament": "^3.0",
+        "filament/spatie-laravel-translatable-plugin": "^3.0",
         "guzzlehttp/guzzle": "^7.8",
         "hamedov/laravel-favorites": "5.0.0.x-dev",
         "hamedov/laravel-messenger": "1.0.0.x-dev",
-        "hamedov/passport-grants": "5.0.0.x-dev",
         "hamedov/laravel-taxonomies": "^4.0",
+        "hamedov/passport-grants": "5.0.0.x-dev",
         "inspheric/nova-email-field": "^2.0",
         "inspheric/nova-url-field": "^2.0",
         "kreait/firebase-tokens": "^4.2",
@@ -32,15 +34,16 @@
         "michielfb/laravel-nova-time-field": "^2.0",
         "moyasar/moyasar": "^1.1",
         "predis/predis": "^2.2",
+        "prgayman/laravel-zatca": "^1.0",
         "spatie/laravel-medialibrary": "^10.12",
         "spatie/laravel-permission": "^5.11",
         "spatie/laravel-translatable": "^6.5",
         "spatie/nova-translatable": "^4.0",
         "symfony/cache": "^6.3",
-        "ziffmedia/nova-select-plus": "^2.0",
-        "prgayman/laravel-zatca": "^1.0"
+        "ziffmedia/nova-select-plus": "^2.0"
     },
     "require-dev": {
+        "doctrine/dbal": "^3.7",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
@@ -86,7 +89,8 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"

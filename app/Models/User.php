@@ -7,6 +7,8 @@ use App\Contracts\Listable;
 use App\Helpers\Common;
 use App\Traits\FcmNotifiable as FcmNotifiableTrait;
 use App\Traits\Listable as ListableTrait;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Hamedov\Favorites\HasFavorites;
 use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,7 +19,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements Listable, FcmNotifiable
+class User extends Authenticatable implements Listable, FcmNotifiable, FilamentUser
 {
     use HasFactory, Notifiable, HasApiTokens, HasRoles,
         ListableTrait, HasFavorites, FcmNotifiableTrait,
@@ -115,7 +117,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable
         return $isEmail ?
             $this->where('email', $username)->first() :
             $this->whereIn('phone', Common::getPhoneVariations($username))
-                ->first();
+            ->first();
     }
 
     /**
@@ -261,5 +263,10 @@ class User extends Authenticatable implements Listable, FcmNotifiable
                 $join->where('user_profiles.gender', $gender);
             });
         return $query;
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->userVendors->count() && $this->hasVerifiedEmail() && !is_null($this->phone_verified_at);
     }
 }

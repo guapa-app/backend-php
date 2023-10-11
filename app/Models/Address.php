@@ -122,4 +122,11 @@ class Address extends Model implements Listable
         $query->with('addressable', 'city');
         return $query;
     }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->whereHasMorph('addressable', [Vendor::class], function (Builder $query) use ($value) {
+            $query->where('id', $value);
+        });
+    }
 }

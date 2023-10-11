@@ -77,4 +77,11 @@ class Comment extends Model implements Listable
     {
         return $query;
     }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->whereHasMorph('user', [Vendor::class], function (Builder $query) use ($value) {
+            $query->where('id', $value);
+        });
+    }
 }
