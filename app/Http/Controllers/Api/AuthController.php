@@ -8,13 +8,13 @@ use App\Exceptions\PhoneNotVerifiedException;
 use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
 use DB;
 use Hash;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -28,9 +28,11 @@ class AuthController extends BaseApiController
     private $userService;
     private $userRepository;
 
-    public function __construct(UserRepositoryInterface $userRepository,
-                                AuthService $authService, UserService $userService)
-    {
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        AuthService $authService,
+        UserService $userService
+    ) {
         parent::__construct();
 
         $this->authService = $authService;
@@ -137,6 +139,7 @@ class AuthController extends BaseApiController
             'scope'      => '*',
         ]);
 
+        // dd($token);
         $this->checkUserCredentials($token);
 
         $username = $request->get('username');
@@ -277,10 +280,13 @@ class AuthController extends BaseApiController
             $tokenPayload['jwt_token'] = $data['firebase_jwt_token'];
         }
 
-        $token = $this->authService->authenticate($tokenPayload);
-
-        if ($token == null)
-            throw new ApiException(__('api.phone_verification_failed'), 401);
+        if (Setting::checkTestingMode()) {
+            $personalAccessToken = $user->createToken('Temp Personal Token', ['*']);
+            $token['access_token'] = $personalAccessToken->accessToken;
+        } else {
+            $token = $this->authService->authenticate($tokenPayload);
+            $this->checkUserCredentials($token);
+        }
 
         $user->update(['phone_verified_at' => now()->toDateTimeString()]);
 

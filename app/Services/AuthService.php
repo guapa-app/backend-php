@@ -9,6 +9,7 @@ use Exception;
 use GuzzleHttp\Client;
 use Log;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Authentication service
@@ -34,15 +35,12 @@ class AuthService
             'scope' => '*',
         ], $data);
 
-        $http = new Client;
-
         try {
-            $response = $http->post($this->tokenUrl, [
-                'form_params' => $data,
-            ]);
+            $res = Http::asForm()->post($this->tokenUrl, $data);
 
-            return json_decode((string)$response->getBody(), true);
-
+            if ($res->status() != 200) return null;
+            
+            return $res->json();
         } catch (Exception $e) {
             return null;
         }

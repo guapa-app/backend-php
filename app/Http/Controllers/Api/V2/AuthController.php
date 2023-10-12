@@ -15,7 +15,7 @@ class AuthController extends ApiAuthController
     public function register(RegisterRequest $request)
     {
         list($token, $user) = parent::register($request);
-        
+
         $user->access_token = $token;
         return UserResource::make($user)
             ->additional([
@@ -27,7 +27,7 @@ class AuthController extends ApiAuthController
     public function login(Request $request)
     {
         list($token, $user) = parent::login($request);
-        
+
         $user->access_token = $token;
         return UserResource::make($user)
             ->additional([
@@ -58,7 +58,14 @@ class AuthController extends ApiAuthController
 
     public function verify(Request $request)
     {
-        return $this->successJsonRes(parent::verify($request));
+        try {
+            $res = parent::verify($request);
+            return $this->successJsonRes($res);
+        } catch (\Throwable $th) {
+            return $this->errorJsonRes([
+                'phone' => [__('api.phone_verification_failed')]
+            ], __('api.phone_verification_failed'), 422);
+        }
     }
 
     public function deleteAccount(Request $request)
@@ -70,7 +77,7 @@ class AuthController extends ApiAuthController
     public function sendSinchOtp(PhoneRequest $request)
     {
         try {
-            if (Setting::checkTestingMode() || config('app.env') === 'local') {
+            if (Setting::checkTestingMode()) {
                 return $this->successJsonRes([
                     "is_otp_sent" => true,
                     "otp" => 1111
@@ -106,7 +113,7 @@ class AuthController extends ApiAuthController
 
     public function verifySinchOtp(VerifyPhoneRequest $request)
     {
-        if (Setting::checkTestingMode() || config('app.env') === 'local') {
+        if (Setting::checkTestingMode()) {
             return $this->successJsonRes([
                 "is_otp_verified" => true
             ], __('api.correct_otp'), 200);
