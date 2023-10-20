@@ -61,7 +61,6 @@ class VendorResource extends JsonResource
 
             "specialties"                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
             "appointments"                              => AppointmentResource::collection($this->whenLoaded('appointments')),
-
         ];
     }
 }

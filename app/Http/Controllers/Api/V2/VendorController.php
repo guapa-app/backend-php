@@ -6,7 +6,8 @@ use App\Http\Controllers\Api\VendorController as ApiVendorController;
 use App\Http\Requests\VendorRequest;
 use App\Http\Resources\VendorCollection;
 use App\Http\Resources\VendorResource;
-use Illuminate;
+use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 /**
@@ -38,13 +39,20 @@ class VendorController extends ApiVendorController
 
     public function create(VendorRequest $request)
     {
-        $item = parent::create($request);
+        try {
+            return DB::transaction(function () use ($request) {
+                $item = parent::create($request);
 
-        return VendorResource::make($item)
-            ->additional([
-                "success" => true,
-                'message' => __('api.created'),
-            ]);
+                return VendorResource::make($item)
+                    ->additional([
+                        "success" => true,
+                        'message' => __('api.created'),
+                    ]);
+            });
+        } catch (Exception $exception) {
+            $this->logReq($exception->getMessage());
+            return $this->errorJsonRes(message: 'something went wrong');
+        }
     }
 
     public function update(VendorRequest $request, $id)

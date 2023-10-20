@@ -139,7 +139,6 @@ class AuthController extends BaseApiController
             'scope'      => '*',
         ]);
 
-        // dd($token);
         $this->checkUserCredentials($token);
 
         $username = $request->get('username');
