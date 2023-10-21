@@ -53,6 +53,6 @@ class Setting extends Model
             "setting_unit" => 'bool',
             "instructions" => "this mode is enabled ONLY for testing environment",
         ]);
-        return $record->setting_value;
+        return (bool)$record->setting_value;
     }
 }

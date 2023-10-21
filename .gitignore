@@ -6,6 +6,7 @@
 /public/js/admin.js
 /public/js/app.js
 /storage/*.key
+/storage/debugbar
 /vendor
 .env
 .env.backup

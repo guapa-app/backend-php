@@ -35,6 +35,12 @@ class VendorService
      */
     public function create(array $data): Vendor
     {
+        /* 
+        * overwrite defualt status value from migration file.
+        * should remove default values from migrations
+        */
+        $data['status'] = array_flip(Vendor::STATUSES)['active'];
+
         // Create vendor
         $vendor = $this->vendorRepository->create($data);
 
@@ -65,7 +71,7 @@ class VendorService
 
         $this->updateStaff($vendor, $data);
 
-        $vendor->loadMissing('staff', 'logo', 'addresses');
+        $vendor->loadMissing('staff', 'logo', 'addresses', 'workDays');
 
         return $vendor;
     }

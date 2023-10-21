@@ -59,7 +59,6 @@ class VendorController extends BaseApiController
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
      *
      * @param VendorRequest $request
-     * @return Model
      */
     public function create(VendorRequest $request)
     {
