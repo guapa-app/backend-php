@@ -12,7 +12,7 @@ class OrderResource extends JsonResource
         return [
             'id'          => $this->id,
             'total'       => (double)$this->total,
-            'status'      => (string)$this->status,
+            'status'      => $this->status,
             'note'        => (string)$this->note,
             'name'        => (string)$this->name,
 

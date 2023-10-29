@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class GetOrdersRequest extends FormRequest
 {
@@ -30,7 +31,7 @@ class GetOrdersRequest extends FormRequest
             $rules = [
                 'vendor_id' => 'sometimes|integer',
                 'status'    => 'sometimes|array',
-                'status.*'  => 'in:' . implode(',', OrderStatus::cases()),
+                'status.*'  => [new Enum(OrderStatus::class)],
             ];
         }
 
