@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Contracts\Listable;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,6 +47,16 @@ class Review extends Model
         })->orWhereHasMorph('reviewable', [Vendor::class], function (Builder $query) use ($value) {
             $query->where('id', $value);
         });
+    }
+
+    public function scopeVendor($query)
+    {
+        return $query->whereHasMorph('reviewable', [Vendor::class]);
+    }
+
+    public function scopeProduct($query)
+    {
+        return $query->whereHasMorph('reviewable', [Product::class]);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request) : Builder

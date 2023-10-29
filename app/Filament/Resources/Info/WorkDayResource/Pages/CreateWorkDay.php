@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\Info\WorkDayResource\Pages;
+
+use App\Filament\Resources\Info\WorkDayResource;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreateWorkDay extends CreateRecord
+{
+    protected static string $resource = WorkDayResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['vendor_id'] = auth()->user()->userVendors->first()->vendor_id;
+
+        return $data;
+    }
+}

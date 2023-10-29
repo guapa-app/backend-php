@@ -9,9 +9,11 @@ use App\Listeners\ProductCreatedListener;
 use App\Models\Offer;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\WorkDay;
 use App\Observers\OfferObserver;
 use App\Observers\ProductObserver;
 use App\Observers\UserObserver;
+use App\Observers\WorkDayObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -47,5 +49,6 @@ class EventServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Offer::observe(OfferObserver::class);
         Product::observe(ProductObserver::class);
+        WorkDay::observe(WorkDayObserver::class);
     }
 }

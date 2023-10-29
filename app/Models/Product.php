@@ -4,6 +4,9 @@ namespace App\Models;
 
 use App\Contracts\HasReviews;
 use App\Contracts\Listable;
+use App\Enums\ProductReview;
+use App\Enums\ProductStatus;
+use App\Enums\ProductType;
 use App\Traits\Likable;
 use App\Traits\Listable as ListableTrait;
 use App\Traits\Reviewable;
@@ -24,8 +27,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Product extends Model implements Listable, HasMedia, HasReviews
 {
-    use HasFactory, ListableTrait, InteractsWithMedia,
-        HasTaxonomies, Reviewable, Likable, Relatable, SoftDeletes;
+    use HasFactory,
+        ListableTrait,
+        InteractsWithMedia,
+        HasTaxonomies,
+        Reviewable,
+        Likable,
+        Relatable,
+        SoftDeletes;
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price',
@@ -51,6 +60,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      */
     protected $search_attributes = [
         'hash_id', 'title', 'description',
+    ];
+
+    protected $casts = [
+        'type'   => ProductType::class,
+        'status' => ProductStatus::class,
+        'review' => ProductReview::class,
     ];
 
     /**
@@ -142,6 +157,16 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function scopeCurrentVendor($query, $value)
     {
         return $query->where('vendor_id', $value);
+    }
+
+    public function scopeCoupon($query)
+    {
+        return $query->where('type', ProductType::Service);
+    }
+
+    public function scopeProduct($query)
+    {
+        return $query->where('type', ProductType::Product);
     }
 
     public function scopePriceRange($query, $minPrice, $maxPrice)

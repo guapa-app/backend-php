@@ -9,32 +9,37 @@ class UserVendor extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = null;
+    protected $primaryKey = 'user_id';
     public $incrementing = false;
 
     protected $table = 'user_vendor';
 
     protected $fillable = [
-    	'user_id', 'vendor_id', 'role', 'email',
+        'user_id', 'vendor_id', 'role', 'email',
     ];
 
     public function vendor()
     {
-    	return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Vendor::class);
     }
 
     public function user()
     {
-    	return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function isManager()
     {
-    	return $this->role === 'manager';
+        return $this->role === 'manager';
     }
 
     public function scopeRole($query, $role)
     {
-    	return $query->where('role', $role);
+        return $query->where('role', $role);
+    }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('vendor_id', $value);
     }
 }

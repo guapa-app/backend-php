@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
+use App\Enums\OrderStatus;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
 use App\Models\Invoice;
@@ -115,7 +116,7 @@ class OrderController extends BaseApiController
         $this->logReq("Update order number - $id");
 
         $data = $this->validate($request, [
-            'status' => 'required|in:' . implode(',', Order::AVA_STAT_FOR_UPDATE),
+            'status' => 'required|in:' . implode(',', OrderStatus::availableForUpdate()),
             'cancellation_reason' => 'required_if:status,Cancel Request',
         ]);
 

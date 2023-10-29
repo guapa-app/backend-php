@@ -7,6 +7,7 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+
 class Handler extends ExceptionHandler
 {
     /**

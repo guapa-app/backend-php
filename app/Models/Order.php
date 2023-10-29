@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\Listable;
+use App\Enums\OrderStatus;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,20 +36,8 @@ class Order extends Model implements Listable
         'name', 'phone',
     ];
 
-    const STATUSES = [
-        'Pending', #this is default status for order and can't return to it if changed
-        'Accepted',
-        'Rejected',
-        'Cancel Request',
-        'Canceled'
-    ];
-
-    # available statuses for update
-    const AVA_STAT_FOR_UPDATE = [
-        'Accepted',
-        'Rejected',
-        'Cancel Request',
-        'Canceled'
+    protected $casts = [
+        'status' => OrderStatus::class,
     ];
 
     protected static function boot()

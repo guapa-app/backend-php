@@ -198,4 +198,9 @@ class Offer extends Model implements Listable, HasMedia
         $query->with('product', 'image');
         return $query;
     }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->whereRelation('product', 'vendor_id', '=', $value);
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Order;
+use App\Enums\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetOrdersRequest extends FormRequest
@@ -30,7 +30,7 @@ class GetOrdersRequest extends FormRequest
             $rules = [
                 'vendor_id' => 'sometimes|integer',
                 'status'    => 'sometimes|array',
-                'status.*'  => 'in:' . implode(',', Order::STATUSES),
+                'status.*'  => 'in:' . implode(',', OrderStatus::cases()),
             ];
         }
 
