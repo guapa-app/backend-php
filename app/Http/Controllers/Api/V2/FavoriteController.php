@@ -32,6 +32,9 @@ class FavoriteController extends ApiFavoriteController
     public function delete($type, $id): JsonResponse
     {
         parent::delete($type, $id);
-        return $this->successJsonRes([], __('api.favourite_deleted'));
+
+        return $this->successJsonRes([
+            "is_deleted" => true
+        ], __('api.favourite_deleted'));
     }
 }

@@ -19,8 +19,8 @@ class PostResource extends JsonResource
             "likes_count"   => $this->likes_count,
             "is_liked"      => $this->is_liked,
 
-            'created_at'  => Carbon::parse($this->created_at)->diffForHumans(),
-            'updated_at'  => Carbon::parse($this->updated_at)->diffForHumans(),
+            'created_at'  => $this->created_at,
+            'updated_at'  => $this->updated_at,
 
             "admin"       => AdminResource::make($this->whenLoaded('admin')),
             "category"    => TaxonomyResource::make($this->whenLoaded('category')),
