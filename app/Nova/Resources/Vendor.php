@@ -2,7 +2,6 @@
 
 namespace App\Nova\Resources;
 
-use App\Traits\NovaVendorAccess;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
@@ -22,8 +21,6 @@ use Laravel\Nova\Panel;
 
 class Vendor extends Resource
 {
-    use NovaVendorAccess;
-
     /**
      * The model the resource corresponds to.
      *
@@ -155,21 +152,13 @@ class Vendor extends Resource
                         ]),
                 ];
             }),
+            Boolean::make(__('verified'), 'verified')->default(false),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
 
-        if (Auth::user()?->isVendor()) {
-            if (($request->isUpdateOrUpdateAttachedRequest() || $request->isResourceDetailRequest()) && Auth::user()->vendor_id != $this->resource->id) {
-                throw new \Exception('You do not have permission to access this page!', 403);
-            }
-            return $returned_arr;
-        }
-
-        return array_merge($returned_arr, [
-            Boolean::make(__('verified'), 'verified')->default(false)
-        ]);
+        return $returned_arr;
     }
 
     public function socialMediaFields(): array

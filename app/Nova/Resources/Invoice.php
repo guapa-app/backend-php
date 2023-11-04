@@ -2,9 +2,7 @@
 
 namespace App\Nova\Resources;
 
-use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
@@ -15,8 +13,6 @@ use Laravel\Nova\Fields\Textarea;
 
 class Invoice extends Resource
 {
-    use NovaVendorAccess;
-
     /**
      * The model the resource corresponds to.
      *
@@ -75,13 +71,6 @@ class Invoice extends Resource
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
 
         ];
-
-        if (Auth::user()?->isVendor()) {
-            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->order->vendor_id) {
-                throw new \Exception('You do not have permission to access this page!', 403);
-            }
-            return $returned_arr;
-        }
 
         return $returned_arr;
     }

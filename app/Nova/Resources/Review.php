@@ -2,7 +2,6 @@
 
 namespace App\Nova\Resources;
 
-use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
@@ -14,8 +13,6 @@ use Laravel\Nova\Fields\Textarea;
 
 class Review extends Resource
 {
-    use NovaVendorAccess;
-
     /**
      * The model the resource corresponds to.
      *
@@ -67,25 +64,6 @@ class Review extends Resource
             DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
         ];
 
-        if (Auth::user()?->isVendor()) {
-            switch ($this->resource->reviewable_type) {
-                case "vendor":
-                    $flag = Auth::user()->vendor_id != $this->resource->reviewable->id;
-                    break;
-                case "product":
-                    $flag = Auth::user()->vendor_id != $this->resource->reviewable->vendor_id;
-                    break;
-                default:
-                    $flag = true;
-            }
-
-            if ($request->isUpdateOrUpdateAttachedRequest() && $flag) {
-                throw new \Exception('You do not have permission to access this page!', 403);
-            }
-
-            return $returned_arr;
-        }
-
         return $returned_arr;
     }
 
@@ -131,10 +109,5 @@ class Review extends Resource
     public function actions(Request $request)
     {
         return [];
-    }
-
-    public function authorizedToUpdate(Request $request)
-    {
-        return !Auth::user()?->isVendor();
     }
 }
