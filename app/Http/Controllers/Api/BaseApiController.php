@@ -10,6 +10,7 @@ use App\Contracts\Repositories\TaxRepositoryInterface;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportMessageRequest;
+use App\Http\Resources\SupportMessageResource;
 use App\Models\Address;
 use App\Models\Product;
 use App\Models\Setting;
@@ -72,7 +73,9 @@ class BaseApiController extends Controller
     public function pages()
     {
         $pageRepository = resolve(PageRepositoryInterface::class);
-        return response()->json($pageRepository->getAll());
+        return $this->successJsonRes([
+            "items" => $pageRepository->getAll()
+        ], __('api.success'));
     }
 
     /**
@@ -91,8 +94,12 @@ class BaseApiController extends Controller
         $data = $request->validated();
         $data['user_id'] = $this->user ? $this->user->id : null;
 
-        $message = app(SupportMessageRepositoryInterface::class)->create($data);
+        $record = app(SupportMessageRepositoryInterface::class)->create($data);
 
-        return response()->json($message);
+        return SupportMessageResource::make($record)
+            ->additional([
+                "success" => true,
+                'message' => __('api.success'),
+            ]);
     }
 }
