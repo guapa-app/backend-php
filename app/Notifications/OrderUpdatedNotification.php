@@ -14,13 +14,13 @@ class OrderUpdatedNotification extends Notification
     use Queueable;
 
     /**
-     * The user who made the order
+     * The user who made the order.
      * @var User
      */
     public $user;
 
     /**
-     * Order object
+     * Order object.
      * @var Order
      */
     public $order;
@@ -75,15 +75,15 @@ class OrderUpdatedNotification extends Notification
         return "------------------------\n" .
             "فريق قوابا يشعركم بوجود تحديث علي طلبكم ارجو التحقق من مركز الطلبات في التطبيق\n" .
             "------------------------\n" .
-            "نوع الطلب: " . $this->orderType() . "\n" .
-            "رقم الطلب: " . $this->order->id . "\n" .
-            "التاجر: " . $this->order->vendor->name . "\n" .
+            'نوع الطلب: ' . $this->orderType() . "\n" .
+            'رقم الطلب: ' . $this->order->id . "\n" .
+            'التاجر: ' . $this->order->vendor->name . "\n" .
             "------------------------\n" .
-            "قوابا";
+            'قوابا';
     }
 
     /**
-     * Get fcm representation of the notification
+     * Get fcm representation of the notification.
      *
      * @param mixed $notifiable
      *
@@ -97,7 +97,7 @@ class OrderUpdatedNotification extends Notification
             'body'          => $this->getSummary(),
             'sound'         => 'default',
             'icon'          => '',
-            'click_action'  => ''
+            'click_action'  => '',
         ])->data([
             'type'          => $this->orderType(),
             'summary'       => $this->getSummary(),
@@ -121,6 +121,7 @@ class OrderUpdatedNotification extends Notification
                 return $type . 'consultation';
             }
         }
+
         return $type . 'order';
     }
 }

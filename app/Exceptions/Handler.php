@@ -2,9 +2,9 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use League\OAuth2\Server\Exception\OAuthServerException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -16,7 +16,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        OAuthServerException::class
+        OAuthServerException::class,
     ];
 
     /**
@@ -44,6 +44,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
             throw new NotFoundException();
         }
+
         return parent::render($request, $exception);
     }
 }

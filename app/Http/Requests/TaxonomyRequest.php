@@ -2,9 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use CodeZero\UniqueTranslation\UniqueTranslationRule;
 use App\Rules\ImageOrArray;
+use Illuminate\Foundation\Http\FormRequest;
 
 class TaxonomyRequest extends FormRequest
 {
@@ -41,7 +40,7 @@ class TaxonomyRequest extends FormRequest
 
         $id = $this->route('id');
         if (is_numeric($id)) {
-            $rule .= ',' . $id .',id';
+            $rule .= ',' . $id . ',id';
         } else {
             $rule .= ',null,null';
         }

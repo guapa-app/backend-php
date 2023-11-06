@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 trait HasAddresses
 {
     /**
-     * Get model addresses relationship
+     * Get model addresses relationship.
      * @return MorphMany
      */
     public function addresses(): MorphMany
@@ -19,7 +19,7 @@ trait HasAddresses
     }
 
     /**
-     * Get model single address relationship
+     * Get model single address relationship.
      * @return MorphOne
      */
     public function address(): MorphOne
@@ -28,11 +28,11 @@ trait HasAddresses
     }
 
     /**
-     * Scope the query to return only models nearby a specific location by specific distance
+     * Scope the query to return only models nearby a specific location by specific distance.
      * @param Builder $query
-     * @param double $lat
-     * @param double $lng
-     * @param integer $dist
+     * @param float $lat
+     * @param float $lng
+     * @param int $dist
      * @return Builder
      */
     public function scopeNearBy($query, $lat, $lng, $dist = 50)
@@ -41,7 +41,7 @@ trait HasAddresses
 
         $query->select($table . '.*');
 
-        if (!isset($dist) || !is_numeric($dist) || (int)$dist < 1) {
+        if (!isset($dist) || !is_numeric($dist) || (int) $dist < 1) {
             $dist = 50;
         }
 
@@ -49,7 +49,7 @@ trait HasAddresses
 
         $query->addSelect([
             'addresses.lat', 'addresses.lng', 'addresses.address_1',
-            DB::raw($distanceAggregate . ' AS distance')
+            DB::raw($distanceAggregate . ' AS distance'),
         ]);
 
         $query->join('addresses', function ($join) use ($table) {

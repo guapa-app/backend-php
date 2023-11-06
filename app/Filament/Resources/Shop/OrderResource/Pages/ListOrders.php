@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Shop\OrderResource\Pages;
 
 use App\Filament\Resources\Shop\OrderResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
+use Filament\Resources\Pages\ListRecords;
 
 class ListOrders extends ListRecords
 {
@@ -24,7 +24,7 @@ class ListOrders extends ListRecords
     {
         return OrderResource::getWidgets();
     }
-    
+
     protected function getHeaderActions(): array
     {
         return [

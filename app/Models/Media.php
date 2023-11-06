@@ -5,7 +5,7 @@ namespace App\Models;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 /**
- * Extend spatie media model
+ * Extend spatie media model.
  */
 class Media extends BaseMedia
 {
@@ -13,7 +13,7 @@ class Media extends BaseMedia
         'disk', 'conversions_disk', 'custom_properties', 'manipulations',
         'responsive_images', 'collection_name', 'model_type', 'model_id',
     ];
-	
+
     protected $appends = [
         'url', 'large', 'medium', 'small', 'collection',
     ];
@@ -25,7 +25,7 @@ class Media extends BaseMedia
 
     public function getUrlAttribute()
     {
-    	if ($this->disk === 's3') {
+        if ($this->disk === 's3') {
             return $this->getTemporaryUrl(now()->addMinutes(20));
         } else {
             return $this->getFullUrl();
@@ -34,28 +34,28 @@ class Media extends BaseMedia
 
     public function getSmallAttribute()
     {
-    	return $this->getConversionUrl('small');
+        return $this->getConversionUrl('small');
     }
 
     public function getMediumAttribute()
     {
-    	return $this->getConversionUrl('medium', 'small');
+        return $this->getConversionUrl('medium', 'small');
     }
 
     public function getLargeAttribute()
     {
-    	return $this->getConversionUrl('large', 'small');
+        return $this->getConversionUrl('large', 'small');
     }
 
     public function getConversionUrl(string $conversion, $fallbackConversion = null)
     {
         $isConversionGenerated = $this->hasGeneratedConversion($conversion);
 
-        if ( ! $isConversionGenerated) {
+        if (!$isConversionGenerated) {
             $conversion = $fallbackConversion;
         }
 
-        if ($conversion == null || ! $this->hasGeneratedConversion($conversion)) {
+        if ($conversion == null || !$this->hasGeneratedConversion($conversion)) {
             return $this->url;
         }
 

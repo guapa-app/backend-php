@@ -3,7 +3,7 @@
 namespace App\Contracts\Repositories;
 
 /**
- * Product Repository Interface
+ * Product Repository Interface.
  */
 interface ProductRepositoryInterface
 {

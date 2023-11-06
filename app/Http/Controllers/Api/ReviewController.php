@@ -17,9 +17,10 @@ class ReviewController extends BaseApiController
     private $reviewService;
     private $reviewRepository;
 
-    public function __construct(ReviewRepositoryInterface $reviewRepository,
-                                ReviewService $reviewService)
-    {
+    public function __construct(
+        ReviewRepositoryInterface $reviewRepository,
+        ReviewService $reviewService
+    ) {
         parent::__construct();
 
         $this->reviewRepository = $reviewRepository;
@@ -27,7 +28,7 @@ class ReviewController extends BaseApiController
     }
 
     /**
-     * List reviews
+     * List reviews.
      *
      * @responseFile 200 scenario="Paginated reviews list" responses/reviews/list.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -42,6 +43,7 @@ class ReviewController extends BaseApiController
 
         $reviews->getCollection()->transform(function ($review) {
             $review->comment = strip_tags($review->comment);
+
             return $review;
         });
 
@@ -49,7 +51,7 @@ class ReviewController extends BaseApiController
     }
 
     /**
-     * Create review
+     * Create review.
      *
      * @responseFile 200 responses/reviews/create.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -64,6 +66,7 @@ class ReviewController extends BaseApiController
     {
         $data = $request->validated();
         $data['user_id'] = $this->user->id;
+
         return $this->reviewService->create($data);
     }
 }

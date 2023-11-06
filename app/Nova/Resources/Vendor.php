@@ -164,11 +164,12 @@ class Vendor extends Resource
             if (($request->isUpdateOrUpdateAttachedRequest() || $request->isResourceDetailRequest()) && Auth::user()->vendor_id != $this->resource->id) {
                 throw new \Exception('You do not have permission to access this page!', 403);
             }
+
             return $returned_arr;
         }
 
         return array_merge($returned_arr, [
-            Boolean::make(__('verified'), 'verified')->default(false)
+            Boolean::make(__('verified'), 'verified')->default(false),
         ]);
     }
 

@@ -62,7 +62,6 @@ class Post extends Resource
 
             BelongsTo::make(__('category'), 'category', Category::class)->showCreateRelationButton(),
 
-
             Text::make(__('title'), 'title')
                 ->required()
                 ->sortable()

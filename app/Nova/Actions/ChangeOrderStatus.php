@@ -29,6 +29,7 @@ class ChangeOrderStatus extends Action
             $order->update(['status' => $fields->get('status')]);
             Notification::send($order->user, new OrderUpdatedNotification($order));
         }
+
         return Action::message('Order Changed Status');
     }
 

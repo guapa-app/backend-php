@@ -6,13 +6,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 /**
- * Define methods all models must implement
+ * Define methods all models must implement.
  */
 interface Listable
 {
-
     /**
-     * Apply filters to list query
+     * Apply filters to list query.
      * @param Builder $builder
      * @param Request $request
      * @return Builder
@@ -20,7 +19,7 @@ interface Listable
     public function scopeApplyFilters(Builder $builder, Request $request): Builder;
 
     /**
-     * Apply sorting to list query
+     * Apply sorting to list query.
      * @param Builder $builder
      * @param string $orderBy
      * @param string $orderSort
@@ -29,21 +28,21 @@ interface Listable
     public function scopeApplyOrderBy(Builder $builder, ?string $orderBy, ?string $orderSort): Builder;
 
     /**
-     * Load relations required in model list
+     * Load relations required in model list.
      * @param Builder $builder
      * @return Builder
      */
     public function scopeWithListRelations(Builder $builder, Request $request): Builder;
 
     /**
-     * Load relation counts required in model list
+     * Load relation counts required in model list.
      * @param Builder $builder
      * @return Builder
      */
     public function scopeWithListCounts(Builder $builder, Request $request): Builder;
 
     /**
-     * Load relations required in single
+     * Load relations required in single.
      * @param Builder $builder
      * @return Builder
      */
@@ -52,7 +51,7 @@ interface Listable
     /**
      * Apply direct filters to list query
      * i.e, filters that don't need extra logic
-     * such is where status: 0 | 1
+     * such is where status: 0 | 1.
      * @param Builder $query
      * @param Request $request
      * @return Builder
@@ -61,7 +60,7 @@ interface Listable
 
     /**
      * Get attributes that can be filtered directly
-     * Used by applyDirectFilters scope
+     * Used by applyDirectFilters scope.
      * @return array
      */
     public function getFilterableAttributes(): array;

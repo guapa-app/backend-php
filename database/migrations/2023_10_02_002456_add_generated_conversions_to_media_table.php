@@ -2,12 +2,11 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -27,7 +26,7 @@ return new class extends Migration
                     ->orWhere('generated_conversions', '')
                     ->orWhereRaw("JSON_TYPE(generated_conversions) = 'NULL'");
             })
-            ->whereRaw("JSON_LENGTH(custom_properties) > 0")
+            ->whereRaw('JSON_LENGTH(custom_properties) > 0')
             ->update([
                 'generated_conversions' => DB::raw("JSON_EXTRACT(custom_properties, '$.generated_conversions')"),
                 // OPTIONAL: Remove the generated conversions from the custom_properties field as well:

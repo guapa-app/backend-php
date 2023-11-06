@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use App\Services\AuthService;
 use App\Contracts\Repositories\AdminRepositoryInterface;
+use App\Services\AuthService;
+use Illuminate\Http\Request;
 
 class AuthController extends BaseAdminController
 {
     private $authService;
     private $adminRepository;
 
-    public function __construct(AuthService $authService,
-        AdminRepositoryInterface $adminRepository)
-    {
+    public function __construct(
+        AuthService $authService,
+        AdminRepositoryInterface $adminRepository
+    ) {
         parent::__construct();
 
         // Initialize service
@@ -24,7 +25,7 @@ class AuthController extends BaseAdminController
     }
 
     /**
-     * Log the user in to the api using email and password
+     * Log the user in to the api using email and password.
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -33,7 +34,7 @@ class AuthController extends BaseAdminController
         // Validate request
         $this->validate($request, [
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         // Authenticate admin
@@ -47,7 +48,7 @@ class AuthController extends BaseAdminController
 
         if ($token == null) {
             return response()->json([
-                'message' => "Wrong email or password"
+                'message' => 'Wrong email or password',
             ], 401);
         }
 
@@ -55,24 +56,25 @@ class AuthController extends BaseAdminController
 
         if ($admin->isVendor()) {
             return response()->json([
-                'message' => "you are not allowed to access this page "
+                'message' => 'you are not allowed to access this page ',
             ], 401);
         }
 
         return response()->json([
             'token' => $token,
-            'data' => $admin
+            'data' => $admin,
         ]);
     }
 
     /**
-     * Log user out from api
+     * Log user out from api.
      * @param  \Illuminate\Http\Request $request
      * @return Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
     {
         $this->authService->logout($request->user());
+
         return response()->json([], 200);
     }
 }

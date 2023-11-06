@@ -57,6 +57,7 @@ class User extends Resource
         }
 
         $query->with(['profile']);
+
         return parent::indexQuery($request, $query);
     }
 
@@ -149,6 +150,7 @@ class User extends Resource
             if ($request->isUpdateOrUpdateAttachedRequest() && !in_array(Auth::user()->vendor_id, $this->resource->getUserVendorsIdsAttribute())) {
                 throw new \Exception('You do not have permission to access this page!', 403);
             }
+
             return $returned_arr;
         }
 

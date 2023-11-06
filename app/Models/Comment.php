@@ -59,12 +59,14 @@ class Comment extends Model implements Listable
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         $query->with('user');
+
         return $query;
     }
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('user', 'user.photo');
+
         return $query;
     }
 

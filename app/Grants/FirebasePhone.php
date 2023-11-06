@@ -12,12 +12,12 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 
 class FirebasePhone extends PassportGrant
 {
-	/**
-	 * Unique string that identifies this grant.
-	 * and will be used as grant_type during access
-	 * token requests.
-	 * @var string
-	 */
+    /**
+     * Unique string that identifies this grant.
+     * and will be used as grant_type during access
+     * token requests.
+     * @var string
+     */
     protected $identifier = 'firebase_phone';
 
     /**
@@ -27,7 +27,7 @@ class FirebasePhone extends PassportGrant
      * @var array
      */
     protected $authParams = [
-    	'phone_number', 'jwt_token',
+        'phone_number', 'jwt_token',
     ];
 
     /**
@@ -42,15 +42,19 @@ class FirebasePhone extends PassportGrant
      * @return \Laravel\Passport\Bridge\User|null
      * @throws \League\OAuth2\Server\Exception\OAuthServerException
      */
-    protected function getUserEntityByAuthParams(Model $model, $authParams,
-        $guard, $grantType, ClientEntityInterface $clientEntity)
-    {
-    	// Do your logic to authenticate the user
-    	// Such as contacting facebook server to validate
+    protected function getUserEntityByAuthParams(
+        Model $model,
+        $authParams,
+        $guard,
+        $grantType,
+        ClientEntityInterface $clientEntity
+    ) {
+        // Do your logic to authenticate the user
+        // Such as contacting facebook server to validate
         // user facebook access token.
-    	// Return false or void if authentication fails.
-    	// This will throw OAuthServerException.
-    	$projectId = config('cosmo.firebase_project_id');
+        // Return false or void if authentication fails.
+        // This will throw OAuthServerException.
+        $projectId = config('cosmo.firebase_project_id');
 
         // Get user profile from facebook using provided token
         $verifier = new Verifier($projectId);
@@ -73,7 +77,7 @@ class FirebasePhone extends PassportGrant
             $data = $verifiedIdToken->getClaims();
         }
 
-        if ( ! isset($data['phone_number']) || $data['phone_number'] != $authParams['phone_number']) {
+        if (!isset($data['phone_number']) || $data['phone_number'] != $authParams['phone_number']) {
             return;
         }
 
@@ -92,7 +96,7 @@ class FirebasePhone extends PassportGrant
     }
 
     /**
-     * Create new user using phone number
+     * Create new user using phone number.
      */
     public function createNewUser($model, $phone)
     {

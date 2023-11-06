@@ -52,7 +52,6 @@ class Product extends Resource
      * @param Request $request
      * @return array
      */
-
     public function fields(Request $request): array
     {
         $returned_arr = [
@@ -111,7 +110,6 @@ class Product extends Resource
 
             HasMany::make(__('reviews'), 'reviews', Review::class),
 
-
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
 
@@ -121,6 +119,7 @@ class Product extends Resource
             if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
                 throw new \Exception('You do not have permission to access this page!', 403);
             }
+
             return $returned_arr;
         }
 

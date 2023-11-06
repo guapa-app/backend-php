@@ -7,7 +7,6 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
@@ -22,7 +21,7 @@ class History extends Model implements Listable, HasMedia
     protected $table = 'history';
 
     protected $fillable = [
-    	'user_id', 'details', 'record_date',
+        'user_id', 'details', 'record_date',
     ];
 
     /**
@@ -39,15 +38,15 @@ class History extends Model implements Listable, HasMedia
     ];
 
     protected $filterable = [
-    	'user_id',
+        'user_id',
     ];
 
     protected $search_attributes = [
-    	'details',
+        'details',
     ];
 
     /**
-     * Register media collections
+     * Register media collections.
      * @return void
      */
     public function registerMediaCollections(): void
@@ -56,7 +55,7 @@ class History extends Model implements Listable, HasMedia
     }
 
     /**
-     * Register media conversions
+     * Register media conversions.
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -81,11 +80,11 @@ class History extends Model implements Listable, HasMedia
 
     public function user()
     {
-    	return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
-     * History image relationship
+     * History image relationship.
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function image(): MorphOne
@@ -122,6 +121,7 @@ class History extends Model implements Listable, HasMedia
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('image');
+
         return $query;
     }
 
@@ -133,6 +133,7 @@ class History extends Model implements Listable, HasMedia
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('image');
+
         return $query;
     }
 }

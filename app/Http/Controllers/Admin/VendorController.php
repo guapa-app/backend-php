@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Admin\BaseAdminController;
+use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Http\Requests\VendorRequest;
 use App\Services\VendorService;
-use App\Contracts\Repositories\VendorRepositoryInterface;
+use Illuminate\Http\Request;
 
 class VendorController extends BaseAdminController
 {
@@ -23,34 +20,39 @@ class VendorController extends BaseAdminController
         $this->vendorRepository = $vendorRepository;
     }
 
-	public function index(Request $request)
-	{
+    public function index(Request $request)
+    {
         $vendors = $this->vendorRepository->all($request);
+
         return response()->json($vendors);
-	}
+    }
 
-	public function single($id = 0)
-	{
-		$vendor = $this->vendorRepository->getOneWithRelations($id);
+    public function single($id = 0)
+    {
+        $vendor = $this->vendorRepository->getOneWithRelations($id);
+
         return response()->json($vendor);
-	}
+    }
 
-	public function create(VendorRequest $request)
-	{
+    public function create(VendorRequest $request)
+    {
         $data = $request->validated();
         $vendor = $this->vendorService->create($data);
+
         return response()->json($vendor);
-	}
+    }
 
     public function update(VendorRequest $request, $id = 0)
     {
         $vendor = $this->vendorService->update($id, $request->validated());
+
         return response()->json($vendor);
     }
 
     public function delete($id = 0)
     {
         $ids = $this->vendorRepository->delete($id);
+
         return response()->json($ids);
     }
 }

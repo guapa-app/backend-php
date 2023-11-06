@@ -10,19 +10,19 @@ class UserResource extends JsonResource
     {
         return [
             'id'                    => $this->id,
-            'name'                  => (string)$this->name,
-            'email'                 => (string)$this->email,
-            'phone'                 => (string)$this->phone,
-            'status'                => (string)$this->status,
-            'email_verified_at'     => (bool)$this->email_verified_at,
-            'phone_verified_at'     => (bool)$this->phone_verified_at,
+            'name'                  => (string) $this->name,
+            'email'                 => (string) $this->email,
+            'phone'                 => (string) $this->phone,
+            'status'                => (string) $this->status,
+            'email_verified_at'     => (bool) $this->email_verified_at,
+            'phone_verified_at'     => (bool) $this->phone_verified_at,
             'role'                  => $this->role,
             'user_vendors_ids'      => $this->user_vendors_ids,
 
             $this->mergeWhen(!$this->relationLoaded('profile'), [
-                "photo"                        => $this->photo,
+                'photo'                        => $this->photo,
             ]),
-            
+
             'profile'               => ProfileResource::make($this->whenLoaded('profile')),
 
             $this->mergeWhen($this->access_token, [

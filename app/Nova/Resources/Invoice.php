@@ -80,6 +80,7 @@ class Invoice extends Resource
             if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->order->vendor_id) {
                 throw new \Exception('You do not have permission to access this page!', 403);
             }
+
             return $returned_arr;
         }
 

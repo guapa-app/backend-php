@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use Lang;
 
 /**
- * Chat message notification
+ * Chat message notification.
  */
 class ChatMessage extends Notification
 {
@@ -45,7 +45,7 @@ class ChatMessage extends Notification
     }
 
     /**
-     * Get fcm representation of the notification
+     * Get fcm representation of the notification.
      *
      * @param mixed $notifiable
      *
@@ -59,7 +59,7 @@ class ChatMessage extends Notification
             'body'          => $this->getMessageBody(),
             'sound'         => 'default', // Optional
             'icon'          => '', // Optional
-            'click_action'  => '' // Optional
+            'click_action'  => '', // Optional
         ])->data([
             'type'          => 'message',
             'is_offer'      => $this->message->type === 'offer',

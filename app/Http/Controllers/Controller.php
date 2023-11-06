@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DeviceRequest;
 use App\Models\Admin;
 use App\Models\User;
-use App\Services\UserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -20,7 +18,7 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
-     * Current user instance
+     * Current user instance.
      * @var User|Admin|null
      */
     protected $user;
@@ -30,35 +28,36 @@ class Controller extends BaseController
         return $this->user && $this->user->isAdmin();
     }
 
-    public function successJsonRes(array $data = [], string $message = "", $status = Response::HTTP_OK): JsonResponse
+    public function successJsonRes(array $data = [], string $message = '', $status = Response::HTTP_OK): JsonResponse
     {
         return response()->json([
-            "success" => true,
-            "message" => $message,
-            "data" => $data
+            'success' => true,
+            'message' => $message,
+            'data' => $data,
         ], $status);
     }
 
-    public function errorJsonRes(array $errors = [], string $message = "", $status = Response::HTTP_BAD_REQUEST): JsonResponse
+    public function errorJsonRes(array $errors = [], string $message = '', $status = Response::HTTP_BAD_REQUEST): JsonResponse
     {
         return response()->json([
-            "success" => false,
-            "message" => $message,
-            "errors" => $errors
+            'success' => false,
+            'message' => $message,
+            'errors' => $errors,
         ], $status);
-
     }
 
-    public function logReq($message = "")
+    public function logReq($message = '')
     {
-        Log::alert("***" .
+        Log::alert(
+            '***' .
             "\nMessage >-> $message" .
             "\nReq method >-> " . request()->method() .
             "\nPath >-> " . request()->decodedPath() .
             "\nRoute name >-> " . request()->route()->getName() .
             "\n***",
             [
-                "\nRequest Data >-> " => request()->all()
-            ]);
+                "\nRequest Data >-> " => request()->all(),
+            ]
+        );
     }
 }

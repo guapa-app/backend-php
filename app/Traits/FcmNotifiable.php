@@ -2,17 +2,17 @@
 
 namespace App\Traits;
 
+use App\Models\Device;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notification;
-use App\Models\Device;
 
-trait FcmNotifiable {
-
-	/**
+trait FcmNotifiable
+{
+    /**
      * Route notifications for the FCM channel.
      *
      * @param  \Illuminate\Notifications\Notification  $notification
-     * 
+     *
      * @return array
      */
     public function routeNotificationForFcm(Notification $notification): array
@@ -21,8 +21,8 @@ trait FcmNotifiable {
     }
 
     /**
-     * Get user devices
-     * 
+     * Get user devices.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function devices(): MorphMany

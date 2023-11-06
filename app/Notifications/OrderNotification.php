@@ -14,13 +14,13 @@ class OrderNotification extends Notification
     use Queueable;
 
     /**
-     * The user who made the order
+     * The user who made the order.
      * @var User
      */
     public $user;
 
     /**
-     * Order object
+     * Order object.
      * @var Order
      */
     public $order;
@@ -75,26 +75,26 @@ class OrderNotification extends Notification
         $message = "------------------------\n" .
             "فريق قوابا يشعركم بوجود طلب جديد ارجو التحقق من مركز الطلبات في التطبيق\n" .
             "------------------------\n" .
-            "نوع الطلب: " . $this->orderType() . "\n" .
-            "الاسم: " . $this->user->name . "\n" .
-            "الرقم: " . $this->user->phone . "\n";
+            'نوع الطلب: ' . $this->orderType() . "\n" .
+            'الاسم: ' . $this->user->name . "\n" .
+            'الرقم: ' . $this->user->phone . "\n";
 
         if ($this->orderType() == 'new-order') {
             $message .= "------------------------\n" .
                 "المنتجات: \n";
             foreach ($this->order->items as $item) {
-                $message .= $item->product->name . " - " . $item->quantity . "-" . $item->amount . "\n";
+                $message .= $item->product->name . ' - ' . $item->quantity . '-' . $item->amount . "\n";
             }
         }
 
         $message .= "------------------------\n" .
-            "قوابا";
+            'قوابا';
 
         return $message;
     }
 
     /**
-     * Get fcm representation of the notification
+     * Get fcm representation of the notification.
      *
      * @param mixed $notifiable
      *
@@ -108,7 +108,7 @@ class OrderNotification extends Notification
             'body'          => 'New order from ' . $this->user->name . ' #' . $this->order->id,
             'sound'         => 'default',
             'icon'          => '',
-            'click_action'  => ''
+            'click_action'  => '',
         ])->data([
             'type'          => $this->orderType(),
             'summary'       => $this->getSummary(),
@@ -132,6 +132,7 @@ class OrderNotification extends Notification
                 return $type . 'consultation';
             }
         }
+
         return $type . 'order';
     }
 }

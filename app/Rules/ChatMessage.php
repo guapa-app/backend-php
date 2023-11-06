@@ -26,16 +26,16 @@ class ChatMessage implements Rule
      */
     public function passes($attribute, $value)
     {
-        $validator1 = Validator::make([ $attribute => $value ], [
+        $validator1 = Validator::make([$attribute => $value], [
             $attribute => 'image|max:5120',
         ]);
 
-        $validator2 = Validator::make([ $attribute => $value ], [
+        $validator2 = Validator::make([$attribute => $value], [
             $attribute => 'array|min:1',
             $attribute . '.*' => 'image|max:5120',
         ]);
 
-        $validator3 = Validator::make([ $attribute => $value ], [
+        $validator3 = Validator::make([$attribute => $value], [
             $attribute => 'string|max:2000',
         ]);
 

@@ -15,7 +15,7 @@ class PostController extends ApiPostController
 
         return PostCollection::make($index)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -24,7 +24,7 @@ class PostController extends ApiPostController
     {
         return PostResource::make(parent::single($id))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }

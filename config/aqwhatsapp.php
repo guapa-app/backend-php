@@ -1,4 +1,5 @@
 <?php
+
 // config for AQuadic/AQWhatsapp
 return [
 

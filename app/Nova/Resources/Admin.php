@@ -37,7 +37,6 @@ class Admin extends Resource
         'id',
     ];
 
-
     public function fields(Request $request)
     {
         $returned_arr = [
@@ -66,6 +65,7 @@ class Admin extends Resource
             if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->id != $this->resource->id) {
                 throw new \Exception('You do not have permission to access this page!', 403);
             }
+
             return $returned_arr;
         }
 

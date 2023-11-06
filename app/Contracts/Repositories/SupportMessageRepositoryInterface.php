@@ -3,7 +3,7 @@
 namespace App\Contracts\Repositories;
 
 /**
- * SupportMessage Repository Interface
+ * SupportMessage Repository Interface.
  */
 interface SupportMessageRepositoryInterface
 {

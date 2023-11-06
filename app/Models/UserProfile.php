@@ -16,7 +16,7 @@ class UserProfile extends Model implements HasMedia
     use InteractsWithMedia;
 
     /**
-     * Attributes that are mass assignable
+     * Attributes that are mass assignable.
      * @var array
      */
     protected $fillable = [
@@ -41,11 +41,11 @@ class UserProfile extends Model implements HasMedia
     const GENDER = [
         'Male',
         'Female',
-        'Other'
+        'Other',
     ];
 
     /**
-     * Modify birthdate before save
+     * Modify birthdate before save.
      * @param string $value
      */
     public function setBirthDateAttribute($value): void
@@ -56,7 +56,7 @@ class UserProfile extends Model implements HasMedia
     }
 
     /**
-     * Register media collections
+     * Register media collections.
      * @return void
      */
     public function registerMediaCollections(): void
@@ -65,7 +65,7 @@ class UserProfile extends Model implements HasMedia
     }
 
     /**
-     * Register media conversions
+     * Register media conversions.
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -84,7 +84,7 @@ class UserProfile extends Model implements HasMedia
     }
 
     /**
-     * Get owner of this profile
+     * Get owner of this profile.
      * @return BelongsTo
      */
     public function user(): BelongsTo
@@ -93,7 +93,7 @@ class UserProfile extends Model implements HasMedia
     }
 
     /**
-     * User profile photo relationship
+     * User profile photo relationship.
      * @return MorphOne
      */
     public function photo(): MorphOne

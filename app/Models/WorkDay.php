@@ -13,7 +13,7 @@ class WorkDay extends Model
     public $timestamps = false;
 
     protected $fillable = [
-    	'vendor_id', 'day',
+        'vendor_id', 'day',
     ];
 
     protected $casts = [
@@ -22,7 +22,7 @@ class WorkDay extends Model
 
     public function vendor()
     {
-    	return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Vendor::class);
     }
 
     public function scopeCurrentVendor($query, $value)

@@ -9,9 +9,9 @@ class AppointmentResource extends JsonResource
     public function toArray($request)
     {
         return [
-            "id"                    => $this->id,
-            "from"                  => $this->from_time,
-            "to"                    => $this->to_time,
+            'id'                    => $this->id,
+            'from'                  => $this->from_time,
+            'to'                    => $this->to_time,
         ];
     }
 }

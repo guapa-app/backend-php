@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Shop;
 
 use App\Enums\OrderStatus;
 use App\Filament\Resources\Shop\OrderResource\Pages;
+use App\Filament\Resources\Shop\OrderResource\RelationManagers;
+use App\Filament\Resources\Shop\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
 use App\Traits\FilamentVendorAccess;
 use Filament\Forms;
@@ -12,8 +14,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use App\Filament\Resources\Shop\OrderResource\RelationManagers;
-use App\Filament\Resources\Shop\OrderResource\Widgets\OrderStats;
 
 class OrderResource extends Resource
 {

@@ -16,7 +16,7 @@ class ProductController extends ApiProductController
 
         return ProductCollection::make($index)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -27,7 +27,7 @@ class ProductController extends ApiProductController
 
         return ProductResource::make($single)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -38,7 +38,7 @@ class ProductController extends ApiProductController
 
         return ProductResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.created'),
             ]);
     }
@@ -49,7 +49,7 @@ class ProductController extends ApiProductController
 
         return ProductResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.updated'),
             ]);
     }

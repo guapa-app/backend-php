@@ -28,7 +28,7 @@ class AddressController extends BaseApiController
     }
 
     /**
-     * Address list
+     * Address list.
      *
      * @queryParam addressable_id integer required Addressable entity id. Example: 3
      * @queryParam addressable_type string required Addressable entity type (vendor, user). Example: vendor
@@ -62,7 +62,7 @@ class AddressController extends BaseApiController
     }
 
     /**
-     * Create Address
+     * Create Address.
      *
      * @responseFile 200 responses/addresses/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -83,7 +83,7 @@ class AddressController extends BaseApiController
     }
 
     /**
-     * Update Address
+     * Update Address.
      *
      * @responseFile 200 responses/addresses/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -94,7 +94,7 @@ class AddressController extends BaseApiController
      * @urlParam id integer required Address id. Example: 3
      *
      * @param AddressRequest $request
-     * @param integer $id
+     * @param int $id
      *
      * @return Model
      */
@@ -108,14 +108,14 @@ class AddressController extends BaseApiController
     }
 
     /**
-     * Delete Address
+     * Delete Address.
      *
      * @responseFile 200 responses/Address/delete.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      * @responseFile 404 scenario="Not found" responses/errors/404.json
      * @responseFile 403 scenario="Not authorized to delete address" responses/errors/403.json
      *
-     * @param integer $id
+     * @param int $id
      *
      * @return array
      */

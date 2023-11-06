@@ -7,16 +7,15 @@ use App\Models\Admin;
 use DB;
 use Exception;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 use Log;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Http;
 
 /**
- * Authentication service
+ * Authentication service.
  */
 class AuthService
 {
-
     private $adminRepository;
     private $tokenUrl;
     private $sendOtpUrl = 'https://verificationapi-v1.sinch.com/verification/v1/verifications';
@@ -38,8 +37,10 @@ class AuthService
         try {
             $res = Http::asForm()->post($this->tokenUrl, $data);
 
-            if ($res->status() != 200) return null;
-            
+            if ($res->status() != 200) {
+                return null;
+            }
+
             return $res->json();
         } catch (Exception $e) {
             return null;
@@ -52,7 +53,7 @@ class AuthService
         $accessToken = $user->token();
         // Revoke refresh token token
         DB::table('oauth_refresh_tokens')->where('access_token_id', $accessToken->id)->update([
-            'revoked' => true
+            'revoked' => true,
         ]);
         // Revoke access token
         $accessToken->revoke();
@@ -113,7 +114,7 @@ class AuthService
             ],
         ]);
 
-        return json_decode((string)$response->getBody(), true);
+        return json_decode((string) $response->getBody(), true);
     }
 
     public function verifySinchOtp(string $phone, string $otp): bool
@@ -137,8 +138,9 @@ class AuthService
                 ],
             ]);
 
-            $result = json_decode((string)$response->getBody(), true);
+            $result = json_decode((string) $response->getBody(), true);
             Log::error(json_encode($result));
+
             return is_array($result) && isset($result['status']) && $result['status'] === 'SUCCESSFUL';
         } catch (Exception $e) {
             // Report the error or do anything with it

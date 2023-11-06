@@ -16,11 +16,11 @@ class PhotoResource extends JsonResource
             'mime_type'            => $this->mime_type,
             'size'                 => $this->size,
             'order_column'         => $this->order_column,
-            "url"                  => $this->url,
-            "large"                => $this->large,
-            "medium"               => $this->medium,
-            "small"                => $this->small,
-            "collection"           => $this->collection,
+            'url'                  => $this->url,
+            'large'                => $this->large,
+            'medium'               => $this->medium,
+            'small'                => $this->small,
+            'collection'           => $this->collection,
         ];
     }
 }

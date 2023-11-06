@@ -15,7 +15,7 @@ class FavoriteController extends ApiFavoriteController
     {
         return FavoriteCollection::make(parent::index($request))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -24,7 +24,7 @@ class FavoriteController extends ApiFavoriteController
     {
         return FavoriteResource::make(parent::create($request))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -34,7 +34,7 @@ class FavoriteController extends ApiFavoriteController
         parent::delete($type, $id);
 
         return $this->successJsonRes([
-            "is_deleted" => true
+            'is_deleted' => true,
         ], __('api.favourite_deleted'));
     }
 }

@@ -2,14 +2,12 @@
 
 namespace App\Services;
 
-use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class MediaService
 {
-    function handleMedia(Model $record, array $data)
+    public function handleMedia(Model $record, array $data)
     {
         // New media must be specified or old media to keep
         if (!isset($data['media']) && !isset($data['keep_media'])) {

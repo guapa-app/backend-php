@@ -14,9 +14,10 @@ class OrderController extends ApiOrderController
     public function index(GetOrdersRequest $request)
     {
         $orders = parent::index($request);
+
         return OrderCollection::make($orders)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -24,20 +25,21 @@ class OrderController extends ApiOrderController
     public function single($id)
     {
         $item = parent::single($id);
+
         return OrderResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
 
-
     public function create(OrderRequest $request)
     {
         $orders = parent::create($request);
+
         return OrderCollection::make($orders)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -45,9 +47,10 @@ class OrderController extends ApiOrderController
     public function update($id, Request $request)
     {
         $item = parent::update($id, $request);
+
         return OrderResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -61,7 +64,7 @@ class OrderController extends ApiOrderController
     {
         $url = parent::printPDF($id);
 
-        return $this->successJsonRes(["url" => $url], __('api.success'));
+        return $this->successJsonRes(['url' => $url], __('api.success'));
     }
 
     public function showInvoice($id)

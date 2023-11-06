@@ -33,11 +33,11 @@ class CreateInvoicesTable extends Migration
         });
 
         Schema::table('invoices', function (Blueprint $table) {
-           $table->foreign('order_id')
-               ->references('id')
-               ->on('orders')
-               ->cascadeOnUpdate()
-               ->cascadeOnDelete();
+            $table->foreign('order_id')
+                ->references('id')
+                ->on('orders')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
         });
     }
 

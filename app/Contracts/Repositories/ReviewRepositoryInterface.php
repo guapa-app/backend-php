@@ -3,7 +3,7 @@
 namespace App\Contracts\Repositories;
 
 /**
- * Review Repository Interface
+ * Review Repository Interface.
  */
 interface ReviewRepositoryInterface
 {

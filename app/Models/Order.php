@@ -16,12 +16,12 @@ class Order extends Model implements Listable
 
     protected $fillable = [
         'user_id', 'vendor_id', 'address_id', 'total', 'status',
-        'note', 'name', 'phone', 'is_used', 'invoice_url', 'cancellation_reason'
+        'note', 'name', 'phone', 'is_used', 'invoice_url', 'cancellation_reason',
     ];
 
     /**
      * Attributes that can be filtered directly
-     * using values from client without any logic
+     * using values from client without any logic.
      * @var array
      */
     protected $filterable = [
@@ -29,7 +29,7 @@ class Order extends Model implements Listable
     ];
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
@@ -107,12 +107,14 @@ class Order extends Model implements Listable
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         $query->with('user', 'vendor');
+
         return $query;
     }
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items.product.offer',  'items.product.taxonomies', 'items.product.image');
+        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies', 'items.product.image');
+
         return $query;
     }
 
@@ -124,6 +126,7 @@ class Order extends Model implements Listable
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
+
         return $query;
     }
 }

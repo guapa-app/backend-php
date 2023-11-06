@@ -28,31 +28,39 @@ class WhatsappChannel
     }
 
     /**
-     * Send message to whatsapp
+     * Send message to whatsapp.
      *
      * @returns bool
      */
     public function sendMessage($phone, $message): bool
     {
         try {
-            if (config('app.debug')) info('Sending message to ' . $phone);
+            if (config('app.debug')) {
+                info('Sending message to ' . $phone);
+            }
             $data = Http::withHeaders([
                 'Content-Type'  => 'application/json',
                 'Authorization' => 'Bearer ' . config('aqwhatsapp.api_token'),
                 'Accept'        => 'application/json',
             ])
                 ->timeout(5)
-                ->post("https://whatsapp.aq-apps.xyz/api/send-message", [
+                ->post('https://whatsapp.aq-apps.xyz/api/send-message', [
                     'session_uuid' => config('aqwhatsapp.session_uuid'),
                     'phone'        => $phone,
                     'message'      => $message,
                     'schedule_at'  => now(),
                 ]);
-            if (config('app.debug')) info($data->body());
+            if (config('app.debug')) {
+                info($data->body());
+            }
+
             return true;
         } catch (Exception $e) {
-            if (config('app.debug')) info($e->getMessage());
+            if (config('app.debug')) {
+                info($e->getMessage());
+            }
             unset($e);
+
             return false;
         }
     }

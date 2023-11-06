@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\ChatMessage;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @bodyParam product_id int Product id, required if `conversation_id` is absent

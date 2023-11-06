@@ -26,7 +26,7 @@ class ImageOrArray implements Rule
      */
     public function passes($attribute, $value)
     {
-        $validator = Validator::make([ $attribute => $value ], [
+        $validator = Validator::make([$attribute => $value], [
             $attribute => 'image',
         ]);
 

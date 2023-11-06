@@ -93,9 +93,9 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
     public function resources()
     {
-        # list of resources that vendor can access.
-        # every resource use trait NovaVendorAccess
-        # and fields array have a check vendor condition (to prevent access resource from edit page).
+        // list of resources that vendor can access.
+        // every resource use trait NovaVendorAccess
+        // and fields array have a check vendor condition (to prevent access resource from edit page).
         if (Auth::user()?->isVendor()) {
             Nova::resources([
                 Invoice::class,

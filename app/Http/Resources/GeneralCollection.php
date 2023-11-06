@@ -17,11 +17,10 @@ abstract class GeneralCollection extends ResourceCollection
     {
         return $this->prepareAddiitonal($request) + [
                 'data' => [
-                        "items" => $this->collection
+                        'items' => $this->collection,
                     ] + $this->preparePayload($request),
             ];
     }
-
 
     private function prepareAddiitonal($request)
     {
@@ -30,8 +29,8 @@ abstract class GeneralCollection extends ResourceCollection
 
     private function preparePayload($request)
     {
-        if ($request->has('perPage') || $request->has('per_page'))
-            $payload =                     [
+        if ($request->has('perPage') || $request->has('per_page')) {
+            $payload = [
                 'payload' => [
                     'pagination' => [
                         'total'             => $this->total(),
@@ -45,8 +44,9 @@ abstract class GeneralCollection extends ResourceCollection
                         'prev_page_url'     => $this->previousPageUrl(),
                         'links'             => $this->linkCollection(),
                     ],
-                ]
+                ],
             ];
+        }
 
         return $payload ?? [];
     }

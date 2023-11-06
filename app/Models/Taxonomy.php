@@ -4,22 +4,22 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Traits\Listable as ListableTrait;
-use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
 use Hamedov\Taxonomies\Taxonomy as BaseTaxonomy;
-use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Spatie\Sluggable\SlugOptions;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Taxonomy extends BaseTaxonomy implements Listable
 {
-	use ListableTrait, HasRecursiveRelationships;
+    use ListableTrait, HasRecursiveRelationships;
 
     protected $fillable = [
-      'fees'
+      'fees',
     ];
-	/**
+    /**
      * Attributes that can be filtered directly
-     * using values from client without any logic
+     * using values from client without any logic.
      * @var array
      */
     protected $filterable_attributes = [
@@ -28,19 +28,19 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     /**
      * Attributes that can be filtered directly
-     * using values from client without any logic
+     * using values from client without any logic.
      * @var array
      */
     protected $filterable = [
-        'type'
+        'type',
     ];
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
-        'slug', 'title', 'description'
+        'slug', 'title', 'description',
     ];
 
     /**
@@ -54,13 +54,13 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function parent()
     {
-    	return $this->belongsTo('App\Models\Taxonomy', 'parent_id');
+        return $this->belongsTo('App\Models\Taxonomy', 'parent_id');
     }
 
     public function icon()
     {
-    	return $this->morphOne('App\Models\Media', 'model')
-    		->where('collection_name', config('taxonomies.icon_collection_name'));
+        return $this->morphOne('App\Models\Media', 'model')
+            ->where('collection_name', config('taxonomies.icon_collection_name'));
     }
 
     public function attributes()
@@ -73,11 +73,10 @@ class Taxonomy extends BaseTaxonomy implements Listable
         return $query->whereNull('taxonomies.parent_id');
     }
 
-	public function scopeApplyFilters(Builder $query, Request $request) : Builder
+    public function scopeApplyFilters(Builder $query, Request $request) : Builder
     {
         $filter = $request->get('filter');
-        if (is_array($filter))
-        {
+        if (is_array($filter)) {
             $request = new Request($filter);
         }
 
@@ -100,7 +99,8 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function scopeWithListRelations(Builder $query, Request $request) : Builder
     {
-    	$query->with('parent', 'icon');
+        $query->with('parent', 'icon');
+
         return $query;
     }
 
@@ -116,7 +116,8 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function scopeWithSingleRelations(Builder $query) : Builder
     {
-    	$query->with('parent', 'icon');
+        $query->with('parent', 'icon');
+
         return $query;
     }
 
@@ -125,7 +126,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
      * of current model
      * Override this method in the listable trait
      * to remove table name as it conflicts with
-     * HasRecursiveRelationships trait
+     * HasRecursiveRelationships trait.
      * @param  string $key
      * @return string
      */

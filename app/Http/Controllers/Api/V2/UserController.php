@@ -13,7 +13,7 @@ class UserController extends ApiUserController
     {
         return UserResource::make(parent::single($request, $id))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -22,7 +22,7 @@ class UserController extends ApiUserController
     {
         return UserResource::make(parent::update($request, $id))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }

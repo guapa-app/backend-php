@@ -14,17 +14,17 @@ class SupportMessage extends Model implements Listable
     use HasFactory, ListableTrait;
 
     /**
-     * Attributes that are mass assignable
+     * Attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-    	'subject', 'body', 'phone', 'read_at', 'user_id',
+        'subject', 'body', 'phone', 'read_at', 'user_id',
     ];
 
     /**
      * Attributes that can be filtered directly
-     * using values from client without any logic
+     * using values from client without any logic.
      * @var array
      */
     protected $filterable = [
@@ -32,7 +32,7 @@ class SupportMessage extends Model implements Listable
     ];
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
@@ -54,7 +54,7 @@ class SupportMessage extends Model implements Listable
 
     public function user()
     {
-    	return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request) : Builder

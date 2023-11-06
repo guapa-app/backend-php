@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Contracts\Repositories\AdminRepositoryInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Contracts\Repositories\AdminRepositoryInterface;
 
 class AdminRequest extends FormRequest
 {
@@ -21,6 +21,7 @@ class AdminRequest extends FormRequest
             // Update request
             // Any admin user type can update his own account.
             $admin = $adminRepository->getOneOrFail($id);
+
             return ($admin->id === $user->id &&
                 $user->hasRole($this->get('role'))) || $user->hasRole('superadmin');
         } else {
@@ -44,7 +45,7 @@ class AdminRequest extends FormRequest
                 'name' => 'required|min:3',
                 'email' => [
                     'required', 'email',
-                    Rule::unique('admins')->ignore($this->route('id'))
+                    Rule::unique('admins')->ignore($this->route('id')),
                 ],
                 'role' => 'required|string|in:admin,moderator',
                 // Any field of the following won't be present unless the user
@@ -60,7 +61,7 @@ class AdminRequest extends FormRequest
                 'name' => 'required|min:3',
                 'email' => [
                     'required', 'email',
-                    Rule::unique('admins')
+                    Rule::unique('admins'),
                 ],
                 'password' => 'required|min:6',
                 'role' => 'required|string|in:admin,moderator',

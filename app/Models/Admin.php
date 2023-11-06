@@ -41,7 +41,7 @@ class Admin extends Authenticatable implements Listable
     protected $guard_name = 'admin';
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
@@ -70,11 +70,12 @@ class Admin extends Authenticatable implements Listable
     public function getRoleAttribute()
     {
         $role = $this->roles()->first();
+
         return $role ? $role->name : 'None';
     }
 
     /**
-     * User profile photo relationship
+     * User profile photo relationship.
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function photo(): MorphOne
@@ -110,6 +111,7 @@ class Admin extends Authenticatable implements Listable
     public function scopeWithListRelations(Builder $query, Request $request) : Builder
     {
         $query->with('roles');
+
         return $query;
     }
 
@@ -126,6 +128,7 @@ class Admin extends Authenticatable implements Listable
     public function scopeWithSingleRelations(Builder $query) : Builder
     {
         $query->with('roles');
+
         return $query;
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Http\Requests\VendorRequest;
 use App\Services\VendorService;
-use Illuminate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -26,7 +25,7 @@ class VendorController extends BaseApiController
     }
 
     /**
-     * List vendors
+     * List vendors.
      *
      * @unauthenticated
      *
@@ -52,7 +51,7 @@ class VendorController extends BaseApiController
     }
 
     /**
-     * Register vendor
+     * Register vendor.
      *
      * @responseFile 200 responses/vendors/create.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -66,7 +65,7 @@ class VendorController extends BaseApiController
     }
 
     /**
-     * Update vendor
+     * Update vendor.
      *
      * @responseFile 200 responses/vendors/update.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -87,7 +86,7 @@ class VendorController extends BaseApiController
     }
 
     /**
-     * Get vendor details
+     * Get vendor details.
      *
      * @unauthenticated
      *
@@ -114,7 +113,7 @@ class VendorController extends BaseApiController
     }
 
     /**
-     * Share vendor
+     * Share vendor.
      *
      * @responseFile 200 responses/vendors/share.json
      *
@@ -126,7 +125,7 @@ class VendorController extends BaseApiController
      */
     public function share(Request $request, $id)
     {
-        $sharesCount = $this->vendorService->share((int)$id);
+        $sharesCount = $this->vendorService->share((int) $id);
 
         return ['shares_count' => $sharesCount];
     }

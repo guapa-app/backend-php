@@ -43,7 +43,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         9 => 'hair specialist',
         10 => 'tattoo artists',
         11 => 'microblading specialist',
-        12 => 'massage therapist'
+        12 => 'massage therapist',
     ];
 
     public const STATUSES = [
@@ -56,7 +56,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'phone', 'about', 'whatsapp', 'twitter',
         'instagram', 'snapchat', 'type', 'working_days',
         'working_hours', 'website_url', 'known_url', 'tax_number',
-        'cat_number', 'reg_number'
+        'cat_number', 'reg_number',
     ];
 
     /**
@@ -79,7 +79,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     /**
      * Attributes that can be filtered directly
-     * using values from client without any logic
+     * using values from client without any logic.
      * @var array
      */
     protected $filterable = [
@@ -87,7 +87,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     ];
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
@@ -100,10 +100,10 @@ class Vendor extends Model implements HasMedia, HasReviews
 
         self::created(function ($item) {
             Admin::query()->create([
-                "vendor_id" => $item->id,
-                "name"      => $item->name,
-                "email"     => auth()->user()->email,
-                "password"  => auth()->user()->password,
+                'vendor_id' => $item->id,
+                'name'      => $item->name,
+                'email'     => auth()->user()->email,
+                'password'  => auth()->user()->password,
             ]);
         });
     }
@@ -120,12 +120,12 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function getSharesCountAttribute()
     {
-        return (int)Redis::hget("vendor:{$this->id}", 'shares_count');
+        return (int) Redis::hget("vendor:{$this->id}", 'shares_count');
     }
 
     public function getViewsCountAttribute()
     {
-        return (int)Redis::hget("vendor:{$this->id}", 'views_count');
+        return (int) Redis::hget("vendor:{$this->id}", 'views_count');
     }
 
     public function getWorkDaysAttribute()
@@ -140,11 +140,12 @@ class Vendor extends Model implements HasMedia, HasReviews
             $relations['workDays']->pluck('day') :
             [];
         $this->setRelation('workDays', $days);
+
         return $days;
     }
 
     /**
-     * Register media collections
+     * Register media collections.
      * @return void
      */
     public function registerMediaCollections(): void
@@ -153,7 +154,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     }
 
     /**
-     * Register media conversions
+     * Register media conversions.
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -183,7 +184,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     /**
      * Route notifications for the FCM channel.
-     * return array of fcm tokens to send the notification to
+     * return array of fcm tokens to send the notification to.
      *
      * @param Notification $notification
      *
@@ -202,7 +203,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     }
 
     /**
-     * Vendor logo relationship
+     * Vendor logo relationship.
      * @return MorphOne
      */
     public function logo(): MorphOne
@@ -334,7 +335,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         $query->applyDirectFilters($request);
 
         if ($request->has('specialty_ids')) {
-            $query->hasAnyTaxonomy((array)$request->get('specialty_ids'));
+            $query->hasAnyTaxonomy((array) $request->get('specialty_ids'));
         }
 
         // Get products nearby specific location by specific distance
@@ -346,7 +347,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         $user = auth()->user();
 
         if ($request->has('user_id') && $user) {
-            $userId = $user->isAdmin() ? (int)$request->get('user_id') : $user->id;
+            $userId = $user->isAdmin() ? (int) $request->get('user_id') : $user->id;
 
             $query->whereHas('users', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
@@ -367,12 +368,14 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         $query->with('logo');
         $query->withCount('products', 'offers', 'services');
+
         return $query;
     }
 
     public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
         $query->withCount('users');
+
         return $query;
     }
 
@@ -380,6 +383,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments');
         $query->withCount('products', 'offers', 'services', 'orders_order', 'orders_consultations');
+
         return $query;
     }
 }

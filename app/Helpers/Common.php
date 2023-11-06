@@ -5,15 +5,14 @@ namespace App\Helpers;
 use App;
 use App\Contracts\Repositories\SettingRepositoryInterface;
 use Artisan;
-use Illuminate\Database\Eloquent\Model;
 
 /**
- * Common helper functions
+ * Common helper functions.
  */
 class Common
 {
     /**
-     * Get setting value
+     * Get setting value.
      * @param string $settingKey
      * @param string $default
      * @return string
@@ -36,7 +35,7 @@ class Common
     }
 
     /**
-     * Get all possible variations of phone number
+     * Get all possible variations of phone number.
      * @param string $phone
      * @return array
      */
@@ -50,7 +49,7 @@ class Common
     }
 
     /**
-     * Update env file value
+     * Update env file value.
      * @param string $environmentKey
      * @param string $configKey
      * @param string $newValue
@@ -67,8 +66,8 @@ class Common
 
         // Reload the cached config
         if (file_exists(App::getCachedConfigPath())) {
-            Artisan::call("config:clear");
-            Artisan::call("cache:clear");
+            Artisan::call('config:clear');
+            Artisan::call('cache:clear');
         }
     }
 
@@ -105,7 +104,6 @@ class Common
         return array_map(function ($v, $k) {
             return ['id' => $k, 'name' => $v];
         }, $data, array_keys($data));
-
     }
 
     /**

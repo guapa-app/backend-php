@@ -25,7 +25,7 @@ class UserController extends BaseApiController
     }
 
     /**
-     * Update user profile
+     * Update user profile.
      *
      * @authenticated
      * @urlParam id required User id
@@ -38,11 +38,12 @@ class UserController extends BaseApiController
     {
         $user = $this->userService->update($this->user, $request->validated());
         $user->loadProfileFields();
+
         return $user;
     }
 
     /**
-     * Get user by id
+     * Get user by id.
      *
      * @urlParam id required User id
      *
@@ -54,6 +55,7 @@ class UserController extends BaseApiController
     {
         $user = $this->userRepository->getOneOrFail($id);
         $user->loadProfileFields();
+
         return $user;
     }
 }

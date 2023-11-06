@@ -2,18 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\Setting;
 use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Support\Facades\Storage;
 use Prgayman\Zatca\Facades\Zatca;
 
 class PDFService
 {
-    function generatePDF($order)
+    public function generatePDF($order)
     {
         $invoice = $order->invoice;
 
-        abort_if($order->invoice == null, 405, "There is no invoice for this order");
+        abort_if($order->invoice == null, 405, 'There is no invoice for this order');
 
         $qr_code = $this->generateQRCode($invoice);
 
@@ -42,7 +41,7 @@ class PDFService
             ->toQrCode();
     }
 
-    function deletePDF($url)
+    public function deletePDF($url)
     {
         return Storage::disk('s3')->delete($url);
     }

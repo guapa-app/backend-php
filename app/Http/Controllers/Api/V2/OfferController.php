@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V2;
 use App\Http\Controllers\Api\OfferController as ApiOfferController;
 use App\Http\Requests\OfferRequest;
 use App\Http\Resources\OfferResource;
-use Illuminate;
 
 class OfferController extends ApiOfferController
 {
@@ -13,7 +12,7 @@ class OfferController extends ApiOfferController
     {
         return OfferResource::make(parent::create($request))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -22,7 +21,7 @@ class OfferController extends ApiOfferController
     {
         return OfferResource::make(parent::update($request, $id))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }

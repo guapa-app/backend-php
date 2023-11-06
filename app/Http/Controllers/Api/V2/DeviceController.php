@@ -13,7 +13,7 @@ class DeviceController extends ApiDeviceController
     {
         return DeviceResource::make(parent::addDevice($request, $service))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }

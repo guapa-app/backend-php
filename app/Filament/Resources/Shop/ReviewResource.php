@@ -5,11 +5,11 @@ namespace App\Filament\Resources\Shop;
 use App\Filament\Resources\Shop\ReviewResource\Pages;
 use App\Models\Review;
 use App\Traits\FilamentVendorAccess;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Model;
 
 class ReviewResource extends Resource
@@ -28,7 +28,7 @@ class ReviewResource extends Resource
             ->schema([
                 Infolists\Components\TextEntry::make('user.name'),
                 Infolists\Components\TextEntry::make('stars')->badge(),
-                Infolists\Components\TextEntry::make('comment')
+                Infolists\Components\TextEntry::make('comment'),
             ]);
     }
 

@@ -1,13 +1,11 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Admin\BaseAdminController;
+use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Http\Requests\ProductRequest;
 use App\Services\ProductService;
-use App\Contracts\Repositories\ProductRepositoryInterface;
+use Illuminate\Http\Request;
 
 class ProductController extends BaseAdminController
 {
@@ -22,34 +20,39 @@ class ProductController extends BaseAdminController
         $this->productRepository = $productRepository;
     }
 
-	public function index(Request $request)
-	{
+    public function index(Request $request)
+    {
         $products = $this->productRepository->all($request);
+
         return response()->json($products);
-	}
+    }
 
-	public function single($id)
-	{
-		$product = $this->productService->getOne($id);
+    public function single($id)
+    {
+        $product = $this->productService->getOne($id);
+
         return response()->json($product);
-	}
+    }
 
-	public function create(ProductRequest $request)
-	{
+    public function create(ProductRequest $request)
+    {
         $data = $request->validated();
         $product = $this->productService->create($data);
+
         return response()->json($product);
-	}
+    }
 
     public function update(ProductRequest $request, $id = 0)
     {
         $product = $this->productService->update($id, $request->validated());
+
         return response()->json($product);
     }
 
     public function delete($id = 0)
     {
         $this->productRepository->delete($id);
+
         return response()->json([
             'message' => $id,
         ]);

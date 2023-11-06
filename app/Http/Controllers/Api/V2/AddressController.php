@@ -20,7 +20,7 @@ class AddressController extends ApiAddressController
 
         return AddressCollection::make($index)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -31,7 +31,7 @@ class AddressController extends ApiAddressController
 
         return AddressResource::make($single)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -42,7 +42,7 @@ class AddressController extends ApiAddressController
 
         return AddressResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.created'),
             ]);
     }
@@ -53,7 +53,7 @@ class AddressController extends ApiAddressController
 
         return AddressResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.updated'),
             ]);
     }

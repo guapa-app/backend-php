@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\HistoryRequest;
 use App\Contracts\Repositories\HistoryRepositoryInterface;
+use App\Http\Requests\HistoryRequest;
+use Illuminate\Http\Request;
 
 /**
  * @group History
@@ -17,12 +16,12 @@ class HistoryController extends BaseApiController
     public function __construct(HistoryRepositoryInterface $historyRepository)
     {
         parent::__construct();
-        
+
         $this->historyRepository = $historyRepository;
     }
 
     /**
-     * History list
+     * History list.
      *
      * @queryParam date string History date. Example: 2021-01-01
      * @queryParam page integer Page number. Example: 1
@@ -30,54 +29,55 @@ class HistoryController extends BaseApiController
      *
      * @responseFile 200 responses/history/list.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
-     * 
+     *
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-	public function index(Request $request)
-	{
+    public function index(Request $request)
+    {
         $request->merge(['user_id' => $this->user->id]);
         $history = $this->historyRepository->all($request);
+
         return response()->json($history);
-	}
+    }
 
     /**
-     * History details
+     * History details.
      *
      * @urlParam id integer required History id. Example: 2
      *
      * @responseFile 200 responses/history/details.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      * @responseFile 404 scenario="Not found" responses/errors/404.json
-     * 
-     * @param  integer $id
+     *
+     * @param  int $id
      * @return \Illuminate\Http\JsonResponse
      */
-	public function single($id = 0)
-	{
-		$history = $this->historyRepository->getOneOrFail($id, [
+    public function single($id = 0)
+    {
+        $history = $this->historyRepository->getOneOrFail($id, [
             'user_id' => $this->user->id,
         ]);
 
         return response()->json($history);
-	}
+    }
 
     /**
-     * Create history
-     * 
+     * Create history.
+     *
      * @responseFile 200 responses/history/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      *
      * @bodyParam details string required History details. Example: Caught a flu
      * @bodyParam record_date string required History date. Example: 2021-01-01
-     * 
+     *
      * @param  \App\Http\Requests\HistoryRequest $request
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-	public function create(HistoryRequest $request)
-	{
+    public function create(HistoryRequest $request)
+    {
         $data = $request->validated();
         $data['user_id'] = $this->user->id;
         $history = $this->historyRepository->create($data);
@@ -89,10 +89,10 @@ class HistoryController extends BaseApiController
         $history->load('image');
 
         return response()->json($history);
-	}
+    }
 
     /**
-     * Update history
+     * Update history.
      *
      * @responseFile 200 responses/history/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -102,10 +102,10 @@ class HistoryController extends BaseApiController
      * @urlParam id integer required History id. Example: 3
      * @bodyParam details string required History details. Example: Caught a flu
      * @bodyParam record_date string required History date. Example: 2021-01-01
-     * 
+     *
      * @param  \App\Http\Requests\HistoryRequest $request
-     * @param  integer $id
-     * 
+     * @param  int $id
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(HistoryRequest $request, $id = 0)
@@ -116,7 +116,7 @@ class HistoryController extends BaseApiController
 
         if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
             $history->addMedia($data['image'])->toMediaCollection('history_images');
-        } elseif ($this->historyRepository->isAdmin() && ! isset($data['image'])) {
+        } elseif ($this->historyRepository->isAdmin() && !isset($data['image'])) {
             $history->media()->delete();
         }
 
@@ -126,14 +126,14 @@ class HistoryController extends BaseApiController
     }
 
     /**
-     * Delete history
+     * Delete history.
      *
      * @responseFile 200 responses/history/delete.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      * @responseFile 404 scenario="Not found" responses/errors/404.json
-     * 
-     * @param  integer $id
-     * 
+     *
+     * @param  int $id
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function delete($id = 0)

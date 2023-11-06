@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Models\UserProfile;
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**

@@ -88,12 +88,12 @@ class Address extends Model implements Listable
         $query->applyDirectFilters($request);
 
         if ($request->has('vendor_id')) {
-            $query->where('addressable_id', (int)$request->get('vendor_id'));
+            $query->where('addressable_id', (int) $request->get('vendor_id'));
             $query->where('addressable_type', 'vendor');
         }
 
         if ($request->has('user_id')) {
-            $query->where('addressable_id', (int)$request->get('user_id'));
+            $query->where('addressable_id', (int) $request->get('user_id'));
             $query->where('addressable_type', 'user');
         }
 
@@ -103,12 +103,14 @@ class Address extends Model implements Listable
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         $query->with('addressable', 'city');
+
         return $query;
     }
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('city');
+
         return $query;
     }
 
@@ -120,6 +122,7 @@ class Address extends Model implements Listable
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('addressable', 'city');
+
         return $query;
     }
 

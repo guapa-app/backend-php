@@ -41,7 +41,7 @@ class AuthController extends BaseApiController
     }
 
     /**
-     * Signup
+     * Signup.
      *
      * @unauthenticated
      *
@@ -110,7 +110,7 @@ class AuthController extends BaseApiController
     }
 
     /**
-     * Login
+     * Login.
      *
      * @unauthenticated
      *
@@ -155,30 +155,32 @@ class AuthController extends BaseApiController
 
     private function checkUserCredentials($token)
     {
-        if ($token == null)
+        if ($token == null) {
             throw new ApiException(__('api.invalid_credentials'), 401);
+        }
     }
 
     private function checkUserVerified($phone_verified_at, $username)
     {
-        if ($phone_verified_at == null && strpos($username, '@') === false)
+        if ($phone_verified_at == null && strpos($username, '@') === false) {
             throw new PhoneNotVerifiedException();
+        }
     }
 
     private function checkIfUserDeleted($status)
     {
-        if ($status == User::STATUS_DELETED)
+        if ($status == User::STATUS_DELETED) {
             throw new ApiException(__('api.account_deleted'), 401);
+        }
     }
 
     /**
-     * Get logged in user
+     * Get logged in user.
      *
      * @authenticated
      *
      * @responseFile 200 responses/auth/current-user.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
-     *
      */
     public function user()
     {
@@ -187,11 +189,12 @@ class AuthController extends BaseApiController
         $this->checkIfUserDeleted($this->user->status);
 
         $this->user->append('user_vendors_ids');
+
         return $this->user;
     }
 
     /**
-     * Refresh access token
+     * Refresh access token.
      *
      * @unauthenticated
      *
@@ -208,20 +211,21 @@ class AuthController extends BaseApiController
         ]);
 
         // Get access token from oauth server
-        $res =  $this->authService->authenticate([
+        $res = $this->authService->authenticate([
             'grant_type' => 'refresh_token',
             'refresh_token' => $request->get('refresh_token'),
             'scope' => '*',
         ]);
 
-        if ($res == null)
+        if ($res == null) {
             throw new ApiException(__('api.invalid_refresh_token'), 401);
+        }
 
         return $res;
     }
 
     /**
-     * Logout
+     * Logout.
      *
      * @responseFile 200 responses/auth/logout.json
      * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
@@ -231,11 +235,12 @@ class AuthController extends BaseApiController
     public function logout(Request $request)
     {
         $this->authService->logout($this->user);
+
         return true;
     }
 
     /**
-     * Verify phone
+     * Verify phone.
      *
      * @unauthenticated
      *
@@ -310,18 +315,19 @@ class AuthController extends BaseApiController
     }
 
     /**
-     * Delete Account
+     * Delete Account.
      *
      * @param Request $request
      */
     public function deleteAccount(Request $request)
     {
         $this->userService->deleteAccount($this->user->getKey());
+
         return $this->logout($request);
     }
 
     /**
-     * Send otp
+     * Send otp.
      *
      * @unauthenticated
      *
@@ -337,7 +343,7 @@ class AuthController extends BaseApiController
     }
 
     /**
-     * Verify otp
+     * Verify otp.
      *
      * @unauthenticated
      *

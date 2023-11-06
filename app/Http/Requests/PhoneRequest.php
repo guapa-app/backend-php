@@ -22,7 +22,7 @@ class PhoneRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'phone' => 'required|string|numeric'
+            'phone' => 'required|string|numeric',
         ];
     }
 }

@@ -38,16 +38,16 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price',
-        'status', 'review', 'type', 'terms', 'url'
+        'status', 'review', 'type', 'terms', 'url',
     ];
 
     protected $appends = [
-        'likes_count', 'is_liked', 'taxonomy_name'
+        'likes_count', 'is_liked', 'taxonomy_name',
     ];
 
     /**
      * Attributes that can be filtered directly
-     * using values from client without any logic
+     * using values from client without any logic.
      * @var array
      */
     protected $filterable = [
@@ -55,7 +55,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     ];
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
@@ -69,7 +69,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     ];
 
     /**
-     * Register media collections
+     * Register media collections.
      * @return void
      */
     public function registerMediaCollections(): void
@@ -78,7 +78,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     }
 
     /**
-     * Register media conversions
+     * Register media conversions.
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -98,7 +98,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getTaxonomyNameAttribute()
     {
-        return $this->getRelations()['taxonomies'][0]->title ?? "";
+        return $this->getRelations()['taxonomies'][0]->title ?? '';
     }
 
     public function getCategoryIdsAttribute()
@@ -196,7 +196,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $query->applyDirectFilters($request);
 
         if ($request->has('category_ids')) {
-            $query->hasAnyTaxonomy((array)$request->get('category_ids'));
+            $query->hasAnyTaxonomy((array) $request->get('category_ids'));
         }
 
         // Filter by price range
@@ -205,7 +205,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         }
 
         if ($request->has('city_id')) {
-            $cityId = (int)$request->get('city_id');
+            $cityId = (int) $request->get('city_id');
             $query->whereHas('addresses', function ($q) use ($cityId) {
                 $q->where('city_id', $cityId);
             });
@@ -220,7 +220,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         // We need to return only active products owned by active vendors
         // Excluding admins and vendors displaying their own products.
         $currentUserWorksForFilteredVendor = $user && !$user->isAdmin() && $request->has('vendor_id')
-            && $user->hasVendor((int)$request->get('vendor_id'));
+            && $user->hasVendor((int) $request->get('vendor_id'));
         if (
             !$currentUserWorksForFilteredVendor &&
             (!$user || !$user->isAdmin())
@@ -229,8 +229,8 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         }
 
         if ($request->has('list_type')) {
-            $listType = (string)$request->get('list_type');
-            $status = (string)$request->get('status');
+            $listType = (string) $request->get('list_type');
+            $status = (string) $request->get('status');
             $query->listType($listType, $currentUserWorksForFilteredVendor, $status);
         }
 
@@ -253,11 +253,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     }
 
     /**
-     * Scope the query to return only products nearby a specific location by specific distance
+     * Scope the query to return only products nearby a specific location by specific distance.
      * @param Builder $query
-     * @param double $lat
-     * @param double $lng
-     * @param integer $dist
+     * @param float $lat
+     * @param float $lng
+     * @param int $dist
      * @return Builder
      */
     public function scopeNearBy($query, $lat, $lng, $dist = 50)
@@ -268,7 +268,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $join->on('products.id', '=', 'product_addresses.product_id');
         });
 
-        if (!isset($dist) || (int)$dist < 1) {
+        if (!isset($dist) || (int) $dist < 1) {
             $dist = 50;
         }
 
@@ -308,12 +308,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         $query->with('vendor');
+
         return $query;
     }
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('vendor.logo', 'media', 'offer', 'offer.image', 'taxonomies');
+
         return $query;
     }
 

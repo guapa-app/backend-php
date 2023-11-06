@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Offer;
 use App\Contracts\Repositories\OfferRepositoryInterface;
 use App\Http\Requests\OfferRequest;
+use App\Models\Offer;
 use App\Services\OfferService;
 
 /**
@@ -16,9 +16,10 @@ class OfferController extends BaseApiController
 
     private $offerService;
 
-    public function __construct(OfferService $offerService,
-                                OfferRepositoryInterface $repository)
-    {
+    public function __construct(
+        OfferService $offerService,
+        OfferRepositoryInterface $repository
+    ) {
         parent::__construct();
 
         $this->offerService = $offerService;
@@ -26,7 +27,7 @@ class OfferController extends BaseApiController
     }
 
     /**
-     * Create offer
+     * Create offer.
      *
      * @responseFile 200 responses/offers/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -43,7 +44,7 @@ class OfferController extends BaseApiController
     }
 
     /**
-     * Update offer
+     * Update offer.
      *
      * @responseFile 200 responses/offers/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -60,7 +61,7 @@ class OfferController extends BaseApiController
     }
 
     /**
-     * Delete offer
+     * Delete offer.
      *
      * @responseFile 200 responses/offers/delete.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json

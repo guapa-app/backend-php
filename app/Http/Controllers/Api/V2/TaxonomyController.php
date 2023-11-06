@@ -23,7 +23,7 @@ class TaxonomyController extends BaseApiController
     {
         return TaxonomyCollection::make($this->taxRepository->all($request))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -32,7 +32,7 @@ class TaxonomyController extends BaseApiController
     {
         return TaxonomyResource::make($this->taxRepository->getOneWithRelations($id))
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }

@@ -5,7 +5,7 @@ namespace App\Contracts\Repositories;
 use App\Models\Post;
 
 /**
- * Post Repository Interface
+ * Post Repository Interface.
  */
 interface PostRepositoryInterface
 {

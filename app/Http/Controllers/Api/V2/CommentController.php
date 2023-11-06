@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Api\CommentController as ApiCommentController;
 use App\Http\Requests\CommentRequest;
-use App\Http\Resources\CommentResource;
 use App\Http\Resources\CommentCollection;
+use App\Http\Resources\CommentResource;
 use Illuminate\Http\Request;
 
 class CommentController extends ApiCommentController
@@ -14,8 +14,8 @@ class CommentController extends ApiCommentController
     {
         return CommentCollection::make(parent::index($request))
             ->additional([
-                "success" => true,
-                "message" => __('api.success')
+                'success' => true,
+                'message' => __('api.success'),
             ]);
     }
 
@@ -23,8 +23,8 @@ class CommentController extends ApiCommentController
     {
         return CommentResource::make(parent::create($request))
             ->additional([
-                "success" => true,
-                "message" => __('api.success')
+                'success' => true,
+                'message' => __('api.success'),
             ]);
     }
 
@@ -32,14 +32,15 @@ class CommentController extends ApiCommentController
     {
         return CommentResource::make(parent::update($request, $id))
             ->additional([
-                "success" => true,
-                "message" => __('api.success')
+                'success' => true,
+                'message' => __('api.success'),
             ]);
     }
 
     public function delete($id)
     {
         parent::delete($id);
+
         return $this->successJsonRes([], __('api.success'));
     }
 }

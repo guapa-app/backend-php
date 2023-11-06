@@ -12,28 +12,27 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 
 /**
- * The base class for all eloquent repositories
+ * The base class for all eloquent repositories.
  */
 class EloquentRepository implements EloquentRepositoryInterface
 {
     /**
-     * Current logged-in user instance
-     * @var User $user
+     * Current logged-in user instance.
+     * @var User
      */
     protected $user;
 
     /**
-     * An empty instance of the model related to this repository
-     * @var User $model
+     * An empty instance of the model related to this repository.
+     * @var User
      */
     protected $model;
 
     /**
-     * Items per page for pagination
-     * @var integer
+     * Items per page for pagination.
+     * @var int
      */
     public $perPage = 10;
-
 
     public function __construct(Model $model)
     {
@@ -42,15 +41,17 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Get multiple rows from database
+     * Get multiple rows from database.
      * @param Request $request
      * @return LengthAwarePaginator| Collection
      */
     public function all(Request $request): object
     {
-        $perPage = (int)($request->has('perPage') ? $request->get('perPage') : $this->perPage);
+        $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
 
-        if ($perPage > 50) $perPage = 50;
+        if ($perPage > 50) {
+            $perPage = 50;
+        }
 
         $query = $this->model
             ->applyFilters($request)
@@ -69,7 +70,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Get all records
+     * Get all records.
      * @return Collection
      */
     public function getAll(): Collection
@@ -78,7 +79,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Get single row from database
+     * Get single row from database.
      *
      * @param int $id
      * @param array $where
@@ -95,7 +96,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Get first row from database
+     * Get first row from database.
      *
      * @param array $where
      *
@@ -107,7 +108,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Get single row from database with relations
+     * Get single row from database with relations.
      *
      * @param int $id
      * @param array $where
@@ -124,7 +125,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Get single row from database or fail with 404
+     * Get single row from database or fail with 404.
      * @param int $id
      * @param array $where
      * @return Model
@@ -133,18 +134,20 @@ class EloquentRepository implements EloquentRepositoryInterface
     public function getOneOrFail(int $id, $where = []): Model
     {
         $where['id'] = $id;
+
         return $this->model->where($where)->firstOrFail();
     }
 
     public function getMany($ids, $where = [], $relations = [])
     {
         $ids = $this->resolveIds($ids);
+
         return $this->model->whereIn('id', $ids)
             ->where($where)->with($relations)->get();
     }
 
     /**
-     * Create new model and persist in db
+     * Create new model and persist in db.
      * @param array $data
      * @return Model
      */
@@ -154,7 +157,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Update model
+     * Update model.
      * @param mixed $model
      * @param array $data
      * @param array $where
@@ -165,11 +168,12 @@ class EloquentRepository implements EloquentRepositoryInterface
     {
         $model = $this->isModel($model) ? $model : $this->getOneOrFail($model, $where);
         $model->update($data);
+
         return $model;
     }
 
     /**
-     * Delete by ids
+     * Delete by ids.
      * @param int|array|json $id
      * @return void
      */
@@ -190,7 +194,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Set current user based on api or admin
+     * Set current user based on api or admin.
      * @return void
      */
     public function setCurrentUser(): void
@@ -198,6 +202,7 @@ class EloquentRepository implements EloquentRepositoryInterface
         $route = request()->route();
         if (!$route) {
             $this->user = auth()->user();
+
             return;
         }
 
@@ -210,8 +215,8 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Check if the current user is an admin
-     * @return boolean
+     * Check if the current user is an admin.
+     * @return bool
      */
     public function isAdmin(): bool
     {
@@ -219,7 +224,7 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Pick some keys from array
+     * Pick some keys from array.
      * @param array $data
      * @param array $keys
      * @return array
@@ -230,9 +235,9 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Check if variable is a Model
+     * Check if variable is a Model.
      * @param mixed $variable
-     * @return boolean
+     * @return bool
      */
     public function isModel($variable): bool
     {
@@ -240,14 +245,14 @@ class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * Get array of ids from input
+     * Get array of ids from input.
      * @param int|json|array $id
      * @return array
      */
     public function resolveIds($id): array
     {
         if (is_numeric($id)) {
-            return [(int)$id];
+            return [(int) $id];
         }
 
         if (is_array($id)) {
@@ -255,7 +260,7 @@ class EloquentRepository implements EloquentRepositoryInterface
         }
 
         try {
-            return (array)json_decode(urldecode($id));
+            return (array) json_decode(urldecode($id));
         } catch (Exception $e) {
             // Not valid json
             return [];

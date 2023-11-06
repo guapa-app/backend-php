@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Events\OfferCreated;
 use App\Models\User;
 use App\Notifications\OfferNotification;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class OfferCreatedListener
@@ -15,7 +14,6 @@ class OfferCreatedListener
      */
     public function __construct()
     {
-
     }
 
     /**

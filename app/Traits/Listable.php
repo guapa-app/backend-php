@@ -67,6 +67,7 @@ trait Listable
         $field = isset($sort) ? $this->getConstraintKey($sort) : $this->getConstraintKey('id');
         $order = in_array(strtolower($order), ['asc', 'desc']) ? $order : 'desc';
         $query->orderBy($field, $order);
+
         return $query;
     }
 
@@ -104,7 +105,7 @@ trait Listable
 
     /**
      * Get constraint key based on table name
-     * of current model
+     * of current model.
      * @param string $key
      * @return string
      */

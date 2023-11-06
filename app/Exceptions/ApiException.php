@@ -8,7 +8,8 @@ class ApiException extends Exception
 {
     protected $message;
     protected $code;
-    public function __construct($message = "", $code = 0)
+
+    public function __construct($message = '', $code = 0)
     {
         $this->message = $message;
         $this->code = $code;
@@ -17,8 +18,8 @@ class ApiException extends Exception
     public function render($request)
     {
         return response()->json([
-            "success" => false,
-            "message" => $this->message,
+            'success' => false,
+            'message' => $this->message,
 //            "errors" => $this->message
         ], $this->code);
     }

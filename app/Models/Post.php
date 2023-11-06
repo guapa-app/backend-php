@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -21,21 +20,21 @@ class Post extends Model implements Listable, HasMedia
     use HasFactory, InteractsWithMedia, ListableTrait, Likable;
 
     public const STATUSES = [
-    	1 => 'Published',
-    	2 => 'Draft',
+        1 => 'Published',
+        2 => 'Draft',
     ];
 
     protected $fillable = [
-    	'admin_id', 'category_id', 'title',
-    	'content', 'status', 'youtube_url',
+        'admin_id', 'category_id', 'title',
+        'content', 'status', 'youtube_url',
     ];
 
     protected $filterable = [
-    	'admin_id', 'category_id', 'status',
+        'admin_id', 'category_id', 'status',
     ];
 
     protected $search_attributes = [
-    	'title', 'content',
+        'title', 'content',
     ];
 
     protected $appends = [
@@ -43,7 +42,7 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     /**
-     * Register media collections
+     * Register media collections.
      * @return void
      */
     public function registerMediaCollections(): void
@@ -52,7 +51,7 @@ class Post extends Model implements Listable, HasMedia
     }
 
     /**
-     * Register media conversions
+     * Register media conversions.
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -72,17 +71,17 @@ class Post extends Model implements Listable, HasMedia
 
     public function admin()
     {
-    	return $this->belongsTo(Admin::class);
+        return $this->belongsTo(Admin::class);
     }
 
     public function category()
     {
-    	return $this->belongsTo(Taxonomy::class, 'category_id');
+        return $this->belongsTo(Taxonomy::class, 'category_id');
     }
 
     public function comments(): HasMany
     {
-    	return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
@@ -103,26 +102,30 @@ class Post extends Model implements Listable, HasMedia
 
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
-    	$query->with('admin', 'category');
+        $query->with('admin', 'category');
+
         return $query;
     }
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-    	$query->with('admin', 'media', 'category');
+        $query->with('admin', 'media', 'category');
+
         return $query;
     }
 
     public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
-    	$query->withCount('comments');
+        $query->withCount('comments');
+
         return $query;
     }
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-    	$query->with('admin', 'media', 'category');
-    	$query->withCount('comments');
+        $query->with('admin', 'media', 'category');
+        $query->withCount('comments');
+
         return $query;
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
- * Review service
+ * Review service.
  */
 class ReviewService
 {
@@ -23,6 +23,7 @@ class ReviewService
     public function getReviews(array $filters = []): LengthAwarePaginator
     {
         $perPage = $filters['per_page'] ?? 15;
+
         return Review::where([
             'reviewable_type' => $filters['reviewable_type'],
             'reviewable_id' => $filters['reviewable_id'],
@@ -55,6 +56,7 @@ class ReviewService
     public function getReviewableClass(string $type): ?string
     {
         $morphMap = Relation::morphMap();
+
         return $morphMap[$type] ?? null;
     }
 }

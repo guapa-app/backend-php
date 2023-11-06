@@ -7,11 +7,11 @@ use Filament\Support\Contracts\HasLabel;
 
 enum OrderStatus: string implements HasColor, HasLabel
 {
-    case Pending        = 'Pending';
-    case Accepted       = 'Accepted';
-    case Rejected       = 'Rejected';
+    case Pending = 'Pending';
+    case Accepted = 'Accepted';
+    case Rejected = 'Rejected';
     case Cancel_Request = 'Cancel Request';
-    case Canceled       = 'Canceled';
+    case Canceled = 'Canceled';
 
     public function getLabel(): string
     {
@@ -41,7 +41,7 @@ enum OrderStatus: string implements HasColor, HasLabel
                 self::Accepted,
                 self::Rejected,
                 self::Cancel_Request,
-                self::Canceled
+                self::Canceled,
         ];
     }
 }

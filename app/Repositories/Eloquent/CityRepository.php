@@ -2,28 +2,26 @@
 
 namespace App\Repositories\Eloquent;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Contracts\Repositories\CityRepositoryInterface;
-use App\Repositories\Eloquent\EloquentRepository;
 use App\Models\City;
 
 /**
- * City repository
+ * City repository.
  */
 class CityRepository extends EloquentRepository implements CityRepositoryInterface
 {
-	/**
-	 * Items per page for pagination
-	 * @var integer
-	 */
-	public $perPage = 10;
+    /**
+     * Items per page for pagination.
+     * @var int
+     */
+    public $perPage = 10;
 
-	/**
-	 * Construct an instance of the repo
-	 * @param \App\Models\City $model
-	 */
-	public function __construct(City $model)
-	{
-		parent::__construct($model);
-	}
+    /**
+     * Construct an instance of the repo.
+     * @param \App\Models\City $model
+     */
+    public function __construct(City $model)
+    {
+        parent::__construct($model);
+    }
 }

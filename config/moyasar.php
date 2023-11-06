@@ -15,7 +15,6 @@ return [
 
     'key' => env('MOYASAR_API_KEY'),
 
-
     /*
     |--------------------------------------------------------------------------
     | Moyasar Publishable API Key

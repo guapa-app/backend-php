@@ -25,7 +25,7 @@ class CommentController extends BaseApiController
     }
 
     /**
-     * Comments list
+     * Comments list.
      *
      * @unauthenticated
      *
@@ -44,7 +44,7 @@ class CommentController extends BaseApiController
     }
 
     /**
-     * Create comment
+     * Create comment.
      *
      * @responseFile 200 responses/posts/create-comment.json
      * @responseFile 404 scenario="Post not found" responses/errors/404.json
@@ -58,11 +58,12 @@ class CommentController extends BaseApiController
         $data = $request->validated();
         $data['user_id'] = auth()->id();
         $data['user_type'] = auth()->user()->getMorphClass();
+
         return $this->commentRepository->create($data);
     }
 
     /**
-     * Update comment
+     * Update comment.
      *
      * @urlParam id integer required Comment id. Example: 10
      *
@@ -85,11 +86,12 @@ class CommentController extends BaseApiController
 
         $data = $request->validated();
         unset($data['post_id']);
+
         return $this->commentRepository->update($comment, $data);
     }
 
     /**
-     * Delete comment
+     * Delete comment.
      *
      * @urlParam id integer required Comment id. Example: 10
      *

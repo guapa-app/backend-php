@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Product;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderRequest extends FormRequest
@@ -71,8 +71,8 @@ class OrderRequest extends FormRequest
             $productQuery = Product::query()->whereIn('id', $productIds);
 
             $types = $productQuery->pluck('type')->toArray();
-            $is_service = in_array("service", $types);
-            $is_product = in_array("product", $types);
+            $is_service = in_array('service', $types);
+            $is_product = in_array('product', $types);
 
             // can't request service and product at same time
             if ($is_service && $is_product) {

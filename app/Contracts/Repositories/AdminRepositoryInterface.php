@@ -3,7 +3,7 @@
 namespace App\Contracts\Repositories;
 
 /**
- * Admin Repository Interface
+ * Admin Repository Interface.
  */
 interface AdminRepositoryInterface
 {

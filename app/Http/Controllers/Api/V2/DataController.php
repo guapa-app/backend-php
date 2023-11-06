@@ -11,20 +11,20 @@ class DataController extends BaseApiController
     {
         $data = parent::data();
 
-        return DataResource::make((object)$data)
+        return DataResource::make((object) $data)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
 
     public function address_types()
     {
-        return $this->successJsonRes(parent::address_types(), __("api.success"));
+        return $this->successJsonRes(parent::address_types(), __('api.success'));
     }
 
     public function vendor_types()
     {
-        return $this->successJsonRes(parent::vendor_types(), __("api.success"));
+        return $this->successJsonRes(parent::vendor_types(), __('api.success'));
     }
 }

@@ -12,34 +12,33 @@ use App\Models\UserVendor;
 use App\Notifications\OrderNotification;
 use App\Notifications\OrderUpdatedNotification;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 
-class OrderService {
-
-	private $repository;
-	private $payment_service;
+class OrderService
+{
+    private $repository;
+    private $payment_service;
     private $product_fees;
     private $taxes_percentage;
     private $is_service = false;
 
     public function __construct(OrderRepositoryInterface $repository, PaymentService $payment_service)
-	{
-		$this->repository = $repository;
-		$this->payment_service = $payment_service;
+    {
+        $this->repository = $repository;
+        $this->payment_service = $payment_service;
         $this->product_fees = Setting::getProductFees();
         $this->taxes_percentage = Setting::getTaxes();
         $this->fees = 0;
         $this->taxes = 0;
-	}
+    }
 
     public function create(array $data): Collection
     {
         return DB::transaction(function () use ($data) {
-
             $productIds = array_map(function ($product) {
                 return $product['id'];
             }, $data['products']);
@@ -59,9 +58,9 @@ class OrderService {
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $data['total'] = (double) array_sum(array_map(function ($product) use ($data) {
+                $data['total'] = (float) array_sum(array_map(function ($product) use ($data) {
                     $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int)($value['id']) === $product->id;
+                        return (int) ($value['id']) === $product->id;
                     });
 
                     if ($product->offer != null) {
@@ -77,7 +76,7 @@ class OrderService {
                         $product_fees = optional($product->categories()->first())->fees;
 
                         $this->fees += ($product_fees / 100) * $final_price;
-                    }else{
+                    } else {
                         $this->fees += ($this->product_fees / 100) * $final_price;
                     }
 
@@ -88,7 +87,7 @@ class OrderService {
 
                 $items = array_map(function ($product) use ($data, $order, $now, $vendorId) {
                     $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int)($value['id']) === $product->id;
+                        return (int) ($value['id']) === $product->id;
                     });
 
                     if (isset($inputItem['appointment'])) {
@@ -137,63 +136,71 @@ class OrderService {
             if ($this->is_service) {
                 $this->taxes = ($this->taxes_percentage / 100) * $this->fees;
 
-                # it 'll be one order at all for one vendor
+                // it 'll be one order at all for one vendor
                 $invoice = $this->payment_service->generateInvoice($orders, $products_titles, $this->fees, $this->taxes);
 
-                # return invoice url with order response
-                $orders->first()["invoice_url"] = $invoice->url;
+                // return invoice url with order response
+                $orders->first()['invoice_url'] = $invoice->url;
             }
 
             return $orders;
         });
     }
 
-	public function checkVendorUsers(int $vendorId, array $userIds): bool
+    public function checkVendorUsers(int $vendorId, array $userIds): bool
     {
         return UserVendor::where('vendor_id', $vendorId)
-        	->whereIn('user_id', $userIds)->count() === count(array_unique($userIds));
+            ->whereIn('user_id', $userIds)->count() === count(array_unique($userIds));
     }
 
-	public function update(int $id, array $data): Order
-	{
-		$order = $this->repository->getOneOrFail($id);
-		$this->validateStatus($order, $data['status']);
+    public function update(int $id, array $data): Order
+    {
+        $order = $this->repository->getOneOrFail($id);
+        $this->validateStatus($order, $data['status']);
         $order = $this->repository->update($order, $data);
-        if ($data['status'] == 'Canceled' && ($order->invoice != null)) $this->payment_service->refund($order);
+        if ($data['status'] == 'Canceled' && ($order->invoice != null)) {
+            $this->payment_service->refund($order);
+        }
         Notification::send($order->user, new OrderUpdatedNotification($order));
+
         return $order;
-	}
+    }
 
-	public function getOrderDetails(int $id): Order
-	{
-		$user = app('cosmo')->user();
-		$order = Order::withSingleRelations()->where('id', $id)->firstOrFail();
-		if ($order->user_id != $user->id && !$user->hasVendor($order->vendor_id)) {
-			abort(403, 'You cannot view details for this order');
-		}
+    public function getOrderDetails(int $id): Order
+    {
+        $user = app('cosmo')->user();
+        $order = Order::withSingleRelations()->where('id', $id)->firstOrFail();
+        if ($order->user_id != $user->id && !$user->hasVendor($order->vendor_id)) {
+            abort(403, 'You cannot view details for this order');
+        }
 
-		return $order;
-	}
+        return $order;
+    }
 
     public function validateStatus(Order $order, string $status): void
     {
         $user = app('cosmo')->user();
 
-        if ($user->isAdmin()) return;
+        if ($user->isAdmin()) {
+            return;
+        }
 
         if ($order->status !== 'Pending' && $user->id !== $order->user_id) {
             $error = 'Sorry this order has been ' . $order->status;
         } elseif ($order->status === $status) {
             $error = 'The order is already ' . $status;
         } elseif (($status === 'Cancel Request') || ($status === 'Canceled')) {
-            if ($order->is_used)
+            if ($order->is_used) {
                 $error = __('api.cancel_used_order_error');
+            }
 
-            if ($order->user_id !== $user->id)
+            if ($order->user_id !== $user->id) {
                 $error = 'You are not authorized to cancel this order';
+            }
 
-            if ($order->user_id === $user->id && $order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString())
+            if ($order->user_id === $user->id && $order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
+            }
         } elseif (in_array($status, ['Accepted', 'Rejected'])) {
             // This should be an employee of a vendor authorized to accept or reject the order.
             $authorizedVendorIds = Product::query()->select('vendor_id')->whereIn('id', function ($q) use ($order) {

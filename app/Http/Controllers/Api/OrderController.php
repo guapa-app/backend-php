@@ -16,7 +16,6 @@ use Illuminate\Support\Collection;
 
 /**
  * @group Orders
- *
  */
 class OrderController extends BaseApiController
 {
@@ -32,7 +31,7 @@ class OrderController extends BaseApiController
     }
 
     /**
-     * Orders listing
+     * Orders listing.
      *
      * @responseFile 200 responses/orders/list.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -52,7 +51,7 @@ class OrderController extends BaseApiController
             $request->merge([
                 'user_id' => $this->user->id,
             ]);
-        } elseif (!$this->user->hasVendor((int)$request->get('vendor_id'))) {
+        } elseif (!$this->user->hasVendor((int) $request->get('vendor_id'))) {
             abort(403, 'Forbidden');
         }
 
@@ -60,7 +59,7 @@ class OrderController extends BaseApiController
     }
 
     /**
-     * Get Order by id
+     * Get Order by id.
      *
      * @unauthenticated
      *
@@ -75,11 +74,11 @@ class OrderController extends BaseApiController
      */
     public function single($id)
     {
-        return $this->orderService->getOrderDetails((int)$id);
+        return $this->orderService->getOrderDetails((int) $id);
     }
 
     /**
-     * Create order
+     * Create order.
      *
      * @responseFile 200 responses/orders/create.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -92,11 +91,12 @@ class OrderController extends BaseApiController
     {
         $data = $request->validated();
         $data['user_id'] = $this->user->id;
+
         return $this->orderService->create($data);
     }
 
     /**
-     * Update order
+     * Update order.
      *
      * @urlParam id required Order id
      * @bodyParam status string required. One of `Accepted`, `Rejected`, `Canceled`
@@ -120,7 +120,7 @@ class OrderController extends BaseApiController
             'cancellation_reason' => 'required_if:status,Cancel Request',
         ]);
 
-        return $this->orderService->update((int)$id, $data);
+        return $this->orderService->update((int) $id, $data);
     }
 
     public function changeInvoiceStatus(Request $request)
@@ -128,9 +128,10 @@ class OrderController extends BaseApiController
         $invoice = Invoice::query()->where('invoice_id', $request->id)->firstOrFail();
         $invoice->updateOrFail(['status' => $request->status]); // paid
 
-        $invoice->order->updateOrFail(['status' => "Accepted"]);
+        $invoice->order->updateOrFail(['status' => 'Accepted']);
 
-        logger("Change Invoice Status By Moyasar Callback URL\n
+        logger(
+            "Change Invoice Status By Moyasar Callback URL\n
          order { $invoice->order_id } <-> Invoice { $invoice->id }",
             [
                 "\nmoyasar" => $request->all(),
@@ -145,8 +146,9 @@ class OrderController extends BaseApiController
     {
         $order = Order::query()->findOrFail($id);
 
-        if ($order->status != "Accepted")
+        if ($order->status != 'Accepted') {
             return response()->json(['message' => __('You must pay first.')], 405);
+        }
 
         $order->invoice_url = (new PDFService)->generatePDF($order);
         $order->save();
@@ -162,25 +164,27 @@ class OrderController extends BaseApiController
 
         $cus_name = $order->user->name;
 
-        if ($order->status != "Accepted")
+        if ($order->status != 'Accepted') {
             return response()->json(['message' => __('You must pay first.')], 405);
-            
+        }
+
         $invoice = $order->invoice;
-        
-        abort_if($invoice == null, 405, "There is no invoice for this order");
+
+        abort_if($invoice == null, 405, 'There is no invoice for this order');
 
         $vat = Setting::getTaxes();
 
-        $order_items = $order->items->map(function ($item) use ($vat){
-            $product      = $item->product;
-            $arr['name']  = $product->title;
+        $order_items = $order->items->map(function ($item) use ($vat) {
+            $product = $item->product;
+            $arr['name'] = $product->title;
             $arr['price'] = $product->categories->first()->fees / 100 * $item->amount;
-            $arr['vat']   = $arr['price'] * $vat / 100;
-            $arr['qty']   = $item->quantity;
+            $arr['vat'] = $arr['price'] * $vat / 100;
+            $arr['qty'] = $item->quantity;
             $arr['subtotal_with_vat'] = ($arr['price'] + $arr['vat']) * $arr['qty'];
+
             return $arr;
         });
-                
+
         return view('invoice', compact('invoice', 'cus_name', 'order_items', 'vat'));
     }
 }

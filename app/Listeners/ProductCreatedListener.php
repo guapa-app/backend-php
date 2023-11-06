@@ -14,7 +14,6 @@ class ProductCreatedListener
      */
     public function __construct()
     {
-
     }
 
     /**
@@ -27,6 +26,6 @@ class ProductCreatedListener
     {
         $event->product->load('vendor');
         $users = User::inRandomOrder()->limit(50)->get();
-	Notification::send($users, new ProductNotification($event->product));
+        Notification::send($users, new ProductNotification($event->product));
     }
 }

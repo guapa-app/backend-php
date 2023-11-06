@@ -17,7 +17,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 
 /**
- * User service
+ * User service.
  */
 class UserService
 {
@@ -29,7 +29,7 @@ class UserService
     }
 
     /**
-     * Create new user with relations
+     * Create new user with relations.
      *
      * @param array $data
      * @return User
@@ -44,7 +44,7 @@ class UserService
 
         // Update profile
         if (isset($data['profile'])) {
-            $this->updateProfile($user, (array)$data['profile']);
+            $this->updateProfile($user, (array) $data['profile']);
         }
 
         if (isset($data['password'])) {
@@ -61,7 +61,7 @@ class UserService
 
         // Update profile
         if (isset($data['profile'])) {
-            $this->updateProfile($user, (array)$data['profile']);
+            $this->updateProfile($user, (array) $data['profile']);
         }
 
         // Update password
@@ -71,7 +71,7 @@ class UserService
     }
 
     /**
-     * Update user address
+     * Update user address.
      * @param User $user
      * @param array $data
      * @return User
@@ -89,7 +89,7 @@ class UserService
     }
 
     /**
-     * Update user profile
+     * Update user profile.
      * @param User $user
      * @param array $data
      * @return User
@@ -126,7 +126,9 @@ class UserService
             ->where('status', 'Pending')
             ->exists();
 
-        if ($hasOrders) abort(403, __('api.vendor_has_active_orders'));
+        if ($hasOrders) {
+            abort(403, __('api.vendor_has_active_orders'));
+        }
 
         UserVendor::query()->where('user_id', $id)->delete();
 
@@ -181,7 +183,6 @@ class UserService
                     'email' => auth()->user()->email ?? auth()->user()->phone,
                 ])->first();
 
-
             if (!$token || now()->subMinutes(15)->gt(Carbon::parse($token->created_at))) {
                 throw ValidationException::withMessages([
                     'reset_token' => 'The reset token is invalid or has expired',
@@ -199,6 +200,7 @@ class UserService
         // Set user password
         $user->password = Hash::make($password);
         $user->save();
+
         return $user;
     }
 

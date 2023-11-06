@@ -5,7 +5,7 @@ namespace App\Contracts\Repositories;
 use App\Models\Doctor;
 
 /**
- * Doctor Repository Interface
+ * Doctor Repository Interface.
  */
 interface DoctorRepositoryInterface
 {

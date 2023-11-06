@@ -16,7 +16,6 @@ use Illuminate\Validation\Rule;
  *
  * @bodyParam keep_media array required Array of media ids to keep (Update only).
  * @bodyParam keep_media.* int required Media id returned from server.
- *
  */
 class ProductRequest extends FormRequest
 {
@@ -39,7 +38,7 @@ class ProductRequest extends FormRequest
         $inputs = parent::validationData();
 
         if (array_key_exists('price', $inputs) && !preg_match('[^0-9]', $inputs['price'])) {
-            $inputs['price'] = (float)$this->ArtoEnNumeric($inputs['price']);
+            $inputs['price'] = (float) $this->ArtoEnNumeric($inputs['price']);
         }
 
         return $inputs;
@@ -57,7 +56,8 @@ class ProductRequest extends FormRequest
 
         $rule_name = $id ? 'nullable' : 'required';
 
-        logger("Check product number - $id",
+        logger(
+            "Check product number - $id",
             [
                 'request' => request()->all(),
                 'rule_name' => $rule_name,
@@ -74,13 +74,13 @@ class ProductRequest extends FormRequest
             'category_ids.*'    => 'integer|exists:taxonomies,id',
             'address_ids'       => 'sometimes|array|min:1',
             'address_ids.*'     => 'integer|exists:addresses,id',
-            'media'             => ($id ? "nullable" : "required_without:keep_media") . "|array|min:1",
+            'media'             => ($id ? 'nullable' : 'required_without:keep_media') . '|array|min:1',
             'media.*'           => "{$rule_name}|image|max:10240",
             'terms'             => 'nullable|string|max:5000',
             'type'              => "{$rule_name}|in:product,service",
             // Admin only attributes
             'review'            => "{$rule_name}|string|in:Approved,Blocked,Pending",
-            'url'               => "nullable|string",
+            'url'               => 'nullable|string',
         ];
 
         // If the user is not an admin, remove the fields updated
@@ -94,7 +94,7 @@ class ProductRequest extends FormRequest
                 "{$rule_name}", 'integer',
                 Rule::exists('user_vendor')->where(function ($query) use ($user) {
                     $query->where('user_id', $user->id);
-                    $query->where('vendor_id', (int)$this->get('vendor_id'));
+                    $query->where('vendor_id', (int) $this->get('vendor_id'));
                 }),
             ];
         }
@@ -112,7 +112,7 @@ class ProductRequest extends FormRequest
             // Validate ad media to keep without deletion
             // If not provided all old media will be removed
             // But new media must be provided
-            $rules['keep_media'] = ($id ? "nullable" : "required_without:media") . "|array|min:1";
+            $rules['keep_media'] = ($id ? 'nullable' : 'required_without:media') . '|array|min:1';
             $rules['keep_media.*'] = "{$rule_name}|integer|exists:media,id";
         }
 
@@ -121,8 +121,9 @@ class ProductRequest extends FormRequest
 
     private function ArtoEnNumeric($string): string
     {
-        return strtr($string,
-            array('٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9')
+        return strtr(
+            $string,
+            ['٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9']
         );
     }
 }

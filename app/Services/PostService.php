@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Contracts\Repositories\CommentRepositoryInterface;
 use App\Contracts\Repositories\PostRepositoryInterface;
 use App\Models\Post;
-use Illuminate\Http\UploadedFile;
 
 class PostService
 {
@@ -13,9 +12,10 @@ class PostService
 
     private $commentRepository;
 
-    public function __construct(PostRepositoryInterface $postRepository,
-        CommentRepositoryInterface $commentRepository)
-    {
+    public function __construct(
+        PostRepositoryInterface $postRepository,
+        CommentRepositoryInterface $commentRepository
+    ) {
         $this->postRepository = $postRepository;
         $this->commentRepository = $commentRepository;
     }
@@ -39,7 +39,7 @@ class PostService
     }
 
     /**
-     * Update post media
+     * Update post media.
      * @param Post $post
      * @param array $data
      * @return Post

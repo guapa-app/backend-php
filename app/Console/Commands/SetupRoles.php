@@ -42,6 +42,7 @@ class SetupRoles extends Command
     {
         $adminRepo = (new AdminRepository((new Admin())));
         $authService = (new AuthService($adminRepo))->setupAdminAccount();
+
         return 0;
     }
 }

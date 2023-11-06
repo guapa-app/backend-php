@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\VendorController as ApiVendorController;
 use App\Http\Requests\VendorRequest;
-use Illuminate;
 use Illuminate\Http\Request;
 
 class VendorController extends ApiVendorController

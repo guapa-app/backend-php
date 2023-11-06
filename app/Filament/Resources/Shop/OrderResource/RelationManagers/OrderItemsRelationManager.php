@@ -69,7 +69,7 @@ class OrderItemsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('quantity'),
                 Tables\Columns\TextColumn::make('amount'),
                 Tables\Columns\TextColumn::make('offer.title'),
-                Tables\Columns\TextColumn::make('offer.discount')->label('Discount %')
+                Tables\Columns\TextColumn::make('offer.discount')->label('Discount %'),
             ]);
     }
 }

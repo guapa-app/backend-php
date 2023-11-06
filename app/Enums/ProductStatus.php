@@ -6,8 +6,8 @@ use Filament\Support\Contracts\HasLabel;
 
 enum ProductStatus: string implements HasLabel
 {
-    case Draft          = 'Draft';
-    case Published      = 'Published';
+    case Draft = 'Draft';
+    case Published = 'Published';
 
     public function getLabel(): string
     {

@@ -36,7 +36,7 @@ class WorkDayResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('day')
+                Tables\Columns\TextColumn::make('day'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

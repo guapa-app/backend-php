@@ -69,10 +69,10 @@ class Review extends Resource
 
         if (Auth::user()?->isVendor()) {
             switch ($this->resource->reviewable_type) {
-                case "vendor":
+                case 'vendor':
                     $flag = Auth::user()->vendor_id != $this->resource->reviewable->id;
                     break;
-                case "product":
+                case 'product':
                     $flag = Auth::user()->vendor_id != $this->resource->reviewable->vendor_id;
                     break;
                 default:

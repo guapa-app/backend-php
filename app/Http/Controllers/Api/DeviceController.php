@@ -9,7 +9,7 @@ use App\Services\UserService;
 class DeviceController extends BaseApiController
 {
     /**
-     * Add new device
+     * Add new device.
      *
      * @authenticated
      *
@@ -20,6 +20,7 @@ class DeviceController extends BaseApiController
     public function addDevice(DeviceRequest $request, UserService $service)
     {
         $data = $request->validated();
+
         return $service->addDevice($this->user, $data);
     }
 }

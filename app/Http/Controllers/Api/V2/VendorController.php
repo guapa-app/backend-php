@@ -7,8 +7,8 @@ use App\Http\Requests\VendorRequest;
 use App\Http\Resources\VendorCollection;
 use App\Http\Resources\VendorResource;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @group Vendors
@@ -21,7 +21,7 @@ class VendorController extends ApiVendorController
 
         return VendorCollection::make($index)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -32,7 +32,7 @@ class VendorController extends ApiVendorController
 
         return VendorResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -45,12 +45,13 @@ class VendorController extends ApiVendorController
 
                 return VendorResource::make($item)
                     ->additional([
-                        "success" => true,
+                        'success' => true,
                         'message' => __('api.created'),
                     ]);
             });
         } catch (Exception $exception) {
             $this->logReq($exception->getMessage());
+
             return $this->errorJsonRes(message: 'something went wrong');
         }
     }
@@ -61,7 +62,7 @@ class VendorController extends ApiVendorController
 
         return VendorResource::make($item)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.updated'),
             ]);
     }

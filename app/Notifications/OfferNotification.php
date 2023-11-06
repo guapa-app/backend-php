@@ -52,7 +52,7 @@ class OfferNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get fcm representation of the notification
+     * Get fcm representation of the notification.
      *
      * @param mixed $notifiable
      *
@@ -66,7 +66,7 @@ class OfferNotification extends Notification implements ShouldQueue
             'body'         => $this->getSummary(),
             'sound'        => 'default', // Optional
             'icon'         => '', // Optional
-            'click_action' => '' // Optional
+            'click_action' => '', // Optional
         ])->data([
             'type'         => 'new-offer',
             'product_id'   => $this->offer->product->id,

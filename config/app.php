@@ -84,7 +84,7 @@ return [
 
     'filament_available_locales' => [
         // 'ar' => ['dir' => 'rtl','name' => 'Arabic','native' => 'العربية','script' => 'Arab','flag_code' => 'sa',],
-        'en' => ['dir' => 'ltr','name' => 'English','native' => 'English','script' => 'Latn','flag_code' => 'us',],
+        'en' => ['dir' => 'ltr', 'name' => 'English', 'native' => 'English', 'script' => 'Latn', 'flag_code' => 'us'],
     ],
 
     'powered_by' => [

@@ -3,41 +3,41 @@
 namespace App\Models;
 
 use App\Traits\Listable as ListableTrait;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Review extends Model
 {
     use HasFactory, ListableTrait;
 
     protected $fillable = [
-    	'user_id', 'reviewable_id', 'reviewable_type',
-    	'stars', 'comment',
+        'user_id', 'reviewable_id', 'reviewable_type',
+        'stars', 'comment',
     ];
 
     protected $filterable = [
-    	'user_id', 'reviewable_id', 'reviewable_type', 'stars',
+        'user_id', 'reviewable_id', 'reviewable_type', 'stars',
     ];
 
     protected $search_attributes = [
-    	'comment',
+        'comment',
     ];
 
     const TYPES = [
         'product',
-        'vendor'
+        'vendor',
     ];
 
     public function reviewable()
     {
-    	return $this->morphTo();
+        return $this->morphTo();
     }
 
     public function user()
     {
-    	return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function scopeCurrentVendor($query, $value)
@@ -77,13 +77,15 @@ class Review extends Model
 
     public function scopeWithListRelations(Builder $query, Request $request) : Builder
     {
-    	$query->with('user', 'reviewable');
+        $query->with('user', 'reviewable');
+
         return $query;
     }
 
     public function scopeWithApiListRelations(Builder $query, Request $request) : Builder
     {
-    	$query->with('user');
+        $query->with('user');
+
         return $query;
     }
 
@@ -94,7 +96,8 @@ class Review extends Model
 
     public function scopeWithSingleRelations(Builder $query) : Builder
     {
-    	$query->with('user', 'reviewable');
+        $query->with('user', 'reviewable');
+
         return $query;
     }
 }

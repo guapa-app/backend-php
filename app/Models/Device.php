@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Device extends Model
 {
     /**
-     * Mass assignable attributes
+     * Mass assignable attributes.
      *
      * @var array
      */
@@ -23,7 +23,7 @@ class Device extends Model
     ];
 
     /**
-     * Get user for this device
+     * Get user for this device.
      * @return MorphTo
      */
     public function user(): MorphTo

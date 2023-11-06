@@ -26,7 +26,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         Messageable;
 
     /**
-     * User account statuses
+     * User account statuses.
      */
     public const STATUS_ACTIVE = 'Active';
     public const STATUS_CLOSED = 'Closed';
@@ -35,7 +35,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     const FAVORITE_TYPES = [
         'vendor',
         'product',
-        'post'
+        'post',
     ];
 
     /**
@@ -76,7 +76,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
 
     /**
      * Attributes that can be filtered directly
-     * using values from client without any logic
+     * using values from client without any logic.
      * @var array
      */
     protected $filterable_attributes = [
@@ -84,7 +84,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     ];
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
@@ -92,7 +92,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     ];
 
     /**
-     * Attributes to be appended to each user
+     * Attributes to be appended to each user.
      * @var array
      */
     protected $appends = [
@@ -100,7 +100,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     ];
 
     /**
-     * Define guard name for the roles package
+     * Define guard name for the roles package.
      *
      * @var  string
      */
@@ -114,6 +114,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function findForPassport($username)
     {
         $isEmail = filter_var($username, FILTER_VALIDATE_EMAIL);
+
         return $isEmail ?
             $this->where('email', $username)->first() :
             $this->whereIn('phone', Common::getPhoneVariations($username))
@@ -133,6 +134,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function getRoleAttribute()
     {
         $relations = $this->getRelations();
+
         return isset($relations['roles']) ? $relations['roles']->pluck('name') : [];
     }
 
@@ -169,7 +171,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
 
     public function hasVendor(int $vendorId)
     {
-        return (bool)$this->userVendors()->where([
+        return (bool) $this->userVendors()->where([
             'vendor_id' => $vendorId,
         ])->exists();
     }
@@ -262,6 +264,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
                 $join->on('users.id', '=', 'user_profiles.user_id');
                 $join->where('user_profiles.gender', $gender);
             });
+
         return $query;
     }
 

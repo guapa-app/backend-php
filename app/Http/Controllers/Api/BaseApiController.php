@@ -25,7 +25,7 @@ class BaseApiController extends Controller
     }
 
     /**
-     * Application data
+     * Application data.
      *
      * @unauthenticated
      *
@@ -54,17 +54,19 @@ class BaseApiController extends Controller
     public function address_types()
     {
         $types = Address::TYPES;
+
         return Common::mapIdName($types);
     }
 
     public function vendor_types()
     {
         $types = Vendor::TYPES;
+
         return Common::mapIdName($types);
     }
 
     /**
-     * Application pages
+     * Application pages.
      *
      * @unauthenticated
      *
@@ -73,13 +75,14 @@ class BaseApiController extends Controller
     public function pages()
     {
         $pageRepository = resolve(PageRepositoryInterface::class);
+
         return $this->successJsonRes([
-            "items" => $pageRepository->getAll()
+            'items' => $pageRepository->getAll(),
         ], __('api.success'));
     }
 
     /**
-     * Contact support
+     * Contact support.
      *
      * @responseFile 200 responses/general/contact.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -98,7 +101,7 @@ class BaseApiController extends Controller
 
         return SupportMessageResource::make($record)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }

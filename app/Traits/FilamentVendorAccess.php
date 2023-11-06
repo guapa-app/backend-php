@@ -5,7 +5,6 @@ namespace App\Traits;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-
 trait FilamentVendorAccess
 {
     public static function getEloquentQuery(): Builder

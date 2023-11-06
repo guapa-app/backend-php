@@ -8,16 +8,15 @@ use Hamedov\PassportGrants\PassportGrant;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\Bridge\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Exception\OAuthServerException;
 
 class Sinch extends PassportGrant
 {
-	/**
-	 * Unique string that identifies this grant.
-	 * and will be used as grant_type during access
-	 * token requests.
-	 * @var string
-	 */
+    /**
+     * Unique string that identifies this grant.
+     * and will be used as grant_type during access
+     * token requests.
+     * @var string
+     */
     protected $identifier = 'sinch_verify';
 
     /**
@@ -27,7 +26,7 @@ class Sinch extends PassportGrant
      * @var array
      */
     protected $authParams = [
-    	'phone_number', 'otp',
+        'phone_number', 'otp',
     ];
 
     /**
@@ -42,9 +41,13 @@ class Sinch extends PassportGrant
      * @return \Laravel\Passport\Bridge\User|null
      * @throws \League\OAuth2\Server\Exception\OAuthServerException
      */
-    protected function getUserEntityByAuthParams(Model $model, $authParams,
-        $guard, $grantType, ClientEntityInterface $clientEntity)
-    {
+    protected function getUserEntityByAuthParams(
+        Model $model,
+        $authParams,
+        $guard,
+        $grantType,
+        ClientEntityInterface $clientEntity
+    ) {
         // It is hard to get a valid firebase jwt token while testing
         // So we will override verification while testing
         $isTesting = config('app.env') === 'testing';
@@ -79,7 +82,7 @@ class Sinch extends PassportGrant
     }
 
     /**
-     * Create new user using phone number
+     * Create new user using phone number.
      */
     public function createNewUser($model, $phone)
     {

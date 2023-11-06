@@ -12,7 +12,6 @@ return [
      */
     'description' => '',
 
-
     /*
      * Tell Scribe what routes to generate documentation for.
      * Each group contains rules defining which routes should be included ('match', 'include' and 'exclude' sections)
@@ -166,7 +165,7 @@ return [
         'middleware' => [],
     ],
 
-    /**
+    /*
      * Add a Try It Out button to your endpoints so consumers can test endpoints right from their browser.
      * Don't forget to enable CORS headers for your endpoints.
      */
@@ -221,7 +220,7 @@ return [
     /*
      * Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
      */
-    'intro_text' => <<<INTRO
+    'intro_text' => <<<'INTRO'
 This documentation aims to provide all the information you need to work with our API.
 
 <aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
@@ -307,7 +306,7 @@ INTRO
      */
     'faker_seed' => null,
 
-    /**
+    /*
      * The strategies Scribe will use to extract information about your routes at each stage.
      * If you write or install a custom strategy, add it here.
      */
@@ -360,16 +359,16 @@ INTRO
      */
     'routeMatcher' => \Knuckles\Scribe\Matching\RouteMatcher::class,
 
-    /**
+    /*
      * [Advanced] If one of your app's database drivers does not support transactions,
      * docs generation (instantiating Eloquent models and making response calls) will likely fail.
      * To avoid that, you can add the driver class name here. Be warned: that means all database changes will persist.
      */
     'continue_without_database_transactions' => [],
 
-    /**
+    /*
      * For response calls, api resource responses and transformer responses, Scribe will try to start database transactions, so no changes are persisted to your database.
      * Tell Scribe which connections should be transacted here. If you only use the default db connection, you can leave this as is.
      */
-    'database_connections_to_transact' => [config('database.default')]
+    'database_connections_to_transact' => [config('database.default')],
 ];

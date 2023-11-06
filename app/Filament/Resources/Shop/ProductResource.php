@@ -6,6 +6,8 @@ use App\Enums\ProductReview;
 use App\Enums\ProductStatus;
 use App\Enums\ProductType;
 use App\Filament\Resources\Shop\ProductResource\Pages;
+use App\Filament\Resources\Shop\ProductResource\RelationManagers;
+use App\Helpers\Common;
 use App\Models\Product;
 use App\Traits\FilamentVendorAccess;
 use Filament\Forms;
@@ -13,8 +15,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Filament\Resources\Shop\ProductResource\RelationManagers;
-use App\Helpers\Common;
 
 class ProductResource extends Resource
 {

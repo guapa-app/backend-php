@@ -9,7 +9,7 @@ use Moyasar\Providers\PaymentService as MoyasarPaymentService;
 
 class PaymentService
 {
-    function generateInvoice($orders, $description, $fees, $taxes)
+    public function generateInvoice($orders, $description, $fees, $taxes)
     {
         $invoice = $this->storeInvoice($orders, $description, $fees, $taxes);
 
@@ -25,19 +25,19 @@ class PaymentService
     {
         $invoice = Invoice::query()->create([
             'order_id'     => $orders->first()->id,
-            'status'       => "initiated",
+            'status'       => 'initiated',
             'expired_at'   => Carbon::now()->addDays('14'),
             'taxes'        => (int) $taxes * 100,
-            'amount'       => (int)(($fees + $taxes) * 100),
+            'amount'       => (int) (($fees + $taxes) * 100),
             'description'  => "You will pay the fees and taxes for \n" . $description,
-            'currency'     => config("nova.currency"),
-            'callback_url' => config("app.url") . "/api/v1/invoices/change-status",
+            'currency'     => config('nova.currency'),
+            'callback_url' => config('app.url') . '/api/v1/invoices/change-status',
         ]);
 
         return $invoice;
     }
 
-    function moyasarInvoice($invoice)
+    public function moyasarInvoice($invoice)
     {
         $invoiceService = new InvoiceService();
         $invoiceService = $invoiceService->create($invoice->toArray());
@@ -45,13 +45,13 @@ class PaymentService
         return $invoiceService;
     }
 
-    function updateInvoice($invoice, $invoiceService)
+    public function updateInvoice($invoice, $invoiceService)
     {
         $invoice->updateOrFail([
-            "invoice_id" => $invoiceService->id,
-            "amount_format" => $invoiceService->amountFormat,
-            "logo_url" => $invoiceService->logoUrl,
-            "url" => $invoiceService->url,
+            'invoice_id' => $invoiceService->id,
+            'amount_format' => $invoiceService->amountFormat,
+            'logo_url' => $invoiceService->logoUrl,
+            'url' => $invoiceService->url,
         ]);
     }
 
@@ -61,18 +61,18 @@ class PaymentService
         $invoiceService = new InvoiceService();
         $invoiceService = $invoiceService->fetch($invoice->invoice_id);
 
-        if(!empty($invoiceService->payments) && $invoiceService->payments[0]->status == "paid") {
+        if (!empty($invoiceService->payments) && $invoiceService->payments[0]->status == 'paid') {
             $paymentService = new MoyasarPaymentService();
             $paymentService = $paymentService->fetch($invoiceService->payments[0]->id);
             $paymentService->refund();
-            $invoice->update(['status' => "refunded"]);
-        }else{
+            $invoice->update(['status' => 'refunded']);
+        } else {
             $invoiceService->cancel();
-            $invoice->update(['status' => "canceled"]);
+            $invoice->update(['status' => 'canceled']);
         }
 
-        # delete Invoice pdf
-        if($order->invoice_url) {
+        // delete Invoice pdf
+        if ($order->invoice_url) {
             (new PDFService)->deletePDF($order->invoice_url);
             $order->update(['invoice_url' => null]);
         }

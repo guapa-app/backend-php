@@ -13,18 +13,20 @@ class AuthController extends ApiAuthController
     public function register(RegisterRequest $request)
     {
         list($token, $user) = parent::register($request);
+
         return response()->json([
             'token' => $token,
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
     public function login(Request $request)
     {
         list($token, $user) = parent::login($request);
+
         return response()->json([
             'token' => $token,
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -41,7 +43,8 @@ class AuthController extends ApiAuthController
     public function logout(Request $request)
     {
         parent::logout($request);
-        return response()->json(["message" => __('api.success')]);
+
+        return response()->json(['message' => __('api.success')]);
     }
 
     public function verify(Request $request)
@@ -52,13 +55,15 @@ class AuthController extends ApiAuthController
     public function deleteAccount(Request $request)
     {
         parent::deleteAccount($request);
-        return response()->json(["message" => __('api.account_deleted')]);
+
+        return response()->json(['message' => __('api.account_deleted')]);
     }
 
     public function sendSinchOtp(PhoneRequest $request)
     {
         parent::sendSinchOtp($request);
-        return response()->json(["message" => __('api.otp_sent')]);
+
+        return response()->json(['message' => __('api.otp_sent')]);
     }
 
     public function verifySinchOtp(VerifyPhoneRequest $request)
@@ -89,5 +94,4 @@ class AuthController extends ApiAuthController
             ], 200);
         }
     }
-
 }

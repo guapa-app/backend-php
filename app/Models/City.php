@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Traits\Listable as ListableTrait;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Spatie\Translatable\HasTranslations;
 
 class City extends Model implements Listable
@@ -14,15 +14,15 @@ class City extends Model implements Listable
     use ListableTrait, HasTranslations;
 
     protected $fillable = [
-    	'name',
+        'name',
     ];
 
     protected $translatable = [
-    	'name',
+        'name',
     ];
 
     /**
-     * Attributes to be searched using like operator
+     * Attributes to be searched using like operator.
      * @var array
      */
     protected $search_attributes = [
@@ -39,7 +39,7 @@ class City extends Model implements Listable
         $query->searchLike($request);
 
         $query->applyDirectFilters($request);
-        
+
         return $query;
     }
 

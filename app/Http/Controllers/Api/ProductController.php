@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @group Products
- *
  */
 class ProductController extends BaseApiController
 {
@@ -28,7 +27,7 @@ class ProductController extends BaseApiController
     }
 
     /**
-     * Products listing
+     * Products listing.
      *
      * @unauthenticated
      *
@@ -58,7 +57,7 @@ class ProductController extends BaseApiController
     }
 
     /**
-     * Get Product by id
+     * Get Product by id.
      *
      * @unauthenticated
      *
@@ -72,7 +71,7 @@ class ProductController extends BaseApiController
      */
     public function single($id)
     {
-        $product = $this->productRepository->getOneWithRelations((int)$id);
+        $product = $this->productRepository->getOneWithRelations((int) $id);
 
         $product->description = strip_tags($product->description);
 
@@ -82,7 +81,7 @@ class ProductController extends BaseApiController
     }
 
     /**
-     * Create product
+     * Create product.
      *
      * @responseFile 200 responses/products/create.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
@@ -101,7 +100,7 @@ class ProductController extends BaseApiController
     }
 
     /**
-     * Update product
+     * Update product.
      *
      *
      * @urlParam id required Product id
@@ -121,7 +120,7 @@ class ProductController extends BaseApiController
     }
 
     /**
-     * Delete product
+     * Delete product.
      *
      * @responseFile 200 responses/products/delete.json
      * @responseFile 404 scenario="Product not found" responses/errors/404.json
@@ -130,7 +129,7 @@ class ProductController extends BaseApiController
      *
      * @urlParam id required Product id
      *
-     * @param integer $id
+     * @param int $id
      *
      * @return int
      */

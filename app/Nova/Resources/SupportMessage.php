@@ -33,7 +33,7 @@ class SupportMessage extends Resource
      */
     public static $search = [
         'id',
-        'subject', 'body', 'phone'
+        'subject', 'body', 'phone',
     ];
 
     /**

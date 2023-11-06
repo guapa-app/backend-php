@@ -76,7 +76,7 @@ class Category extends Resource
                 ->displayUsingLabels()
                 ->required(),
 
-            BelongsTo::make('parent', 'parent', Category::class)->showCreateRelationButton()->nullable(),
+            BelongsTo::make('parent', 'parent', self::class)->showCreateRelationButton()->nullable(),
 
             DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),

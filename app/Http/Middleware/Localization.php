@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
-
 class Localization
 {
     /**
@@ -41,6 +40,7 @@ class Localization
         $this->app->setLocale($locale);
         $response = $next($request);
         $response->headers->set('Accept-Language', $locale);
+
         return $response;
     }
 }

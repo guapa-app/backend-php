@@ -22,3 +22,4 @@ storage/media-library/
 /.idea
 /.vscode
 TODO.md
+.php-cs-fixer.dist.php

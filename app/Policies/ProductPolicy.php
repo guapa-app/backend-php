@@ -25,7 +25,6 @@ class ProductPolicy
         }
     }
 
-
     /**
      * Determine whether the user can view any models.
      *
@@ -69,7 +68,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product)
     {
-       return true;
+        return true;
     }
 
     /**

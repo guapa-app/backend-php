@@ -6,11 +6,11 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\RegisterVendorRequest;
 use App\Services\UserService;
 use App\Services\VendorService;
+use Exception;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Exception;
 
 class RegistrationController extends BaseApiController
 {
@@ -23,7 +23,8 @@ class RegistrationController extends BaseApiController
         $this->vendorService = $vendorService;
     }
 
-    public function registerForm(){
+    public function registerForm()
+    {
         return view('register', $this->data());
     }
 
@@ -32,8 +33,7 @@ class RegistrationController extends BaseApiController
         try {
             $data = $request->validated();
 
-            DB::transaction(function() use ($data){
-
+            DB::transaction(function () use ($data) {
                 $user_data = $data['user'];
 
                 $user_data += [
@@ -42,7 +42,7 @@ class RegistrationController extends BaseApiController
                         'firstname'     => $user_data['firstname'] ?? null,
                         'lastname'      => $user_data['lastname'] ?? null,
                     ],
-                    "password" => Hash::make($user_data['password'])
+                    'password' => Hash::make($user_data['password']),
                 ];
 
                 $user = $this->userService->create($user_data);
@@ -57,9 +57,9 @@ class RegistrationController extends BaseApiController
             Auth::logout();
 
             return back()->with('success', __('success'));
-
         } catch (Exception $exception) {
             $this->logReq($exception->getMessage());
+
             return back()->with('error', 'something went wrong, please contact support');
         }
     }

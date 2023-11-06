@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Vendor;
-use Illuminate\Http\JsonResponse;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Http\Requests\StaffRequest;
+use App\Models\Vendor;
 use App\Services\VendorService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -21,17 +21,18 @@ class StaffController extends BaseApiController
 
     private $vendorService;
 
-    public function __construct(VendorRepositoryInterface $vendorRepository,
-                                UserRepositoryInterface   $userRepository,
-                                VendorService $vendorService)
-    {
+    public function __construct(
+        VendorRepositoryInterface $vendorRepository,
+        UserRepositoryInterface $userRepository,
+        VendorService $vendorService
+    ) {
         $this->vendorRepository = $vendorRepository;
         $this->userRepository = $userRepository;
         $this->vendorService = $vendorService;
     }
 
     /**
-     * Get vendor staff
+     * Get vendor staff.
      *
      * @responseFile 200 responses/staff/list.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -56,7 +57,7 @@ class StaffController extends BaseApiController
     }
 
     /**
-     * Create staff
+     * Create staff.
      *
      * @responseFile 200 responses/staff/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -76,7 +77,7 @@ class StaffController extends BaseApiController
     }
 
     /**
-     * Update staff
+     * Update staff.
      *
      * @responseFile 200 responses/staff/create.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -97,7 +98,7 @@ class StaffController extends BaseApiController
     }
 
     /**
-     * Delete staff
+     * Delete staff.
      *
      * @responseFile 200 responses/staff/delete.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -110,11 +111,11 @@ class StaffController extends BaseApiController
 
         $this->validateVendorManager($vendor);
 
-        return $this->vendorService->deleteStaff((int)$userId, $vendor);
+        return $this->vendorService->deleteStaff((int) $userId, $vendor);
     }
 
     /**
-     * Validate that current user manages given vendor
+     * Validate that current user manages given vendor.
      *
      * @param Vendor $vendor
      * @return void

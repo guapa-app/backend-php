@@ -10,7 +10,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * @group Favorites
- *
  */
 class FavoriteController extends BaseApiController
 {
@@ -24,7 +23,7 @@ class FavoriteController extends BaseApiController
     }
 
     /**
-     * Get favorites
+     * Get favorites.
      *
      * @authenticated
      *
@@ -45,7 +44,7 @@ class FavoriteController extends BaseApiController
     }
 
     /**
-     * Add entity to favorites
+     * Add entity to favorites.
      *
      * @responseFile 200 scenario="Add product to favorites" responses/favorites/add-product.json
      * @responseFile 200 scenario="Add vendor to favorites" responses/favorites/add-vendor.json
@@ -58,12 +57,13 @@ class FavoriteController extends BaseApiController
     public function create(FavoriteRequest $request)
     {
         $data = $request->validated();
+
         return $this->favoritesService
             ->addFavorite($this->user, $data['type'], $data['id']);
     }
 
     /**
-     * Delete Favorite
+     * Delete Favorite.
      *
      * @responseFile 200 scenario="Remove entity from favorites" responses/favorites/remove-favorite.json
      * @responseFile 404 scenario="Invalid id/type" responses/errors/404.json
@@ -74,7 +74,6 @@ class FavoriteController extends BaseApiController
      *
      * @param string $type
      * @param int $id
-     *
      */
     public function delete($type, $id)
     {

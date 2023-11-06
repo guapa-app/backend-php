@@ -120,7 +120,6 @@ class VendorRequest extends FormRequest
 
             $rules['verified'] = 'required|boolean';
             $rules['status'] = 'required|in:0,1';
-
         } elseif (!is_numeric($id)) {
             // Api vendor registration
             // $rules = array_merge($rules, [

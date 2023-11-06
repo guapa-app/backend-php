@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Info\WorkDayResource\Pages;
 
 use App\Filament\Resources\Info\WorkDayResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateWorkDay extends CreateRecord

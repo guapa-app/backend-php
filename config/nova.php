@@ -110,7 +110,7 @@ return [
         Authenticate::class,
         Authorize::class,
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Nova Pagination Type

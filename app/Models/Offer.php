@@ -29,7 +29,7 @@ class Offer extends Model implements Listable, HasMedia
 
     protected $appends = [
         'discount_string', 'status',
-        'expires_countdown','price'
+        'expires_countdown', 'price',
     ];
 
     protected $search_attributes = [
@@ -46,7 +46,7 @@ class Offer extends Model implements Listable, HasMedia
     ];
 
     /**
-     * Register media collections
+     * Register media collections.
      * @return void
      */
     public function registerMediaCollections(): void
@@ -55,7 +55,7 @@ class Offer extends Model implements Listable, HasMedia
     }
 
     /**
-     * Register media conversions
+     * Register media conversions.
      * @param BaseMedia|null $media
      * @return void
      * @throws InvalidManipulation
@@ -78,7 +78,7 @@ class Offer extends Model implements Listable, HasMedia
     public function getExpiresCountdownAttribute(): string
     {
         $difference = Carbon::parse($this->expires_at)->diff(now());
-        
+
         $daysString = Common::getLocalizedUnitString($difference->days, 'day');
 
         return __('api.the_offer_expires_in', ['countdown' => $daysString]);
@@ -96,8 +96,11 @@ class Offer extends Model implements Listable, HasMedia
 
     public function setDescriptionAttribute($value)
     {
-        $value = str_replace(['<p>', '</p>', '<br>', '<br/>', '<br />'],
-            ['', "\n", "\n", "\n", "\n"], $value);
+        $value = str_replace(
+            ['<p>', '</p>', '<br>', '<br/>', '<br />'],
+            ['', "\n", "\n", "\n", "\n"],
+            $value
+        );
 
         $this->attributes['description'] = strip_tags($value);
     }
@@ -126,7 +129,7 @@ class Offer extends Model implements Listable, HasMedia
     }
 
     /**
-     * Offer image relationship
+     * Offer image relationship.
      * @return MorphOne
      */
     public function image(): MorphOne
@@ -185,6 +188,7 @@ class Offer extends Model implements Listable, HasMedia
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('image');
+
         return $query;
     }
 
@@ -196,6 +200,7 @@ class Offer extends Model implements Listable, HasMedia
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('product', 'image');
+
         return $query;
     }
 

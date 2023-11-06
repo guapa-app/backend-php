@@ -19,6 +19,7 @@ class SupportMessageRequest extends FormRequest
     public function authorize()
     {
         $id = $this->route('id');
+
         return is_numeric($id) ?
             $this->user() && $this->user()->isAdmin() :
             true;

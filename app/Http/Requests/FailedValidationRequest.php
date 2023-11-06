@@ -13,8 +13,8 @@ abstract class FailedValidationRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => implode(",", Arr::flatten($validator->errors()->toArray())),
-            'errors' => $validator->errors()
+            'message' => implode(',', Arr::flatten($validator->errors()->toArray())),
+            'errors' => $validator->errors(),
         ], 422));
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 /**
@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class NotificationController extends BaseApiController
 {
     /**
-     * Get user notifications
+     * Get user notifications.
      *
      * Notification types and corresponding data
      * new-product, new-service => product_id
@@ -49,7 +49,7 @@ class NotificationController extends BaseApiController
     }
 
     /**
-     * Get only unread notifications
+     * Get only unread notifications.
      *
      * @responseFile 200 responses/notifications/list.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -79,7 +79,7 @@ class NotificationController extends BaseApiController
     }
 
     /**
-     * Get unread notifications count
+     * Get unread notifications count.
      *
      * @responseFile 200 responses/notifications/unread_count.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -92,7 +92,7 @@ class NotificationController extends BaseApiController
     }
 
     /**
-     * Mark all as read
+     * Mark all as read.
      *
      * @responseFile 200 responses/notifications/mark_read.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
@@ -106,7 +106,7 @@ class NotificationController extends BaseApiController
     }
 
     /**
-     * Mark notification as read
+     * Mark notification as read.
      *
      * @urlParam id required Notification id
      *
@@ -117,12 +117,12 @@ class NotificationController extends BaseApiController
      *
      * @return int
      */
-    public function markRead(string $notification_id = "")
+    public function markRead(string $notification_id = '')
     {
         return $this->user->unreadNotifications()
             ->where('id', $notification_id)
             ->update([
-                'read_at' => Carbon::now()
+                'read_at' => Carbon::now(),
             ]);
     }
 }

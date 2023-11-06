@@ -6,10 +6,9 @@ use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Events\ProductCreated;
 use App\Helpers\Common;
 use App\Models\Product;
-use Illuminate\Http\UploadedFile;
 
 /**
- * Product service
+ * Product service.
  */
 class ProductService
 {
@@ -26,7 +25,7 @@ class ProductService
     }
 
     /**
-     * Create new product with relations
+     * Create new product with relations.
      * @param array $data
      * @return Product
      */
@@ -71,7 +70,7 @@ class ProductService
     }
 
     /**
-     * Update product media
+     * Update product media.
      * @param Product $product
      * @param array $data
      * @return Product
@@ -89,6 +88,7 @@ class ProductService
     {
         $product->setTaxonomies($categories, 'specialty');
         $product->load('categories');
+
         return $product;
     }
 

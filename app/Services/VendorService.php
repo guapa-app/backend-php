@@ -14,28 +14,28 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Redis;
 
 /**
- * Vendor service
+ * Vendor service.
  */
 class VendorService
 {
     private $vendorRepository;
     private $userRepository;
 
-    public function __construct(VendorRepositoryInterface $vendorRepository, UserRepositoryInterface   $userRepository)
+    public function __construct(VendorRepositoryInterface $vendorRepository, UserRepositoryInterface $userRepository)
     {
         $this->vendorRepository = $vendorRepository;
         $this->userRepository = $userRepository;
     }
 
     /**
-     * Create new vendor with relations
+     * Create new vendor with relations.
      *
      * @param array $data
      * @return Vendor
      */
     public function create(array $data): Vendor
     {
-        /* 
+        /*
         * overwrite defualt status value from migration file.
         * should remove default values from migrations
         */
@@ -180,11 +180,12 @@ class VendorService
     {
         $vendor->setTaxonomies($specialties, 'specialty');
         $vendor->load('specialties');
+
         return $vendor;
     }
 
     /**
-     * Create vendor address
+     * Create vendor address.
      * @param Vendor $vendor
      * @param array $data
      * @return Vendor
@@ -192,11 +193,12 @@ class VendorService
     public function createAddress(Vendor $vendor, array $data): Vendor
     {
         $address = $vendor->addresses()->create($data);
+
         return $vendor;
     }
 
     /**
-     * Update vendor staff
+     * Update vendor staff.
      * @param Vendor $vendor
      * @param array $data
      * @return Vendor
@@ -264,11 +266,11 @@ class VendorService
 
     public function share(int $id): int
     {
-        return (int)Redis::hincrby("vendor:{$id}", 'shares_count', 1);
+        return (int) Redis::hincrby("vendor:{$id}", 'shares_count', 1);
     }
 
     public function view(int $id): int
     {
-        return (int)Redis::hincrby("vendor:{$id}", 'views_count', 1);
+        return (int) Redis::hincrby("vendor:{$id}", 'views_count', 1);
     }
 }

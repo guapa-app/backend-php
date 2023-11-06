@@ -3,7 +3,7 @@
 namespace App\Contracts\Repositories;
 
 /**
- * Offer Repository Interface
+ * Offer Repository Interface.
  */
 interface OfferRepositoryInterface
 {

@@ -17,9 +17,10 @@ class AuthController extends ApiAuthController
         list($token, $user) = parent::register($request);
 
         $user->access_token = $token;
+
         return UserResource::make($user)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -29,9 +30,10 @@ class AuthController extends ApiAuthController
         list($token, $user) = parent::login($request);
 
         $user->access_token = $token;
+
         return UserResource::make($user)
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -40,7 +42,7 @@ class AuthController extends ApiAuthController
     {
         return UserResource::make(parent::user())
             ->additional([
-                "success" => true,
+                'success' => true,
                 'message' => __('api.success'),
             ]);
     }
@@ -53,6 +55,7 @@ class AuthController extends ApiAuthController
     public function logout(Request $request)
     {
         parent::logout($request);
+
         return $this->successJsonRes([], __('api.success'));
     }
 
@@ -60,10 +63,11 @@ class AuthController extends ApiAuthController
     {
         try {
             $res = parent::verify($request);
+
             return $this->successJsonRes($res);
         } catch (\Throwable $th) {
             return $this->errorJsonRes([
-                'phone' => [__('api.phone_verification_failed')]
+                'phone' => [__('api.phone_verification_failed')],
             ], __('api.phone_verification_failed'), 422);
         }
     }
@@ -71,6 +75,7 @@ class AuthController extends ApiAuthController
     public function deleteAccount(Request $request)
     {
         parent::deleteAccount($request);
+
         return $this->successJsonRes([], __('api.account_deleted'));
     }
 
@@ -79,34 +84,35 @@ class AuthController extends ApiAuthController
         try {
             if (Setting::checkTestingMode()) {
                 return $this->successJsonRes([
-                    "is_otp_sent" => true,
-                    "otp" => 1111
+                    'is_otp_sent' => true,
+                    'otp' => 1111,
                 ], __('api.otp_sent'), 200);
             }
 
             parent::sendSinchOtp($request);
 
             return $this->successJsonRes([
-                "is_otp_sent" => true
+                'is_otp_sent' => true,
             ], __('api.otp_sent'), 200);
         } catch (\Throwable $th) {
             if ($th instanceof \Illuminate\Validation\ValidationException) {
                 throw $th;
             }
-            $res = json_decode((string)$th->getResponse()?->getBody());
+            $res = json_decode((string) $th->getResponse()?->getBody());
             if ($th instanceof \GuzzleHttp\Exception\ClientException) {
                 if ($th->getCode() == 402) {
                     // 402 Not enough credit.
                 } elseif ($th->getCode() == 400) {
                     // 400 Invalid phone number.
                     return $this->errorJsonRes([
-                        'phone' => [__('api.invalid_phone')]
+                        'phone' => [__('api.invalid_phone')],
                     ], __('api.otp_not_sent'), 422);
                 }
             }
             $this->logReq($res?->message);
+
             return $this->successJsonRes([
-                "is_otp_sent" => false
+                'is_otp_sent' => false,
             ], __('api.contact_support'), 422);
         }
     }
@@ -115,18 +121,18 @@ class AuthController extends ApiAuthController
     {
         if (Setting::checkTestingMode()) {
             return $this->successJsonRes([
-                "is_otp_verified" => true
+                'is_otp_verified' => true,
             ], __('api.correct_otp'), 200);
         }
 
         $bool = parent::verifySinchOtp($request);
         if ($bool) {
             return $this->successJsonRes([
-                "is_otp_verified" => true
+                'is_otp_verified' => true,
             ], __('api.correct_otp'), 200);
         } else {
             return $this->errorJsonRes([
-                'otp' => [__('api.incorrect_otp')]
+                'otp' => [__('api.incorrect_otp')],
             ], __('api.incorrect_otp'), 406);
         }
     }
@@ -137,11 +143,11 @@ class AuthController extends ApiAuthController
 
         if ($user == null) {
             return $this->successJsonRes([
-                "is_phone_exists" => false
+                'is_phone_exists' => false,
             ], __('api.phone_doesnt_exist'), 200);
         } else {
             return $this->successJsonRes([
-                "is_phone_exists" => true
+                'is_phone_exists' => true,
             ], __('api.phone_exist'), 200);
         }
     }

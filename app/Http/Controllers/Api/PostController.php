@@ -22,7 +22,7 @@ class PostController extends BaseApiController
     }
 
     /**
-     * Posts list
+     * Posts list.
      *
      * @unauthenticated
      *
@@ -46,7 +46,7 @@ class PostController extends BaseApiController
     }
 
     /**
-     * Get post by id
+     * Get post by id.
      *
      * @unauthenticated
      *
@@ -60,7 +60,7 @@ class PostController extends BaseApiController
      */
     public function single($id)
     {
-        $post = $this->postRepository->getOneWithRelations((int)$id);
+        $post = $this->postRepository->getOneWithRelations((int) $id);
 
         $post->content = strip_tags($post->content);
 

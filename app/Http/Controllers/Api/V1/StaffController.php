@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\StaffController as ApiStaffController;
 use App\Http\Requests\StaffRequest;
-use Illuminate;
 use Illuminate\Http\Request;
 
 class StaffController extends ApiStaffController

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     // Api versions
     'api_version' => env('API_VERSION', 'v1'),
     'admin_api_version' => env('ADMIN_API_VERSION', 'v1'),

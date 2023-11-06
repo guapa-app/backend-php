@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Shop\ProductResource\RelationManagers;
 
-use Filament\Actions\CreateAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
@@ -58,7 +57,7 @@ class OfferRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price')
                     ->numeric(),
                 Tables\Columns\TextColumn::make('discount')
-                    ->formatStateUsing(fn ($state): string => $state . "%"),
+                    ->formatStateUsing(fn ($state): string => $state . '%'),
                 Tables\Columns\TextColumn::make('title'),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->date(),
