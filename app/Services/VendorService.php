@@ -107,6 +107,7 @@ class VendorService
         ]);
 
         $newRoles = UserVendor::where('user_id', $user->id)->pluck('role')->toArray();
+
         if ($user->hasRole('patient')) {
             $newRoles[] = 'patient';
         }

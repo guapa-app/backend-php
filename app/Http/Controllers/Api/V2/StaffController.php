@@ -30,11 +30,18 @@ class StaffController extends ApiStaffController
 
     public function update(StaffRequest $request, $userId)
     {
-        return UserResource::make(parent::update($request, $userId))
-            ->additional([
-                'success' => true,
-                'message' => __('api.success'),
-            ]);
+        try {
+            return UserResource::make(parent::update($request, $userId))
+                ->additional([
+                    'success' => true,
+                    'message' => __('api.success'),
+                ]);
+        } catch (\Throwable $th) {
+            return $this->errorJsonRes([
+                'is_updated' => false,
+                'user' => $th->getMessage(),
+            ], __('api.contact_support'), 422);
+        }
     }
 
     public function delete($userId, $vendorId)

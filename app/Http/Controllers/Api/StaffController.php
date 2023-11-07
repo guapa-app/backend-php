@@ -93,6 +93,7 @@ class StaffController extends BaseApiController
         $vendor = $this->vendorRepository->getOneOrFail($data['vendor_id']);
 
         $this->validateVendorManager($vendor);
+        $this->validateUserBelongsToVendor($vendor, $userToUpdate);
 
         return $this->vendorService->updateSingleStaff($vendor, $userToUpdate, $data);
     }
@@ -126,6 +127,19 @@ class StaffController extends BaseApiController
 
         if (!$vendor->hasManager($user)) {
             abort(403, 'You must be a manager to manage staff of this vendor');
+        }
+    }
+
+    /**
+     * Validate that current vendor can update requested user.
+     *
+     * @param Vendor $vendor
+     * @return void
+     */
+    public function validateUserBelongsToVendor($vendor, $user): void
+    {
+        if (!$vendor->hasUser($user)) {
+            abort(403, 'This user does not belong to this manager');
         }
     }
 }
