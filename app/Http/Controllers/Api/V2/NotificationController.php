@@ -28,7 +28,7 @@ class NotificationController extends ApiNotificationController
 
     public function unread_count()
     {
-        return $this->successJsonRes(['count' => parent::unread_count()]);
+        return $this->successJsonRes(['count' => parent::unread_count()], __('api.success'));
     }
 
     public function markAllAsRead()
@@ -42,6 +42,8 @@ class NotificationController extends ApiNotificationController
     {
         parent::markRead($notification_id);
 
-        return $this->successJsonRes([], __('api.success'));
+        return $this->successJsonRes([
+            'is_read' => true,
+        ], __('api.success'));
     }
 }

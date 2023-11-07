@@ -33,7 +33,7 @@ class Controller extends BaseController
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data,
+            'data' => (object) $data,
         ], $status);
     }
 
@@ -50,11 +50,11 @@ class Controller extends BaseController
     {
         Log::alert(
             '***' .
-            "\nMessage >-> $message" .
-            "\nReq method >-> " . request()->method() .
-            "\nPath >-> " . request()->decodedPath() .
-            "\nRoute name >-> " . request()->route()->getName() .
-            "\n***",
+                "\nMessage >-> $message" .
+                "\nReq method >-> " . request()->method() .
+                "\nPath >-> " . request()->decodedPath() .
+                "\nRoute name >-> " . request()->route()->getName() .
+                "\n***",
             [
                 "\nRequest Data >-> " => request()->all(),
             ]
