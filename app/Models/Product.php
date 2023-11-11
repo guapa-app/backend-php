@@ -327,8 +327,8 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with([
-            'vendor', 'vendor.logo', 'offer', 'offer.image',
-            'media', 'taxonomies', 'addresses', 'vendor.appointments',
+            'vendor', 'vendor.logo', 'vendor.addresses', 'offer', 'offer.image',
+            'media', 'taxonomies', 'vendor.appointments',
             'vendor.workDays',
         ]);
 

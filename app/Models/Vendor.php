@@ -381,7 +381,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments');
+        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses');
         $query->withCount('products', 'offers', 'services', 'orders_order', 'orders_consultations');
 
         return $query;

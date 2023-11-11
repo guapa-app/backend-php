@@ -56,6 +56,7 @@ class VendorResource extends JsonResource
                 'distance'                                  => (float) $this->distance,
             ]),
 
+            'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),
             'staff'                                     => StaffResource::collection($this->whenLoaded('staff')),
             'logo'                                      => MediaResource::make($this->whenLoaded('logo')),
 
