@@ -17,8 +17,8 @@ class OfferResource extends JsonResource
             'discount'              => $this->discount,
             'discount_string'       => $this->discount_string,
             'status'                => $this->status,
-            'starts_at'             => $this->starts_at,
-            'expires_at'            => $this->expires_at,
+            'starts_at'             => $this->starts_at->format('Y-m-d'),
+            'expires_at'            => $this->expires_at->format('Y-m-d'),
             'expires_countdown'     => $this->expires_countdown,
             'image'                 => MediaResource::make($this->whenLoaded('image')),
         ];
