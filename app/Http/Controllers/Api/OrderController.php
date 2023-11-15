@@ -147,7 +147,7 @@ class OrderController extends BaseApiController
     {
         $order = Order::query()->findOrFail($id);
 
-        if ($order->status != 'Accepted') {
+        if ($order->status != OrderStatus::Accepted) {
             return response()->json(['message' => __('You must pay first.')], 405);
         }
 
@@ -165,7 +165,7 @@ class OrderController extends BaseApiController
 
         $cus_name = $order->user->name;
 
-        if ($order->status != 'Accepted') {
+        if ($order->status != OrderStatus::Accepted) {
             return response()->json(['message' => __('You must pay first.')], 405);
         }
 
