@@ -41,8 +41,8 @@ class Offer extends Model implements Listable, HasMedia
     ];
 
     protected $casts = [
-        'starts_at'  => 'date',
-        'expires_at' => 'date',
+        'starts_at'  => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
     /**
@@ -142,19 +142,19 @@ class Offer extends Model implements Listable, HasMedia
     {
         return $query->whereNull('starts_at')
             ->orWhere(function ($q) {
-                $q->whereDate('starts_at', '<=', now())
-                    ->whereDate('expires_at', '>=', now());
+                $q->where('starts_at', '<=', now())
+                    ->where('expires_at', '>=', now());
             });
     }
 
     public function scopeIncoming($query): Builder
     {
-        return $query->whereDate('starts_at', '>', now());
+        return $query->where('starts_at', '>', now());
     }
 
     public function scopeExpired($query): Builder
     {
-        return $query->whereDate('expires_at', '<', now());
+        return $query->where('expires_at', '<', now());
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder

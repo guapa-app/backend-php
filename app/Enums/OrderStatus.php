@@ -37,11 +37,11 @@ enum OrderStatus: string implements HasColor, HasLabel
 
     public static function availableForUpdate(): array
     {
-        return [
-                self::Accepted,
-                self::Rejected,
-                self::Cancel_Request,
-                self::Canceled,
-        ];
+        return array_column([
+            self::Accepted,
+            self::Rejected,
+            self::Cancel_Request,
+            self::Canceled,
+        ], 'value', 'name');
     }
 }

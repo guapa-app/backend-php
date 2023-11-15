@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
+use App\Enums\OrderStatus;
+use App\Enums\ProductType;
 use App\Models\Appointment;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -70,7 +72,7 @@ class OrderService
 
                     $final_price = $inputItem['quantity'] * $product['price'];
 
-                    if ($product->type == 'service') {
+                    if ($product->type == ProductType::Service) {
                         $this->is_service = true;
 
                         $product_fees = optional($product->categories()->first())->fees;
@@ -185,9 +187,9 @@ class OrderService
             return;
         }
 
-        if ($order->status !== 'Pending' && $user->id !== $order->user_id) {
-            $error = 'Sorry this order has been ' . $order->status;
-        } elseif ($order->status === $status) {
+        if ($order->status !== OrderStatus::Pending && $user->id !== $order->user_id) {
+            $error = 'Sorry this order has been ' . $order->status->value;
+        } elseif ($order->status->value === $status) {
             $error = 'The order is already ' . $status;
         } elseif (($status === 'Cancel Request') || ($status === 'Canceled')) {
             if ($order->is_used) {

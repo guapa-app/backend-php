@@ -13,6 +13,7 @@ use App\Services\OrderService;
 use App\Services\PDFService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rules\Enum;
 
 /**
  * @group Orders
