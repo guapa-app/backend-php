@@ -2,7 +2,6 @@
 
 namespace App\Nova\Resources;
 
-use App\Traits\NovaVendorAccess;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -19,7 +18,6 @@ use Laravel\Nova\Panel;
 
 class User extends Resource
 {
-    use NovaVendorAccess;
     /**
      * The model the resource corresponds to.
      *
@@ -52,10 +50,6 @@ class User extends Resource
 
     public static function indexQuery(NovaRequest $request, $query): Builder
     {
-        if (Auth::user()?->isVendor()) {
-            return $query->CurrentVendor(Auth::user()->vendor->id);
-        }
-
         $query->with(['profile']);
 
         return parent::indexQuery($request, $query);
@@ -141,26 +135,14 @@ class User extends Resource
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
 
-            //profile
-            //userVendors
-            //roles
-        ];
-
-        if (Auth::user()?->isVendor()) {
-            if ($request->isUpdateOrUpdateAttachedRequest() && !in_array(Auth::user()->vendor_id, $this->resource->getUserVendorsIdsAttribute())) {
-                throw new \Exception('You do not have permission to access this page!', 403);
-            }
-
-            return $returned_arr;
-        }
-
-        return array_merge($returned_arr, [
             Panel::make(__('Profile'), $this->profileFields()),
             MorphMany::make(__('Devices'), 'devices', Device::class),
             MorphMany::make(__('Notifications'), 'notifications', Notifications::class),
             HasMany::make(__('histories'), 'histories'),
             HasMany::make(__('support messages'), 'support_messages'),
-        ]);
+        ];
+    
+        return $returned_arr;
     }
 
     public function profileFields(): array

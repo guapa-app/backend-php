@@ -2,16 +2,13 @@
 
 namespace App\Nova\Resources;
 
-use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 
 class WorkDay extends Resource
 {
-    use NovaVendorAccess;
     /**
      * @array Days Arr
      */
@@ -63,14 +60,6 @@ class WorkDay extends Resource
                 ->displayUsingLabels()
                 ->options(self::days),
         ];
-
-        if (Auth::user()?->isVendor()) {
-            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
-                throw new \Exception('You do not have permission to access this page!', 403);
-            }
-
-            return $returned_arr;
-        }
 
         return $returned_arr;
     }

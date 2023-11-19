@@ -3,7 +3,6 @@
 namespace App\Nova\Resources;
 
 use App\Nova\Actions\ChangeOrderStatus;
-use App\Traits\NovaVendorAccess;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +17,6 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Order extends Resource
 {
-    use NovaVendorAccess;
-
     /**
      * The model the resource corresponds to.
      *
@@ -98,20 +95,12 @@ class Order extends Resource
 
             DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+
+            // BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+            // BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
         ];
 
-        if (Auth::user()?->isVendor()) {
-            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->vendor_id) {
-                throw new \Exception('You do not have permission to access this page!', 403);
-            }
-
             return $returned_arr;
-        }
-
-        return array_merge($returned_arr, [
-            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
-            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
-        ]);
     }
 
     /**

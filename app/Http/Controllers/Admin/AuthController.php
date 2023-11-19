@@ -53,13 +53,7 @@ class AuthController extends BaseAdminController
         }
 
         $admin = $this->adminRepository->getOne(0, ['email' => $request->get('email')]);
-
-        if ($admin->isVendor()) {
-            return response()->json([
-                'message' => 'you are not allowed to access this page ',
-            ], 401);
-        }
-
+        
         return response()->json([
             'token' => $token,
             'data' => $admin,

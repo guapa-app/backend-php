@@ -2,7 +2,6 @@
 
 namespace App\Nova\Resources;
 
-use App\Traits\NovaVendorAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
@@ -13,7 +12,6 @@ use Laravel\Nova\Fields\Text;
 
 class OrderItem extends Resource
 {
-    use NovaVendorAccess;
     /**
      * The model the resource corresponds to.
      *
@@ -69,14 +67,6 @@ class OrderItem extends Resource
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
-
-        if (Auth::user()?->isVendor()) {
-            if ($request->isUpdateOrUpdateAttachedRequest() && Auth::user()->vendor_id != $this->resource->product->vendor_id) {
-                throw new \Exception('You do not have permission to access this page!', 403);
-            }
-
-            return $returned_arr;
-        }
 
         return $returned_arr;
     }

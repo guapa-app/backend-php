@@ -94,20 +94,6 @@ class Vendor extends Model implements HasMedia, HasReviews
         'name', 'email', 'phone', 'about',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        self::created(function ($item) {
-            Admin::query()->create([
-                'vendor_id' => $item->id,
-                'name'      => $item->name,
-                'email'     => auth()->user()->email,
-                'password'  => auth()->user()->password,
-            ]);
-        });
-    }
-
     public function getSpecialtyIdsAttribute()
     {
         $relations = $this->getRelations();

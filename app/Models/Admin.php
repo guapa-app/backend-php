@@ -23,7 +23,6 @@ class Admin extends Authenticatable implements Listable
      * @var array
      */
     protected $fillable = [
-        'vendor_id',
         'name',
         'email',
         'password',
@@ -55,16 +54,6 @@ class Admin extends Authenticatable implements Listable
     public function isAdmin()
     {
         return true;
-    }
-
-    public function isVendor()
-    {
-        return (bool) $this->vendor_id;
-    }
-
-    public function vendor()
-    {
-        return $this->belongsTo(Vendor::class);
     }
 
     public function getRoleAttribute()
@@ -101,11 +90,6 @@ class Admin extends Authenticatable implements Listable
         }
 
         return $query;
-    }
-
-    public function scopeCurrentVendor($query, $value)
-    {
-        return $query->where('vendor_id', $value);
     }
 
     public function scopeWithListRelations(Builder $query, Request $request) : Builder
