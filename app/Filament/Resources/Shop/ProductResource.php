@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources\Shop;
 
-use App\Enums\ProductReview;
-use App\Enums\ProductStatus;
-use App\Enums\ProductType;
 use App\Filament\Resources\Shop\ProductResource\Pages;
 use App\Filament\Resources\Shop\ProductResource\RelationManagers;
 use App\Helpers\Common;
@@ -15,6 +12,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductResource extends Resource
 {
@@ -30,37 +29,36 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Hidden::make('hash_id')
+                    ->label('Number')
+                    ->default(Common::generateUniqueHashForModel(self::$model, 16)),
+                Forms\Components\Hidden::make('type')
+                    ->default(request('type')),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('hash_id')
-                    ->disabled()
-                    ->dehydrated(true)
-                    ->default(Common::generateUniqueHashForModel(self::$model, 16))
-                    ->maxLength(16),
-                Forms\Components\Textarea::make('description')
-                    ->maxLength(65535)
-                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
                     ->prefix('$'),
-                Forms\Components\Select::make('review')
-                    ->options(ProductReview::class)
-                    ->default(ProductReview::Pending)
-                    ->disabled()
-                    ->dehydrated(true),
-                Forms\Components\Select::make('status')
-                    ->options(ProductStatus::class)
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('taxonomies')
+                    ->label(__('Categories'))
+                    ->relationship(
+                        name: 'taxonomies',
+                        modifyQueryUsing: fn (Builder $query) => request('type') == 'service' ?
+                            $query->where('type', 'specialty') :
+                            $query->where('type', 'category')
+                    )
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
                     ->required(),
-                Forms\Components\Select::make('type')
-                    ->options(ProductType::class)
-                    ->required(),
+                Forms\Components\TextInput::make('url')
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('terms')
                     ->maxLength(65535)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('url')
-                    ->maxLength(255),
             ]);
     }
 
@@ -68,15 +66,14 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('hash_id')
+                    ->label('Number')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
                     ->money()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('review')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -87,9 +84,6 @@ class ProductResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

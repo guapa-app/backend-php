@@ -14,7 +14,10 @@ class ListProducts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->label('New Product')
+                ->url(route('filament.user.resources.shop.products.create') . "?type=product"),
+            Actions\CreateAction::make()->label('New Coupon')
+                ->url(route('filament.user.resources.shop.products.create') . "?type=service"),
         ];
     }
 
