@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App;
 use App\Contracts\Repositories\SettingRepositoryInterface;
 use Artisan;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Common helper functions.
@@ -124,5 +125,21 @@ class Common
 
         // Return the unique hash ID.
         return $hash;
+    }
+
+    public static function logReq($message = '', $data = null)
+    {
+        Log::alert(
+            '***' .
+                "\nMessage >-> $message" .
+                "\nReq method >-> " . request()->method() .
+                "\nPath >-> " . request()->decodedPath() .
+                "\nRoute name >-> " . request()->route()?->getName() .
+                "\n***",
+            [
+                "\nRequest Data >-> " => request()->all(),
+                "\nData >-> " => $data,
+            ]
+        );
     }
 }
