@@ -6,13 +6,13 @@ use Filament\Support\Contracts\HasLabel;
 
 enum WorkDay: int implements HasLabel
 {
-    case Sunday = 0;
-    case Monday = 1;
-    case Tuesday = 2;
+    case Sunday    = 0;
+    case Monday    = 1;
+    case Tuesday   = 2;
     case Wednesday = 3;
-    case Thursday = 4;
-    case Friday = 5;
-    case Saturday = 6;
+    case Thursday  = 4;
+    case Friday    = 5;
+    case Saturday  = 6;
 
     public function getLabel(): string
     {
@@ -25,5 +25,10 @@ enum WorkDay: int implements HasLabel
             self::Friday    => 'Friday',
             self::Saturday  => 'Saturday'
         };
+    }
+
+    public static function toSelect(): array
+    {
+        return array_column(self::cases(),'name', 'value');
     }
 }

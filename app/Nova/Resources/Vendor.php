@@ -5,7 +5,6 @@ namespace App\Nova\Resources;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inspheric\Fields\Email;
 use Inspheric\Fields\Url;
 use Laravel\Nova\Fields\BelongsToMany;
@@ -124,9 +123,6 @@ class Vendor extends Resource
 
             Text::make(__('working hours'), 'working_hours')
                 ->required(),
-
-            // TODO: THIS IS WRONG, SHOULD DISABLE ADDING SAME DAY AGAIN.
-            HasMany::make(__('work days'), 'workDays', WorkDay::class),
 
             HasMany::make(__('appointments'), 'appointments', Appointment::class),
 

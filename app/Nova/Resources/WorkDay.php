@@ -2,25 +2,13 @@
 
 namespace App\Nova\Resources;
 
+use App\Enums\WorkDay as EnumsWorkDay;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 
 class WorkDay extends Resource
 {
-    /**
-     * @array Days Arr
-     */
-    public const days = [
-        0 => 'Sat',
-        1 => 'Sun',
-        2 => 'Mon',
-        3 => 'Tue',
-        4 => 'Wed',
-        5 => 'Thu',
-        6 => 'Fri',
-    ];
     /**
      * The model the resource corresponds to.
      *
@@ -52,13 +40,10 @@ class WorkDay extends Resource
     public function fields(Request $request): array
     {
         $returned_arr = [
-            ID::make(__('ID'), 'id')->sortable(),
-
-            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+            BelongsTo::make(__('vendor'), 'vendor', Vendor::class),
 
             Select::make(__('day'), 'day')
-                ->displayUsingLabels()
-                ->options(self::days),
+                ->options(EnumsWorkDay::toSelect()),
         ];
 
         return $returned_arr;
