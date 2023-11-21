@@ -16,13 +16,12 @@ class CreatePostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('admin_id');
-            $table->foreignId('category_id');
+            $table->foreignId('category_id')->index();
             $table->string('title');
             $table->text('content');
             $table->tinyInteger('status')->default(1);
+            $table->string('youtube_url')->nullable();
             $table->timestamps();
-
-            $table->index('category_id');
         });
 
         \DB::statement('ALTER TABLE posts ADD FULLTEXT fulltext_index (title, content)');

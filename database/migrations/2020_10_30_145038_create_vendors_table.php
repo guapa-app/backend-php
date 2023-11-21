@@ -18,13 +18,27 @@ class CreateVendorsTable extends Migration
             $table->string('name', 150);
             $table->string('email');
             $table->string('phone');
-            $table->text('about')->nullable();
+            $table->tinyInteger('type')->unsigned()->default(0);
+
             $table->enum('status', ['0', '1'])->default('1');
             $table->boolean('verified')->default(0);
-            $table->timestamp('deleted_at')->nullable();
+            $table->text('about')->nullable();
+
+            $table->string('working_days')->nullable();
+            $table->string('working_hours')->nullable();
+
             $table->string('whatsapp')->nullable();
             $table->string('twitter')->nullable();
             $table->string('instagram')->nullable();
+            $table->string('snapchat')->nullable();
+
+            $table->string('website_url')->nullable();
+            $table->string('known_url')->nullable();
+            $table->string('tax_number')->nullable();
+            $table->string('cat_number')->nullable();
+            $table->string('reg_number')->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }

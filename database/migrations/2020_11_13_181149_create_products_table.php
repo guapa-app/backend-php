@@ -15,6 +15,7 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('hash_id');
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
@@ -22,8 +23,8 @@ class CreateProductsTable extends Migration
             $table->enum('status', ['Published', 'Draft'])->default('Draft');
             $table->enum('review', ['Approved', 'Blocked', 'Pending'])->default('Approved');
             $table->string('type', 30)->default('product'); // product / service
-            $table->text('terms')->nullable();
             $table->string('url')->nullable();
+            $table->text('terms')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

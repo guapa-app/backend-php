@@ -18,11 +18,14 @@ class CreateOrdersTable extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('vendor_id');
             $table->foreignId('address_id')->nullable();
-            $table->decimal('total', 8, 2);
-            $table->enum('status', ['Pending', 'Accepted', 'Canceled', 'Rejected'])->default('Pending');
-            $table->text('note')->nullable();
             $table->string('name')->nullable();
             $table->string('phone')->nullable();
+            $table->decimal('total', 8, 2);
+            $table->enum('status', ['Pending', 'Accepted', 'Rejected', 'Cancel Request', 'Canceled'])->default('Pending');
+            $table->boolean('is_used');
+            $table->string('invoice_url')->nullable();
+            $table->text('note')->nullable();
+            $table->text('cancellation_reason')->nullable();
             $table->timestamps();
         });
     }

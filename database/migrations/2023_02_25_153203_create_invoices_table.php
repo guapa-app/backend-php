@@ -18,6 +18,7 @@ class CreateInvoicesTable extends Migration
             $table->unsignedBigInteger('order_id');
 
             $table->char('status', '12');
+            $table->integer('taxes');
             $table->integer('amount');
             $table->char('currency', 5);
             $table->string('description');

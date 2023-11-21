@@ -19,9 +19,9 @@ class CreateDoctorsTable extends Migration
             $table->string('name', 150)->nullable();
             $table->string('email')->nullable();
             $table->string('phone', 50)->nullable();
-            $table->text('about')->nullable();
             $table->enum('status', ['0', '1'])->default('1');
             $table->boolean('verified')->default(0);
+            $table->text('about')->nullable();
             $table->timestamps();
         });
     }
