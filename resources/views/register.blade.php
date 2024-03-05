@@ -145,7 +145,7 @@
                                     <div class="col-lg-6 col-md-12">
                                         <div class="form-group">
                                             <label>رقم الهاتف<span>*</span></label>
-                                            <input class="form-control" data-error="Please enter your phone number" id="user[phone_number]" name="user[phone]" type="text" value="{{ old('user.phone') }}">
+                                            <input class="form-control" placeholder="966xxxxxxxxxx+" data-error="Please enter your phone number" id="user[phone_number]" name="user[phone]" type="text" value="{{ old('user.phone') }}">
                                             @error('user.phone')
                                                 <div class="help-block with-errors">{{ $message }}</div>
                                             @enderror

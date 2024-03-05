@@ -48,7 +48,7 @@ class Offer extends Resource
             ID::make(__('ID'), 'id')->sortable(),
 
             Images::make(__('image'), 'offer_images') // second parameter is the media collection name
-            ->temporary(now()->addMinutes(5))
+                ->temporary(now()->addMinutes(5))
                 ->conversionOnIndexView('small') // conversion used to display the image
                 ->rules('required'), // validation rules
 
@@ -57,7 +57,11 @@ class Offer extends Resource
             Text::make(__('title'), 'title')->required(),
             Textarea::make(__('description'), 'description')->required(),
 
-            Number::make(__('discount'), 'discount')->step(0.01)->required(),
+            Number::make(__('discount'), 'discount')
+                ->step(0.01)
+                ->min(0)
+                ->max(100)
+                ->required(),
 
             DateTime::make(__('starts at'), 'starts_at')->required(),
             DateTime::make(__('expires at'), 'expires_at')->required(),

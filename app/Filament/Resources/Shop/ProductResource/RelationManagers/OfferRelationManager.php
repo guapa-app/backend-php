@@ -20,7 +20,10 @@ class OfferRelationManager extends RelationManager
             ->columns(1)
             ->schema([
                 TextEntry::make('title'),
-                TextEntry::make('discount'),
+                TextEntry::make('discount')
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100),
                 TextEntry::make('description'),
                 TextEntry::make('starts_at'),
                 TextEntry::make('expires_at'),
@@ -39,6 +42,8 @@ class OfferRelationManager extends RelationManager
                     ->required(),
                 Forms\Components\TextInput::make('discount')
                     ->numeric()
+                    ->minValue(1)
+                    ->maxValue(100)
                     ->required(),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
