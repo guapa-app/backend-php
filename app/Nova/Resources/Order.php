@@ -5,7 +5,6 @@ namespace App\Nova\Resources;
 use App\Nova\Actions\ChangeOrderStatus;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
@@ -100,7 +99,7 @@ class Order extends Resource
             // BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
         ];
 
-            return $returned_arr;
+        return $returned_arr;
     }
 
     /**

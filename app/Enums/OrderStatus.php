@@ -44,4 +44,13 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Canceled,
         ], 'value', 'name');
     }
+
+    public static function availableForUpdateByVendor(): array
+    {
+        return array_column([
+            self::Accepted,
+            self::Rejected,
+            self::Canceled,
+        ], 'value', 'name');
+    }
 }

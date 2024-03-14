@@ -187,24 +187,7 @@ class OrderService
             return;
         }
 
-        if ($order->status !== OrderStatus::Pending && $user->id !== $order->user_id) {
-            $error = 'Sorry this order has been ' . $order->status->value;
-        } elseif ($order->status->value === $status) {
-            $error = 'The order is already ' . $status;
-        } elseif (($status === 'Cancel Request') || ($status === 'Canceled')) {
-            if ($order->is_used) {
-                $error = __('api.cancel_used_order_error');
-            }
-
-            if ($order->user_id !== $user->id) {
-                $error = 'You are not authorized to cancel this order';
-            }
-
-            if ($order->user_id === $user->id && $order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
-                $error = __('api.cancel_order_error');
-            }
-        } elseif (in_array($status, ['Accepted', 'Rejected'])) {
-            // This should be an employee of a vendor authorized to accept or reject the order.
+        if (in_array($status, OrderStatus::availableForUpdateByVendor())) {
             $authorizedVendorIds = Product::query()->select('vendor_id')->whereIn('id', function ($q) use ($order) {
                 $q->select('product_id')->from('order_items')->where('order_id', $order->id);
             })->pluck('vendor_id')->toArray();
@@ -212,6 +195,20 @@ class OrderService
             if (!$user->hasAnyVendor(array_merge($authorizedVendorIds, [$order->vendor_id]))) {
                 $error = 'You are not authorized to ' . str_replace('ed', '', $status) . ' this order';
             }
+        } elseif ($status == (OrderStatus::Cancel_Request)->value) {
+            if ($order->user_id !== $user->id) {
+                $error = 'You are not authorized to cancel this order';
+            } elseif ($order->is_used) {
+                $error = __('api.cancel_used_order_error');
+            } elseif ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
+                $error = __('api.cancel_order_error');
+            } elseif (!in_array($order->status, [OrderStatus::Rejected, OrderStatus::Canceled])) {
+                $error = __('api.cancel_rejected_canceled_order_error');
+            }
+        }
+
+        if ($order->status->value === $status) {
+            $error = 'The order is already ' . $status;
         }
 
         if (isset($error)) {

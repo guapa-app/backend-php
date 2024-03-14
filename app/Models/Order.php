@@ -92,7 +92,7 @@ class Order extends Model implements Listable
 
         $query->applyDirectFilters($request);
 
-        # Filter list orders based on the type of the items service or product
+        // Filter list orders based on the type of the items service or product
         if ($request->hasAny(['products', 'procedures'])) {
             $productType = $request->has('products') ? 'product' : 'service';
             $query->whereHas('items', function ($q) use ($productType) {
