@@ -48,6 +48,11 @@ class Category extends Resource
     public function fields(Request $request): array
     {
         return [
+            Images::make(__('icon'), config('taxonomies.icon_collection_name', 'taxonomy_icons'))
+                ->temporary(now()->addMinutes(5))
+                ->conversionOnIndexView('small') // conversion used to display the image
+                ->rules('required'),
+
             ID::make(__('ID'), 'id')->sortable(),
 
             Translatable::make([
@@ -60,12 +65,13 @@ class Category extends Resource
                     ->rules('required'),
             ]),
 
-            Number::make(__('fees'), 'fees')->step(0.5)->required()->placeholder('10 %'),
-
-            Images::make(__('icon'), config('taxonomies.icon_collection_name', 'taxonomy_icons'))
-                ->temporary(now()->addMinutes(5))
-                ->conversionOnIndexView('small') // conversion used to display the image
-                ->rules('required'),
+            Number::make(__('fees'), 'fees')
+                ->help('Fees is the <strong>precntage</strong> value that applied to the product <strong>(example: 10% of 100 riyals = 10 riyals)</strong>')
+                ->placeholder('10 %')
+                ->step(0.5)
+                ->min(0)
+                ->max(100)
+                ->required(),
 
             Select::make(__('type'), 'type')
                 ->options([
