@@ -92,6 +92,7 @@ class Order extends Model implements Listable
 
         $query->applyDirectFilters($request);
 
+        # Filter list orders based on the type of the items service or product
         if ($request->hasAny(['products', 'procedures'])) {
             $productType = $request->has('products') ? 'product' : 'service';
             $query->whereHas('items', function ($q) use ($productType) {
@@ -113,7 +114,7 @@ class Order extends Model implements Listable
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies', 'items.product.image');
+        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies', 'items.product.media');
 
         return $query;
     }

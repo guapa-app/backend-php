@@ -69,9 +69,9 @@ class Category extends Resource
 
             Select::make(__('type'), 'type')
                 ->options([
-                    'category' => 'category',
-                    'specialty' => 'specialty',
-                    'blog_category' => 'blog',
+                    'category'      => 'Products',
+                    'specialty'     => 'Procedures',
+                    'blog_category' => 'Blog',
                 ])
                 ->displayUsingLabels()
                 ->required(),

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Invoice;
-use Carbon\Carbon;
 use Moyasar\Providers\InvoiceService;
 use Moyasar\Providers\PaymentService as MoyasarPaymentService;
 
@@ -26,7 +25,6 @@ class PaymentService
         $invoice = Invoice::query()->create([
             'order_id'     => $orders->first()->id,
             'status'       => 'initiated',
-            'expired_at'   => Carbon::now()->addDays('14'),
             'taxes'        => (int) $taxes * 100,
             'amount'       => (int) (($fees + $taxes) * 100),
             'description'  => "You will pay the fees and taxes for \n" . $description,
@@ -61,13 +59,18 @@ class PaymentService
         $invoiceService = new InvoiceService();
         $invoiceService = $invoiceService->fetch($invoice->invoice_id);
 
-        if (!empty($invoiceService->payments) && $invoiceService->payments[0]->status == 'paid') {
-            $paymentService = new MoyasarPaymentService();
-            $paymentService = $paymentService->fetch($invoiceService->payments[0]->id);
-            $paymentService->refund();
-            $invoice->update(['status' => 'refunded']);
+        if (!empty($invoiceService->payments)) {
+            if ($invoiceService->payments[0]->status == 'paid') {
+                $paymentService = new MoyasarPaymentService();
+                $paymentService = $paymentService->fetch($invoiceService->payments[0]->id);
+                $paymentService->refund();
+                $invoice->update(['status' => 'refunded']);
+            } else {
+                $invoiceService->cancel();
+                $invoice->update(['status' => 'canceled']);
+            }
         } else {
-            $invoiceService->cancel();
+            // Expired invoices has no payments.
             $invoice->update(['status' => 'canceled']);
         }
 

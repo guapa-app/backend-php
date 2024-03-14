@@ -62,8 +62,8 @@ class Product extends Resource
 
             Select::make(__('type'), 'type')
                 ->options([
-                    'product' => 'Product',
-                    'service' => 'Service',
+                    'product' => 'Products',
+                    'service' => 'Procedures',
                 ])
                 ->displayUsingLabels()
                 ->required(),
