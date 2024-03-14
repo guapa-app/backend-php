@@ -66,7 +66,7 @@ class Category extends Resource
             ]),
 
             Number::make(__('fees'), 'fees')
-                ->help('Fees is the <strong>precntage</strong> value that applied to the product <strong>(example: 10% of 100 riyals = 10 riyals)</strong>')
+                ->help('Fees are the <strong>percentage</strong> value applied to the product. <strong>(example: a 10% fee on a 100 riyal product would result in a 10 riyal fee.)</strong>')
                 ->placeholder('10 %')
                 ->step(0.5)
                 ->min(0)
