@@ -5,7 +5,6 @@ namespace App\Nova\Resources;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
@@ -141,7 +140,7 @@ class User extends Resource
             HasMany::make(__('histories'), 'histories'),
             HasMany::make(__('support messages'), 'support_messages'),
         ];
-    
+
         return $returned_arr;
     }
 

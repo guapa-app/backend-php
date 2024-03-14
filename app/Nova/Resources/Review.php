@@ -3,7 +3,6 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;

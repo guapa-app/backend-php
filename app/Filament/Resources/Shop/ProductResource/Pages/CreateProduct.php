@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Shop\ProductResource\Pages;
 
 use App\Enums\ProductReview;
 use App\Enums\ProductStatus;
-use App\Enums\ProductType;
 use App\Filament\Resources\Shop\ProductResource;
 use Filament\Resources\Pages\CreateRecord;
 

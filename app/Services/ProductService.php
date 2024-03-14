@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Events\ProductCreated;
-use App\Helpers\Common;
 use App\Models\Product;
 
 /**
@@ -32,7 +31,6 @@ class ProductService
     public function create(array $data): Product
     {
         // Create product
-        $data['hash_id'] = Common::generateUniqueHashForModel(Product::class, 16);
         $product = $this->productRepository->create($data);
 
         // Update product media only if media params are provided

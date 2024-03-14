@@ -51,6 +51,10 @@ class Product extends Resource
     public function fields(Request $request): array
     {
         $returned_arr = [
+            Images::make(__('images'), 'products') // second parameter is the media collection name
+                ->temporary(now()->addMinutes(5))
+                ->rules('required'), // validation rules
+
             ID::make(__('ID'), 'id')->sortable(),
 
             Text::make(__('title'), 'title')->required(),
@@ -65,7 +69,25 @@ class Product extends Resource
                     'service' => 'Procedures',
                 ])
                 ->displayUsingLabels()
-                ->required(),
+                ->rules('required'),
+
+            SelectPlus::make(__('categories'), 'taxonomies', Category::class)
+                ->required()
+                ->help('Only first category \'ll be stored')
+                ->label(function ($state) {
+                    return $state->title . ' - (' . $state->type . ')';
+                })->optionsQuery(function ($query) {
+                    $query->where('taxonomies.type', '!=', 'blog_category');
+                })
+                ->rules('required', function ($attribute, $value, $fail) use ($request) {
+                    if (preg_match('/^\[({.*?})/', $request->taxonomies, $matches)) {
+                        $firstObject = $matches[1];
+
+                        $request->merge(['taxonomies' => '[' . $firstObject . ']']);
+                    } else {
+                        return $fail('The categories field is required.');
+                    }
+                }),
 
             Select::make(__('status'), 'status')
                 ->options([
@@ -92,17 +114,6 @@ class Product extends Resource
                 })->optionsQuery(function ($query) {
                     $query->where('addressable_type', 'vendor');
                 }),
-
-            SelectPlus::make(__('categories'), 'taxonomies', Category::class)
-                ->label(function ($state) {
-                    return $state->title . ' - (' . $state->type . ')';
-                })->optionsQuery(function ($query) {
-                    $query->where('taxonomies.type', '!=', 'blog_category');
-                }),
-
-            Images::make(__('images'), 'products') // second parameter is the media collection name
-                ->temporary(now()->addMinutes(5))
-                ->rules('required'), // validation rules
 
             HasMany::make(__('reviews'), 'reviews', Review::class),
 

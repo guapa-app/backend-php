@@ -15,9 +15,9 @@ class ListProducts extends ListRecords
     {
         return [
             Actions\CreateAction::make()->label('New Product')
-                ->url(route('filament.user.resources.shop.products.create') . "?type=product"),
+                ->url(route('filament.user.resources.shop.products.create') . '?type=product'),
             Actions\CreateAction::make()->label('New Coupon')
-                ->url(route('filament.user.resources.shop.products.create') . "?type=service"),
+                ->url(route('filament.user.resources.shop.products.create') . '?type=service'),
         ];
     }
 

@@ -53,7 +53,7 @@ class AuthController extends BaseAdminController
         }
 
         $admin = $this->adminRepository->getOne(0, ['email' => $request->get('email')]);
-        
+
         return response()->json([
             'token' => $token,
             'data' => $admin,

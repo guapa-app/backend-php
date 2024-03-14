@@ -42,7 +42,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         \App\Helpers\Common::logReq('LOG HANDLER');
-        
+
         if ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
             throw new NotFoundException();
         }

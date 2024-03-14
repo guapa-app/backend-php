@@ -3,10 +3,22 @@
 namespace App\Observers;
 
 use App\Events\ProductCreated;
+use App\Helpers\Common;
 use App\Models\Product;
 
 class ProductObserver
 {
+    /**
+     * Handle the Product "creating" event.
+     *
+     * @param Product $product
+     * @return void
+     */
+    public function creating(Product $product)
+    {
+        $product->hash_id = Common::generateUniqueHashForModel(Product::class, 16);
+    }
+
     /**
      * Handle the Product "created" event.
      *
