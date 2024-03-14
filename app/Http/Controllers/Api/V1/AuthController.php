@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class AuthController extends ApiAuthController
@@ -61,22 +62,25 @@ class AuthController extends ApiAuthController
 
     public function sendSinchOtp(PhoneRequest $request)
     {
-        parent::sendSinchOtp($request);
+        if (!Setting::checkTestingMode()) {
+            parent::sendSinchOtp($request);
+        }
 
         return response()->json(['message' => __('api.otp_sent')]);
     }
 
     public function verifySinchOtp(VerifyPhoneRequest $request)
     {
-        $bool = parent::verifySinchOtp($request);
+        $bool = true;
+
+        if (!Setting::checkTestingMode()) {
+            $bool = parent::verifySinchOtp($request);
+        }
+
         if ($bool) {
-            return response()->json([
-                'message' => __('api.correct_otp'),
-            ], 200);
+            return response()->json(['message' => __('api.correct_otp')], 200);
         } else {
-            return response()->json([
-                'message' => __('api.incorrect_otp'),
-            ], 406);
+            return response()->json(['message' => __('api.incorrect_otp')], 406);
         }
     }
 
