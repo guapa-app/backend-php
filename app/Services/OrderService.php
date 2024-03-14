@@ -202,7 +202,7 @@ class OrderService
                 $error = __('api.cancel_used_order_error');
             } elseif ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
-            } elseif (!in_array($order->status, [OrderStatus::Rejected, OrderStatus::Canceled])) {
+            } elseif (in_array($order->status, [OrderStatus::Rejected, OrderStatus::Canceled])) {
                 $error = __('api.cancel_rejected_canceled_order_error');
             }
         }
