@@ -3,6 +3,7 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
+use Laravel\Nova\Actions\ExportAsCsv;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
@@ -116,7 +117,20 @@ class Invoice extends Resource
      */
     public function actions(Request $request)
     {
-        return [];
+        return [
+            ExportAsCsv::make()->nameable()
+                ->withFormat(function ($model) {
+                    return [
+                        'ID'                    => $model->getKey(),
+                        'Status'                => $model->status,
+                        'Taxes'                 => $model->taxes,
+                        'Amount Without taxes'  => $model->amount_without_taxes,
+                        'Amount'                => $model->amount,
+                        'Amount Formatted'      => $model->amount_format,
+                        'Invoice ID'            => $model->invoice_id,
+                    ];
+                }),
+        ];
     }
 
     public static function authorizedToCreate(Request $request): bool
