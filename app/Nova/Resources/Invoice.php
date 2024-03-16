@@ -3,6 +3,7 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
+use Laravel\Nova\Actions;
 use Laravel\Nova\Actions\ExportAsCsv;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
@@ -130,6 +131,8 @@ class Invoice extends Resource
                         'Invoice ID'            => $model->invoice_id,
                     ];
                 }),
+
+            (new \App\Nova\Actions\DownloadInvoice)->showInline(),
         ];
     }
 

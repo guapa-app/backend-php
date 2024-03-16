@@ -160,7 +160,9 @@ class OrderController extends BaseApiController
 
     public function showInvoice($id)
     {
-        $order = Order::query()->findOrFail($id);
+        $order = Order::query()
+            ->where('hash_id', $id)
+            ->firstOrFail();
 
         $cus_name = $order->user->name;
 

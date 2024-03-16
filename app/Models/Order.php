@@ -15,7 +15,7 @@ class Order extends Model implements Listable
     use HasFactory, ListableTrait;
 
     protected $fillable = [
-        'user_id', 'vendor_id', 'address_id', 'total', 'status',
+        'hash_id', 'user_id', 'vendor_id', 'address_id', 'total', 'status',
         'note', 'name', 'phone', 'is_used', 'invoice_url', 'cancellation_reason',
     ];
 

@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V2\OrderController;
 use App\Http\Controllers\RegistrationController;
-use App\Models\Taxonomy;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/.well-known/apple-developer-merchantid-domain-association', function () {
     return view('apple_pay');
 });
+Route::get('/{id}/show-invoice', [OrderController::class, 'showInvoice']);
 
 Route::get('/', function () {
     return view('landing');

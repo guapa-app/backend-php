@@ -7,10 +7,12 @@ use App\Events\ProductCreated;
 use App\Listeners\OfferCreatedListener;
 use App\Listeners\ProductCreatedListener;
 use App\Models\Offer;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\WorkDay;
 use App\Observers\OfferObserver;
+use App\Observers\OrderObserver;
 use App\Observers\ProductObserver;
 use App\Observers\UserObserver;
 use App\Observers\WorkDayObserver;
@@ -50,5 +52,6 @@ class EventServiceProvider extends ServiceProvider
         Offer::observe(OfferObserver::class);
         Product::observe(ProductObserver::class);
         WorkDay::observe(WorkDayObserver::class);
+        Order::observe(OrderObserver::class);
     }
 }
