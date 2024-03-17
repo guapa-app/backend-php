@@ -68,6 +68,7 @@ class Product extends Resource
                     'product' => 'Products',
                     'service' => 'Procedures',
                 ])
+                ->filterable()
                 ->displayUsingLabels()
                 ->rules('required'),
 
@@ -168,5 +169,10 @@ class Product extends Resource
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public static function softDeletes()
+    {
+        return false;
     }
 }
