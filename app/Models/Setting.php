@@ -10,55 +10,67 @@ class Setting extends Model
     use HasFactory;
 
     protected $fillable = [
-        'setting_key',
-        'setting_value',
-        'setting_unit',
+        's_key',
+        's_value',
+        's_unit',
+        's_validation',
+        's_validation_type',
         'instructions',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::updating(function ($setting) {
-            if ($setting->isDirty('setting_key')) {
-                return false;
-            }
-        });
-
-        static::deleting(function ($setting) {
-            return false;
-        });
-    }
+    protected $casts = [
+        's_validation' => 'array',
+    ];
 
     public static function getTaxes()
     {
-        $record = static::firstOrCreate(['setting_key' => 'taxes'], [
-            'setting_value' => 0.00,
-            'instructions' => 'Taxes are a percentage of the service (example: 10% of 150 riyals = 15 riyals)',
+        $record = static::firstOrCreate(['s_key' => 'taxes'], [
+            's_value'           => 15.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min'=> 0, 'max'=> 100],
+            'instructions'      => 'Taxes are a percentage of the service (example: 10% of 150 riyals = 15 riyals)',
         ]);
 
-        return $record->setting_value;
+        return $record->s_value;
     }
 
     public static function getProductFees()
     {
-        $record = static::firstOrCreate(['setting_key' => 'product_fees'], [
-            'setting_value' => 0.00,
-            'instructions' => 'Fees are a percentage of the product (example: 10% of 150 riyals = 15 riyals)',
+        $record = static::firstOrCreate(['s_key' => 'product_fees'], [
+            's_value'           => 0.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min'=> 0, 'max'=> 100],
+            'instructions'      => 'Fees are a percentage of the product (example: 10% of 150 riyals = 15 riyals)',
         ]);
 
-        return $record->setting_value;
+        return $record->s_value;
     }
 
     public static function checkTestingMode()
     {
-        $record = static::firstOrCreate(['setting_key' => 'is_testing_mode_enabled'], [
-            'setting_value' => config('app.env') === 'production' ? false : true,
-            'setting_unit' => 'bool',
-            'instructions' => 'this mode is enabled ONLY for testing environment',
+        $record = static::firstOrCreate(['s_key' => 'is_testing_mode_enabled'], [
+            's_value'           => config('app.env') === 'production' ? false : true,
+            's_unit'            => 'bool',
+            's_validation_type' => 'boolean',
+            's_validation'      => null,
+            'instructions'      => 'This mode is enabled ONLY for testing environment',
         ]);
 
-        return (bool) $record->setting_value;
+        return (bool) $record->s_value;
+    }
+
+    public static function getPaymentGatewayMethod()
+    {
+        $record = static::firstOrCreate(['s_key' => 'payment_gateway'], [
+            's_value'           => 'ottu',
+            's_unit'            => 'string',
+            's_validation_type' => 'options',
+            's_validation'      => ['moyasar', 'ottu'],
+            'instructions'      => 'Available Payment Gateway To Use moyasar or ottu only. anything else \'ll get error.',
+        ]);
+
+        return (string) $record->s_value;
     }
 }

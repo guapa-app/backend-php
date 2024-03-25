@@ -9,11 +9,13 @@ use App\Listeners\ProductCreatedListener;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\WorkDay;
 use App\Observers\OfferObserver;
 use App\Observers\OrderObserver;
 use App\Observers\ProductObserver;
+use App\Observers\SettingObserver;
 use App\Observers\UserObserver;
 use App\Observers\WorkDayObserver;
 use Illuminate\Auth\Events\Registered;
@@ -53,5 +55,6 @@ class EventServiceProvider extends ServiceProvider
         Product::observe(ProductObserver::class);
         WorkDay::observe(WorkDayObserver::class);
         Order::observe(OrderObserver::class);
+        Setting::observe(SettingObserver::class);
     }
 }

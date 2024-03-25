@@ -30,8 +30,8 @@ class Setting extends Resource
      */
     public static $search = [
         'id',
-        'setting_key', 'setting_value',
-        'setting_unit', 'instructions',
+        's_key',
+        'instructions',
     ];
 
     /**
@@ -44,9 +44,8 @@ class Setting extends Resource
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
-            Text::make('key', 'setting_key')->required()->readonly(!is_null($request->resourceId)),
-            Text::make('value', 'setting_value')->required(),
-//            Text::make('unit', 'setting_unit')->required(),
+            Text::make('key', 's_key')->required()->readonly(!is_null($request->resourceId)),
+            Text::make('value', 's_value')->required(),
             Text::make('instructions', 'instructions')->required(),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
@@ -54,47 +53,13 @@ class Setting extends Resource
         ];
     }
 
-    /**
-     * Get the cards available for the request.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function cards(Request $request)
+    public static function authorizedToCreate(Request $request)
     {
-        return [];
+        return false;
     }
 
-    /**
-     * Get the filters available for the resource.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function filters(Request $request)
+    public function authorizedToDelete(Request $request)
     {
-        return [];
-    }
-
-    /**
-     * Get the lenses available for the resource.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function lenses(Request $request)
-    {
-        return [];
-    }
-
-    /**
-     * Get the actions available for the resource.
-     *
-     * @param Request $request
-     * @return array
-     */
-    public function actions(Request $request)
-    {
-        return [];
+        return false;
     }
 }
