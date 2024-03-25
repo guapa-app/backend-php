@@ -16,14 +16,12 @@ class CreateInvoicesTable extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('order_id');
-
             $table->char('status', '12');
-            $table->integer('taxes');
-            $table->integer('amount');
+            $table->decimal('taxes', 8, 2);
+            $table->decimal('amount', 8, 2);
             $table->char('currency', 5);
             $table->string('description');
             $table->string('callback_url');
-
             $table->string('invoice_id')->nullable();
             $table->char('amount_format')->nullable();
             $table->dateTime('expired_at')->nullable();

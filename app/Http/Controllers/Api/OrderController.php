@@ -14,9 +14,6 @@ use App\Services\PDFService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
-/**
- * @group Orders
- */
 class OrderController extends BaseApiController
 {
     protected $orderRepository;
@@ -125,16 +122,21 @@ class OrderController extends BaseApiController
 
     public function changeInvoiceStatus(Request $request)
     {
-        $invoice = Invoice::query()->where('invoice_id', $request->id)->firstOrFail();
-        $invoice->updateOrFail(['status' => $request->status]); // paid
+        $invoice = Invoice::query()
+            ->where('invoice_id', $request->session_id ?? $request->id)
+            ->firstOrFail();
 
-        $invoice->order->updateOrFail(['status' => 'Accepted']);
+        $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
+
+        if ($invoice->status == 'paid') {
+            $invoice->order->updateOrFail(['status' => 'Accepted']);
+        }
 
         logger(
-            "Change Invoice Status By Moyasar Callback URL\n
-         order { $invoice->order_id } <-> Invoice { $invoice->id }",
+            "Change Invoice Status By Callback URL\n
+            order { $invoice->order_id } <-> Invoice { $invoice->id }",
             [
-                "\nmoyasar" => $request->all(),
+                "\npayment gateway" => $request->all(),
                 "\ninvoice" => $invoice,
             ]
         );
