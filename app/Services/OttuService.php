@@ -64,12 +64,48 @@ class OttuService
         }
     }
 
-    public function update($session_id, $data)
+    public function update($session_id, $data): ?array
     {
+        $data = $this->dataHandler($data);
+
+        try {
+            $res = Http::asForm()
+                ->withHeaders(['Authorization' => $this->apiKey])
+                ->acceptJson()
+                ->patch($this->baseUrl . "/$session_id", $data);
+
+            if ($res->status() != 200) {
+                \App\Helpers\Common::logReq('Ottu UPDATE SESSION ERR LOG', $res->json());
+                abort(400, 'something went wrong');
+            }
+
+            return $res->json();
+        } catch (Exception $e) {
+            \App\Helpers\Common::logReq('Ottu UPDATE SESSION ERR LOG', $e->getMessage());
+
+            return null;
+        }
     }
 
-    public function get($session_id)
+    public function get($session_id): ?array
     {
+        try {
+            $res = Http::asForm()
+                ->withHeaders(['Authorization' => $this->apiKey])
+                ->acceptJson()
+                ->get($this->baseUrl . "/$session_id");
+
+            if ($res->status() != 200) {
+                \App\Helpers\Common::logReq('Ottu GET SESSION ERR LOG', $res->json());
+                abort(400, 'something went wrong');
+            }
+
+            return $res->json();
+        } catch (Exception $e) {
+            \App\Helpers\Common::logReq('Ottu GET SESSION ERR LOG', $e->getMessage());
+
+            return null;
+        }
     }
 
     public function refund($order)
