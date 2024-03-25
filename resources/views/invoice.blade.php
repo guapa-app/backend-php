@@ -153,7 +153,7 @@
                                         <p class="cs-primary_color cs-bold cs-f16 cs-m0">Total Amount (Excluding VAT)</p>
                                     </td>
                                     <td class="cs-width_2 cs-text_center cs-f16">
-                                        <p class="cs-primary_color cs-bold cs-f16 cs-m0 cs-text_right">{{ round(($invoice->amount_without_taxes / 100), 2) }} <small>SAR</small></p>
+                                        <p class="cs-primary_color cs-bold cs-f16 cs-m0 cs-text_right">{{ round(($invoice->amount_without_taxes), 2) }} <small>SAR</small></p>
                                     </td>
                                     <td class="cs-width_5 cs-text_right">
                                         <p class="cs-primary_color cs-bold cs-f16 cs-m0">المبلغ بدون ضريبة القيمة المضافة</p>
@@ -164,7 +164,7 @@
                                         <p class="cs-primary_color cs-bold cs-f16 cs-m0">Total VAT</p>
                                     </td>
                                     <td class="cs-width_2 cs-text_center cs-f16">
-                                        <p class="cs-primary_color cs-bold cs-f16 cs-m0 cs-text_right">{{ round(($invoice->taxes / 100), 2) }} <small>SAR</small></p>
+                                        <p class="cs-primary_color cs-bold cs-f16 cs-m0 cs-text_right">{{ round(($invoice->taxes), 2) }} <small>SAR</small></p>
                                     </td>
                                     <td class="cs-width_5 cs-text_right">
                                         <p class="cs-primary_color cs-bold cs-f16 cs-m0">إجمالي ضريبة القيمة المضافة</p>
