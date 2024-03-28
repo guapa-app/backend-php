@@ -36,7 +36,7 @@ class OttuService
                 'transaction_reference_no' => 'Order' . $data->order_id,
             ],
             'order_no' => 'guapa-order-' . $data->order_id,
-            'redirect_url' => '',
+            'redirect_url' => config('app.url') . '/status=paid&message=APPROVED',
             'webhook_url' => $data->callback_url,
         ];
     }
@@ -49,7 +49,7 @@ class OttuService
             $res = Http::asForm()
                 ->withHeaders(['Authorization' => $this->apiKey])
                 ->acceptJson()
-                ->post($this->baseUrl, $invoice);
+                ->post("$this->baseUrl/b/checkout/v1/pymt-txn", $invoice);
 
             if ($res->status() != 201) {
                 \App\Helpers\Common::logReq('Ottu CREATE SESSION ERR LOG', $res->json());
@@ -72,7 +72,7 @@ class OttuService
             $res = Http::asForm()
                 ->withHeaders(['Authorization' => $this->apiKey])
                 ->acceptJson()
-                ->patch($this->baseUrl . "/$session_id", $data);
+                ->patch("$this->baseUrl/b/checkout/v1/pymt-txn/$session_id", $data);
 
             if ($res->status() != 200) {
                 \App\Helpers\Common::logReq('Ottu UPDATE SESSION ERR LOG', $res->json());
@@ -93,7 +93,7 @@ class OttuService
             $res = Http::asForm()
                 ->withHeaders(['Authorization' => $this->apiKey])
                 ->acceptJson()
-                ->get($this->baseUrl . "/$session_id");
+                ->get("$this->baseUrl/b/checkout/v1/pymt-txn/$session_id");
 
             if ($res->status() != 200) {
                 \App\Helpers\Common::logReq('Ottu GET SESSION ERR LOG', $res->json());
@@ -110,6 +110,39 @@ class OttuService
 
     public function refund($order)
     {
+        $invoice = $order->invoice;
+
+        $data = [
+            'order_no' => 'guapa-order-' . $order->id,
+            'session_id' => $invoice->invoice_id,
+            'operation' => 'refund',
+        ];
+
+        try {
+            $res = Http::asForm()
+                ->withHeaders(['Authorization' => $this->apiKey])
+                ->acceptJson()
+                ->post("$this->baseUrl/b/pbl/v2/operation", $data);
+
+            if ($res->status() != 200) {
+                \App\Helpers\Common::logReq('Ottu REFUND SESSION ERR LOG', $res->json());
+                abort(400, 'something went wrong');
+            }
+
+            if ($res->json()['result'] == 'success') {
+                $invoice->update(['status' => 'refunded']);
+            }
+
+            // delete Invoice pdf if exists
+            if ($order->invoice_url) {
+                (new PDFService)->deletePDF($order->invoice_url);
+                $order->update(['invoice_url' => null]);
+            }
+        } catch (Exception $e) {
+            \App\Helpers\Common::logReq('Ottu REFUND SESSION ERR LOG', $e->getMessage());
+
+            return null;
+        }
     }
 
     public function updateInvoice($invoice, $invoiceService)
