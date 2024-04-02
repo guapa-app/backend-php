@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Setting;
+use Exception;
+use GuzzleHttp\Client;
+use Log;
+
+class SMSService
+{
+    private $smsService;
+
+    public function __construct()
+    {
+        $sms_option = Setting::getSmsService();
+
+        switch ($sms_option) {
+            case 'sinch':
+                $this->smsService = new SinchService;
+                break;
+            case 'twilio':
+            default:
+                $this->smsService = new TwilioService;
+                break;
+        }
+    }
+
+    public function sendOtp(string $phone)
+    {
+        return $this->smsService->sendOtp($phone);
+    }
+
+    public function verifyOtp(string $phone, string $otp): bool
+    {
+        return $this->smsService->verifyOtp(trim($phone), trim($otp));
+    }
+}

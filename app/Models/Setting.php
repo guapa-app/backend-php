@@ -73,4 +73,17 @@ class Setting extends Model
 
         return (string) $record->s_value;
     }
+
+    public static function getSmsService()
+    {
+        $record = static::firstOrCreate(['s_key' => 'sms_service'], [
+            's_value'           => 'twilio',
+            's_unit'            => 'string',
+            's_validation_type' => 'options',
+            's_validation'      => ['twilio', 'sinch'],
+            'instructions'      => 'Available SMS Services To Use twilio or Sinch only. anything else \'ll get error.',
+        ]);
+
+        return (string) $record->s_value;
+    }
 }

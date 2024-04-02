@@ -41,6 +41,7 @@
         "spatie/laravel-translatable": "^6.5",
         "spatie/nova-translatable": "^4.0",
         "symfony/cache": "^6.3",
+        "twilio/sdk": "^7.16",
         "ziffmedia/nova-select-plus": "^2.0"
     },
     "require-dev": {
