@@ -26,9 +26,9 @@ class SettingRequest extends FormRequest
         $id = $this->route('id');
 
         return is_numeric($id) ? [] : [
-            'setting_key' => 'required|string|unique:settings,setting_key',
-            'setting_value' => 'required|string',
-            'setting_unit' => 'nullable|string',
+            's_key'        => 'required|string|unique:settings,s_key',
+            's_value'      => 'required|string',
+            's_unit'       => 'nullable|string',
             'instructions' => 'nullable|string',
         ];
     }

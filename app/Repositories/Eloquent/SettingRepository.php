@@ -36,7 +36,7 @@ class SettingRepository extends EloquentRepository implements SettingRepositoryI
     {
         return cache()->get('settings', function () {
             return $this->model->select([
-                'id', 'setting_key', 'setting_value', 'setting_unit',
+                'id', 's_key', 's_value', 's_unit',
             ])->get();
         });
     }
@@ -48,7 +48,7 @@ class SettingRepository extends EloquentRepository implements SettingRepositoryI
      */
     public function create(array $data) : Model
     {
-        $data['setting_value'] = strip_tags($data['setting_value']);
+        $data['s_value'] = strip_tags($data['s_value']);
         if (isset($data['instructions'])) {
             $data['instructions'] = strip_tags($data['instructions']);
         }
@@ -62,14 +62,14 @@ class SettingRepository extends EloquentRepository implements SettingRepositoryI
 
     public function updateSettings(array $data) : array
     {
-        $existing = Setting::pluck('setting_key')->toArray();
+        $existing = Setting::pluck('s_key')->toArray();
         $data = array_filter($data, function ($key) use ($existing) {
             return in_array($key, $existing);
         }, ARRAY_FILTER_USE_KEY);
 
         foreach ($data as $key => $value) {
-            $this->model->where('setting_key', $key)->update([
-                'setting_value' => strip_tags($value),
+            $this->model->where('s_key', $key)->update([
+                's_value' => strip_tags($value),
             ]);
         }
 

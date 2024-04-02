@@ -27,12 +27,12 @@ class Common
             return $default;
         }
 
-        $setting = $settings->firstWhere('setting_key', $settingKey);
+        $setting = $settings->firstWhere('s_key', $settingKey);
         if (!$setting) {
             return $default;
         }
 
-        return $setting->setting_value;
+        return $setting->s_value;
     }
 
     /**
