@@ -7,7 +7,6 @@ use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Models\Setting;
 use App\Services\AuthService;
-use App\Services\SinchService;
 use App\Services\SMSService;
 use DB;
 use Illuminate\Http\Request;
@@ -68,14 +67,12 @@ class OTPController extends BaseApiController
         ];
 
         if (isset($data['otp'])) {
-            $grantType = ($this->smsService instanceof SinchService) ? 'sinch_verify' : 'twilio_verify';
+            $tokenPayload['grant_type'] = 'otp_verify';
             $tokenPayload['otp'] = $data['otp'];
         } else {
-            $grantType = 'firebase_phone';
+            $tokenPayload['grant_type'] = 'firebase_phone';
             $tokenPayload['jwt_token'] = $data['firebase_jwt_token'];
         }
-
-        $tokenPayload['grant_type'] = $grantType;
 
         if (Setting::checkTestingMode()) {
             $personalAccessToken = $user->createToken('Temp Personal Token', ['*']);

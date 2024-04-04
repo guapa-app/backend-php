@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\OTPController as ApiOTPController;
 use App\Http\Requests\PhoneRequest;
-use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Models\Setting;
 use Illuminate\Http\Request;

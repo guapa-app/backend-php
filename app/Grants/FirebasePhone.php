@@ -8,7 +8,6 @@ use Hamedov\PassportGrants\PassportGrant;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\Bridge\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Exception\OAuthServerException;
 
 class FirebasePhone extends PassportGrant
 {

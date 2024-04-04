@@ -57,7 +57,7 @@ class AuthController extends BaseApiController
         $token = null;
 
         if (isset($data['firebase_jwt_token']) || isset($data['otp'])) {
-            $grantType = isset($data['firebase_jwt_token']) ? 'firebase_phone' : 'sinch_verify';
+            $grantType = isset($data['firebase_jwt_token']) ? 'firebase_phone' : 'otp_verify';
             $isFirebase = $grantType === 'firebase_phone';
             $requestPayload = [
                 'grant_type'   => $grantType,

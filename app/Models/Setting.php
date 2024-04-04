@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -85,5 +86,10 @@ class Setting extends Model
         ]);
 
         return (string) $record->s_value;
+    }
+
+    public function scopeByKey(Builder $query, string $key = ''): Builder
+    {
+        return $query->where('s_key', $key);
     }
 }

@@ -132,7 +132,7 @@ return [
 
     'grants' => [
         \App\Grants\FirebasePhone::class,
-        \App\Grants\Sinch::class,
+        \App\Grants\OtpVerify::class,
     ],
 
 ];

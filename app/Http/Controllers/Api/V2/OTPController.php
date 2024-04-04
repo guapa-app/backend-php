@@ -42,7 +42,6 @@ class OTPController extends ApiOTPController
             if ($th instanceof \Illuminate\Validation\ValidationException) {
                 throw $th;
             }
-            $res = json_decode((string) $th->getResponse()?->getBody());
             if ($th instanceof \GuzzleHttp\Exception\ClientException) {
                 if ($th->getCode() == 402) {
                     // 402 Not enough credit.
@@ -53,7 +52,7 @@ class OTPController extends ApiOTPController
                     ], __('api.otp_not_sent'), 422);
                 }
             }
-            $this->logReq($res?->message);
+            $this->logReq(json_decode($th));
 
             return $this->successJsonRes([
                 'is_otp_sent' => false,

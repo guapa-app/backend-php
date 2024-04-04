@@ -3,9 +3,6 @@
 namespace App\Services;
 
 use App\Models\Setting;
-use Exception;
-use GuzzleHttp\Client;
-use Log;
 
 class SMSService
 {

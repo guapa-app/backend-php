@@ -3,13 +3,13 @@
 namespace App\Grants;
 
 use App\Helpers\Common;
-use App\Services\AuthService;
+use App\Services\SMSService;
 use Hamedov\PassportGrants\PassportGrant;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\Bridge\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 
-class Sinch extends PassportGrant
+class OtpVerify extends PassportGrant
 {
     /**
      * Unique string that identifies this grant.
@@ -17,7 +17,7 @@ class Sinch extends PassportGrant
      * token requests.
      * @var string
      */
-    protected $identifier = 'sinch_verify';
+    protected $identifier = 'otp_verify';
 
     /**
      * Required parameters in access token request
@@ -59,9 +59,9 @@ class Sinch extends PassportGrant
             }
         }
 
-        $authService = app(AuthService::class);
+        $smsService = app(SMSService::class);
 
-        $isOtpCorrect = $isTesting || $authService->verifySinchOtp($authParams['phone_number'], $authParams['otp']);
+        $isOtpCorrect = $isTesting || $smsService->verifyOtp($authParams['phone_number'], $authParams['otp']);
 
         if (!$isOtpCorrect) {
             return;
