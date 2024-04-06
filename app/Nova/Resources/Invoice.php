@@ -5,11 +5,11 @@ namespace App\Nova\Resources;
 use Illuminate\Http\Request;
 use Laravel\Nova\Actions;
 use Laravel\Nova\Actions\ExportAsCsv;
+use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
-use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 
@@ -58,16 +58,20 @@ class Invoice extends Resource
             Number::make(__('amount'), 'amount')->step(0.01)->required(),
             Text::make(__('currency'), 'currency')->required(),
 
-            Select::make(__('status'), 'status')
-                ->options([
-                    'Paid' => 'Paid',
-                    'Pending' => 'Pending',
-                    'Refunded' => 'Refunded',
-                    'Initial' => 'Initial',
-                ])
-                ->default('Initial')
-                ->displayUsingLabels()
-                ->required(),
+            Badge::make('Status')->map([
+                'paid'       => 'success',
+                'pending'    => 'warning',
+                'refunded'   => 'danger',
+                'initiated'  => 'info',
+                'created'    => 'warning',
+                'attempted'  => 'warning',
+                'authorized' => 'warning',
+                'failed'     => 'warning',
+                'canceled'   => 'warning',
+                'expired'    => 'warning',
+                'invalided'  => 'warning',
+                'cod'        => 'warning',
+            ])->withIcons(),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
@@ -147,6 +151,11 @@ class Invoice extends Resource
     }
 
     public function authorizedToDelete(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToReplicate(Request $request)
     {
         return false;
     }

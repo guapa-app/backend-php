@@ -71,7 +71,8 @@ class Category extends Resource
                 ->step(0.5)
                 ->min(0)
                 ->max(100)
-                ->required(),
+                ->required()
+                ->rules('required'),
 
             Select::make(__('type'), 'type')
                 ->options([
@@ -80,7 +81,8 @@ class Category extends Resource
                     'blog_category' => 'Blog',
                 ])
                 ->displayUsingLabels()
-                ->required(),
+                ->required()
+                ->rules('required'),
 
             BelongsTo::make('parent', 'parent', self::class)->showCreateRelationButton()->nullable(),
 
