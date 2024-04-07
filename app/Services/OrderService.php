@@ -198,12 +198,10 @@ class OrderService
         } elseif ($status == (OrderStatus::Cancel_Request)->value) {
             if ($order->user_id !== $user->id) {
                 $error = 'You are not authorized to cancel this order';
-            } elseif ($order->is_used) {
-                $error = __('api.cancel_used_order_error');
             } elseif ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
-            } elseif (in_array($order->status, [OrderStatus::Rejected, OrderStatus::Canceled])) {
-                $error = __('api.cancel_rejected_canceled_order_error');
+            } elseif ($order->is_used || in_array($order->status->value, OrderStatus::notAvailableForCancle())) {
+                 $error = __('api.not_available_for_cancel', ['status' => __('api.order_statuses.'.$order->status->value)]);
             }
         }
 
