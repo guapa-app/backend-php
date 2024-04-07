@@ -130,7 +130,7 @@ class OrderService
 
                 $order->load('items', 'address', 'user', 'vendor');
 
-                // Notification::send($order->vendor->staff, new OrderNotification($order));
+                Notification::send($order->vendor->staff, new OrderNotification($order));
 
                 $orders->push($order);
             }
