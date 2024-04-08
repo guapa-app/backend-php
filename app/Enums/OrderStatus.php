@@ -87,7 +87,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Canceled,
         ], 'value', 'name');
     }
-    
+
     public static function notAvailableForCancle(): array
     {
         return array_column([
@@ -97,6 +97,20 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Deliveried,
             self::Return_Request,
             self::Returned,
+            self::Canceled,
+        ], 'value', 'name');
+    }
+
+    public static function notAvailableForExpire(): array
+    {
+        return array_column([
+            self::Rejected,
+            self::Expired,
+            self::Used,
+            self::Deliveried,
+            self::Return_Request,
+            self::Returned,
+            self::Cancel_Request,
             self::Canceled,
         ], 'value', 'name');
     }

@@ -130,4 +130,9 @@ class Order extends Model implements Listable
 
         return $query;
     }
+
+    public function scopeStatus(Builder $query, $status): Builder
+    {
+        return $query->where('status', $status);
+    }
 }
