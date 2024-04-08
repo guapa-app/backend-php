@@ -25,7 +25,7 @@ class ListProducts extends ListRecords
     {
         return [
             'Product' => Tab::make()->query(fn ($query) => $query->product()),
-            'Coupon' => Tab::make()->query(fn ($query) => $query->service()),
+            'Service' => Tab::make()->query(fn ($query) => $query->service()),
         ];
     }
 }

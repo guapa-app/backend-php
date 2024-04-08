@@ -7,12 +7,14 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\FormData;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Http\Requests\NovaRequest;
 use ZiffMedia\NovaSelectPlus\SelectPlus;
 
 class Product extends Resource
@@ -59,10 +61,6 @@ class Product extends Resource
             ID::make(__('ID'), 'id')->sortable(),
 
             Text::make(__('title'), 'title')->required()->rules('required'),
-            Text::make(__('url'), 'url')->nullable(),
-            Textarea::make(__('description'), 'description')->required(),
-            Textarea::make(__('terms'), 'terms')->required(),
-            Number::make(__('price'), 'price')->step(0.01)->required()->rules('required'),
 
             Select::make(__('type'), 'type')
                 ->options([
@@ -73,14 +71,27 @@ class Product extends Resource
                 ->displayUsingLabels()
                 ->rules('required'),
 
+            Text::make(__('url'), 'url')->nullable(),
+            Textarea::make(__('description'), 'description')->required(),
+            Textarea::make(__('terms'), 'terms')->required(),
+            Number::make(__('price'), 'price')->step(0.01)->required()->rules('required'),
+
             SelectPlus::make(__('categories'), 'taxonomies', Category::class)
                 ->required()
                 ->help('Only first category \'ll be stored')
                 ->label(function ($state) {
                     return $state->title . ' - (' . $state->type . ')';
-                })->optionsQuery(function ($query) {
-                    $query->where('taxonomies.type', '!=', 'blog_category');
                 })
+                ->dependsOn(
+                    ['type'],
+                    function (SelectPlus $field, NovaRequest $request, FormData $formData) {
+                        $type = $formData->type != null ? ($formData->type == 'service' ? 'specialty' : 'category') : '';
+
+                        $field->optionsQuery(function ($query) use ($type) {
+                            $query->where('type', '=', $type);
+                        });
+                    }
+                )
                 ->rules('required', function ($attribute, $value, $fail) use ($request) {
                     if (preg_match('/^\[({.*?})/', $request->taxonomies, $matches)) {
                         $firstObject = $matches[1];
@@ -114,7 +125,7 @@ class Product extends Resource
 
             SelectPlus::make(__('addresses'), 'addresses', Address::class)
                 ->label(function ($state) {
-                    return $state->title . ' - (vId:' . $state->addressable_id . ')';
+                    return $state->title ?? $state->address_1 ?? $state->address_2 ?? ' - (vId:' . $state->addressable_id . ')';
                 })->optionsQuery(function ($query) {
                     $query->where('addressable_type', 'vendor');
                 }),
