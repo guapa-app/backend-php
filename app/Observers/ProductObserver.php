@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Events\ProductCreated;
+use App\Helpers\Common;
 use App\Models\Product;
 
 class ProductObserver
@@ -15,7 +16,7 @@ class ProductObserver
      */
     public function creating(Product $product)
     {
-        $product->hash_id = rand(10000, 20000);
+        $product->hash_id = Common::generateUniqueHashForModel(Product::class, 1000000, true);
     }
 
     /**

@@ -100,7 +100,7 @@ class Common
         }
     }
 
-    public static function mapIdName(array $data) :array
+    public static function mapIdName(array $data): array
     {
         return array_map(function ($v, $k) {
             return ['id' => $k, 'name' => $v];
@@ -112,10 +112,10 @@ class Common
      * @param int $length
      * @return bool|string
      */
-    public static function generateUniqueHashForModel(string $model, int $length = 20)
+    public static function generateUniqueHashForModel(string $model, int $length = 20, bool $numeric = false)
     {
         // Generate a random string of characters.
-        $hash = str_random($length);
+        $hash = $numeric ? rand(0, $length) : str_random($length);
 
         // Check if the hash already exists in the database.
         // If the hash exists, generate a new one.
