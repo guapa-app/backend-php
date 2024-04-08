@@ -5,6 +5,7 @@ namespace App\Nova\Resources;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
@@ -57,11 +58,11 @@ class Product extends Resource
 
             ID::make(__('ID'), 'id')->sortable(),
 
-            Text::make(__('title'), 'title')->required(),
+            Text::make(__('title'), 'title')->required()->rules('required'),
             Text::make(__('url'), 'url')->nullable(),
             Textarea::make(__('description'), 'description')->required(),
             Textarea::make(__('terms'), 'terms')->required(),
-            Number::make(__('price'), 'price')->step(0.01)->required(),
+            Number::make(__('price'), 'price')->step(0.01)->required()->rules('required'),
 
             Select::make(__('type'), 'type')
                 ->options([
@@ -97,7 +98,8 @@ class Product extends Resource
                 ])
                 ->default('Draft')
                 ->displayUsingLabels()
-                ->required(),
+                ->required()
+                ->rules('required'),
 
             Select::make(__('review'), 'review')
                 ->options([
@@ -107,7 +109,8 @@ class Product extends Resource
                 ])
                 ->default('Pending')
                 ->displayUsingLabels()
-                ->required(),
+                ->required()
+                ->rules('required'),
 
             SelectPlus::make(__('addresses'), 'addresses', Address::class)
                 ->label(function ($state) {
@@ -118,10 +121,16 @@ class Product extends Resource
 
             HasMany::make(__('reviews'), 'reviews', Review::class),
 
+            Date::make(__('expires_at'), 'expires_at')
+                ->rules(fn ($request) => [
+                    $request->type == 'service' ? 'required' : 'sometimes',
+                ]),
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
 
-            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+            BelongsTo::make(__('vendor'), 'vendor', Vendor::class)
+                ->withoutTrashed()
+                ->showCreateRelationButton(),
         ];
 
         return $returned_arr;

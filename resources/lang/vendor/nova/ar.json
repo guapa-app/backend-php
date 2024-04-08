@@ -416,5 +416,6 @@
     "Customize": "تخصيص",
     "Update :resource: :title": "تحديث :resource: :title",
     "Update attached :resource: :title": "تحديث المرفق :resource: :title",
-    ":resource Details: :title": "تفاصيل :resource : :title"
+    ":resource Details: :title": "تفاصيل :resource : :title",
+    "expires_at": "وقت الانتهاء"
 }

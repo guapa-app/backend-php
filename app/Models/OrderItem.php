@@ -38,9 +38,9 @@ class OrderItem extends Model
 
     public function getCouponNumAttribute()
     {
-        return rand(1, 100) . '@$%' . $this->order_id . '#' .
-            rand(1, 100) . '@$%' . $this->id . '#' .
-            rand(1, 100) . '@$%' . $this->product_id . '#';
+        return rand(1, 100) . '-' . $this->order_id . '-' .
+            rand(1, 100) . '-' . $this->id . '-' .
+            rand(1, 100) . '-' . $this->product_id;
     }
 
     public function order()

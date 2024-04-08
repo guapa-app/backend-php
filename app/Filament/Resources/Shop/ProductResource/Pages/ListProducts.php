@@ -16,7 +16,7 @@ class ListProducts extends ListRecords
         return [
             Actions\CreateAction::make()->label('New Product')
                 ->url(route('filament.user.resources.shop.products.create') . '?type=product'),
-            Actions\CreateAction::make()->label('New Coupon')
+            Actions\CreateAction::make()->label('New Service')
                 ->url(route('filament.user.resources.shop.products.create') . '?type=service'),
         ];
     }
@@ -25,7 +25,7 @@ class ListProducts extends ListRecords
     {
         return [
             'Product' => Tab::make()->query(fn ($query) => $query->product()),
-            'Coupon' => Tab::make()->query(fn ($query) => $query->coupon()),
+            'Coupon' => Tab::make()->query(fn ($query) => $query->service()),
         ];
     }
 }

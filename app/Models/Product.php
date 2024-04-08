@@ -38,7 +38,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price',
-        'status', 'review', 'type', 'terms', 'url',
+        'status', 'review', 'type', 'terms', 'url', 'expires_at',
     ];
 
     protected $appends = [
@@ -66,6 +66,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         'type'   => ProductType::class,
         'status' => ProductStatus::class,
         'review' => ProductReview::class,
+        'expires_at' => 'datetime',
     ];
 
     /**
@@ -159,7 +160,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $query->where('vendor_id', $value);
     }
 
-    public function scopeCoupon($query)
+    public function scopeService($query)
     {
         return $query->where('type', ProductType::Service);
     }
