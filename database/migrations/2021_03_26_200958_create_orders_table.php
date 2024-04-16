@@ -22,7 +22,6 @@ class CreateOrdersTable extends Migration
             $table->string('phone')->nullable();
             $table->decimal('total', 8, 2);
             $table->char('status', 25);
-            $table->boolean('is_used');
             $table->string('invoice_url')->nullable();
             $table->text('note')->nullable();
             $table->text('cancellation_reason')->nullable();

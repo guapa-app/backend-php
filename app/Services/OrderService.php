@@ -204,7 +204,7 @@ class OrderService
 
             if ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
-            } elseif ($order->is_used || in_array($order->status->value, OrderStatus::notAvailableForCancle())) {
+            } elseif (in_array($order->status->value, OrderStatus::notAvailableForCancle())) {
                 $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
             }
         } elseif ($status == (OrderStatus::Return_Request)->value) {

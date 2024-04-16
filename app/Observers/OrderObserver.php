@@ -18,6 +18,5 @@ class OrderObserver
     {
         $order->hash_id = Common::generateUniqueHashForModel(Order::class, 16);
         $order->status = OrderStatus::Pending;
-        $order->is_used = false;
     }
 }

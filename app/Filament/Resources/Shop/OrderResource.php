@@ -66,8 +66,6 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_used')
-                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -126,9 +124,6 @@ class OrderResource extends Resource
             Forms\Components\TextInput::make('phone')
                 ->tel()
                 ->maxLength(255)
-                ->disabled(),
-            Forms\Components\Toggle::make('is_used')
-                ->required()
                 ->disabled(),
             Forms\Components\Textarea::make('cancellation_reason')
                 ->maxLength(65535)
