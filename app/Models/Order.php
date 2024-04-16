@@ -16,7 +16,7 @@ class Order extends Model implements Listable
 
     protected $fillable = [
         'hash_id', 'user_id', 'vendor_id', 'address_id', 'total', 'status',
-        'note', 'name', 'phone', 'is_used', 'invoice_url', 'cancellation_reason',
+        'note', 'name', 'phone', 'invoice_url', 'cancellation_reason',
     ];
 
     /**
@@ -39,15 +39,6 @@ class Order extends Model implements Listable
     protected $casts = [
         'status' => OrderStatus::class,
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($order) {
-            $order->is_used = false;
-        });
-    }
 
     public function user()
     {
@@ -129,5 +120,10 @@ class Order extends Model implements Listable
         $query->with('vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
 
         return $query;
+    }
+
+    public function scopeStatus(Builder $query, $status): Builder
+    {
+        return $query->where('status', $status);
     }
 }

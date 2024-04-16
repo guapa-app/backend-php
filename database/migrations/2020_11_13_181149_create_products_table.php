@@ -22,9 +22,10 @@ class CreateProductsTable extends Migration
             $table->decimal('price', 12, 2);
             $table->enum('status', ['Published', 'Draft'])->default('Draft');
             $table->enum('review', ['Approved', 'Blocked', 'Pending'])->default('Approved');
-            $table->string('type', 30)->default('product'); // product / service
+            $table->string('type', 30)->default('product'); // product || service
             $table->string('url')->nullable();
             $table->text('terms')->nullable();
+            $table->date('expires_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

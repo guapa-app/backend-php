@@ -130,7 +130,7 @@ class OrderService
 
                 $order->load('items', 'address', 'user', 'vendor');
 
-                // Notification::send($order->vendor->staff, new OrderNotification($order));
+                Notification::send($order->vendor->staff, new OrderNotification($order));
 
                 $orders->push($order);
             }
@@ -158,11 +158,15 @@ class OrderService
     public function update(int $id, array $data): Order
     {
         $order = $this->repository->getOneOrFail($id);
+
         $this->validateStatus($order, $data['status']);
+
         $order = $this->repository->update($order, $data);
-        if ($data['status'] == 'Canceled' && ($order->invoice != null)) {
+
+        if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
             $this->payment_service->refund($order);
         }
+
         Notification::send($order->user, new OrderUpdatedNotification($order));
 
         return $order;
@@ -196,14 +200,18 @@ class OrderService
                 $error = 'You are not authorized to ' . str_replace('ed', '', $status) . ' this order';
             }
         } elseif ($status == (OrderStatus::Cancel_Request)->value) {
-            if ($order->user_id !== $user->id) {
-                $error = 'You are not authorized to cancel this order';
-            } elseif ($order->is_used) {
-                $error = __('api.cancel_used_order_error');
-            } elseif ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
+            $error = $this->checkAuthorization($order, $user);
+
+            if ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
-            } elseif (in_array($order->status, [OrderStatus::Rejected, OrderStatus::Canceled])) {
-                $error = __('api.cancel_rejected_canceled_order_error');
+            } elseif (in_array($order->status->value, OrderStatus::notAvailableForCancle())) {
+                $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
+            }
+        } elseif ($status == (OrderStatus::Return_Request)->value) {
+            $error = $this->checkAuthorization($order, $user);
+            
+            if ($order->status != OrderStatus::Deliveried) {
+                $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
             }
         }
 
@@ -216,5 +224,13 @@ class OrderService
                 'status' => $error,
             ]);
         }
+    }
+
+    private function checkAuthorization($order, $user): ?string
+    {
+        if ($order->user_id !== $user->id)
+            $error = 'You are not authorized to cancel this order';
+
+        return $error;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\OrderStatus;
 use App\Helpers\Common;
 use App\Models\Order;
 
@@ -16,5 +17,6 @@ class OrderObserver
     public function creating(Order $order)
     {
         $order->hash_id = Common::generateUniqueHashForModel(Order::class, 16);
+        $order->status = OrderStatus::Pending;
     }
 }

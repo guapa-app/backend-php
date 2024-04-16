@@ -423,5 +423,6 @@
     "Start Polling": "Start Polling",
     "Stop Polling": "Stop Polling",
     "The HasOne relationship has already been filled.": "The HasOne relationship has already been filled.",
-    "An error occured while uploading the file.": "An error occured while uploading the file."
+    "An error occured while uploading the file.": "An error occured while uploading the file.",
+    "expires_at": "expires at"
 }

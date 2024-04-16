@@ -81,6 +81,7 @@ class ProductRequest extends FormRequest
             // Admin only attributes
             'review'            => "{$rule_name}|string|in:Approved,Blocked,Pending",
             'url'               => 'nullable|string',
+            'expires_at'        => 'required_if:type,service|date',
         ];
 
         // If the user is not an admin, remove the fields updated

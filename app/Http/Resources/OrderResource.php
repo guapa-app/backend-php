@@ -18,7 +18,6 @@ class OrderResource extends JsonResource
             'name'        => (string) $this->name,
 
             'phone'       => (string) $this->phone,
-            'is_used'     => (bool) $this->is_used,
             'invoice_url' => (string) $this->invoice_url,
 
             'cancellation_reason' => (string) $this->cancellation_reason,

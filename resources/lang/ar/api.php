@@ -44,4 +44,20 @@ return [
     'cancel_used_order_error'                => 'لا يمكنك إلغاء هذا الطلب.',
     'cancel_order_error'                     => 'لا يمكنك إلغاء الطلب بعد 14 يومًا',
     'cancel_rejected_canceled_order_error'   => 'لا يمكنك إلغاء هذا الطلب',
+    'not_available_for_action'               => 'لا يمكن تنفيذ هذا الإجراء لان هذا الطلب :status',
+
+    'order_statuses' => [
+        'Pending'              => 'قيد الانتظار',
+        'Accepted'             => 'تم قبوله',
+        'Rejected'             => 'تم رفضه',
+        'Expired'              => 'منتهي الصَّلاحِيَة',
+        'Used'                 => 'تم استخدامه',
+        'Prepare for delivery' => 'يجهز للشحن و الاستلام',
+        'Shipping'             => 'تم شحنه',
+        'Delivered'            => 'تم أستلامه',
+        'Return Request'       => 'قيد الاسترجاع',
+        'Returned'             => 'تم أرجاعه',
+        'Cancel Request'       => 'قيد الإلغاء',
+        'Canceled'             => 'تم إلغاؤه',
+    ]
 ];
