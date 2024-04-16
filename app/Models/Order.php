@@ -40,15 +40,6 @@ class Order extends Model implements Listable
         'status' => OrderStatus::class,
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($order) {
-            $order->is_used = false;
-        });
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
