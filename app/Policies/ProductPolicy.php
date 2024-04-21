@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\Product;
-use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,98 +11,114 @@ class ProductPolicy
     use HandlesAuthorization;
 
     /**
-     * Perform pre-authorization checks.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $user
-     * @param  string  $ability
-     * @return void|bool
+     * Determine whether the user can view any models.
      */
-    public function before(Model $user, $ability)
+    public function viewAny(Model $user)
     {
-        if ($user->isAdmin()) {
-            return true;
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('view_products');
+            } else {
+                return true;
+            }
+        } catch (\Throwable $th) {
+            return false;
         }
     }
 
     /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return mixed
-     */
-    public function viewAny(User $user)
-    {
-        return true;
-    }
-
-    /**
      * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Product  $product
-     * @return mixed
      */
-    public function view(User $user, Product $product)
+    public function view(Model $user, Product $product)
     {
-        return true;
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('view_products');
+            } else {
+                return true;
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function create(User $user)
+    public function create(Model $user)
     {
-        return true;
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('create_products');
+            } else {
+                return true;
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Product  $product
-     * @return mixed
      */
-    public function update(User $user, Product $product)
+    public function update(Model $user, Product $product)
     {
-        return true;
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('update_products');
+            } else {
+                return true;
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Product  $product
-     * @return mixed
      */
-    public function delete(User $user, Product $product)
+    public function delete(Model $user, Product $product)
     {
-        return $product->vendor && $product->vendor->hasUser($user);
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('delete_products');
+            } else {
+                return $product->vendor && $product->vendor->hasUser($user);
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Product  $product
-     * @return mixed
      */
-    public function restore(User $user, Product $product)
+    public function restore(Model $user, Product $product)
     {
-        return $product->vendor && $product->vendor->hasUser($user);
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('update_products');
+            } else {
+                return $product->vendor && $product->vendor->hasUser($user);
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Product  $product
-     * @return mixed
      */
-    public function forceDelete(User $user, Product $product)
+    public function forceDelete(Model $user, Product $product)
     {
-        return false;
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('delete_products');
+            } else {
+                return false;
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 }

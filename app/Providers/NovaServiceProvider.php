@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Nova\Dashboards\Main;
+use App\Policies\PermissionPolicy;
+use App\Policies\RolePolicy;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
@@ -67,7 +69,11 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      */
     public function tools()
     {
-        return [];
+        return [
+            \Vyuldashev\NovaPermission\NovaPermissionTool::make()
+                ->rolePolicy(RolePolicy::class)
+                ->permissionPolicy(PermissionPolicy::class),
+        ];
     }
 
     /**

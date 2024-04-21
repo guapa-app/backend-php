@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\WorkDay;
 use App\Observers\OfferObserver;
 use App\Observers\OrderObserver;
+use App\Observers\PermissionObserver;
 use App\Observers\ProductObserver;
 use App\Observers\SettingObserver;
 use App\Observers\UserObserver;
@@ -21,6 +22,7 @@ use App\Observers\WorkDayObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Spatie\Permission\Models\Permission;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -56,5 +58,6 @@ class EventServiceProvider extends ServiceProvider
         WorkDay::observe(WorkDayObserver::class);
         Order::observe(OrderObserver::class);
         Setting::observe(SettingObserver::class);
+        Permission::observe(PermissionObserver::class);
     }
 }

@@ -3,9 +3,12 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Laravel\Nova\Fields\BelongsToMany;
+use Laravel\Nova\Fields\Hidden;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
+use ZiffMedia\NovaSelectPlus\SelectPlus;
 
 class Role extends Resource
 {
@@ -44,11 +47,21 @@ class Role extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Text::make(__('guard name'), 'guard_name')->default(config('auth.defaults.guard')),
+            Hidden::make(__('guard name'), 'guard_name')
+                ->withMeta([
+                    'value' => 'admin',
+                ]),
 
             Text::make(__('name'), 'name'),
 
-            BelongsToMany::make(__('users'), 'users', User::class),
+            BelongsToMany::make(__('users'), 'users', Admin::class),
+
+            SelectPlus::make(__('permissions'), 'permissions', \Vyuldashev\NovaPermission\Permission::class)->onlyOnForms()
+                ->label(function ($state) {
+                    return Str::headline($state->name);
+                })->optionsQuery(function ($query) {
+                    $query->where('guard_name', 'admin');
+                }),
         ];
     }
 

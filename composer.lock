@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b4f3a166ae895c877deecca01cd8305",
+    "content-hash": "db88af84981a8c123ccc6a09b2a0faf4",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -11842,6 +11842,57 @@
                 }
             ],
             "time": "2022-03-08T17:03:00+00:00"
+        },
+        {
+            "name": "vyuldashev/nova-permission",
+            "version": "v3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vyuldashev/nova-permission.git",
+                "reference": "2485abfef6d950e8b8b6f0a566da93383e83c6f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vyuldashev/nova-permission/zipball/2485abfef6d950e8b8b6f0a566da93383e83c6f1",
+                "reference": "2485abfef6d950e8b8b6f0a566da93383e83c6f1",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/nova": "^4.0",
+                "php": "^7.4|^8.0",
+                "spatie/laravel-permission": "^3.0|^4.0|^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Vyuldashev\\NovaPermission\\ToolServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vyuldashev\\NovaPermission\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A Laravel Nova tool for Spatie's Permission library.",
+            "keywords": [
+                "laravel",
+                "nova",
+                "spatie-permission"
+            ],
+            "support": {
+                "issues": "https://github.com/vyuldashev/nova-permission/issues",
+                "source": "https://github.com/vyuldashev/nova-permission/tree/v3.2.0"
+            },
+            "time": "2022-08-23T23:14:12+00:00"
         },
         {
             "name": "webmozart/assert",

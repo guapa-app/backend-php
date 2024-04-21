@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Database\Eloquent\Model;
@@ -12,98 +11,70 @@ class VendorPolicy
     use HandlesAuthorization;
 
     /**
-     * Perform pre-authorization checks.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $user
-     * @param  string  $ability
-     * @return void|bool
+     * Determine whether the user can view any models.
      */
-    public function before(Model $user, $ability)
+    public function viewAny(Model $user)
     {
-        if ($user->isAdmin()) {
-            return true;
+        try {
+            return $user->hasPermissionTo('view_vendors');
+        } catch (\Throwable $th) {
+            return false;
         }
     }
 
     /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return mixed
-     */
-    public function viewAny(User $user)
-    {
-        //
-    }
-
-    /**
      * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Vendor  $vendor
-     * @return mixed
      */
-    public function view(User $user, Vendor $vendor)
+    public function view(Model $user, Vendor $vendor)
     {
-        //
+        try {
+            return $user->hasPermissionTo('view_vendors');
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function create(User $user)
+    public function create(Model $user)
     {
-        return true;
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('create_vendors');
+            } else {
+                return true;
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Vendor  $vendor
-     * @return mixed
      */
-    public function update(User $user, Vendor $vendor)
+    public function update(Model $user, Vendor $vendor)
     {
-        return $user->hasRole('manager') && $vendor->hasManager($user);
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('update_vendors');
+            } else {
+                return $user->hasRole('manager') && $vendor->hasManager($user);
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
      * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Vendor  $vendor
-     * @return mixed
      */
-    public function delete(User $user, Vendor $vendor)
+    public function delete(Model $user, Vendor $vendor)
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Vendor  $vendor
-     * @return mixed
-     */
-    public function restore(User $user, Vendor $vendor)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Vendor  $vendor
-     * @return mixed
-     */
-    public function forceDelete(User $user, Vendor $vendor)
-    {
-        //
+        try {
+            return $user->hasPermissionTo('delete_vendors');
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 }

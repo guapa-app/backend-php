@@ -42,6 +42,7 @@
         "spatie/nova-translatable": "^4.0",
         "symfony/cache": "^6.3",
         "twilio/sdk": "^7.16",
+        "vyuldashev/nova-permission": "^3.2",
         "ziffmedia/nova-select-plus": "^2.0"
     },
     "require-dev": {
