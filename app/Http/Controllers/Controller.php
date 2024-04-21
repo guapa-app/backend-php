@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ErrorAlarmMail;
 use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -11,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use function request;
 
 class Controller extends BaseController
@@ -46,7 +48,7 @@ class Controller extends BaseController
         ], $status);
     }
 
-    public function logReq($message = '')
+    public function logReq($message = '', $data = null)
     {
         Log::alert(
             '***' .
@@ -57,7 +59,13 @@ class Controller extends BaseController
                 "\n***",
             [
                 "\nRequest Data >-> " => request()->all(),
+                "\nData >-> " => $data,
             ]
         );
+    }
+
+    public function sendAlarmMail($message = '', $exception = []): void
+    {
+        Mail::to(config('app.support_email'))->send(new ErrorAlarmMail($message, $exception));
     }
 }

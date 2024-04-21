@@ -2,9 +2,13 @@
 
 namespace App\Exceptions;
 
+use App\Mail\ErrorAlarmMail;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Mail;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use Moyasar\Exceptions\ApiException as MoyasarApiException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -41,12 +45,16 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
-        \App\Helpers\Common::logReq('LOG HANDLER');
-
         if ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
             throw new NotFoundException();
+        } elseif ($exception instanceof MoyasarApiException || $exception instanceof ClientException) {
+            Mail::to(config('app.support_email'))
+                ->send(new ErrorAlarmMail("LOG HANDLER - {$request->path()} \n {$exception->getMessage()}", $exception));
         }
 
+        if ($request->wantsJson()) {
+            return (new ApiException(__('api.server_error'), 400))->render($request);
+        }
         return parent::render($request, $exception);
     }
 }
