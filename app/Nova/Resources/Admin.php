@@ -7,6 +7,7 @@ use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Password;
 use Laravel\Nova\Fields\Text;
+use Spatie\Permission\Models\Role;
 use Vyuldashev\NovaPermission\RoleSelect;
 
 class Admin extends Resource
@@ -54,7 +55,8 @@ class Admin extends Resource
                 ->creationRules('required', 'string', 'min:8')
                 ->updateRules('nullable', 'string', 'min:8'),
 
-            RoleSelect::make('Role', 'roles'),
+            RoleSelect::make('Role', 'roles')
+                ->options(Role::where('guard_name', 'admin')->pluck('name', 'name')),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),

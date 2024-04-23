@@ -136,7 +136,6 @@ class User extends Resource
 
             Panel::make(__('Profile'), $this->profileFields()),
             MorphMany::make(__('Devices'), 'devices', Device::class),
-            MorphMany::make(__('Notifications'), 'notifications', Notifications::class),
             HasMany::make(__('histories'), 'histories'),
             HasMany::make(__('support messages'), 'support_messages'),
         ];

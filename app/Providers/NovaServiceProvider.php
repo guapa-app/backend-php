@@ -20,6 +20,8 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     {
         parent::boot();
 
+        Nova::withoutGlobalSearch();
+
         \Spatie\NovaTranslatable\Translatable::defaultLocales(['en', 'ar']);
     }
 

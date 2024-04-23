@@ -54,7 +54,13 @@ class Role extends Resource
 
             Text::make(__('name'), 'name'),
 
-            BelongsToMany::make(__('users'), 'users', Admin::class),
+            BelongsToMany::make(__('admins'), 'users', Admin::class)->showOnDetail(function () {
+                return $this->guard_name == 'admin';
+            })->showCreateRelationButton(),
+
+            BelongsToMany::make(__('users'), 'users', User::class)->showOnDetail(function () {
+                return $this->guard_name == 'api';
+            }),
 
             SelectPlus::make(__('permissions'), 'permissions', \Vyuldashev\NovaPermission\Permission::class)->onlyOnForms()
                 ->label(function ($state) {
