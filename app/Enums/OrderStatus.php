@@ -7,18 +7,18 @@ use Filament\Support\Contracts\HasLabel;
 
 enum OrderStatus: string implements HasColor, HasLabel
 {
-    case Pending              = 'Pending';
-    case Accepted             = 'Accepted';
-    case Rejected             = 'Rejected';
-    case Expired              = 'Expired';
-    case Used                 = 'Used';
+    case Pending = 'Pending';
+    case Accepted = 'Accepted';
+    case Rejected = 'Rejected';
+    case Expired = 'Expired';
+    case Used = 'Used';
     case Prepare_For_Delivery = 'Prepare for delivery';
-    case Shipping             = 'Shipping';
-    case Deliveried           = 'Delivered';
-    case Return_Request       = 'Return Request';
-    case Returned             = 'Returned';
-    case Cancel_Request       = 'Cancel Request';
-    case Canceled             = 'Canceled';
+    case Shipping = 'Shipping';
+    case Deliveried = 'Delivered';
+    case Return_Request = 'Return Request';
+    case Returned = 'Returned';
+    case Cancel_Request = 'Cancel Request';
+    case Canceled = 'Canceled';
 
     public function getLabel(): string
     {
@@ -112,6 +112,14 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Returned,
             self::Cancel_Request,
             self::Canceled,
+        ], 'value', 'name');
+    }
+
+    public static function notAvailableShowInvoice(): array
+    {
+        return array_column([
+            self::Pending,
+            self::Rejected,
         ], 'value', 'name');
     }
 }

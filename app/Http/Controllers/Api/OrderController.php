@@ -168,13 +168,11 @@ class OrderController extends BaseApiController
 
         $cus_name = $order->user->name;
 
-        if ($order->status != OrderStatus::Accepted) {
-            return response()->json(['message' => __('You must pay first.')], 405);
-        }
-
         $invoice = $order->invoice;
 
-        abort_if($invoice == null, 405, 'There is no invoice for this order');
+        if (in_array($order->status->value, OrderStatus::notAvailableShowInvoice()) || $invoice == null) {
+            return response('Not Available', 405);
+        }
 
         $vat = Setting::getTaxes();
 
