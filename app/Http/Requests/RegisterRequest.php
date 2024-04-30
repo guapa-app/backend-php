@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Common;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -34,12 +35,21 @@ class RegisterRequest extends FormRequest
      */
     public function rules()
     {
+        $input = $this->all();
+
+        // Check and modify the phone number for the user
+        if (isset($input['phone'])) {
+            $input['phone'] = Common::removeZeroFromPhoneNumber($input['phone']);
+        }
+
+        $this->replace($input);
+
         return [
             'name'                  => 'required_without:firstname|string|min:3|max:64',
             'firstname'             => 'required_without:name|string|min:3|max:32',
             'lastname'              => 'required_without:name|string|min:3|max:32',
             'email'                 => 'sometimes|required|email|unique:users,email',
-            'phone'                 => 'required|string|min:6|max:30|unique:users,phone',
+            'phone'                 => 'required|unique:users,phone|' . Common::phoneValidation(),
             'firebase_jwt_token'    => 'sometimes|required|string',
             'otp'                   => 'sometimes|required|string|max:10',
             'password'              => 'required|confirmed|min:6|max:100',
