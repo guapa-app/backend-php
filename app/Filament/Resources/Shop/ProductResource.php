@@ -56,8 +56,6 @@ class ProductResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('url')
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('expires_at')
-                    ->requiredIf('type', 'service'),
                 Forms\Components\Textarea::make('terms')
                     ->maxLength(65535)
                     ->columnSpanFull(),

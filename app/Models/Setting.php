@@ -88,6 +88,19 @@ class Setting extends Model
         return (string) $record->s_value;
     }
 
+    public static function getSeviceExpiredAfter()
+    {
+        $record = static::firstOrCreate(['s_key' => 'service_expired_after'], [
+            's_value'           => 60,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min'=> 0, 'max'=> 365],
+            'instructions'      => 'Orders that have services (procedures) should expired after (numer) of days. if user does not use it before',
+        ]);
+
+        return (int) $record->s_value;
+    }
+
     public function scopeByKey(Builder $query, string $key = ''): Builder
     {
         return $query->where('s_key', $key);

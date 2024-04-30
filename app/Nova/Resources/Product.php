@@ -5,7 +5,6 @@ namespace App\Nova\Resources;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\FormData;
 use Laravel\Nova\Fields\HasMany;
@@ -132,10 +131,6 @@ class Product extends Resource
 
             HasMany::make(__('reviews'), 'reviews', Review::class),
 
-            Date::make(__('expires_at'), 'expires_at')
-                ->rules(fn ($request) => [
-                    $request->type == 'service' ? 'required' : 'sometimes',
-                ]),
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
 
