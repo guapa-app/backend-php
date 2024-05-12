@@ -240,81 +240,6 @@ class AuthController extends BaseApiController
     }
 
     /**
-     * Verify phone.
-     *
-     * @unauthenticated
-     *
-     * @responseFile 200 responses/auth/login.json
-     * @responseFile 422 scenario="Validation errors" responses/errors/422.json
-     * @responseFile 404 scenario="Phone number not found" responses/errors/404.json
-     * @responseFile 401 scenario="Verification failed" responses/auth/invalid-credentials.json
-     *
-     * @bodyParam phone string required Phone number
-     * @bodyParam firebase_jwt_token Firebase jwt token (Required if otp is absent)
-     * @bodyParam otp string Sinch otp (Required if firebase jwt token is absent)
-     *
-     * @param Request $request
-     */
-    public function verify(Request $request)
-    {
-        $data = $this->validate($request, [
-            'phone'              => 'required|string|max:30',
-            'otp'                => 'required_without:firebase_jwt_token|string|max:10',
-            'firebase_jwt_token' => 'required_without:otp|string|max:2000',
-            'for_reset_password' => 'sometimes|required',
-        ]);
-
-        $user = $this->userRepository->getByPhone($data['phone']);
-
-        if (!$user) {
-            abort(404, 'Phone number doesn\'t exist.');
-        }
-
-        $grantType = isset($data['otp']) ? 'sinch_verify' : 'firebase_phone';
-
-        $tokenPayload = [
-            'grant_type'   => $grantType,
-            'phone_number' => $data['phone'],
-            'scope'        => '*',
-        ];
-
-        if ($grantType === 'sinch_verify') {
-            $tokenPayload['otp'] = $data['otp'];
-        } else {
-            $tokenPayload['jwt_token'] = $data['firebase_jwt_token'];
-        }
-
-        if (Setting::checkTestingMode()) {
-            $personalAccessToken = $user->createToken('Temp Personal Token', ['*']);
-            $token['access_token'] = $personalAccessToken->accessToken;
-        } else {
-            $token = $this->authService->authenticate($tokenPayload);
-            $this->checkUserCredentials($token);
-        }
-
-        $user->update(['phone_verified_at' => now()->toDateTimeString()]);
-
-        $responseBody = [
-            'user'  => $user,
-            'token' => $token,
-        ];
-
-        if (isset($data['for_reset_password'])) {
-            $resetToken = Str::random(64);
-
-            DB::table(config('auth.passwords.users.table'))->insert([
-                'email'      => $user->email ?? $user->phone,
-                'token'      => $resetToken,
-                'created_at' => now(),
-            ]);
-
-            $responseBody['reset_token'] = $resetToken;
-        }
-
-        return $responseBody;
-    }
-
-    /**
      * Delete Account.
      *
      * @param Request $request
@@ -324,39 +249,6 @@ class AuthController extends BaseApiController
         $this->userService->deleteAccount($this->user->getKey());
 
         return $this->logout($request);
-    }
-
-    /**
-     * Send otp.
-     *
-     * @unauthenticated
-     *
-     * @bodyParam phone string required Phone number
-     *
-     * @param Request $request
-     */
-    public function sendSinchOtp(PhoneRequest $request)
-    {
-        $data = $request->validated();
-
-        return $this->authService->sendSinchOtp($data['phone']);
-    }
-
-    /**
-     * Verify otp.
-     *
-     * @unauthenticated
-     *
-     * @bodyParam phone string required Phone number
-     * @bodyParam otp string required Otp from sms
-     *
-     * @param VerifyPhoneRequest $request
-     */
-    public function verifySinchOtp(VerifyPhoneRequest $request)
-    {
-        $data = $request->validated();
-
-        return $this->authService->verifySinchOtp($data['phone'], $data['otp']);
     }
 
     /**
