@@ -11,7 +11,6 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\UserVendor;
-use App\Notifications\OrderNotification;
 use App\Notifications\OrderUpdatedNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -60,9 +59,9 @@ class OrderService
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $data['total'] = (float)array_sum(array_map(function ($product) use ($data) {
+                $data['total'] = (float) array_sum(array_map(function ($product) use ($data) {
                     $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int)($value['id']) === $product->id;
+                        return (int) ($value['id']) === $product->id;
                     });
 
                     if ($product->offer != null) {
@@ -89,7 +88,7 @@ class OrderService
 
                 $items = array_map(function ($product) use ($data, $order, $now, $vendorId) {
                     $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int)($value['id']) === $product->id;
+                        return (int) ($value['id']) === $product->id;
                     });
 
                     if (isset($inputItem['appointment'])) {
@@ -129,8 +128,6 @@ class OrderService
                 OrderItem::insert($items);
 
                 $order->load('items', 'address', 'user', 'vendor');
-
-                Notification::send($order->vendor->staff, new OrderNotification($order));
 
                 $orders->push($order);
 
@@ -177,13 +174,13 @@ class OrderService
         $user = app('cosmo')->user();
         $order = Order::withSingleRelations()->where('id', $id)->firstOrFail();
         if ($order->user_id != $user->id && !$user->hasVendor($order->vendor_id)) {
-            abort(403, 'You cannot view details for this order');
+            abort(403, __('api.order_not_available_for', ['status' => __('view_details')]));
         }
 
         return $order;
     }
 
-    public function validateStatus(Order $order, string $status): void
+    public function validateStatus(Order $order, string $req_status): void
     {
         $user = app('cosmo')->user();
 
@@ -191,32 +188,32 @@ class OrderService
             return;
         }
 
-        if (in_array($status, OrderStatus::availableForUpdateByVendor())) {
+        if (in_array($req_status, OrderStatus::availableForUpdateByVendor())) {
             $authorizedVendorIds = Product::query()->select('vendor_id')->whereIn('id', function ($q) use ($order) {
                 $q->select('product_id')->from('order_items')->where('order_id', $order->id);
             })->pluck('vendor_id')->toArray();
 
             if (!$user->hasAnyVendor(array_merge($authorizedVendorIds, [$order->vendor_id]))) {
-                $error = 'You are not authorized to ' . str_replace('ed', '', $status) . ' this order';
+                $error = __('api.order_authorization_error');
             }
-        } elseif ($status == (OrderStatus::Cancel_Request)->value) {
-            $error = $this->checkAuthorization($order, $user);
+        } elseif ($req_status == (OrderStatus::Cancel_Request)->value) {
+            $error = $this->checkUserAuthorization($order, $user);
 
             if ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
             } elseif (in_array($order->status->value, OrderStatus::notAvailableForCancle())) {
                 $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
             }
-        } elseif ($status == (OrderStatus::Return_Request)->value) {
-            $error = $this->checkAuthorization($order, $user);
+        } elseif ($req_status == (OrderStatus::Return_Request)->value) {
+            $error = $this->checkUserAuthorization($order, $user);
 
             if ($order->status != OrderStatus::Deliveried) {
                 $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
             }
         }
 
-        if ($order->status->value === $status) {
-            $error = 'The order is already ' . $status;
+        if ($order->status->value === $req_status) {
+            $error = __('api.order_status_req_status_error', ['status' => __('api.order_statuses.' . $order->status->value)]);
         }
 
         if (isset($error)) {
@@ -226,11 +223,10 @@ class OrderService
         }
     }
 
-    private function checkAuthorization($order, $user): ?string
+    private function checkUserAuthorization($order, $user): ?string
     {
-        if ($order->user_id !== $user->id)
-            $error = 'You are not authorized to cancel this order';
-
-        return $error;
+        return ($order->user_id !== $user->id)
+            ? __('api.order_authorization_error')
+            : null;
     }
 }

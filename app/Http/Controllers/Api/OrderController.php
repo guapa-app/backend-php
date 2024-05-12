@@ -9,10 +9,12 @@ use App\Http\Requests\OrderRequest;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Notifications\OrderNotification;
 use App\Services\OrderService;
 use App\Services\PDFService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Notification;
 
 class OrderController extends BaseApiController
 {
@@ -129,7 +131,9 @@ class OrderController extends BaseApiController
         $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
 
         if ($invoice->status == 'paid') {
-            $invoice->order->updateOrFail(['status' => 'Accepted']);
+            $order = $invoice->order;
+            $order->updateOrFail(['status' => 'Accepted']);
+            Notification::send($order->vendor->staff, new OrderNotification($order));
         }
 
         logger(

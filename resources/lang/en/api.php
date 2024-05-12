@@ -43,8 +43,11 @@ return [
 
     'cancel_used_order_error'                => "You can't cancel this order.",
     'cancel_order_error'                     => "You can't cancel order after 14 days",
-    'cancel_rejected_canceled_order_error'   => "You can not cancel this order.",
+    'cancel_rejected_canceled_order_error'   => 'You can not cancel this order.',
     'not_available_for_action'               => 'This action cannot be performed because the order is :status',
+    'order_authorization_error'              => 'You are not authorized to perform this action',
+    'order_not_available_for'                => 'You cannot :status for this order',
+    'order_status_req_status_error'          => 'The order is already :status',
 
     'order_statuses' => [
         'Pending'              => 'Pending',
@@ -59,5 +62,7 @@ return [
         'Returned'             => 'Returned',
         'Cancel Request'       => 'Cancel Request',
         'Canceled'             => 'Canceled',
-    ]
+    ],
+
+    'view_details'             => 'view details',
 ];

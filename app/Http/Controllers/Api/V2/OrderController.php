@@ -55,11 +55,6 @@ class OrderController extends ApiOrderController
             ]);
     }
 
-    public function changeInvoiceStatus(Request $request)
-    {
-        return parent::changeInvoiceStatus($request);
-    }
-
     public function printPDF($id)
     {
         $url = parent::printPDF($id);

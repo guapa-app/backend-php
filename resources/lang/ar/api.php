@@ -45,6 +45,9 @@ return [
     'cancel_order_error'                     => 'لا يمكنك إلغاء الطلب بعد 14 يومًا',
     'cancel_rejected_canceled_order_error'   => 'لا يمكنك إلغاء هذا الطلب',
     'not_available_for_action'               => 'لا يمكن تنفيذ هذا الإجراء لان هذا الطلب :status',
+    'order_authorization_error'              => 'غير مصرح لك بتنفيذ هذا الإجراء',
+    'order_not_available_for'                => 'لا يمكنك :status هذا الطلب',
+    'order_status_req_status_error'          => 'هذا الطلب بالفعل :status',
 
     'order_statuses' => [
         'Pending'              => 'قيد الانتظار',
@@ -59,5 +62,7 @@ return [
         'Returned'             => 'تم أرجاعه',
         'Cancel Request'       => 'قيد الإلغاء',
         'Canceled'             => 'تم إلغاؤه',
-    ]
+    ],
+
+    'view_details'             => 'عرض تفاصيل',
 ];
