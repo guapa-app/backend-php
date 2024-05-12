@@ -66,7 +66,7 @@ class OTPController extends BaseApiController
             $personalAccessToken = $user->createToken('Temp Personal Token', ['*']);
             $token['access_token'] = $personalAccessToken->accessToken;
         } else {
-            $token = $user->createToken('Temp Personal Token', ['*'])->accessToken;
+            $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
             $this->checkUserCredentials($token);
         }
 
