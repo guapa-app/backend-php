@@ -66,12 +66,12 @@ class OTPController extends BaseApiController
             'scope'        => '*',
         ];
 
-        if (isset($data['otp'])) {
-            $tokenPayload['grant_type'] = 'otp_verify';
-            $tokenPayload['otp'] = $data['otp'];
-        } else {
+        if (isset($data['firebase_jwt_token'])) {
             $tokenPayload['grant_type'] = 'firebase_phone';
             $tokenPayload['jwt_token'] = $data['firebase_jwt_token'];
+        } else {
+            $tokenPayload['grant_type'] = 'otp_verify';
+            $tokenPayload['otp'] = $data['otp'];
         }
 
         if (Setting::checkTestingMode()) {
