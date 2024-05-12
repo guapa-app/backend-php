@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\ProductType;
 use App\Models\Product;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
@@ -47,7 +48,7 @@ class ProductNotification extends Notification implements ShouldQueue
         return [
             'product_id' => $this->product->id,
             'summary'    => $this->getSummary(),
-            'type'       => 'new-' . $this->product->type,
+            'type'       => 'new-' . $this->product->type->value,
         ];
     }
 
@@ -68,7 +69,7 @@ class ProductNotification extends Notification implements ShouldQueue
             'icon'          => '', // Optional
             'click_action'  => '', // Optional
         ])->data([
-            'type'          => 'new-' . $this->product->type,
+            'type'          => 'new-' . $this->product->type->value,
             'summary'       => $this->getSummary(),
             'product_id'    => $this->product->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
@@ -78,7 +79,7 @@ class ProductNotification extends Notification implements ShouldQueue
 
     public function getSummary()
     {
-        $type = $this->product->type === 'product' ? 'منتج' : 'إجراء';
+        $type = $this->product->type === ProductType::Product ? 'منتج' : 'إجراء';
 
         return 'تم إضافة ' . $type . ' جديد بواسطة ' . $this->product->vendor->name;
     }
