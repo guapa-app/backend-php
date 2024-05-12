@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Models\Order;
+use App\Models\Setting;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +23,7 @@ class OrderExpire extends Command
      *
      * @var string
      */
-    protected $description = 'Change Orders Status to Expired when service (product) depending on expires at date';
+    protected $description = 'Automatically expire orders (services) that have exceeded a predefined number of days. The threshold for expiration will be configurable within the admin panel settings.';
 
     /**
      * Execute the console command.
@@ -31,11 +32,13 @@ class OrderExpire extends Command
     {
         Log::info('Order expire job start successfully');
 
+        $num_of_days = Setting::getSeviceExpiredAfter();
+
         Order::query()
             ->whereNotIn('status', OrderStatus::notAvailableForExpire())
-            ->chunkMap(function ($order) {
+            ->chunkMap(function ($order) use ($num_of_days) {
                 foreach ($order->items as $item) {
-                    if ($item->product?->type == ProductType::Service && $item->product?->expires_at <= today()) {
+                    if ($item->product?->type == ProductType::Service && $order->created_at->addDays($num_of_days) <= today()) {
                         // Update order status to "expired"
                         $order->status = OrderStatus::Expired;
                         $order->save();
@@ -43,7 +46,7 @@ class OrderExpire extends Command
                     }
                 }
             }, 50);
-            
+
         Log::info('Order expire job done.');
     }
 }

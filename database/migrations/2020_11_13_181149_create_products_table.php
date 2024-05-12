@@ -25,7 +25,6 @@ class CreateProductsTable extends Migration
             $table->string('type', 30)->default('product'); // product || service
             $table->string('url')->nullable();
             $table->text('terms')->nullable();
-            $table->date('expires_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

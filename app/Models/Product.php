@@ -38,7 +38,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price',
-        'status', 'review', 'type', 'terms', 'url', 'expires_at',
+        'status', 'review', 'type', 'terms', 'url',
     ];
 
     protected $appends = [
@@ -66,7 +66,6 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         'type'   => ProductType::class,
         'status' => ProductStatus::class,
         'review' => ProductReview::class,
-        'expires_at' => 'datetime',
     ];
 
     /**
