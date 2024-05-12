@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Common;
 use App\Models\Address;
 use App\Models\Vendor;
 use App\Rules\ImageOrArray;
@@ -81,32 +82,48 @@ class VendorRequest extends FormRequest
     {
         $id = $this->route('id');
 
+        $input = $this->all();
+
+        // Check and modify the phone number for the vendor
+        if (isset($input['phone'])) {
+            $input['phone'] = Common::removeZeroFromPhoneNumber($input['phone']);
+        }
+
+        // Check and modify the WhatsApp number for the vendor (assuming it's different from the phone number)
+        if (isset($input['whatsapp'])) {
+            $input['whatsapp'] = Common::removeZeroFromPhoneNumber($input['whatsapp']);
+        }
+
+        $this->replace($input);
+
+        $phoneNumbersRule = Common::phoneValidation();
+
         $rules = [
-            'name' => 'required|string|min:5|max:150',
-            'email' => 'required|email|unique:vendors,email',
-            'phone' => 'required|string|min:6|max:30',
-            'about' => 'nullable|string|min:10|max:1024',
-            'specialty_ids' => 'sometimes|array|min:1',
-            'specialty_ids.*' => 'integer|exists:taxonomies,id',
-            'logo' => ['nullable', new ImageOrArray(), 'max:10240'],
-            'whatsapp' => 'nullable|string|max:50',
-            'twitter' => 'nullable|string|max:200',
-            'instagram' => 'nullable|string|max:200',
-            'snapchat' => 'nullable|string|max:200',
-            'website_url' => 'sometimes|nullable|string|max:200',
-            'known_url' => 'sometimes|nullable|string|max:200',
-            'tax_number' => 'sometimes|nullable|string|max:200',
-            'cat_number' => 'sometimes|nullable|string|max:200',
-            'reg_number' => 'sometimes|nullable|string|max:200',
-            'type' => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
-            'working_days' => 'nullable|string',
-            'working_hours' => 'nullable|string',
-            'work_days' => 'sometimes|required|array|min:1',
-            'work_days.*' => 'required|integer|min:0|max:6',
-            'appointments' => 'sometimes|required|array|min:1',
-            'appointments.*' => 'required|array|min:2',
+            'name'                  => 'required|string|min:5|max:150',
+            'email'                 => 'required|email|unique:vendors,email',
+            'phone'                 => 'required|' . $phoneNumbersRule,
+            'about'                 => 'nullable|string|min:10|max:1024',
+            'specialty_ids'         => 'sometimes|array|min:1',
+            'specialty_ids.*'       => 'integer|exists:taxonomies,id',
+            'logo'                  => ['nullable', new ImageOrArray(), 'max:10240'],
+            'whatsapp'              => 'nullable|' . $phoneNumbersRule,
+            'twitter'               => 'nullable|string|max:200',
+            'instagram'             => 'nullable|string|max:200',
+            'snapchat'              => 'nullable|string|max:200',
+            'website_url'           => 'sometimes|nullable|string|max:200',
+            'known_url'             => 'sometimes|nullable|string|max:200',
+            'tax_number'            => 'sometimes|nullable|string|max:200',
+            'cat_number'            => 'sometimes|nullable|string|max:200',
+            'reg_number'            => 'sometimes|nullable|string|max:200',
+            'type'                  => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
+            'working_days'          => 'nullable|string',
+            'working_hours'         => 'nullable|string',
+            'work_days'             => 'sometimes|required|array|min:1',
+            'work_days.*'           => 'required|integer|min:0|max:6',
+            'appointments'             => 'sometimes|required|array|min:1',
+            'appointments.*'           => 'required|array|min:2',
             'appointments.*.from_time' => 'required|date_format:H:i:s',
-            'appointments.*.to_time' => 'required|date_format:H:i:s',
+            'appointments.*.to_time'   => 'required|date_format:H:i:s',
         ];
 
         if ($this->user() && $this->user()->isAdmin()) {
@@ -159,7 +176,7 @@ class VendorRequest extends FormRequest
     {
         return [
             'staff.*.user_id.exists' => 'The selected staff user doesn\'t exist',
-            'staff.*.user_id.exists' => 'The staff user id field must be an integer',
+            'staff.*.user_id.integer' => 'The staff user id field must be an integer',
             'staff.*.user_id.required' => 'Please select staff user account',
         ];
     }

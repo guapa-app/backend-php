@@ -50,6 +50,26 @@ class Common
     }
 
     /**
+     * Remove leading "+" or "00" or "+00" or "00+"
+     * and remove "0" after the country code if it exists.
+     * @param string $phone
+     * @return string
+     */
+    public static function removeZeroFromPhoneNumber(string $phone): string
+    {
+        return preg_replace('/^(\+|00|\+00|00\+)?9660?/', '966', $phone);
+    }
+
+    /**
+     * Rules to validate requiested phone number.
+     * @return string
+     */
+    public static function phoneValidation(): string
+    {
+        return 'numeric|regex:/^966\d{9}$/';
+    }
+
+    /**
      * Update env file value.
      * @param string $environmentKey
      * @param string $configKey
