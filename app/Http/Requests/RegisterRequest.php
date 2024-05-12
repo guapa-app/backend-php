@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Helpers\Common;
+use App\Models\Setting;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -49,7 +50,7 @@ class RegisterRequest extends FormRequest
             'firstname'             => 'required_without:name|string|min:3|max:32',
             'lastname'              => 'required_without:name|string|min:3|max:32',
             'email'                 => 'sometimes|required|email|unique:users,email',
-            'phone'                 => 'required|unique:users,phone|' . Common::phoneValidation(),
+            'phone'                 => 'required|unique:users,phone|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
             'firebase_jwt_token'    => 'sometimes|required|string',
             'otp'                   => 'sometimes|required|string|max:10',
             'password'              => 'required|confirmed|min:6|max:100',

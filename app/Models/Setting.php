@@ -101,6 +101,19 @@ class Setting extends Model
         return (int) $record->s_value;
     }
 
+    public static function isAllMobileNumsAccepted()
+    {
+        $record = static::firstOrCreate(['s_key' => 'is_all_mob_nums_accepted'], [
+            's_value'           => false,
+            's_unit'            => 'bool',
+            's_validation_type' => 'boolean',
+            's_validation'      => [],
+            'instructions'      => 'This setting used to accept all mobile numbers to text sms service in any environment',
+        ]);
+
+        return (int) $record->s_value;
+    }
+
     public function scopeByKey(Builder $query, string $key = ''): Builder
     {
         return $query->where('s_key', $key);

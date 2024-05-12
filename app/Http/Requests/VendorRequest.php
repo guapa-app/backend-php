@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Helpers\Common;
 use App\Models\Address;
+use App\Models\Setting;
 use App\Models\Vendor;
 use App\Rules\ImageOrArray;
 use Illuminate\Foundation\Http\FormRequest;
@@ -96,7 +97,7 @@ class VendorRequest extends FormRequest
 
         $this->replace($input);
 
-        $phoneNumbersRule = Common::phoneValidation();
+        $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation();
 
         $rules = [
             'name'                  => 'required|string|min:5|max:150',
