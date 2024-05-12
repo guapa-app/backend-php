@@ -18,7 +18,7 @@ class OTPController extends ApiOTPController
             return $this->successJsonRes($res);
         } catch (\Throwable $th) {
             return $this->errorJsonRes([
-                'phone' => [__('api.phone_verification_failed')],
+                'phone' => [$th->getMessage()],
             ], __('api.phone_verification_failed'), 422);
         }
     }

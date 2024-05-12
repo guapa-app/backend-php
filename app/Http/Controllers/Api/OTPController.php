@@ -11,6 +11,7 @@ use App\Services\SMSService;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Exceptions\ApiException;
 
 class OTPController extends BaseApiController
 {
@@ -54,31 +55,18 @@ class OTPController extends BaseApiController
             'firebase_jwt_token' => 'required_without:otp|string|max:2000',
             'for_reset_password' => 'sometimes|required',
         ]);
-
+        
         $user = $this->userRepository->getByPhone($data['phone']);
-
+        
         if (!$user) {
-            abort(404, 'Phone number doesn\'t exist.');
+            abort(404, __('api.phone_doesnt_exist'));
         }
-
-        $tokenPayload = [
-            'phone_number' => $data['phone'],
-            'scope'        => '*',
-        ];
-
-        if (isset($data['firebase_jwt_token'])) {
-            $tokenPayload['grant_type'] = 'firebase_phone';
-            $tokenPayload['jwt_token'] = $data['firebase_jwt_token'];
-        } else {
-            $tokenPayload['grant_type'] = 'otp_verify';
-            $tokenPayload['otp'] = $data['otp'];
-        }
-
+         
         if (Setting::checkTestingMode()) {
             $personalAccessToken = $user->createToken('Temp Personal Token', ['*']);
             $token['access_token'] = $personalAccessToken->accessToken;
         } else {
-            $token = $this->authService->authenticate($tokenPayload);
+            $token = $user->createToken('Temp Personal Token', ['*'])->accessToken;
             $this->checkUserCredentials($token);
         }
 
@@ -135,5 +123,12 @@ class OTPController extends BaseApiController
         $data = $request->validated();
 
         return $this->smsService->verifyOtp($data['phone'], $data['otp']);
+    }
+
+    private function checkUserCredentials($token)
+    {
+        if ($token == null) {
+            throw new ApiException(__('api.invalid_credentials'), 401);
+        }
     }
 }
