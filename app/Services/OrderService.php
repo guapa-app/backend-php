@@ -60,9 +60,9 @@ class OrderService
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $data['total'] = (float) array_sum(array_map(function ($product) use ($data) {
+                $data['total'] = (float)array_sum(array_map(function ($product) use ($data) {
                     $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int) ($value['id']) === $product->id;
+                        return (int)($value['id']) === $product->id;
                     });
 
                     if ($product->offer != null) {
@@ -89,7 +89,7 @@ class OrderService
 
                 $items = array_map(function ($product) use ($data, $order, $now, $vendorId) {
                     $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int) ($value['id']) === $product->id;
+                        return (int)($value['id']) === $product->id;
                     });
 
                     if (isset($inputItem['appointment'])) {
@@ -133,16 +133,16 @@ class OrderService
                 Notification::send($order->vendor->staff, new OrderNotification($order));
 
                 $orders->push($order);
-            }
 
-            if ($this->is_service) {
-                $this->taxes = ($this->taxes_percentage / 100) * $this->fees;
+                if ($this->is_service) {
+                    $this->taxes = ($this->taxes_percentage / 100) * $this->fees;
 
-                // it 'll be one order at all for one vendor
-                $invoice = $this->payment_service->generateInvoice($orders, $products_titles, $this->fees, $this->taxes);
+                    // it 'll be one order at all for one vendor
+                    $invoice = $this->payment_service->generateInvoice($orders, $products_titles, $this->fees, $this->taxes);
 
-                // return invoice url with order response
-                $orders->first()['invoice_url'] = $invoice->url;
+                    // return invoice url with order response
+                    $orders->first()['invoice_url'] = $invoice->url;
+                }
             }
 
             return $orders;
@@ -152,7 +152,7 @@ class OrderService
     public function checkVendorUsers(int $vendorId, array $userIds): bool
     {
         return UserVendor::where('vendor_id', $vendorId)
-            ->whereIn('user_id', $userIds)->count() === count(array_unique($userIds));
+                ->whereIn('user_id', $userIds)->count() === count(array_unique($userIds));
     }
 
     public function update(int $id, array $data): Order
@@ -209,7 +209,7 @@ class OrderService
             }
         } elseif ($status == (OrderStatus::Return_Request)->value) {
             $error = $this->checkAuthorization($order, $user);
-            
+
             if ($order->status != OrderStatus::Deliveried) {
                 $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
             }

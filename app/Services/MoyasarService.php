@@ -12,9 +12,10 @@ class MoyasarService
     {
         $data = $data->toArray();
 
-        // The amount should be in the smallest currency unit.
+        // The amount should be in the smallest currency unit only in integer value .
         // Means, ( 100 Halals to charges 1 Riyal )
-        return array_merge($data, ['amount' => (int) $data['amount'] * 100]);
+        // number_format to prevent floating-point precision issues
+        return array_merge($data, ['amount' => (int)number_format($data['amount'] * 100, 2)]);
     }
 
     public function create(Invoice $invoice)

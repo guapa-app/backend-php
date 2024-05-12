@@ -13,17 +13,10 @@ class PaymentService
     {
         $payment_option = Setting::getPaymentGatewayMethod();
 
-        switch ($payment_option) {
-            case 'moyasar':
-                $this->paymentService = new MoyasarService;
-                break;
-            case 'ottu':
-                $this->paymentService = new OttuService;
-                break;
-            default:
-                $this->paymentService = new OttuService;
-                break;
-        }
+        $this->paymentService = match ($payment_option) {
+            'ottu' => new OttuService,
+            default => new MoyasarService,
+        };
     }
 
     public function generateInvoice($orders, $description, $fees, $taxes)
@@ -47,7 +40,7 @@ class PaymentService
             'amount'       => ($fees + $taxes),
             'description'  => "You will pay the fees and taxes. \n" . $description,
             'currency'     => config('nova.currency'),
-            'callback_url' => config('app.url') . '/api/v1/invoices/change-status',
+            'callback_url' => config('app.url') . '/api/v2/invoices/change-status',
         ]);
 
         return $invoice;
