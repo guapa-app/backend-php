@@ -29,6 +29,7 @@ class OrderResource extends JsonResource
             'address'     => AddressResource::make($this->whenLoaded('address')),
             'user'        => UserResource::make($this->whenLoaded('user')),
             'vendor'      => VendorResource::make($this->whenLoaded('vendor')),
+            'invoice'     => InvoiceResource::make($this->whenLoaded('invoice')),
         ];
     }
 }

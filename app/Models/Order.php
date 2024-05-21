@@ -118,7 +118,7 @@ class Order extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
+        $query->with('invoice','vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
 
         return $query;
     }
