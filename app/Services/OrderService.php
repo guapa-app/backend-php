@@ -209,7 +209,7 @@ class OrderService
         } elseif ($req_status == (OrderStatus::Return_Request)->value) {
             $error = $this->checkUserAuthorization($order, $user);
 
-            if ($order->status != OrderStatus::Deliveried) {
+            if ($order->status != OrderStatus::Delivered) {
                 $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
             }
         }
