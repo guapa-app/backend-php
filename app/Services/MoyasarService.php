@@ -12,10 +12,15 @@ class MoyasarService
     {
         $data = $data->toArray();
 
-        // The amount should be in the smallest currency unit only in integer value .
-        // Means, ( 100 Halals to charges 1 Riyal )
-        // number_format to prevent floating-point precision issues
-        return array_merge($data, ['amount' => (int)number_format($data['amount'] * 100, 2)]);
+        /**
+         * Convert the amount to the smallest currency unit as an integer.
+         * For example, 1 Riyal = 100 Halals.
+         * Use number_format to avoid floating-point precision issues and convert the result to an integer.
+         * Examples: 167.56 becomes 16756, and 9.2 becomes 920.
+         */
+        $data['amount'] = (int)number_format($data['amount'] * 100, decimal_separator: '', thousands_separator: '');
+
+        return $data;
     }
 
     public function create(Invoice $invoice)
