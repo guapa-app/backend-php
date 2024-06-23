@@ -107,7 +107,7 @@ class OrderResource extends Resource
     {
         return [
             Forms\Components\Select::make('status')
-                ->options(OrderStatus::class)
+                ->options(OrderStatus::availableForUpdateByVendor())
                 ->required()
                 ->native(false),
             Forms\Components\TextInput::make('total')
