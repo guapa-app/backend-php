@@ -45,16 +45,17 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
-        if ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
-            throw new NotFoundException();
-        } elseif ($exception instanceof MoyasarApiException || $exception instanceof ClientException) {
-            Mail::to(config('app.support_email'))
-                ->send(new ErrorAlarmMail("LOG HANDLER - {$request->path()} \n {$exception->getMessage()}", $exception));
+        if ($request->wantsJson()) {
+            if ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
+                throw new NotFoundException();
+            } elseif ($exception instanceof MoyasarApiException || $exception instanceof ClientException) {
+                Mail::to(config('app.support_email'))
+                    ->send(new ErrorAlarmMail("LOG HANDLER - {$request->path()} \n {$exception->getMessage()}", $exception));
+
+                return (new ApiException(__('api.server_error'), 400))->render($request);
+            }
         }
 
-        if ($request->wantsJson()) {
-            return (new ApiException(__('api.server_error'), 400))->render($request);
-        }
         return parent::render($request, $exception);
     }
 }

@@ -16,7 +16,11 @@ class VendorPolicy
     public function viewAny(Model $user)
     {
         try {
-            return $user->hasPermissionTo('view_vendors');
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('view_vendors');
+            } else {
+                return true;
+            }
         } catch (\Throwable $th) {
             return false;
         }
@@ -28,7 +32,11 @@ class VendorPolicy
     public function view(Model $user, Vendor $vendor)
     {
         try {
-            return $user->hasPermissionTo('view_vendors');
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('view_vendors');
+            } else {
+                return true;
+            }
         } catch (\Throwable $th) {
             return false;
         }
@@ -59,7 +67,7 @@ class VendorPolicy
             if ($user->isAdmin()) {
                 return $user->hasPermissionTo('update_vendors');
             } else {
-                return $user->hasRole('manager') && $vendor->hasManager($user);
+                return true;
             }
         } catch (\Throwable $th) {
             return false;
@@ -72,7 +80,43 @@ class VendorPolicy
     public function delete(Model $user, Vendor $vendor)
     {
         try {
-            return $user->hasPermissionTo('delete_vendors');
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('delete_vendors');
+            } else {
+                return false;
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(Model $user, Vendor $vendor)
+    {
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('update_vendors');
+            } else {
+                return false;
+            }
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(Model $user, Vendor $vendor)
+    {
+        try {
+            if ($user->isAdmin()) {
+                return $user->hasPermissionTo('delete_vendors');
+            } else {
+                return false;
+            }
         } catch (\Throwable $th) {
             return false;
         }
