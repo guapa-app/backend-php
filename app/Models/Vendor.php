@@ -370,6 +370,10 @@ class Vendor extends Model implements HasMedia, HasReviews
         $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses');
         $query->withCount('products', 'offers', 'services', 'orders_order', 'orders_consultations');
 
+        if (\request()->load_products) {
+            $query->with('products', 'services', 'offers');
+        }
+
         return $query;
     }
 }

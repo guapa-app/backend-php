@@ -21,6 +21,7 @@ class OfferResource extends JsonResource
             'expires_at'            => $this->expires_at,
             'expires_countdown'     => $this->expires_countdown,
             'image'                 => MediaResource::make($this->whenLoaded('image')),
+            'product'               => ProductResource::make($this->whenLoaded('product')),
         ];
     }
 }
