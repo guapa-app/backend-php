@@ -8,7 +8,7 @@ class VendorResource extends JsonResource
 {
     public function toArray($request)
     {
-        return [
+        $returned_arr = [
             'id'                                        => $this->id,
             'name'                                      => (string) $this->name,
             'email'                                     => (string) $this->email,
@@ -63,5 +63,15 @@ class VendorResource extends JsonResource
             'specialties'                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'appointments'                              => AppointmentResource::collection($this->whenLoaded('appointments')),
         ];
+
+        if ($request->load_products) {
+            $returned_arr = array_merge($returned_arr, [
+                'products'                                => ProductResource::collection($this->whenLoaded('products'))->take(5),
+                'services'                                => ProductResource::collection($this->whenLoaded('services'))->take(5),
+                'offers'                                  => OfferResource::collection($this->whenLoaded('offers'))->take(5),
+            ]);
+        }
+
+        return $returned_arr;
     }
 }
