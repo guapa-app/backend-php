@@ -8,7 +8,7 @@ class OfferResource extends JsonResource
 {
     public function toArray($request)
     {
-        return [
+        $returned_arr = [
             'id'                    => $this->id,
             'product_id'            => $this->product_id,
             'title'                 => $this->title,
@@ -21,7 +21,14 @@ class OfferResource extends JsonResource
             'expires_at'            => $this->expires_at,
             'expires_countdown'     => $this->expires_countdown,
             'image'                 => MediaResource::make($this->whenLoaded('image')),
-            'product'               => ProductResource::make($this->whenLoaded('product')),
         ];
+
+        if ($request->load_products) {
+            $returned_arr = array_merge($returned_arr, [
+                'product'               => ProductResource::make($this->whenLoaded('product')),
+            ]);
+        }
+
+        return $returned_arr;
     }
 }

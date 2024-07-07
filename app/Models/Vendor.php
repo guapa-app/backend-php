@@ -264,7 +264,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function offers()
     {
-        return $this->hasManyThrough(Offer::class, Product::class);
+        return $this->hasManyThrough(Offer::class, Product::class)->active();
     }
 
     public function workDays()
@@ -371,7 +371,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         $query->withCount('products', 'offers', 'services', 'orders_order', 'orders_consultations');
 
         if (\request()->load_products) {
-            $query->with('products', 'services', 'offers');
+            $query->with('products', 'services', 'products.offer', 'services.offer', 'offers');
         }
 
         return $query;
