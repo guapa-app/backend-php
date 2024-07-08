@@ -252,6 +252,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(Product::class);
     }
 
+    public function productsHasOffers()
+    {
+        return $this->allProducts()->whereHas('offer');
+    }
+
     public function products()
     {
         return $this->allProducts()->where('type', 'product');
@@ -264,7 +269,12 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function offers()
     {
-        return $this->hasManyThrough(Offer::class, Product::class)->active();
+        return $this->hasManyThrough(Offer::class, Product::class);
+    }
+
+    public function activeOffers()
+    {
+        return $this->offers()->active();
     }
 
     public function workDays()
@@ -353,7 +363,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('logo');
-        $query->withCount('products', 'offers', 'services');
+        $query->withCount('products', 'activeOffers', 'services');
 
         return $query;
     }
@@ -368,10 +378,25 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses');
-        $query->withCount('products', 'offers', 'services', 'orders_order', 'orders_consultations');
+        $query->withCount('products', 'activeOffers', 'services', 'orders_order', 'orders_consultations');
 
         if (\request()->load_products) {
-            $query->with('products', 'services', 'products.offer', 'services.offer', 'offers');
+            $query->with(
+                'products',
+                'products.taxonomies',
+                'products.media',
+                'products.offer',
+
+                'services',
+                'services.taxonomies',
+                'services.media',
+                'services.offer',
+
+                'productsHasOffers',
+                'productsHasOffers.taxonomies',
+                'productsHasOffers.media',
+                'productsHasOffers.offer',
+            );
         }
 
         return $query;
