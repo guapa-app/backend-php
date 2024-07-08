@@ -33,7 +33,7 @@ class VendorResource extends JsonResource
 
             'users_count'                               => (int) $this->users_count,
             'products_count'                            => (int) $this->products_count,
-            'offers_count'                              => (int) $this->offers_count,
+            'offers_count'                              => (int) $this->active_offers_count,
             'services_count'                            => (int) $this->services_count,
 
             'likes_count'                               => (int) $this->likes_count,
@@ -68,7 +68,7 @@ class VendorResource extends JsonResource
             $returned_arr = array_merge($returned_arr, [
                 'products'                                => ProductResource::collection($this->whenLoaded('products'))->take(5),
                 'services'                                => ProductResource::collection($this->whenLoaded('services'))->take(5),
-                'offers'                                  => OfferResource::collection($this->whenLoaded('offers'))->take(5),
+                'offers'                                  => ProductResource::collection($this->whenLoaded('productsHasOffers'))->take(5),
             ]);
         }
 

@@ -23,12 +23,6 @@ class OfferResource extends JsonResource
             'image'                 => MediaResource::make($this->whenLoaded('image')),
         ];
 
-        if ($request->load_products) {
-            $returned_arr = array_merge($returned_arr, [
-                'product'               => ProductResource::make($this->whenLoaded('product')),
-            ]);
-        }
-
         return $returned_arr;
     }
 }
