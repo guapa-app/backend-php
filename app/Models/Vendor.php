@@ -396,6 +396,7 @@ class Vendor extends Model implements HasMedia, HasReviews
                 'productsHasOffers.taxonomies',
                 'productsHasOffers.media',
                 'productsHasOffers.offer',
+                'productsHasOffers.offer.image',
             );
         }
 
