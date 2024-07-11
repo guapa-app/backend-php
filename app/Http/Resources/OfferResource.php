@@ -13,6 +13,7 @@ class OfferResource extends JsonResource
             'product_id'            => $this->product_id,
             'title'                 => $this->title,
             'description'           => $this->description,
+            'terms'                 => $this->terms,
             'price'                 => $this->price,
             'discount'              => $this->discount,
             'discount_string'       => $this->discount_string,

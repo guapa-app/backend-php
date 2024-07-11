@@ -24,7 +24,7 @@ class Offer extends Model implements Listable, HasMedia
 
     protected $fillable = [
         'product_id', 'discount', 'title', 'description',
-        'starts_at', 'expires_at',
+        'terms', 'starts_at', 'expires_at',
     ];
 
     protected $appends = [

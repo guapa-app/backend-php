@@ -25,6 +25,7 @@ class OfferRelationManager extends RelationManager
                     ->minValue(0)
                     ->maxValue(100),
                 TextEntry::make('description'),
+                TextEntry::make('terms'),
                 TextEntry::make('starts_at'),
                 TextEntry::make('expires_at'),
             ]);
@@ -47,6 +48,8 @@ class OfferRelationManager extends RelationManager
                     ->required(),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('terms')
                     ->columnSpanFull(),
                 Forms\Components\DatePicker::make('starts_at')
                     ->required(),
