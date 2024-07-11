@@ -1,7 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import { Create, Datagrid, FileField, FileInput, Filter,
-    List, SelectArrayInput, SelectInput, SimpleForm,
-    TextField, TextInput, useDataProvider,
+import {
+    Create,
+    Datagrid,
+    FileField,
+    FileInput,
+    Filter,
+    List,
+    SelectArrayInput,
+    SelectInput,
+    SimpleForm,
+    TextField,
+    TextInput,
+    useDataProvider,
 } from 'react-admin'
 import {withStyles} from '@material-ui/core/styles'
 import StayCurrentPortraitIcon from '@material-ui/icons/StayCurrentPortrait'
@@ -15,15 +25,8 @@ const types = [
     {id: 'ios', name: 'iOS'},
 ]
 
-const NotificationFilter = (props) => (
-    <Filter {...props}>
-        <TextInput label="Search" source="keyword" alwaysOn/>
-        <SelectInput source="type" choices={types} alwaysOn/>
-    </Filter>
-)
-
 export const NotificationList = (props) => (
-    <List title="Notifications" {...props} filters={<NotificationFilter/>}>
+    <List title="Notifications" {...props} >
         <Datagrid>
             <TextField source="id"/>
             <TextField source="data.title" label="Title"/>
