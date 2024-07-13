@@ -8,7 +8,8 @@ class ProductResource extends JsonResource
 {
     public function toArray($request)
     {
-        return [
+
+        $returned_arr = [
             'id'                                    => $this->id,
             'hash_id'                               => (string) $this->hash_id,
             'vendor_id'                             => $this->vendor_id,
@@ -30,5 +31,13 @@ class ProductResource extends JsonResource
             'addresses'                             => AddressResource::collection($this->whenLoaded('addresses')),
             'images'                                => MediaResource::collection($this->whenLoaded('media')),
         ];
+
+        if ($this->whenLoaded('oldCurrentUpcomingOffer')) {
+            $returned_arr = array_merge($returned_arr, [
+                'offer'                             => OfferResource::make($this->whenLoaded('oldCurrentUpcomingOffer')),
+            ]);
+        }
+
+        return $returned_arr;
     }
 }
