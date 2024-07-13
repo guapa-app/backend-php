@@ -138,6 +138,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->hasOne(Offer::class)->active();
     }
 
+    public function oldCurrentUpcomingOffer(): HasOne
+    {
+        return $this->hasOne(Offer::class);
+    }
+
     public function categories()
     {
         return $this->taxonomies('specialty');
@@ -315,6 +320,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('vendor.logo', 'media', 'offer', 'offer.image', 'taxonomies');
+
+        return $query;
+    }
+    public function scopeWithApiListRelationsForVendor(Builder $query, Request $request): Builder
+    {
+        $query->with('vendor.logo', 'media', 'oldCurrentUpcomingOffer', 'oldCurrentUpcomingOffer.image', 'taxonomies');
 
         return $query;
     }
