@@ -323,6 +323,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         return $query;
     }
+    public function scopeWithApiListRelationsForVendor(Builder $query, Request $request): Builder
+    {
+        $query->with('vendor.logo', 'media', 'oldCurrentUpcomingOffer', 'oldCurrentUpcomingOffer.image', 'taxonomies');
+
+        return $query;
+    }
 
     public function scopeWithAllVendorOffers(Builder $query, Request $request): Builder
     {
