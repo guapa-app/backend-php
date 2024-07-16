@@ -40,6 +40,7 @@ class OfferRequest extends FormRequest
             'discount'      => 'required|integer|min:1|max:99',
             'title'         => 'nullable|string|max:200',
             'description'   => 'nullable|max:1000',
+            'terms'         => 'nullable',
             'image'         => ['nullable', new ImageOrArray(), 'max:10240'],
         ];
 

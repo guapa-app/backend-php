@@ -6,6 +6,7 @@ use App\Contracts\Repositories\OfferRepositoryInterface;
 use App\Http\Requests\OfferRequest;
 use App\Models\Offer;
 use App\Services\OfferService;
+use Illuminate\Http\Request;
 
 /**
  * @group Offers
@@ -24,6 +25,11 @@ class OfferController extends BaseApiController
 
         $this->offerService = $offerService;
         $this->offerRepository = $repository;
+    }
+
+    public function index(Request $request)
+    {
+        return $this->offerRepository->all($request);
     }
 
     /**
