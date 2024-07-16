@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\OfferRepositoryInterface;
 use App\Http\Requests\OfferRequest;
-use App\Http\Requests\OfferListRequest;
 use App\Models\Offer;
 use App\Services\OfferService;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 /**

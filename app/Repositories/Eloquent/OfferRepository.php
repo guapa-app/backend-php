@@ -3,7 +3,6 @@
 namespace App\Repositories\Eloquent;
 
 use App\Contracts\Repositories\OfferRepositoryInterface;
-use App\Http\Requests\OfferListRequest;
 use App\Models\Offer;
 use App\Models\Product;
 use Illuminate\Http\Request;

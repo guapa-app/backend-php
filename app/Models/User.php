@@ -180,7 +180,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     {
         return $this->userVendors()
             ->where('role', 'manager')
-            ->first()->vendor_id;
+            ->first()?->vendor_id;
     }
 
     public function hasAnyVendor(array $vendorIds): bool
