@@ -28,6 +28,7 @@ Route::group(['middleware' => 'auth:admin'], function() {
     Route::prefix('products')->group(base_path('routes/v1/admin/products.php'));
     Route::prefix('offers')->group(base_path('routes/v1/admin/offers.php'));
     Route::prefix('taxonomies')->group(base_path('routes/v1/admin/taxonomies.php'));
+    Route::prefix('notifications')->group(base_path('routes/v1/admin/notifications.php'));
     Route::prefix('addresses')->group(base_path('routes/v1/admin/addresses.php'));
     Route::prefix('posts')->group(base_path('routes/v1/admin/posts.php'));
     Route::prefix('comments')->group(base_path('routes/v1/admin/comments.php'));
