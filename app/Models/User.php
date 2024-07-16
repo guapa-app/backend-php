@@ -149,16 +149,6 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
             ->where('model_type', 'profile');
     }
 
-    public function userVendors()
-    {
-        return $this->hasMany(UserVendor::class);
-    }
-
-    public function getUserVendorsIdsAttribute(): array
-    {
-        return $this->userVendors()->pluck('vendor_id')->toArray();
-    }
-
     public function histories()
     {
         return $this->hasMany(History::class);
@@ -169,11 +159,28 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->hasMany(SupportMessage::class);
     }
 
+    public function userVendors()
+    {
+        return $this->hasMany(UserVendor::class);
+    }
+
+    public function getUserVendorsIdsAttribute(): array
+    {
+        return $this->userVendors()->pluck('vendor_id')->toArray();
+    }
+
     public function hasVendor(int $vendorId)
     {
         return (bool) $this->userVendors()->where([
             'vendor_id' => $vendorId,
         ])->exists();
+    }
+
+    public function managerVendorId()
+    {
+        return $this->userVendors()
+            ->where('role', 'manager')
+            ->first()?->vendor_id;
     }
 
     public function hasAnyVendor(array $vendorIds): bool

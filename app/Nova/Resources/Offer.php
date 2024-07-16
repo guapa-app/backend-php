@@ -56,6 +56,7 @@ class Offer extends Resource
 
             Text::make(__('title'), 'title')->required(),
             Textarea::make(__('description'), 'description')->required(),
+            Textarea::make(__('terms'), 'terms'),
 
             Number::make(__('discount'), 'discount')
                 ->help('Discount is the <strong>percentage</strong> value that applied to the product <strong>(example: 10% of 100 riyals = 10 riyals)</strong>')
