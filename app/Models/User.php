@@ -188,6 +188,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->userVendors()->whereIn('vendor_id', $vendorIds)->count() > 0;
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function scopeCurrentVendor($query, $value)
     {
         return $query->whereRelation('userVendors', 'vendor_id', '=', $value);

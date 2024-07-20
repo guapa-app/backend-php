@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Enums\OrderStatus;
+use App\Enums\ProductType;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -77,6 +78,10 @@ class Order extends Model implements Listable
             $request = new Request($filter);
         }
 
+        if ($request->has('user_id')) {
+            $query->forUserWithFilteredItems();
+        }
+
         $query->dateRange($request->get('startDate'), $request->get('endDate'));
 
         $query->searchLike($request);
@@ -85,12 +90,8 @@ class Order extends Model implements Listable
 
         // Filter list orders based on the type of the items service or product
         if ($request->hasAny(['products', 'procedures'])) {
-            $productType = $request->has('products') ? 'product' : 'service';
-            $query->whereHas('items', function ($q) use ($productType) {
-                $q->whereHas('product', function ($q2) use ($productType) {
-                    $q2->where('type', $productType);
-                });
-            });
+            $productType = $request->has('products') ? ProductType::Product : ProductType::Service;
+            $query->hasProductType($productType);
         }
 
         return $query;
@@ -117,7 +118,7 @@ class Order extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
+        $query->with('invoice','vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
 
         return $query;
     }
@@ -125,5 +126,33 @@ class Order extends Model implements Listable
     public function scopeStatus(Builder $query, $status): Builder
     {
         return $query->where('status', $status);
+    }
+
+    public function scopeHasProductType(Builder $query, ProductType $type): Builder
+    {
+        return $query->whereHas('items.product', function (Builder $query) use ($type) {
+            $query->where('type', $type);
+        });
+    }
+
+    /**
+     * Filter user orders to return all product orders
+     * And all service orders except pending.
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeForUserWithFilteredItems(Builder $query): Builder
+    {
+        return $query->distinct()
+            ->select('orders.*')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where(function ($query) {
+                $query->where('products.type', ProductType::Product)
+                    ->orWhere(function ($query) {
+                        $query->where('products.type', ProductType::Service)
+                            ->where('orders.status', '!=', OrderStatus::Pending);
+                    });
+            });
     }
 }
