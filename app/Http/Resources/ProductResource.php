@@ -3,12 +3,12 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 
 class ProductResource extends JsonResource
 {
     public function toArray($request)
     {
-
         $returned_arr = [
             'id'                                    => $this->id,
             'hash_id'                               => (string) $this->hash_id,
@@ -32,7 +32,7 @@ class ProductResource extends JsonResource
             'images'                                => MediaResource::collection($this->whenLoaded('media')),
         ];
 
-        if ($this->whenLoaded('oldCurrentUpcomingOffer')) {
+        if (!($this->whenLoaded('oldCurrentUpcomingOffer') instanceof MissingValue)) {
             $returned_arr = array_merge($returned_arr, [
                 'offer'                             => OfferResource::make($this->whenLoaded('oldCurrentUpcomingOffer')),
             ]);

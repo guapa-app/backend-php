@@ -381,23 +381,32 @@ class Vendor extends Model implements HasMedia, HasReviews
         $query->withCount('products', 'activeOffers', 'services', 'orders_order', 'orders_consultations');
 
         if (\request()->load_products) {
-            $query->with(
-                'products',
+            $query->with([
+                'products' => function ($query) {
+                    $query->take(5);
+                },
                 'products.taxonomies',
                 'products.media',
                 'products.offer',
+                'products.offer.image',
 
-                'services',
+                'services' => function ($query) {
+                    $query->take(5);
+                },
                 'services.taxonomies',
                 'services.media',
                 'services.offer',
+                'services.offer.image',
 
-                'productsHasOffers',
+                'productsHasOffers' => function ($query) {
+                    $query->take(5);
+                },
                 'productsHasOffers.taxonomies',
                 'productsHasOffers.media',
                 'productsHasOffers.offer',
                 'productsHasOffers.offer.image',
-            );
+
+            ]);
         }
 
         return $query;
