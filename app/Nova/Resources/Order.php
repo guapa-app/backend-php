@@ -65,19 +65,7 @@ class Order extends Resource
             Text::make(__('note'), 'note'),
 
             Text::make(__('name'), 'name'),
-
-            PhoneNumber::make(__('phone'), 'phone')
-//                ->resolveUsing(function ($value) {
-//                    return $value;
-//                })
-                ->fillUsing(function (NovaRequest $request, $model, $attribute, $requestAttribute) {
-                    $value = $request[$requestAttribute];
-                    $string = str_replace(' ', '-', $value); // Replaces all spaces with hyphens.
-                    $string = preg_replace('/[^0-9]/', '', $string); // Removes special chars.
-                    $model->{$attribute} = $string;
-                })
-                ->required()
-                ->onlyCountries('SA', 'EG'),
+            Text::make(__('phone'), 'phone'),
 
             Select::make(__('status'), 'status')
                 ->default(2)
