@@ -24,9 +24,9 @@ use Illuminate\Validation\ValidationException;
  */
 class AuthController extends BaseApiController
 {
-    private $authService;
-    private $userService;
-    private $userRepository;
+    protected $authService;
+    protected $userService;
+    protected $userRepository;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -167,7 +167,7 @@ class AuthController extends BaseApiController
         }
     }
 
-    private function checkIfUserDeleted($status)
+    protected function checkIfUserDeleted($status)
     {
         if ($status == User::STATUS_DELETED) {
             throw new ApiException(__('api.account_deleted'), 401);

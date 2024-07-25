@@ -5,6 +5,7 @@ namespace App\Grants;
 use App\Helpers\Common;
 use App\Services\SMSService;
 use Hamedov\PassportGrants\PassportGrant;
+use http\Exception\RuntimeException;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\Bridge\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
