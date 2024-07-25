@@ -44,6 +44,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(function () {
                     require base_path('routes/v1/api.php');
                     require base_path('routes/v2/api.php');
+                    require base_path('routes/v3/api.php');
                 });
 
             Route::prefix('admin-api')
