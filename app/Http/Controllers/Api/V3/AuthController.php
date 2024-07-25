@@ -1,0 +1,220 @@
+<?php
+
+namespace App\Http\Controllers\Api\V3;
+
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\PhoneRequest;
+use App\Http\Requests\V3\RegisterRequest;
+use App\Http\Requests\VerifyPhoneRequest;
+use App\Http\Resources\V3\UserResource;
+use App\Models\Setting;
+use App\Services\AuthService;
+use App\Services\UserService;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+
+class AuthController extends BaseApiController
+{
+    private $authService;
+    private $userService;
+    private $userRepository;
+
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        AuthService $authService,
+        UserService $userService
+    ) {
+        parent::__construct();
+
+        $this->authService = $authService;
+        $this->userService = $userService;
+        $this->userRepository = $userRepository;
+    }
+
+    /**
+     * Signup.
+     *
+     * @unauthenticated
+     *
+     * @responseFile 200 responses/auth/register.json
+     * @responseFile 422 scenario="Validation errors" responses/errors/422.json
+     *
+     * @param \App\Http\Requests\RegisterRequest $request
+     */
+    public function register(RegisterRequest $request)
+    {
+        $data = $request->validated();
+
+        $requestPayload = [
+            'grant_type'   => 'otp_verify',
+            'phone_number' => $data['phone'],
+            'otp'          => $data['otp'],
+            'scope'        => '*',
+        ];
+
+        $token = $this->authService->authenticate($requestPayload);
+
+        // Split the string by spaces
+        $nameParts = explode(' ', $data['name']);
+        // Assign the first and last name
+        $firstName = $nameParts[0];
+        $lastName = $nameParts[1] ?? '';
+
+        $userData = [
+            'name'          => $data['name'],
+            'email'         => $data['email'] ?? null,
+            'phone'         => $data['phone'],
+            'profile'       => [
+                'firstname'     => $firstName ?? null,
+                'lastname'      => $lastName ?? null,
+                'gender'        => $data['gender'] ?? null,
+            ],
+        ];
+
+        if ($token != null) {
+            $user = $this->userRepository->getByPhone($data['phone']);
+            $user = $this->userService->update($user, $userData);
+        } else {
+            $user = $this->userService->create($userData);
+        }
+
+        event(new Registered($user));
+
+        $user->access_token = $token;
+
+        return UserResource::make($user)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
+    public function login(Request $request)
+    {
+        list($token, $user) = parent::login($request);
+
+        $user->access_token = $token;
+
+        return UserResource::make($user)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
+    public function user()
+    {
+        return UserResource::make(parent::user())
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
+    public function refreshToken(Request $request)
+    {
+        return $this->successJsonRes(parent::refreshToken($request), __('api.success'));
+    }
+
+    public function logout(Request $request)
+    {
+        parent::logout($request);
+
+        return $this->successJsonRes([], __('api.success'));
+    }
+
+    public function verify(Request $request)
+    {
+        try {
+            $res = parent::verify($request);
+
+            return $this->successJsonRes($res);
+        } catch (\Throwable $th) {
+            return $this->errorJsonRes([
+                'phone' => [__('api.phone_verification_failed')],
+            ], __('api.phone_verification_failed'), 422);
+        }
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        parent::deleteAccount($request);
+
+        return $this->successJsonRes([], __('api.account_deleted'));
+    }
+
+    public function sendSinchOtp(PhoneRequest $request)
+    {
+        try {
+            if (Setting::checkTestingMode()) {
+                return $this->successJsonRes([
+                    'is_otp_sent' => true,
+                    'otp' => 1111,
+                ], __('api.otp_sent'), 200);
+            }
+
+            parent::sendSinchOtp($request);
+
+            return $this->successJsonRes([
+                'is_otp_sent' => true,
+            ], __('api.otp_sent'), 200);
+        } catch (\Throwable $th) {
+            if ($th instanceof \Illuminate\Validation\ValidationException) {
+                throw $th;
+            }
+            $res = json_decode((string) $th->getResponse()?->getBody());
+            if ($th instanceof \GuzzleHttp\Exception\ClientException) {
+                if ($th->getCode() == 402) {
+                    // 402 Not enough credit.
+                } elseif ($th->getCode() == 400) {
+                    // 400 Invalid phone number.
+                    return $this->errorJsonRes([
+                        'phone' => [__('api.invalid_phone')],
+                    ], __('api.otp_not_sent'), 422);
+                }
+            }
+            $this->logReq($res?->message);
+
+            return $this->successJsonRes([
+                'is_otp_sent' => false,
+            ], __('api.contact_support'), 422);
+        }
+    }
+
+    public function verifySinchOtp(VerifyPhoneRequest $request)
+    {
+        if (Setting::checkTestingMode()) {
+            return $this->successJsonRes([
+                'is_otp_verified' => true,
+            ], __('api.correct_otp'), 200);
+        }
+
+        $bool = parent::verifySinchOtp($request);
+        if ($bool) {
+            return $this->successJsonRes([
+                'is_otp_verified' => true,
+            ], __('api.correct_otp'), 200);
+        } else {
+            return $this->errorJsonRes([
+                'otp' => [__('api.incorrect_otp')],
+            ], __('api.incorrect_otp'), 406);
+        }
+    }
+
+    public function checkIfPhoneExist(Request $request)
+    {
+        $user = parent::checkIfPhoneExist($request);
+
+        if ($user == null) {
+            return $this->successJsonRes([
+                'is_phone_exists' => false,
+            ], __('api.phone_doesnt_exist'), 200);
+        } else {
+            return $this->successJsonRes([
+                'is_phone_exists' => true,
+            ], __('api.phone_exist'), 200);
+        }
+    }
+}
