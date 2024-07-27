@@ -34,6 +34,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(Repositories\TaxRepositoryInterface::class, Eloquent\TaxRepository::class);
         $this->app->bind(Repositories\UserRepositoryInterface::class, Eloquent\UserRepository::class);
         $this->app->bind(Repositories\VendorRepositoryInterface::class, Eloquent\VendorRepository::class);
+        $this->app->bind(Repositories\VendorClientRepositoryInterface::class, Eloquent\VendorClientRepository::class);
         $this->app->bind(Repositories\DatabaseNotificationRepositoryInterface::class, Eloquent\DatabaseNotificationRepository::class);
 
         $this->app->singleton('cosmo', function ($app) {
