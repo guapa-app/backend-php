@@ -411,4 +411,9 @@ class Vendor extends Model implements HasMedia, HasReviews
 
         return $query;
     }
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(VendorClient::class);
+    }
 }
