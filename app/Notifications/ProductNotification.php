@@ -17,6 +17,7 @@ class ProductNotification extends Notification implements ShouldQueue
      * @var Product
      */
     private $product;
+    private $productType;
 
     /**
      * @param Product $product
@@ -24,6 +25,7 @@ class ProductNotification extends Notification implements ShouldQueue
     public function __construct(Product $product)
     {
         $this->product = $product;
+        $this->productType = $product->type->value;
     }
 
     /**
@@ -48,7 +50,8 @@ class ProductNotification extends Notification implements ShouldQueue
         return [
             'product_id' => $this->product->id,
             'summary'    => $this->getSummary(),
-            'type'       => 'new-' . $this->product->type->value,
+            'type'       => "new-$this->productType",
+            'title'      => "New $this->productType",
         ];
     }
 
@@ -69,7 +72,7 @@ class ProductNotification extends Notification implements ShouldQueue
             'icon'          => '', // Optional
             'click_action'  => '', // Optional
         ])->data([
-            'type'          => 'new-' . $this->product->type->value,
+            'type'          => "new-$this->productType",
             'summary'       => $this->getSummary(),
             'product_id'    => $this->product->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
@@ -79,7 +82,7 @@ class ProductNotification extends Notification implements ShouldQueue
 
     public function getSummary()
     {
-        $type = $this->product->type === ProductType::Product ? 'منتج' : 'إجراء';
+        $type = $this->productType === ProductType::Product ? 'منتج' : 'إجراء';
 
         return 'تم إضافة ' . $type . ' جديد بواسطة ' . $this->product->vendor->name;
     }
