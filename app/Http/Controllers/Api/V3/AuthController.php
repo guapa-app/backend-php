@@ -63,12 +63,6 @@ class AuthController extends ApiAuthController
     {
         $data = $request->validated();
 
-        if (Setting::checkTestingMode()) {
-            return $this->successJsonRes([
-                'is_otp_verified' => true,
-            ], __('api.correct_otp'), 200);
-        }
-
         $user = $this->userRepository->getByPhone($data['phone']);
 
         if (!$user) {
@@ -76,6 +70,17 @@ class AuthController extends ApiAuthController
         }
 
         $this->checkIfUserDeleted($user->status);
+
+        if (Setting::checkTestingMode()) {
+            $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
+
+            $this->prepareUserResponse($user, $token);
+            return UserResource::make($user)
+                ->additional([
+                    'success' => true,
+                    'message' => __('api.success'),
+                ]);
+        }
 
         $requestPayload = [
             'grant_type' => 'otp_verify',
@@ -87,13 +92,7 @@ class AuthController extends ApiAuthController
         $token = $this->authService->authenticate($requestPayload);
 
         if ($token) {
-            $user->update(['phone_verified_at' => now()->toDateTimeString()]);
-
-            $user->loadProfileFields();
-            $user->append('user_vendors_ids');
-            $user->access_token = $token;
-
-            event(new Registered($user));
+            $user = $this->prepareUserResponse($user, $token);
 
             return UserResource::make($user)
                 ->additional([
@@ -105,5 +104,18 @@ class AuthController extends ApiAuthController
                 'otp' => [__('api.incorrect_otp')],
             ], __('api.incorrect_otp'), 406);
         }
+    }
+
+    private function prepareUserResponse($user, $token)
+    {
+        $user->update(['phone_verified_at' => now()->toDateTimeString()]);
+
+        $user->loadProfileFields();
+        $user->append('user_vendors_ids');
+        $user->access_token = $token;
+
+        event(new Registered($user));
+
+        return $user;
     }
 }
