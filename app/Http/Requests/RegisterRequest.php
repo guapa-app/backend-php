@@ -45,7 +45,7 @@ class RegisterRequest extends FormRequest
 
         $this->replace($input);
 
-        return [
+        $v2Rules = [
             'name'                  => 'required_without:firstname|string|min:3|max:64',
             'firstname'             => 'required_without:name|string|min:3|max:32',
             'lastname'              => 'required_without:name|string|min:3|max:32',
@@ -56,5 +56,18 @@ class RegisterRequest extends FormRequest
             'password'              => 'required|confirmed|min:6|max:100',
             'gender'                => 'required|string|in:' . implode(',', UserProfile::GENDER),
         ];
+
+        $v3Rules = [
+            'name'      => 'required|string|min:3|max:64',
+            'email'     => 'sometimes|required|email|unique:users,email',
+            'phone'     => 'required|unique:users,phone|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
+            'gender'    => 'nullable|string|in:' . implode(',', UserProfile::GENDER),
+        ];
+
+        if (str_contains($this->url(), 'v3')) {
+            return $v3Rules;
+        } else {
+            return $v2Rules;
+        }
     }
 }
