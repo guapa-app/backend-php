@@ -41,6 +41,25 @@ class Order extends Model implements Listable
         'status' => OrderStatus::class,
     ];
 
+    protected $appends = [
+        'paid_amount_with_taxes', 'paid_amount', 'remaining_amount',
+    ];
+
+    public function getPaidAmountWithTaxesAttribute()
+    {
+        return ($this->invoice?->amount ?? 0);
+    }
+
+    public function getPaidAmountAttribute()
+    {
+        return number_format(($this->invoice?->amount - $this->invoice?->taxes), decimal_separator: '', thousands_separator: '');
+    }
+
+    public function getRemainingAmountAttribute()
+    {
+        return ($this->total - ($this->paid_amount));
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
