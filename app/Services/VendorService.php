@@ -36,7 +36,7 @@ class VendorService
     public function create(array $data): Vendor
     {
         /*
-        * overwrite defualt status value from migration file.
+        * overwrite default status value from migration file.
         * should remove default values from migrations
         */
         $data['status'] = array_flip(Vendor::STATUSES)['active'];
