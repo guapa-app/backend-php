@@ -15,4 +15,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix("v3")->group(function () {
     Route::prefix('auth')->group(base_path('routes/v3/api/auth.php'));
+    Route::prefix('vendors')->group(base_path('routes/v3/api/vendors.php'));
 });
