@@ -28,7 +28,7 @@ use Illuminate\Validation\Rule;
  * @bodyParam address object Vendor address.
  * @bodyParam address.city_id integer required City id. Example: 65
  * @bodyParam address.address_1 string required Address line 1. Example: XYZ Street
- * @bodyParam address.address_2 string Address line 2. Example: 6th floot, next to xyz restaurant
+ * @bodyParam address.address_2 string Address line 2. Example: 6th floor, next to xyz restaurant
  * @bodyParam address.postal_code string Postal code. Example: 56986
  * @bodyParam address.lat number Latitude. Example: 65.236589
  * @bodyParam address.lng number Longitude. Example: 62.659898
@@ -53,6 +53,17 @@ class VendorRequest extends FormRequest
         $target = $action === 'update' ? Vendor::findOrFail($id) : Vendor::class;
 
         return $this->user()->can($action, $target);
+    }
+
+    protected function prepareForValidation()
+    {
+        if (str_contains($this->url(), 'v3')) {
+            $this->merge([
+                // Transforming the name to have the first letter of each word capitalized
+                'email' => $this->user()->email,
+                'phone' => $this->user()->phone,
+            ]);
+        }
     }
 
     /**
@@ -104,24 +115,31 @@ class VendorRequest extends FormRequest
             'email'                 => 'required|email|unique:vendors,email',
             'phone'                 => 'required|' . $phoneNumbersRule,
             'about'                 => 'nullable|string|min:10|max:1024',
+
             'specialty_ids'         => 'sometimes|array|min:1',
             'specialty_ids.*'       => 'integer|exists:taxonomies,id',
+
             'logo'                  => ['nullable', new ImageOrArray(), 'max:10240'],
+
             'whatsapp'              => 'nullable|' . $phoneNumbersRule,
             'twitter'               => 'nullable|string|max:200',
             'instagram'             => 'nullable|string|max:200',
             'snapchat'              => 'nullable|string|max:200',
-            'website_url'           => 'sometimes|nullable|string|max:200',
-            'known_url'             => 'sometimes|nullable|string|max:200',
-            'tax_number'            => 'sometimes|nullable|string|max:200',
-            'cat_number'            => 'sometimes|nullable|string|max:200',
-            'reg_number'            => 'sometimes|nullable|string|max:200',
+            'website_url'           => 'nullable|string|max:200',
+            'known_url'             => 'nullable|string|max:200',
+
+            'tax_number'            => 'nullable|string|max:200',
+            'cat_number'            => 'nullable|string|max:200',
+            'reg_number'            => 'nullable|string|max:200',
+            'health_declaration'    => 'nullable|string|max:200',
+
             'type'                  => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
             'working_days'          => 'nullable|string',
             'working_hours'         => 'nullable|string',
             'work_days'             => 'sometimes|required|array|min:1',
             'work_days.*'           => 'required|integer|min:0|max:6',
-            'appointments'             => 'sometimes|required|array|min:1',
+
+            'appointments'             => 'sometimes|array|min:1',
             'appointments.*'           => 'required|array|min:2',
             'appointments.*.from_time' => 'required|date_format:H:i:s',
             'appointments.*.to_time'   => 'required|date_format:H:i:s',
@@ -138,11 +156,6 @@ class VendorRequest extends FormRequest
 
             $rules['verified'] = 'required|boolean';
             $rules['status'] = 'required|in:0,1';
-        } elseif (!is_numeric($id)) {
-            // Api vendor registration
-            // $rules = array_merge($rules, [
-            //     'specialty_ids' => 'required|array|min:1',
-            // ]);
         }
 
         if (is_numeric($id)) {
