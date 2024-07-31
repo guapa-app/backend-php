@@ -36,6 +36,21 @@ use Illuminate\Validation\Rule;
  */
 class VendorRequest extends FormRequest
 {
+    private $id;
+
+    protected function prepareForValidation()
+    {
+        $this->id = $this->route('id');
+
+        if (str_contains($this->url(), 'v3') && !is_numeric($this->id)) {
+            $this->merge([
+                // Transforming the name to have the first letter of each word capitalized
+                'email' => $this->user()->email,
+                'phone' => $this->user()->phone,
+            ]);
+        }
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -47,23 +62,10 @@ class VendorRequest extends FormRequest
             return false;
         }
 
-        $id = $this->route('id');
-
-        $action = is_numeric($id) ? 'update' : 'create';
-        $target = $action === 'update' ? Vendor::findOrFail($id) : Vendor::class;
+        $action = is_numeric($this->id) ? 'update' : 'create';
+        $target = $action === 'update' ? Vendor::findOrFail($this->id) : Vendor::class;
 
         return $this->user()->can($action, $target);
-    }
-
-    protected function prepareForValidation()
-    {
-        if (str_contains($this->url(), 'v3')) {
-            $this->merge([
-                // Transforming the name to have the first letter of each word capitalized
-                'email' => $this->user()->email,
-                'phone' => $this->user()->phone,
-            ]);
-        }
     }
 
     /**
@@ -92,8 +94,6 @@ class VendorRequest extends FormRequest
      */
     public function rules()
     {
-        $id = $this->route('id');
-
         $input = $this->all();
 
         // Check and modify the phone number for the vendor
@@ -158,12 +158,12 @@ class VendorRequest extends FormRequest
             $rules['status'] = 'required|in:0,1';
         }
 
-        if (is_numeric($id)) {
+        if (is_numeric($this->id)) {
             // Updating vendor
             $rules = array_merge($rules, [
                 'name' => 'sometimes|required|string|min:5|max:150',
                 'email' => [
-                    'sometimes', 'required', 'email', Rule::unique('vendors')->ignore($id),
+                    'sometimes', 'required', 'email', Rule::unique('vendors')->ignore($this->id),
                 ],
                 'phone' => 'sometimes|required|string|min:6|max:30',
             ]);
