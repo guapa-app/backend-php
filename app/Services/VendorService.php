@@ -147,6 +147,8 @@ class VendorService
             $this->updateSpecialties($vendor, $data['specialty_ids']);
         }
 
+        $vendor->loadMissing('staff', 'logo', 'addresses', 'workDays');
+
         return $vendor;
     }
 
@@ -267,11 +269,11 @@ class VendorService
 
     public function share(int $id): int
     {
-        return (int) Redis::hincrby("vendor:{$id}", 'shares_count', 1);
+        return (int)Redis::hincrby("vendor:{$id}", 'shares_count', 1);
     }
 
     public function view(int $id): int
     {
-        return (int) Redis::hincrby("vendor:{$id}", 'views_count', 1);
+        return (int)Redis::hincrby("vendor:{$id}", 'views_count', 1);
     }
 }
