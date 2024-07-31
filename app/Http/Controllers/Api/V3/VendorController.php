@@ -37,4 +37,14 @@ class VendorController extends ApiVendorController
         }
     }
 
+    public function update(VendorRequest $request, $id)
+    {
+        $item = parent::update($request, $id);
+
+        return VendorResource::make($item)
+            ->additional([
+                'success' => true,
+                'message' => __('api.updated'),
+            ]);
+    }
 }

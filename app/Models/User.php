@@ -218,7 +218,9 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function loadProfileFields()
     {
         $this->load('profile', 'profile.photo', 'roles');
-        $this->profile->about = strip_tags($this->profile->about);
+
+        if (isset($this->profile))
+            $this->profile->about = strip_tags($this->profile->about);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
