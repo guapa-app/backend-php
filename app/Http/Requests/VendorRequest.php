@@ -68,6 +68,17 @@ class VendorRequest extends FormRequest
         return $this->user()->can($action, $target);
     }
 
+    protected function prepareForValidation()
+    {
+        if (str_contains($this->url(), 'v3')) {
+            $this->merge([
+                // Transforming the name to have the first letter of each word capitalized
+                'email' => $this->user()->email,
+                'phone' => $this->user()->phone,
+            ]);
+        }
+    }
+
     /**
      * Handle data to be validated from the request.
      * @return array
