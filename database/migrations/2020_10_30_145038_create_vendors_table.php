@@ -37,6 +37,7 @@ class CreateVendorsTable extends Migration
             $table->string('tax_number')->nullable();
             $table->string('cat_number')->nullable();
             $table->string('reg_number')->nullable();
+            $table->string('health_declaration')->nullable();
 
             $table->softDeletes();
             $table->timestamps();
