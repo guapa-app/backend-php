@@ -45,7 +45,7 @@ class EloquentRepository implements EloquentRepositoryInterface
      * @param Request $request
      * @return LengthAwarePaginator| Collection
      */
-    public function all(Request $request): object
+    public function all(Request $request, $perPage = 10): object
     {
         $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
 
@@ -265,5 +265,15 @@ class EloquentRepository implements EloquentRepositoryInterface
             // Not valid json
             return [];
         }
+    }
+
+    /**
+     * Get all records paginated.
+     * @param int $perPage
+     * @return EloquentRepository
+     */
+    public function getAllPaginated(int $perPage = 10)
+    {
+        return $this->model = $this->model->paginate($perPage);
     }
 }

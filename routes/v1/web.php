@@ -24,6 +24,11 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+
+Route::get('/blogs', [\App\Http\Controllers\PostController::class, 'index'])->name('blogs.index');
+Route::get('/blogs/{id}', [\App\Http\Controllers\PostController::class, 'show'])->name('blogs.show');
+
+
 Route::get('/register', [RegistrationController::class, 'registerForm'])->name('register.form');
 Route::post('/register', [RegistrationController::class, 'register'])->name('register')->middleware('throttle:10');
 
@@ -40,3 +45,4 @@ Route::any('{any?}', function () {
 Route::any('admin/{any?}', function () {
     return view(config('cosmo.admin_view')); // Admin view
 })->where('any', '^((?!api).)*$');
+

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -44,5 +45,6 @@ class AppServiceProvider extends ServiceProvider
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(365));
 
         $this->app['request']->server->set('HTTPS', $this->app->environment() != 'local');
+        Paginator::useBootstrap();
     }
 }
