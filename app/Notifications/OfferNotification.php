@@ -34,7 +34,7 @@ class OfferNotification extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return [
-            'database', 'fcm',
+            'database', 'fcm', \App\Channels\WhatsAppChannel::class,
         ];
     }
 
@@ -75,7 +75,20 @@ class OfferNotification extends Notification implements ShouldQueue
 
         return $message;
     }
-
+    public function toWhatsapp($notifiable)
+    {
+        return [
+            'client' => $notifiable->phone,
+            'campaignName' => 'campaign 5',
+            "campaignVersion"=> "0190fff5-7605-eea5-c565-b8c2e3b240f9",
+            'variables' => [
+                'variable1' => $notifiable->name,
+//                'discount' => $this->offer->discount_string,
+//                'vendor_name' => $this->offer->product->vendor->name,
+//                'product' => $this->offer->product->title,
+            ],
+        ];
+    }
     public function getSummary()
     {
         return 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title . ' من ' .
