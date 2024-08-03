@@ -11,6 +11,7 @@ use App\Models\Vendor;
 use App\Models\WorkDay;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 /**
@@ -39,41 +40,43 @@ class VendorService
         * overwrite default status value from migration file.
         * should remove default values from migrations
         */
-        $data['status'] = array_flip(Vendor::STATUSES)['active'];
+        return DB::transaction(function () use ($data) {
+            $data['status'] = array_flip(Vendor::STATUSES)['active'];
 
-        // Create vendor
-        $vendor = $this->vendorRepository->create($data);
+            // Create vendor
+            $vendor = $this->vendorRepository->create($data);
 
-        // Update logo
-        if (isset($data['logo'])) {
-            $this->updateLogo($vendor, ['logo' => $data['logo']]);
-        }
+            // Update logo
+            if (isset($data['logo'])) {
+                $this->updateLogo($vendor, ['logo' => $data['logo']]);
+            }
 
-        if (isset($data['specialty_ids'])) {
-            $this->updateSpecialties($vendor, $data['specialty_ids']);
-        }
+            if (isset($data['specialty_ids'])) {
+                $this->updateSpecialties($vendor, $data['specialty_ids']);
+            }
 
-        if (isset($data['address'])) {
-            $this->createAddress($vendor, $data['address']);
-        }
+            if (isset($data['address'])) {
+                $this->createAddress($vendor, $data['address']);
+            }
 
-        if (!$this->vendorRepository->isAdmin()) {
-            $vendor->users()->create([
-                'user_id' => auth()->id(),
-                'role' => 'manager',
-                'email' => auth()->user()->email,
-            ]);
+            if (!$this->vendorRepository->isAdmin()) {
+                $vendor->users()->create([
+                    'user_id' => auth()->id(),
+                    'role' => 'manager',
+                    'email' => auth()->user()->email,
+                ]);
 
-            auth()->user()->assignRole('manager');
-        }
+                auth()->user()->assignRole('manager');
+            }
 
-        $this->updateWorkingDaysAndAppointments($vendor, $data);
+            $this->updateWorkingDaysAndAppointments($vendor, $data);
 
-        $this->updateStaff($vendor, $data);
+            $this->updateStaff($vendor, $data);
 
-        $vendor->loadMissing('staff', 'logo', 'addresses', 'workDays');
+            $vendor->loadMissing('staff', 'logo', 'addresses', 'workDays');
 
-        return $vendor;
+            return $vendor;
+        });
     }
 
     public function addStaff(Vendor $vendor, $data): User

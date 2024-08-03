@@ -62,15 +62,12 @@ class VendorResource extends JsonResource
 
             'specialties'                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'appointments'                              => AppointmentResource::collection($this->whenLoaded('appointments')),
-        ];
 
-        if ($request->load_products) {
-            $returned_arr = array_merge($returned_arr, [
-                'products'                                => ProductResource::collection($this->whenLoaded('products')),
-                'services'                                => ProductResource::collection($this->whenLoaded('services')),
-                'offers'                                  => ProductResource::collection($this->whenLoaded('productsHasOffers')),
-            ]);
-        }
+            'products'                                => ProductResource::collection($this->whenLoaded('products')),
+            'services'                                => ProductResource::collection($this->whenLoaded('services')),
+            'offers'                                  => ProductResource::collection($this->whenLoaded('productsHasOffers')),
+
+        ];
 
         return $returned_arr;
     }
