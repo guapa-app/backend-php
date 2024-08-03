@@ -1,0 +1,23 @@
+<svg width="36" height="60" viewBox="0 0 36 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 1321317461">
+<g id="Group 1321317463">
+<rect id="Rectangle 39464" x="1" y="1" width="33.5556" height="58" rx="16.7778" stroke="white" stroke-opacity="0.6" stroke-width="2"/>
+<g id="translate_1" style=" transform-origin: center; transform-box: fill-box; animation: translateY 2s linear infinite alternate;">
+<path id="Line 46" d="M18.5273 8.88867C18.5273 8.47446 18.1916 8.13867 17.7773 8.13867C17.3631 8.13867 17.0273 8.47446 17.0273 8.88867L18.5273 8.88867ZM17.7773 27.6632L22.1075 23.3331L17.7773 19.003L13.4472 23.3331L17.7773 27.6632ZM17.0273 8.88867L17.0273 23.3331L18.5273 23.3331L18.5273 8.88867L17.0273 8.88867Z" fill="white"/>
+<path id="Line 47" d="M17.0273 51.1118C17.0273 51.526 17.3631 51.8618 17.7773 51.8618C18.1916 51.8618 18.5273 51.526 18.5273 51.1118L17.0273 51.1118ZM17.0273 23.334L17.0273 51.1118L18.5273 51.1118L18.5273 23.334L17.0273 23.334Z" fill="white"/>
+</g>
+</g>
+</g>
+<style>
+  @keyframes translateY {
+    0%,
+    100% {
+      transform: translateY(2px);
+    }
+
+    50% {
+      transform: translateY(-2px);
+    }
+  }
+</style>
+</svg>
