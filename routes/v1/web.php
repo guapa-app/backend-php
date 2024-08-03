@@ -62,7 +62,7 @@ Route::get('/ready', function () {
 
 Route::get('/register', function () {
     return view('frontend.register');
-})->name('register');
+})->name('register.form');
 
 Route::get('/single-blog', function () {
     return view('frontend.single-blog');
@@ -73,7 +73,7 @@ Route::get('/user-terms', function () {
 })->name('user-terms');
 
 
-Route::get('/register', [RegistrationController::class, 'registerForm'])->name('register.form');
+//Route::get('/register', [RegistrationController::class, 'registerForm'])->name('register.form');
 Route::post('/register', [RegistrationController::class, 'register'])->name('register')->middleware('throttle:10');
 
 Route::get('/navigation', function () {

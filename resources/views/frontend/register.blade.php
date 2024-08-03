@@ -1,21 +1,10 @@
-<!DOCTYPE html>
-<html dir="rtl">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="description" content="guapa app"/>
-    <meta name="author" content="guapa app"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <title>
-        GUAPA
-    </title>
-    <link rel="shortcut icon" href="assets/images/logo/icon.png" type="image/x-icon"/>
-    <link rel="stylesheet" href="assets/css/lib/animate.css"/>
-    <link rel="stylesheet" href="assets/css/lib/bootstrap.min.css"/>
-    <link rel="stylesheet" href="assets/css/lib/swiper-bundle.min.css"/>
-    <link rel="stylesheet" href="assets/css/style.css"/>
-</head>
-<body>
-<main>
+@extends('frontend.layouts.app')
+
+@section('title')
+    {{ ucfirst(__("register")) }}
+@endsection
+@section('content')
+    <main>
     <section class="register">
         <div class="container-fluid">
             <div class="row">
@@ -23,8 +12,8 @@
                     <div class="data-contain">
                         <div class="row">
                             <div class="col-lg-8 col-12 mx-auto">
-                                <a href="index.html" class="brand-name">
-                                    <img src="assets/images/logo/logo.svg" loading="lazy" alt=""/>
+                                <a href="{{ route('landing') }}" class="brand-name">
+                                    <img src="{{ asset('frontend/assets/images/logo/logo.svg') }}" loading="lazy" alt=""/>
                                 </a>
 
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -209,13 +198,13 @@
 
                                                                         <div class="show-pass">
                                                                             <img
-                                                                                src="assets/images/icons/password.svg"
+                                                                                src="{{ asset('frontend/assets/images/icons/password.svg') }}"
                                                                                 class="icon"
                                                                                 loading="lazy"
                                                                                 alt=""
                                                                             />
                                                                             <img
-                                                                                src="assets/images/icons/show-pass.svg"
+                                                                                src="{{ asset('frontend/assets/images/icons/show-pass.svg') }}"
                                                                                 class="slash-icon"
                                                                                 loading="lazy"
                                                                                 alt=""
@@ -246,13 +235,13 @@
 
                                                                         <div class="show-pass">
                                                                             <img
-                                                                                src="assets/images/icons/password.svg"
+                                                                                src="{{ asset('frontend/assets/images/icons/password.svg') }}"
                                                                                 class="icon"
                                                                                 loading="lazy"
                                                                                 alt=""
                                                                             />
                                                                             <img
-                                                                                src="assets/images/icons/show-pass.svg"
+                                                                                src="{{ asset('frontend/assets/images/icons/show-pass.svg') }}"
                                                                                 class="slash-icon"
                                                                                 loading="lazy"
                                                                                 alt=""
@@ -443,7 +432,7 @@
                                                                            accept=".svg, .webp, .jpg, .png, .jpeg">
                                                                     <label for="worker_resume"
                                                                            class="file__input--label form-label-shape">
-                                                                        <img src="assets/images/icons/upload.svg"
+                                                                        <img src="{{ asset('frontend/assets/images/icons/upload.svg') }}"
                                                                              loading="lazy" alt="">
 
                                                                         <div class="data">
@@ -747,7 +736,7 @@
                                 </div>
                             </div>
 
-                            <a href="login.html" class="link">
+                            <a href="{{ route('login') }}" class="link">
                                 لدي حساب بالفعل
 
                                 <span>
@@ -762,7 +751,7 @@
                 <div class="col-lg-6 col-12 px-0">
                     <div class="register-contain">
                         <div class="image-contain">
-                            <img src="assets/images/intro/intro.svg" loading="lazy" alt="">
+                            <img src="{{ asset('frontend/assets/images/intro/intro.svg') }}" loading="lazy" alt="">
                         </div>
 
                         <h1>
@@ -781,11 +770,4 @@
         </div>
     </section>
 </main>
-
-<script src="assets/js/lib/jquery4.js"></script>
-<script src="assets/js/lib/popper.js"></script>
-<script src="assets/js/lib/bootstrap.js"></script>
-<script src="assets/js/lib/swiper-bundle.min.js"></script>
-<script src="assets/js/main.js"></script>
-</body>
-</html>
+@endsection
