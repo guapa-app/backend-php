@@ -80,8 +80,11 @@
                     <div class="col-lg-4 col-12 mb-3">
                         <div class="box">
                             <div class="image-contain">
-{{--                                <img src="{{ $post->getFirstMediaUrl('posts', 'medium') }}" loading="lazy" alt="" />--}}
-                                <img src="{{ asset('landing-v2/images/blogs/img_1.png') }}" loading="lazy" alt="" />
+                                @if($post->getFirstMediaUrl('posts', 'medium'))
+                                    <img src="{{ $post->getFirstMediaUrl('posts', 'medium') }}" loading="lazy" alt="" />
+                                @else
+                                    <img src="{{ asset('landing-v2/images/blogs/img_1.png') }}" loading="lazy" alt="" />
+                                @endif
                             </div>
                             <div class="contain">
                                 <div class="flex-data">

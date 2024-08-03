@@ -108,10 +108,11 @@
     <section class="single-blog general-section">
         <div class="container">
             <div class="image-contain">
-{{--                @if($post->hasMedia('posts'))--}}
-{{--                    <img src="{{ $post->getFirstMediaUrl('posts', 'large') }}" loading="lazy" alt="{{ $post->title }}" />--}}
-{{--                @endif--}}
-                <img src="{{ asset('landing-v2/images/blogs/img_1.png') }}" loading="lazy" alt="" />
+                @if($post->getFirstMediaUrl('posts', 'large'))
+                    <img src="{{ $post->getFirstMediaUrl('posts', 'large') }}" loading="lazy" alt="" />
+                @else
+                    <img src="{{ asset('landing-v2/images/blogs/img_1.png') }}" loading="lazy" alt="" />
+                @endif
             </div>
 
             <div class="contain">
