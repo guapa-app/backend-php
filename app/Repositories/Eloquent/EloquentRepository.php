@@ -45,7 +45,7 @@ class EloquentRepository implements EloquentRepositoryInterface
      * @param Request $request
      * @return LengthAwarePaginator| Collection
      */
-    public function all(Request $request, $perPage = 10): object
+    public function all(Request $request): object
     {
         $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
 
