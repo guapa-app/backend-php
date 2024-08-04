@@ -41,34 +41,22 @@
 
                         <ul class="links">
                             <li>
-                                <a href="{{ route('download-app') }}">
-                      <span>
-                        تطبيق مزودي الخدمة
-                      </span>
+                                <a href="{{ route('download-app') }}"><span>تطبيق مزودي الخدمة</span>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="{{ route('about-app') }}">
-                      <span>
-                        تطبيق المستخدمين
-                      </span>
+                                <a href="{{ route('about-app') }}"><span>تطبيق المستخدمين</span>
                                 </a>
                             </li>
 
                             <li>
-                                <a href{ route(){('="about ')}}">
-                      <span>
-                        عن قوابا
-                      </span>
+                                <a href="{{ route('about')}}"><span>عن قوابا</span>
                                 </a>
                             </li>
 
                             <li>
-                                <a href{ route(){('="blogs ')}}">
-                      <span>
-                        المدونة
-                      </span>
+                                <a href="{{ route('blogs')}}"><span>المدونة</span>
                                 </a>
                             </li>
                         </ul>
@@ -117,7 +105,8 @@
                     <ul class="links">
                         <li>
                             <a href="#">
-                                <img src="{{ asset('frontend/assets/images/footer/youtube.svg') }}" loading="lazy" alt=""/>
+                                <img src="{{ asset('frontend/assets/images/footer/youtube.svg') }}" loading="lazy"
+                                     alt=""/>
 
                                 <span>
                       موقع YouTube
@@ -137,7 +126,8 @@
 
                         <li>
                             <a href="#">
-                                <img src="{{ asset('frontend/assets/images/footer/linked.svg') }}" loading="lazy" alt=""/>
+                                <img src="{{ asset('frontend/assets/images/footer/linked.svg') }}" loading="lazy"
+                                     alt=""/>
 
                                 <span>
                       لينكدين
@@ -147,7 +137,8 @@
 
                         <li>
                             <a href="#">
-                                <img src="{{ asset('frontend/assets/images/footer/insta.svg') }}" loading="lazy" alt=""/>
+                                <img src="{{ asset('frontend/assets/images/footer/insta.svg') }}" loading="lazy"
+                                     alt=""/>
 
                                 <span>
                       انستغرام
@@ -157,7 +148,8 @@
 
                         <li>
                             <a href="#">
-                                <img src="{{ asset('frontend/assets/images/footer/facebook.svg') }}" loading="lazy" alt=""/>
+                                <img src="{{ asset('frontend/assets/images/footer/facebook.svg') }}" loading="lazy"
+                                     alt=""/>
                                 <span>
                       فيسبوك
                     </span>
