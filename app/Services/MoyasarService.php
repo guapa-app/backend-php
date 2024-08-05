@@ -10,7 +10,7 @@ class MoyasarService
 {
     private function dataHandler($data)
     {
-        $data = $data->toArray();
+        $data = $data->attributesToArray();
 
         /**
          * Convert the amount to the smallest currency unit as an integer.
