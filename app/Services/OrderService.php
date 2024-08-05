@@ -10,9 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Models\User;
 use App\Models\UserVendor;
-use App\Notifications\OrderNotification;
 use App\Notifications\OrderUpdatedNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -24,17 +22,17 @@ use Illuminate\Validation\ValidationException;
 class OrderService
 {
     private $repository;
-    private $payment_service;
-    private $product_fees;
-    private $taxes_percentage;
-    private $is_service = false;
+    private $paymentService;
+    private $productFees;
+    private $taxesPercentage;
+    private $isService = false;
 
     public function __construct(OrderRepositoryInterface $repository, PaymentService $payment_service)
     {
         $this->repository = $repository;
-        $this->payment_service = $payment_service;
-        $this->product_fees = Setting::getProductFees();
-        $this->taxes_percentage = Setting::getTaxes();
+        $this->paymentService = $payment_service;
+        $this->productFees = Setting::getProductFees();
+        $this->taxesPercentage = Setting::getTaxes();
         $this->fees = 0;
         $this->taxes = 0;
     }
@@ -42,61 +40,49 @@ class OrderService
     public function create(array $data): Collection
     {
         return DB::transaction(function () use ($data) {
-            $productIds = array_map(function ($product) {
-                return $product['id'];
-            }, $data['products']);
-
+            $productIds = array_column($data['products'], 'id');
             $products = Product::whereIn('id', $productIds)->get();
 
-            $products_titles = $products->implode('title', ' - ');
+            $productsTitles = $products->pluck('title')->implode(' - ');
 
             // Group products by vendor to create an order for each vendor
-            $keyedProducts = [];
-            foreach ($products as $k => $product) {
-                $keyedProducts[$product->vendor_id][] = $product;
-            }
+            $keyedProducts = $products->groupBy('vendor_id');
 
             $orders = new Collection;
             $now = now();
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $data['total'] = (float) array_sum(array_map(function ($product) use ($data) {
-                    $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int) ($value['id']) === $product->id;
-                    });
+                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data) {
+                    $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
 
-                    if ($product->offer != null) {
-                        $product['price'] -= ($product['price'] * ($product->offer->discount / 100));
-                        $product['price'] = round($product['price'], 2);
+                    if ($product->offer) {
+                        $product->price -= ($product->price * ($product->offer->discount / 100));
+                        $product->price = round($product->price, 2);
                     }
 
-                    $final_price = $inputItem['quantity'] * $product['price'];
+                    $finalPrice = $inputItem['quantity'] * $product->price;
 
-                    if ($product->type == ProductType::Service) {
-                        $this->is_service = true;
-
-                        $product_fees = optional($product->categories()->first())->fees;
-
-                        $this->fees += ($product_fees / 100) * $final_price;
+                    if ($product->type === ProductType::Service) {
+                        $this->isService = true;
+                        $productFees = optional($product->categories()->first())->fees ?? 0;
+                        $this->fees += ($productFees / 100) * $finalPrice;
                     } else {
-                        $this->fees += ($this->product_fees / 100) * $final_price;
+                        $this->fees += ($this->productFees / 100) * $finalPrice;
                     }
 
-                    return $final_price;
-                }, $vendorProducts));
+                    return $finalPrice;
+                });
 
                 $order = $this->repository->create($data);
 
-                $items = array_map(function ($product) use ($data, $order, $now, $vendorId) {
-                    $inputItem = Arr::first($data['products'], function ($value, $key) use ($product) {
-                        return (int) ($value['id']) === $product->id;
-                    });
+                $items = $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId) {
+                    $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
 
                     if (isset($inputItem['appointment'])) {
                         $appointment = Appointment::find($inputItem['appointment']['id']);
 
-                        if ($appointment->vendor_id != $vendorId) {
+                        if ($appointment->vendor_id !== $vendorId) {
                             $order->delete();
                             abort(400, 'Invalid appointment selected');
                         }
@@ -116,31 +102,26 @@ class OrderService
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
-                }, $vendorProducts);
+                });
 
                 // Check that provided user ids belong to vendor
-                $userIds = array_filter(array_map(function ($item) {
-                    return $item['user_id'];
-                }, $items));
+                $userIds = $items->pluck('user_id')->filter()->all();
 
                 if (!$this->checkVendorUsers($vendorId, $userIds)) {
                     abort(400, 'Invalid staff provided for vendor');
                 }
 
-                OrderItem::insert($items);
+                OrderItem::insert($items->toArray());
 
                 $order->load('items', 'address', 'user', 'vendor');
-
                 $orders->push($order);
 
-                if ($this->is_service) {
-                    $this->taxes = ($this->taxes_percentage / 100) * $this->fees;
+                if ($this->isService) {
+                    $this->taxes = ($this->taxesPercentage / 100) * $this->fees;
 
-                    // it 'll be one order at all for one vendor
-                    $invoice = $this->payment_service->generateInvoice($orders, $products_titles, $this->fees, $this->taxes);
-
-                    // return invoice url with order response
-                    $orders->first()['invoice_url'] = $invoice->url;
+                    // Generate invoice for the first order (since there's only one order per vendor)
+                    $invoice = $this->paymentService->generateInvoice($orders, $productsTitles, $this->fees, $this->taxes);
+                    $orders->first()->invoice_url = $invoice->url;
                 }
             }
 
@@ -163,7 +144,7 @@ class OrderService
         $order = $this->repository->update($order, $data);
 
         if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
-            $this->payment_service->refund($order);
+            $this->paymentService->refund($order);
         }
 
         Notification::send($order->user, new OrderUpdatedNotification($order));
