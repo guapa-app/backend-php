@@ -9,23 +9,27 @@
         position: relative;
         text-align: center;
     }
+
     @-webkit-keyframes seconds {
         0% {
             opacity: 1;
         }
+
         100% {
             opacity: 0;
-            left: -9999px;
+            left: 0;
             position: absolute;
         }
     }
+
     @keyframes seconds {
         0% {
             opacity: 1;
         }
+
         100% {
             opacity: 0;
-            left: -9999px;
+            left: 0;
             position: absolute;
         }
     }
@@ -53,11 +57,11 @@
         </div>
     @elseif (is_string($errors))
         <div class="alert alert-secondary">
-            @lang('texts.'.$errors)
+            @lang('texts.' . $errors)
         </div>
     @elseif ($errors->any())
-        <div class="alert alert-secondary">
-            @lang('texts.check_errors')
+        <div class="alert alert-danger">
+            @lang('check errors')
         </div>
     @endif
 </div>
