@@ -9,8 +9,6 @@
         @include('frontend.includes.header')
     @endif
 
-        @include('alert-message')
-
     @yield('content')
 
     @if(!Route::is(['login', 'register.form']))
