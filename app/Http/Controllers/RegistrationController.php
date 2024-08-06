@@ -25,7 +25,7 @@ class RegistrationController extends BaseApiController
 
     public function registerForm()
     {
-        return view('register', $this->data());
+        return view('frontend.register', $this->data());
     }
 
     public function register(RegisterVendorRequest $request)

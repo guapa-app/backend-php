@@ -8,7 +8,7 @@
             </div>
 
             <a href="{{ route('landing') }}" class="brand-name">
-                <img src="{{ asset('frontend/assets/images/logo/logo.svg') }}" loading="lazy" alt=""/>
+                <img src="{{ asset('frontend/assets/images/logo/logo.svg') }}" loading="lazy" alt="" />
             </a>
 
             <div class="nav-contain">
@@ -47,12 +47,6 @@
                 <div class="button-contain">
                     <a href="{{ route('register') }}" class="btn-signup">
                         تسجيل كمزود خدمة
-                    </a>
-
-                    <a href="{{ route('login') }}" class="custom-btn primary-btn">
-                <span>
-                  تسجيل الدخول
-                </span>
                     </a>
                 </div>
             </div>

@@ -72,6 +72,7 @@ class RegisterVendorRequest extends FormRequest
                 'vendor.tax_number'             => 'nullable|string|max:200',
                 'vendor.cat_number'             => 'nullable|string|max:200',
                 'vendor.reg_number'             => 'nullable|string|max:200',
+                'vendor.health_declaration'     => 'nullable|string|max:200',
                 'vendor.logo'                   => ['nullable', new ImageOrArray(), 'max:10240'],
 
                 'vendor.whatsapp'               => 'nullable|' . $phoneNumbersRule,
