@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Common;
+use App\Models\Setting;
 use Illuminate\Foundation\Http\FormRequest;
 
 class VendorClientRequest extends FormRequest
@@ -12,7 +14,6 @@ class VendorClientRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-//        return $this->user() && !$this->user()->isAdmin();
     }
 
     /**
@@ -24,7 +25,8 @@ class VendorClientRequest extends FormRequest
     {
         return [
             'name'      => 'required|string|min:3|max:100',
-            'phone'     => 'required|string|min:4|max:30',
+            'phone'     => 'required|string|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
+
         ];
     }
 }

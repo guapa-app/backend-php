@@ -7,7 +7,6 @@ use App\Http\Requests\GetClientOrdersRequest;
 use App\Http\Requests\VendorClientRequest;
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\V3\VendorClientCollection;
-use App\Models\User;
 use App\Models\Vendor;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +28,6 @@ class VendorClientController extends ApiVendorClientController
     public function index(Request $request, Vendor $vendor) : VendorClientCollection
     {
         $clients = parent::index($request, $vendor);
-//        dd($clients);
         return VendorClientCollection::make($clients)
             ->additional([
                 'success' => true,
@@ -55,11 +53,9 @@ class VendorClientController extends ApiVendorClientController
         } catch (Exception $exception) {
             $this->logReq($exception->getMessage());
 
-            return $this->errorJsonRes(message: 'Something went wrong');
+            return $this->errorJsonRes(message: __('api.error_occurred'));
         }
     }
-
-
     /**
      * Get client orders for a vendor.
      *
@@ -82,7 +78,6 @@ class VendorClientController extends ApiVendorClientController
                 'success' => true,
                 'message' => __('api.success'),
             ]);
-
     }
 
     public function delete(Vendor $vendor, $clientId)
@@ -90,11 +85,11 @@ class VendorClientController extends ApiVendorClientController
         try {
             parent::delete($vendor, $clientId);
 
-            return $this->successJsonRes(null, __('api.deleted'));
+            return $this->successJsonRes(message: __('api.deleted'));
         } catch (Exception $exception) {
             $this->logReq($exception->getMessage());
 
-            return $this->errorJsonRes(message: 'Something went wrong');
+            return $this->errorJsonRes(message: __('api.error_occurred'));
         }
     }
 }
