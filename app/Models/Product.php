@@ -128,6 +128,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             0;
     }
 
+    public function shareLinks()
+    {
+        return $this->morphMany(ShareLink::class, 'shareable');
+    }
+
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
@@ -323,6 +328,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         return $query;
     }
+
     public function scopeWithApiListRelationsForVendor(Builder $query, Request $request): Builder
     {
         $query->with('vendor.logo', 'media', 'oldCurrentUpcomingOffer', 'oldCurrentUpcomingOffer.image', 'taxonomies');

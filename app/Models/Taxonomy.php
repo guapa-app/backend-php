@@ -6,13 +6,14 @@ use App\Contracts\Listable;
 use App\Traits\Listable as ListableTrait;
 use Hamedov\Taxonomies\Taxonomy as BaseTaxonomy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Http\Request;
 use Spatie\Sluggable\SlugOptions;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Taxonomy extends BaseTaxonomy implements Listable
 {
-    use ListableTrait, HasRecursiveRelationships;
+    use ListableTrait, HasRecursiveRelationships, HasFactory;
 
     protected $fillable = [
       'fees',

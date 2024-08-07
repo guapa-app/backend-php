@@ -1,1 +1,0 @@
-{"version":1,"defects":{"Tests\\Feature\\app\\Models\\ProductTest::test_product_created_by_authenticated_vendor":8,"Tests\\Feature\\app\\Models\\ProductTest::test_user_can_create_product":8},"times":{"Tests\\Feature\\app\\Models\\ProductTest::test_product_created_by_authenticated_vendor":0.138,"Tests\\Feature\\app\\Models\\ProductTest::test_user_can_create_product":0.021}}
