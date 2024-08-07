@@ -22,3 +22,5 @@ storage/media-library/
 /.vscode
 TODO.md
 .php-cs-fixer.dist.php
+.phpunit.cache
+phpunit.xml.bak
