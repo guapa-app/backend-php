@@ -32,6 +32,7 @@
         "laravel/tinker": "^2.8",
         "lcobucci/jwt": "^5.0",
         "league/flysystem-aws-s3-v3": "^3.15",
+        "maatwebsite/excel": "^3.1",
         "michielfb/laravel-nova-time-field": "^2.0",
         "moyasar/moyasar": "^1.1",
         "predis/predis": "^2.2",
