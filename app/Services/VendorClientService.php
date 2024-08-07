@@ -19,27 +19,48 @@ class VendorClientService
     public function addClient(Vendor $vendor, array $data)
     {
         return DB::transaction(function () use ($vendor, $data) {
-            $isNewClient = false;
-            $user = User::where('phone', $data['phone'])->first();
+            $user = $this->findOrCreateUser($data);
+            $isNewClient = $user->wasRecentlyCreated;
 
-            if (!$user) {
-                $user = $this->createNewUser($data);
-                $isNewClient = true;
-            }
-            $this->sendNotification($user, $vendor,$isNewClient);
+            $this->sendNotification($user, $vendor, $isNewClient);
 
             $vendorClient = VendorClient::firstOrCreate([
                 'vendor_id' => $vendor->id,
                 'user_id' => $user->id,
             ]);
 
+            $orders_count = $this->getUserOrdersCount($user, $vendor, $isNewClient);
+
             return [
-                'user' => $user,
-                'vendor_client' => $vendorClient,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'orders_count' => $orders_count,
             ];
         });
     }
 
+    private function findOrCreateUser(array $data): User
+    {
+        return User::firstOrCreate(
+            ['phone' => $data['phone']],
+            ['name' => $data['name'], 'status' => User::STATUS_ACTIVE]
+        );
+    }
+
+    private function getUserOrdersCount(User $user, Vendor $vendor, bool $isNewClient): int
+    {
+        if ($isNewClient) {
+            return 0;
+        }
+
+        $user->load(['orders' => function ($query) use ($vendor) {
+            $query->where('vendor_id', $vendor->id);
+        }]);
+
+        return $user->orders->count();
+    }
     public function listClientsWithOrderCount(Vendor $vendor, array $filters = []): Collection
     {
         $query = $vendor->clients()

@@ -38,11 +38,13 @@ class UserPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverResources(in: app_path('Filament/Resources/GuapaPlus'), for: 'App\\Filament\\Resources\\GuapaPlus')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Widgets/GuapaPlus'), for: 'App\\Filament\\Widgets\\GuapaPlus')
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
@@ -50,6 +52,7 @@ class UserPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Info',
                 'Shop',
+                'Guapa Plus',
             ])
             ->middleware([
                 EncryptCookies::class,

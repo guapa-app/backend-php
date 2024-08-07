@@ -23,9 +23,7 @@ class VendorClientController extends Controller
         $request->validate([
             'name' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:255',
-
         ]);
-
         $filters = $request->only(['name', 'phone']);
         return $this->vendorClientService->listClientsWithOrderCount($vendor, $filters);
     }
@@ -33,7 +31,6 @@ class VendorClientController extends Controller
 
     public function store(VendorClientRequest $request, Vendor $vendor)
     {
-
         return $this->vendorClientService->addClient($vendor, $request->validated());
     }
 
