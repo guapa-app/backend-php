@@ -11,8 +11,8 @@ use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Fields\Trix;
 
 class Post extends Resource
 {
@@ -67,7 +67,7 @@ class Post extends Resource
                 ->sortable()
                 ->rules('required', 'max:191'),
 
-            Textarea::make(__('content'), 'content')
+                Trix::make(__('content'), 'content')
                 ->required()
                 ->sortable()
                 ->rules('required'),

@@ -32,9 +32,8 @@ Route::get('/about-app', function () {
     return view('frontend.about-app');
 })->name('about-app');
 
-Route::get('/blogs', function () {
-    return view('frontend.blogs');
-})->name('blogs');
+Route::get('/blogs', [\App\Http\Controllers\PostController::class, 'index'])->name('blogs');
+Route::get('/single-blog/{id}', [\App\Http\Controllers\PostController::class, 'show'])->name('single-blog');
 
 Route::get('/download-app', function () {
     return view('frontend.download-app');
@@ -59,10 +58,6 @@ Route::get('/login', function () {
 Route::get('/ready', function () {
     return view('frontend.ready');
 })->name('ready');
-
-Route::get('/single-blog', function () {
-    return view('frontend.single-blog');
-})->name('single-blog');
 
 Route::get('/user-terms', function () {
     return view('frontend.user-terms');
