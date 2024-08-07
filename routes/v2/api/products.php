@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\V2\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/',                                              [ProductController::class, 'index']);
-Route::get('/{id}',                                          [ProductController::class, 'single']);
+Route::get('/{id}',                                          [ProductController::class, 'single'])->name('products.show');
 
 Route::group(['middleware' => 'auth:api'], function() {
 	Route::post('/',                                         [ProductController::class, 'create']);

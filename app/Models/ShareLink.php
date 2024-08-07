@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ShareLink extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['identifier', 'shareable_id', 'shareable_type', 'link'];
+
+    public function shareable()
+    {
+        return $this->morphTo();
+    }
+
+    public function scopeVendor(Builder $query): Builder
+    {
+        return $query->where('shareable_type', Vendor::class);
+    }
+
+    public function scopeProduct(Builder $query): Builder
+    {
+        return $query->where('shareable_type', Product::class);
+    }
+
+    public function scopeOffer(Builder $query): Builder
+    {
+        return $query->where('shareable_type', Offer::class);
+    }
+}
