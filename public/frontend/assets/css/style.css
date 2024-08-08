@@ -197,7 +197,7 @@ button {
 }
 @keyframes pulse-shadow {
   100% {
-    box-shadow: 0 0 0 10px rgba(255, 102, 0, 0), 0 0 0 20px rgba(255, 102, 0, 0);
+    box-shadow: 0 0 0 10px rgba(100, 102, 142, 0.2), 0 0 0 20px rgba(100, 102, 142, 0.1);
   }
 }
 @keyframes spinner {
@@ -1857,6 +1857,8 @@ html[dir=rtl] .faq .card .card-header .btn::after, html[dir=rtl] .faq .card .car
   height: 640px;
   border-radius: 20px;
   overflow: hidden;
+  position: relative;
+  z-index: 9;
 }
 @media (max-width: 992px) {
   .single-blog .image-contain {
@@ -1870,6 +1872,28 @@ html[dir=rtl] .faq .card .card-header .btn::after, html[dir=rtl] .faq .card .car
      object-fit: cover;
   -o-object-position: center;
      object-position: center;
+}
+.single-blog .image-contain .video-icon {
+  width: 50px;
+  height: 50px;
+  background-color: var(--primary-color);
+  position: absolute;
+  animation: pulse-shadow 4s linear infinite alternate;
+  top: calc(50% - 25px);
+  left: calc(50% - 25px);
+  z-index: 91;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.single-blog .image-contain .video-icon img {
+  width: 24px;
+  height: 24px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  filter: var(--light-filter);
 }
 .single-blog .contain {
   width: 100%;

@@ -25,7 +25,11 @@ $(document).ready(function () {
     $('.nav-contain').toggleClass('active-nav');
     $('body').toggleClass('overflowNone')
   });
-
+  
+  $("[data-fancybox]").fancybox({
+    selector: '[data-fancybox="images"]',
+    loop: true
+  });
   
   var swiper = new Swiper(".swiper-brands", {
     spaceBetween: 10,
