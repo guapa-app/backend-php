@@ -275,6 +275,3 @@
         </section>
     </main>
 @endsection
-
-@section('js')
-@endsection

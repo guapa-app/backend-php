@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/lib/animate.css') }}"/>
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/lib/bootstrap.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/lib/swiper-bundle.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('frontend/assets/css/lib/jquery.fancybox.css') }}"/>
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/style.css') }}"/>
 
     @yield('heads')

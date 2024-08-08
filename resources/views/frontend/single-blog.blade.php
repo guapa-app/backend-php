@@ -46,7 +46,11 @@
         <section class="single-blog general-section">
             <div class="container">
                 <div class="image-contain">
-                        <iframe src="{{ $post->youtube_url }}" allowfullscreen></iframe>
+                    <img src="{{ $post->getFirstMediaUrl('posts', 'large') }}" loading="lazy" alt="" />
+
+                    <a href="{{ $post->youtube_url }}" data-fancybox class="video-icon">
+                        <img src="{{ asset('frontend/assets/images/icons/video_play.svg') }}" loading="lazy" alt="" />
+                    </a>
                 </div>
 
                 <div class="contain">
