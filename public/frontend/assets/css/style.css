@@ -1345,13 +1345,22 @@ html[dir=ltr] .sub-header .container .icon {
   color: var(--dark-color);
 }
 .mobile-contain.secondary {
-  background-color: rgba(100, 102, 142, 0.22);
+  background-color: rgba(100, 102, 142, 0.72);
 }
 .mobile-contain.secondary span {
   color: var(--secondary-color);
 }
-.mobile-contain.secondary h1, .mobile-contain.secondary span {
+.mobile-contain.secondary h1, .mobile-contain.secondary p {
   color: var(--light-color);
+}
+.mobile-contain.secondary .custom-btn {
+  width: 250px;
+}
+.mobile-contain.secondary .custom-btn span {
+  color: var(--light-color);
+}
+.mobile-contain.secondary .custom-btn:hover span {
+  color: var(--secondary-color);
 }
 @media (max-width: 992px) {
   .mobile-contain {
@@ -2508,13 +2517,27 @@ html[dir=rtl] .form-contain .error::after {
 
 .register-contain {
   width: 100%;
-  height: 100vh;
-  background-color: var(--primary-color);
+  min-height: 100vh;
+  background-color: var(--secondary-color);
   display: flex;
   justify-content: center;
   flex-direction: column;
   text-align: center;
   padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  z-index: 9;
+}
+.register-contain::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url("../images/pattern.png") center/cover no-repeat;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  animation: spinner 10s linear infinite alternate;
 }
 @media (max-width: 992px) {
   .register-contain {
@@ -2693,7 +2716,7 @@ html[dir=rtl] .form-contain .error::after {
   text-align: center;
 }
 .register .link span {
-  color: var(--primary-color);
+  color: var(--secondary-color);
 }
 .register .data-contain {
   width: 100%;
@@ -3389,7 +3412,7 @@ html[dir=rtl] .register .contain .price-tabs .nav-item .nav-link .save {
 }
 .register .button-contain {
   width: 100%;
-  margin-top: 25px;
+  margin-top: 0px;
   display: flex;
   align-items: center;
   align-content: center;
@@ -3608,6 +3631,105 @@ html[dir=rtl] .file__value--remove::after {
 
 input[type=file] {
   display: none;
+}
+
+.application-features {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.application-features .custom-heading h1, .application-features .custom-heading p {
+  color: var(--light-color);
+}
+.application-features .data-contain {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  justify-content: space-around !important;
+}
+@media (min-width: 992px) {
+  .application-features .right-data .box {
+    justify-content: flex-end;
+    align-content: flex-end;
+    align-items: flex-end;
+    text-align: end;
+  }
+}
+@media (min-width: 992px) {
+  .application-features .left-data .box {
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+    text-align: start;
+  }
+}
+.application-features .box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  gap: 20px;
+  transition: all 0.3s linear;
+  margin-bottom: 30px;
+}
+.application-features .box.margin-data {
+  margin-bottom: 30px;
+}
+@media (min-width: 992px) {
+  .application-features .box.margin-data {
+    margin-bottom: 100px;
+  }
+}
+.application-features .box .image-contain img {
+  width: 50px;
+  height: 50px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  transition: all 0.3s linear;
+}
+.application-features .box .image-contain img.secondary {
+  filter: var(--light-filter);
+  opacity: 0.7;
+}
+.application-features .box .image-contain img.primary {
+  filter: var(--primary-filter);
+}
+.application-features .box h2 {
+  color: var(--light-color);
+  font-size: 20px;
+  font-weight: 900;
+  margin: 0px;
+}
+.application-features .box p {
+  color: var(--light-color);
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0px;
+  opacity: 0.7;
+}
+.application-features .box:hover {
+  transform: translateY(-10px);
+}
+.application-features .image-app {
+  width: 100%;
+  height: 800px;
+  animation: translateY 1s linear infinite alternate;
+}
+@media (max-width: 992px) {
+  .application-features .image-app {
+    height: 500px;
+  }
+}
+.application-features .image-app img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+  -o-object-position: center;
+     object-position: center;
 }
 
 @media (max-width: 999px) {

@@ -905,14 +905,25 @@ header {
   }
 
   &.secondary {
-    background-color: rgba($color: #64668E, $alpha: 0.220);
+    background-color: rgba($color: #64668E, $alpha: 0.720);
 
     span {
       color: var(--secondary-color);
     }
 
-    h1, span {
+    h1, p {
       color: var(--light-color);
+    }
+
+    .custom-btn {
+      width: 250px;
+      span {
+        color: var(--light-color);
+      }
+
+      &:hover span {
+        color: var(--secondary-color);
+      }
     }
   }
 
@@ -2136,11 +2147,26 @@ footer {
 
 .register-contain {
   width: 100%;
-  height: 100vh;
-  background-color: var(--primary-color);
+  min-height: 100vh;
+  background-color: var(--secondary-color);
   @include flexColumnCenter();
   text-align: center;
   padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  z-index: 9;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('../images/pattern.png') center / cover no-repeat;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    animation: spinner 10s linear infinite alternate;
+  }
 
   @include media() {
     padding: 40px 20px;
@@ -2179,7 +2205,6 @@ footer {
 }
 
 .register {
-
 
   .nav {
     width: 100%;
@@ -2322,7 +2347,7 @@ footer {
     text-align: center;
 
     span {
-      color: var(--primary-color);
+      color: var(--secondary-color);
     }
   }
 
@@ -3049,7 +3074,7 @@ footer {
 
   .button-contain {
     width: 100%;
-    margin-top: 25px;
+    margin-top: 0px;
     @include flexBetween();
     gap: 10px;
 
@@ -3272,6 +3297,116 @@ footer {
 
 input[type="file"]{
   display: none;
+}
+
+.application-features {
+  background-color: rgba($color: #000000, $alpha: 0.80);
+
+  .custom-heading {
+    h1, p {
+      color: var(--light-color);
+    }
+  }
+
+  .data-contain {
+    width: 100%;
+    height: 100%;
+    @include flexColumnCenter();
+    justify-content: space-around !important;
+  }
+
+  .right-data {
+    .box {
+      @media (min-width: 992px) {
+        justify-content: flex-end;
+        align-content: flex-end;
+        align-items: flex-end;
+        text-align: end;
+      }
+    }
+  }
+
+  .left-data {
+    .box {
+      @media (min-width: 992px) {
+        justify-content: flex-start;
+        align-content: flex-start;
+        align-items: flex-start;
+        text-align: start;
+      }
+    }
+  }
+
+  .box {
+    width: 100%;
+    @include flexColumnCenter();
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    gap: 20px;
+    transition: all .3s linear;
+    margin-bottom: 30px;
+
+    &.margin-data {
+      margin-bottom: 30px;
+
+      @media (min-width: 992px) {
+        margin-bottom: 100px;
+      }
+    }
+
+    .image-contain img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      transition: all .3s linear;
+
+      &.secondary {
+        filter: var(--light-filter);
+        opacity: .7;
+      }
+
+      &.primary {
+        filter: var(--primary-filter);
+      }
+    }
+
+    h2 {
+      color: var(--light-color);
+      font-size: 20px;
+      font-weight: 900;
+      margin: 0px;
+    }
+
+    p {
+      color: var(--light-color);
+      font-size: 15px;
+      font-weight: 500;
+      margin: 0px;
+      opacity: .7;
+    }
+
+    &:hover {
+      transform: translateY(-10px);
+    }
+  }
+
+  .image-app {
+    width: 100%;
+    height: 800px;
+    animation: translateY 1s linear infinite alternate;
+
+    @include media() {
+      height: 500px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+  }
 }
 
 @import 'media';

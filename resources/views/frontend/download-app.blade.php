@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('title')
-    {{ ucfirst(__("download")) }}
+    {{ ucfirst(__('download')) }}
 @endsection
 @section('content')
     <main>
@@ -17,214 +17,170 @@
                             </h1>
 
                             <p>
-                                لوريم إيبسوم هو نص مؤقت يستخدم في التصميم والنشر لإظهار شكل
-                                الوثيقة أو الخط دون الاعتماد على محتوى معنوي. قد يستخدم لوريم
-                                إيبسوم كنص بديل قبل وضع النص النهائي المطلوب للتصميم. كما
-                                يستخدم لإخفاء النص في عملية تسمى بالتغريق
+                                في "قوابا" هو أداة متكاملة تُمكن مقدمي خدمات التجميل من إدارة أعمالهم بكفاءة، من خلال أدوات
+                                متطورة لتقديم العروض، متابعة التقييمات، وتحليل الأداء. صُمم التطبيق ليدعم نموهم وتعزيز
+                                تفاعلهم مع العملاء، مما يساهم في تحسين جودة الخدمات وتوسيع قاعدة عملائهم.
                             </p>
 
-                            <a href="#" class="custom-btn secondary-btn mt-4">
-                  <span>
-                    تسجيل كمزود خدمة
-                  </span>
+                            <a href="{{ route('register.form') }}" class="custom-btn secondary-btn mt-4">
+                                <span>
+                                    تسجيل كمزود خدمة
+                                </span>
                             </a>
                         </div>
                     </div>
 
                     <div class="col-lg-6 col-12">
                         <div class="image-contain">
-                            <img src="{{ asset('frontend/assets/images/mobile_1.svg') }}" loading="lazy" alt=""/>
+                            <img src="{{ asset('frontend/assets/images/mobile_1.svg') }}" loading="lazy" alt="" />
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="faq general-section border-shape">
+        <section class="application-features general-section">
             <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="download secondary-color">
-                            <div class="row">
-                                <div class="col-lg-6 col-12 mb-3">
-                                    <div class="contain-data">
-                                        <h1>هل اعجبتك مميزات التطبيق ؟</h1>
+                <div class="custom-heading">
+                    <h1>
+                        مميزات التطبيق
+                    </h1>
 
-                                        <p>لا تترد حمل التطبيق الان</p>
+                    <p>
+                        في منصة "قوابا" يتيح لمقدمي خدمات التجميل الاستفادة من مجموعة من الميزات المصممة لدعم وتعزيز
+                        أعمالهم. إليك أبرز هذه المميزات:
+                    </p>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 mx-auto mb-3">
+                        <div class="box">
+                            <div class="image-contain">
+                                <img src="{{ asset('frontend/assets/images/crown.svg') }}" class="secondary" loading="lazy"
+                                    alt="" />
+                            </div>
+
+                            <h2>
+                                ميزة التطبيق رقم 1
+                            </h2>
+
+                            <p>
+                                **واجهة إدارة سهلة الاستخدام:** يوفر التطبيق واجهة مستخدم بسيطة وسهلة للتنقل، مما يسهل على
+                                مقدمي الخدمات إدارة عروضهم، تحديث بياناتهم، ومعالجة طلباتهم بكفاءة.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-lg-4 col-12 mb-3 right-data">
+                                <div class="data-contain">
+                                    <div class="box">
+                                        <div class="image-contain">
+                                            <img src="{{ asset('frontend/assets/images/crown.svg') }}" class="secondary"
+                                                loading="lazy" alt="" />
+                                        </div>
+
+                                        <h2>
+                                            ميزة التطبيق رقم 2
+                                        </h2>
+
+                                        <p>
+                                            **إدارة الملف الشخصي والعروض:** يتيح التطبيق لمقدمي الخدمات إنشاء وتحديث ملفاتهم
+                                            الشخصية، بما في ذلك المعلومات الأساسية، الصور، والتفاصيل حول الخدمات المقدمة.
+                                            كما يمكنهم عرض العروض والخصومات الخاصة لجذب العملاء.
+                                        </p>
+                                    </div>
+
+                                    <div class="box">
+                                        <div class="image-contain">
+                                            <img src="{{ asset('frontend/assets/images/crown.svg') }}" class="secondary"
+                                                loading="lazy" alt="" />
+                                        </div>
+
+                                        <h2>
+                                            ميزة التطبيق رقم 3
+                                        </h2>
+
+                                        <p>
+                                            **نظام تقييم ومراجعات:** يوفر التطبيق نظامًا لتلقي تقييمات ومراجعات من العملاء،
+                                            مما يساعد في بناء سمعة قوية ويعزز من الثقة والشفافية بين مقدمي الخدمات والعملاء.
+                                        </p>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="col-lg-6 col-12 mb-3">
-                                    <div class="mobile-button">
-                                        <a href="#" class="download-btn">
-                                            <img
-                                                src="{{ asset('frontend/assets/images/icons/app-store.svg') }}"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                        </a>
+                            <div class="col-lg-4 col-12 mb-3">
+                                <div class="image-app">
+                                    <img src="{{ asset('frontend/assets/images/app.png') }}" loading="lazy"
+                                        alt="" />
+                                </div>
+                            </div>
 
-                                        <a href="#" class="download-btn">
-                                            <img
-                                                src="{{ asset('frontend/assets/images/icons/google_play.svg') }}"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                        </a>
+                            <div class="col-lg-4 col-12 mb-3 left-data">
+                                <div class="data-contain">
+                                    <div class="box">
+                                        <div class="image-contain">
+                                            <img src="{{ asset('frontend/assets/images/crown.svg') }}" class="secondary"
+                                                loading="lazy" alt="" />
+                                        </div>
+
+                                        <h2>
+                                            ميزة التطبيق رقم 4
+                                        </h2>
+
+                                        <p>
+                                            **تحليلات وتقارير:** يقدم التطبيق تقارير وتحليلات شاملة حول أداء الخدمات، بما في
+                                            ذلك عدد الحجوزات، الإيرادات، وتفضيلات العملاء، مما يمكن مقدمي الخدمات من اتخاذ
+                                            قرارات مدروسة لتحسين أدائهم.
+                                        </p>
+                                    </div>
+
+                                    <div class="box">
+                                        <div class="image-contain">
+                                            <img src="{{ asset('frontend/assets/images/crown.svg') }}" class="secondary"
+                                                loading="lazy" alt="" />
+                                        </div>
+
+                                        <h2>
+                                            ميزة التطبيق رقم 5
+                                        </h2>
+
+                                        <p>
+                                            **إشعارات وتنبيهات فورية:** يتلقى مقدمو الخدمات إشعارات فورية حول الحجوزات
+                                            الجديدة، التعديلات، والتعليقات من العملاء، مما يساعد في متابعة التحديثات
+                                            والتفاعل بسرعة.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12">
-                        <div class="heading-shape">
-                            <img
-                                src="{{ asset('frontend/assets/images/crown.svg') }}"
-                                class="secondary"
-                                loading="lazy"
-                                alt=""
-                            />
 
-                            <h1>ميزة التطبيق رقم واحد</h1>
+                    <div class="col-lg-4 mx-auto mb-3">
+                        <div class="box">
+                            <div class="image-contain">
+                                <img src="{{ asset('frontend/assets/images/crown.svg') }}" class="secondary" loading="lazy"
+                                    alt="" />
+                            </div>
+
+                            <h2>
+                                ميزة التطبيق رقم 6
+                            </h2>
+
+                            <p>
+                                **دعم وتواصل مباشر:** يوفر التطبيق وسائل للتواصل المباشر مع فريق دعم "قوابا" لحل أي مشكلات
+                                أو استفسارات بسرعة وفعالية.
+                            </p>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="accordion" id="accordionExample">
-                            <div class="card">
-                                <div class="card-header" id="headingOne">
-                                    <button
-                                        class="btn"
-                                        type="button"
-                                        data-toggle="collapse"
-                                        data-target="#collapseOne"
-                                        aria-expanded="true"
-                                        aria-controls="collapseOne"
-                                    >
-                                        <span class="number"> 1 </span>
-
-                                        <p>يكتب هنا عنوان السؤال الاول ؟</p>
-                                    </button>
-                                </div>
-
-                                <div
-                                    id="collapseOne"
-                                    class="collapse show"
-                                    aria-labelledby="headingOne"
-                                    data-parent="#accordionExample"
-                                >
-                                    <div class="card-body">
-                                        <p>
-                                            الاجابة تظهر هنا وهذا شكل الاجابة قد يكون سطر او اكثر
-                                            ... لوريم إيبسوم هو نموذج إفتراضي يتم وضعه في التصاميم
-                                            التي سيتم عرضها على العميل. وبعد موافقة العميل على بداية
-                                            التصميم يتم إزالة هذا النص من التصميم ويتم وضع النصوص
-                                            النهائية المطلوبة للتصميم.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header" id="headingTwo">
-                                    <button
-                                        class="btn collapsed"
-                                        type="button"
-                                        data-toggle="collapse"
-                                        data-target="#collapseTwo"
-                                        aria-expanded="false"
-                                        aria-controls="collapseTwo"
-                                    >
-                                        <span class="number"> 2 </span>
-
-                                        <p>يكتب هنا عنوان السؤال الرابع ؟</p>
-                                    </button>
-                                </div>
-
-                                <div
-                                    id="collapseTwo"
-                                    class="collapse"
-                                    aria-labelledby="headingTwo"
-                                    data-parent="#accordionExample"
-                                >
-                                    <div class="card-body">
-                                        <p>
-                                            الاجابة تظهر هنا وهذا شكل الاجابة قد يكون سطر او اكثر
-                                            ... لوريم إيبسوم هو نموذج إفتراضي يتم وضعه في التصاميم
-                                            التي سيتم عرضها على العميل. وبعد موافقة العميل على بداية
-                                            التصميم يتم إزالة هذا النص من التصميم ويتم وضع النصوص
-                                            النهائية المطلوبة للتصميم.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header" id="headingThree">
-                                    <button
-                                        class="btn collapsed"
-                                        type="button"
-                                        data-toggle="collapse"
-                                        data-target="#collapseThree"
-                                        aria-expanded="false"
-                                        aria-controls="collapseThree"
-                                    >
-                                        <span class="number"> 3 </span>
-
-                                        <p>يكتب هنا عنوان السؤال الثالث ؟</p>
-                                    </button>
-                                </div>
-
-                                <div
-                                    id="collapseThree"
-                                    class="collapse"
-                                    aria-labelledby="headingThree"
-                                    data-parent="#accordionExample"
-                                >
-                                    <div class="card-body">
-                                        <p>
-                                            الاجابة تظهر هنا وهذا شكل الاجابة قد يكون سطر او اكثر
-                                            ... لوريم إيبسوم هو نموذج إفتراضي يتم وضعه في التصاميم
-                                            التي سيتم عرضها على العميل. وبعد موافقة العميل على بداية
-                                            التصميم يتم إزالة هذا النص من التصميم ويتم وضع النصوص
-                                            النهائية المطلوبة للتصميم.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header" id="headingFour">
-                                    <button
-                                        class="btn collapsed"
-                                        type="button"
-                                        data-toggle="collapse"
-                                        data-target="#collapseFour"
-                                        aria-expanded="false"
-                                        aria-controls="collapseFour"
-                                    >
-                                        <span class="number"> 4 </span>
-
-                                        <p>ما هي وسائل الدفع التي تقبلها المنصة؟</p>
-                                    </button>
-                                </div>
-
-                                <div
-                                    id="collapseFour"
-                                    class="collapse"
-                                    aria-labelledby="headingFour"
-                                    data-parent="#accordionExample"
-                                >
-                                    <div class="card-body">
-                                        <p>
-                                            الاجابة تظهر هنا وهذا شكل الاجابة قد يكون سطر او اكثر
-                                            ... لوريم إيبسوم هو نموذج إفتراضي يتم وضعه في التصاميم
-                                            التي سيتم عرضها على العميل. وبعد موافقة العميل على بداية
-                                            التصميم يتم إزالة هذا النص من التصميم ويتم وضع النصوص
-                                            النهائية المطلوبة للتصميم.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-12">
+                    <div class="box">
+                        <p>
+                            هذه الميزات تساهم في تحسين تجربة مقدمي الخدمات، وتعزيز كفاءتهم، وزيادة رضا العملاء.
+                        </p>
                     </div>
                 </div>
             </div>
