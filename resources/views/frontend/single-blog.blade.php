@@ -29,7 +29,7 @@
                             </h1>
 
                             <p>
-                                {{ Str::limit($post->content, 150) }}
+                                {{ Str::limit(strip_tags($post->content, false), 100) }}
                             </p>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
         <section class="single-blog general-section">
             <div class="container">
                 <div class="image-contain">
-                    <img src="{{ asset('frontend/assets/images/blogs/blog_3.png') }}" loading="lazy" alt="" />
+                        <iframe src="{{ $post->youtube_url }}" allowfullscreen></iframe>
                 </div>
 
                 <div class="contain">

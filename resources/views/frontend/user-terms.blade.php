@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('title')
-    {{ ucfirst(__("terms")) }}
+    {{ ucfirst(__('terms')) }}
 @endsection
 @section('content')
     <main>
@@ -18,38 +18,24 @@
                                 </li>
 
                                 <li>
-                    <span>
-                      شروط الخدمة
-                    </span>
+                                    <span>
+                                        شروط الخدمة
+                                    </span>
                                 </li>
                             </ul>
 
                             <h1>
                                 شروط الخدمة
                             </h1>
-
-                            <p>
-                                لوريم إيبسوم هو نموذج إفتراضي يتم وضعه في التصاميم التي سيتم عرضها على العميل. وبعد
-                                موافقة
-                                العميل على بداية التصميم يتم إزالة هذا النص من التصميم ويتم وضع النصوص النهائية المطلوبة
-                                للتصميم.
-                            </p>
                         </div>
                     </div>
                 </div>
 
-                <img
-                    src="{{ asset('frontend/assets/images/use.svg') }}"
-                    class="icon"
-                    loading="lazy"
-                    alt=""/>
+                <img src="{{ asset('frontend/assets/images/use.svg') }}" class="icon" loading="lazy" alt="" />
             </div>
 
-            <img
-                src="{{ asset('frontend/assets/images/icons/sub_header.png') }}"
-                class="sub-header-img"
-                loading="lazy"
-                alt=""/>
+            <img src="{{ asset('frontend/assets/images/icons/sub_header.png') }}" class="sub-header-img" loading="lazy"
+                alt="" />
         </section>
 
         <section class="terms-data general-section border-shape">

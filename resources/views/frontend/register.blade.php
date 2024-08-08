@@ -216,7 +216,7 @@
                                                                 </div>
 
                                                                 <a href="#"
-                                                                    class="custom-btn primary-btn next-step">
+                                                                    class="custom-btn secondary-btn next-step">
                                                                     <span> متابعة </span>
                                                                 </a>
                                                             </div>
@@ -463,7 +463,7 @@
                                                                 </a>
 
                                                                 <a href="#"
-                                                                    class="custom-btn primary-btn next-step">
+                                                                    class="custom-btn secondary-btn next-step">
 
                                                                     <span> متابعة </span>
                                                                 </a>
@@ -620,7 +620,7 @@
                                                                 </a>
 
                                                                 <a href="#"
-                                                                    class="custom-btn primary-btn next-step">
+                                                                    class="custom-btn secondary-btn next-step">
 
                                                                     <span> متابعة </span>
                                                                 </a>
@@ -740,7 +740,7 @@
                                                                 </a>
 
                                                                 <a href="javascript:$('#register-form').submit();"
-                                                                    class="custom-btn primary-btn next-step">
+                                                                    class="custom-btn secondary-btn next-step">
                                                                     <span> تسجيل </span>
                                                                 </a>
                                                             </div>

@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('title')
-    {{ ucfirst(__("ready")) }}
+    {{ ucfirst(__('ready')) }}
 @endsection
 @section('content')
     <main>
@@ -18,9 +18,9 @@
                                 </li>
 
                                 <li>
-                    <span>
+                                    <span>
 
-                    </span>
+                                    </span>
                                 </li>
                             </ul>
 
@@ -35,18 +35,12 @@
                     </div>
                 </div>
 
-                <img
-                    src="{{ asset('frontend/assets/images/questions/question_pattern.svg') }}"
-                    class="icon"
-                    loading="lazy"
-                    alt=""/>
+                <img src="{{ asset('frontend/assets/images/questions/question_pattern.svg') }}" class="icon" loading="lazy"
+                    alt="" />
             </div>
 
-            <img
-                src="{{ asset('frontend/assets/images/icons/sub_header.png') }}"
-                class="sub-header-img"
-                loading="lazy"
-                alt=""/>
+            <img src="{{ asset('frontend/assets/images/icons/sub_header.png') }}" class="sub-header-img" loading="lazy"
+                alt="" />
         </section>
     </main>
 @endsection
