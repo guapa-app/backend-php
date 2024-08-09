@@ -66,7 +66,7 @@ class VendorClientService
         $query = $vendor->clients()
             ->with(['user' => function ($query) use ($vendor){
                 $query->select('id', 'name', 'email', 'phone')
-                    ->with(['orders' => function ($query) use ($vendor) {
+                    ->withCount(['orders' => function ($query) use ($vendor) {
                     $query->where('vendor_id', $vendor->id);
                 }]);
             }]);
