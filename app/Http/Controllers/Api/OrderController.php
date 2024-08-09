@@ -140,8 +140,8 @@ class OrderController extends BaseApiController
             "Change Invoice Status By Callback URL\n
             order { $invoice->order_id } <-> Invoice { $invoice->id }",
             [
-                "\npayment gateway" => $request->all(),
-                "\ninvoice" => $invoice,
+                "\n***payment gateway***" => $request->all(),
+                "\n***invoice***" => $invoice->attributesToArray(),
             ]
         );
 
