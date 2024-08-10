@@ -80,10 +80,12 @@ class VendorClientController extends ApiVendorClientController
             ]);
     }
 
-    public function delete(Vendor $vendor, $clientId)
+    public function destroy(Vendor $vendor, $clientId)
     {
+
+
         try {
-            parent::delete($vendor, $clientId);
+            parent::destroy($vendor, $clientId);
 
             return $this->successJsonRes(message: __('api.deleted'));
         } catch (Exception $exception) {

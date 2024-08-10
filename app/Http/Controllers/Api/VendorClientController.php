@@ -40,7 +40,7 @@ class VendorClientController extends Controller
         return $this->vendorClientService->getClientOrders($vendor, $client, $productType);
 
     }
-    public function delete(Vendor $vendor, $clientId)
+    public function destroy(Vendor $vendor, $clientId)
     {
         return $this->vendorClientService->deleteClient($vendor, $clientId);
     }

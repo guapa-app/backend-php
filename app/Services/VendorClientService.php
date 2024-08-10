@@ -107,9 +107,8 @@ class VendorClientService
 
     public function deleteClient(Vendor $vendor, $clientId)
     {
-        $client = $this->getClient($vendor, $clientId);
         return VendorClient::where('vendor_id', $vendor->id)
-            ->where('user_id', $client->id)
+            ->where('user_id', $clientId)
             ->delete();
     }
 
