@@ -207,6 +207,10 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         return $this->hasMany(Order::class);
     }
+    public function clients(): HasMany
+    {
+        return $this->hasMany(VendorClient::class);
+    }
 
     public function orders_order(): HasMany
     {
