@@ -44,7 +44,7 @@ class OrderNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database', WhatsappChannel::class];
+        return ['fcm', 'database'];
     }
 
     /**
