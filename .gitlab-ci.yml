@@ -11,12 +11,6 @@ variables:
   SSH_HOST: 3.67.253.208
   BRANCH_NAME: $CI_COMMIT_REF_NAME
 
-before_script:
-  - apt-get update -yqq
-  - apt-get install -yqq git curl openssh-client unzip
-  - curl -sS https://getcomposer.org/installer | php
-  - mv composer.phar /usr/local/bin/composer
-
 build:
   stage: build
   script:
