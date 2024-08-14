@@ -20,9 +20,7 @@ class SupportMessageRequest extends FormRequest
     {
         $id = $this->route('id');
 
-        return is_numeric($id) ?
-            $this->user() && $this->user()->isAdmin() :
-            true;
+        return !is_numeric($id) || ($this->user() && $this->user()->isAdmin());
     }
 
     /**
@@ -39,7 +37,6 @@ class SupportMessageRequest extends FormRequest
         ] : [
             'subject' => 'required|string|max:100',
             'body' => 'required|string|max:1000',
-            'phone' => 'required|string|min:4|max:30',
         ];
     }
 }

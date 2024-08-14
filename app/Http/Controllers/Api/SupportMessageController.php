@@ -17,6 +17,17 @@ class SupportMessageController extends BaseApiController
     }
 
     /**
+     * List supportMessages.
+     *
+     * @param $request
+     * @return Model
+     */
+    public function indexCommon($request)
+    {
+        return $this->supportMessageRepository->all($request);
+    }
+
+    /**
      * Register supportMessage.
      *
      * @responseFile 200 responses/supportMessages/create.json
@@ -33,5 +44,23 @@ class SupportMessageController extends BaseApiController
         $data['phone'] ??= $this->user?->phone;
 
         return $this->supportMessageRepository->create($data);
+    }
+
+    /**
+     * Get supportMessage details.
+     *
+     * @unauthenticated
+     *
+     * @responseFile 200 responses/supportMessages/details.json
+     * @responseFile 404 scenario="Support Message not found" responses/errors/404.json
+     *
+     * @urlParam id required Message id
+     *
+     * @param int $id
+     * @return Model
+     */
+    public function singleCommon($id)
+    {
+        return $this->supportMessageRepository->getOneWithRelations($id);
     }
 }
