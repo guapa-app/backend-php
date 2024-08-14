@@ -14,8 +14,6 @@ class SupportMessageResource extends JsonResource
             'body'                  => (string) $this->body,
             'phone'                 => (string) $this->phone,
             'is_read'               => (bool) $this->is_read,
-            'status'                => $this->status,
-            'type'                  => $this->type,
             'user'                  => UserResource::make($this->whenLoaded('user')),
             'created_at'            => $this->created_at,
             'updated_at'            => $this->updated_at,
