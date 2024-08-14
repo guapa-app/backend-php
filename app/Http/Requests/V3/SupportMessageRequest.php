@@ -30,7 +30,7 @@ class SupportMessageRequest extends SupportMessageRequestAlias
     {
         return parent::rules() +
             [
-                'type' => 'required',
+                'support_message_type_id' => 'required|exists:support_message_types,id',
             ];
     }
 }

@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\V3;
 
+use App\Http\Resources\UserResource;
+use App\Models\SupportMessageType;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SupportMessageResource extends JsonResource
@@ -14,6 +16,8 @@ class SupportMessageResource extends JsonResource
             'body'                  => (string) $this->body,
             'phone'                 => (string) $this->phone,
             'is_read'               => (bool) $this->is_read,
+            'status'                => $this->status,
+            'type'                  => SupportMessageTypeResource::make($this->whenLoaded('supportMessageType')),
             'user'                  => UserResource::make($this->whenLoaded('user')),
             'created_at'            => $this->created_at,
             'updated_at'            => $this->updated_at,
