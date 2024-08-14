@@ -5,12 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Contracts\Repositories\CityRepositoryInterface;
 use App\Contracts\Repositories\PageRepositoryInterface;
 use App\Contracts\Repositories\SettingRepositoryInterface;
-use App\Contracts\Repositories\SupportMessageRepositoryInterface;
 use App\Contracts\Repositories\TaxRepositoryInterface;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SupportMessageRequest;
-use App\Http\Resources\SupportMessageResource;
 use App\Models\Address;
 use App\Models\Product;
 use App\Models\Setting;
@@ -79,30 +76,5 @@ class BaseApiController extends Controller
         return $this->successJsonRes([
             'items' => $pageRepository->getAll(),
         ], __('api.success'));
-    }
-
-    /**
-     * Contact support.
-     *
-     * @responseFile 200 responses/general/contact.json
-     * @responseFile 422 scenario="Validation errors" responses/errors/422.json
-     *
-     * @unauthenticated
-     *
-     * @param SupportMessageRequest $request
-     * @return JsonResponse
-     */
-    public function contact(SupportMessageRequest $request)
-    {
-        $data = $request->validated();
-        $data['user_id'] = $this->user ? $this->user->id : null;
-
-        $record = app(SupportMessageRepositoryInterface::class)->create($data);
-
-        return SupportMessageResource::make($record)
-            ->additional([
-                'success' => true,
-                'message' => __('api.success'),
-            ]);
     }
 }
