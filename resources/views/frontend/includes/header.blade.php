@@ -36,12 +36,6 @@
                             عن قوابا
                         </a>
                     </li>
-
-                    <li class="nav-item">
-                        <a href="{{ route('questions') }}" class="nav-link">
-                            الاسئلة الشائعة
-                        </a>
-                    </li>
                 </ul>
 
                 <div class="button-contain">
