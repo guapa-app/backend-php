@@ -2,13 +2,11 @@
 
 namespace App\Nova\Resources;
 
-use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Http\Requests\NovaRequest;
 
 class SupportMessage extends Resource
 {
@@ -32,8 +30,7 @@ class SupportMessage extends Resource
      * @var array
      */
     public static $search = [
-        'id',
-        'subject', 'body', 'phone',
+        'id', 'subject', 'body', 'phone'
     ];
 
     /**
@@ -47,26 +44,17 @@ class SupportMessage extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+            BelongsTo::make(__('user'), 'user', User::class),
+            BelongsTo::make(__('type'), 'supportMessageType', SupportMessageType::class)
+                ->showCreateRelationButton()
+                ->sortable(),
 
             Text::make('subject')->required(),
 
-            Text::make('body')->required(),
+            Text::make('body')->required()
+                ->onlyOnDetail(),
 
-            PhoneNumber::make(__('phone'), 'phone')
-//                ->resolveUsing(function ($value) {
-//                    return $value;
-//                })
-                ->fillUsing(function (NovaRequest $request, $model, $attribute, $requestAttribute) {
-                    $value = $request[$requestAttribute];
-                    $string = str_replace(' ', '-', $value); // Replaces all spaces with hyphens.
-                    $string = preg_replace('/[^0-9]/', '', $string); // Removes special chars.
-                    $model->{$attribute} = $string;
-                })
-                ->required()
-                ->onlyCountries('SA', 'EG'),
-
-            DateTime::make(__('read at'), 'read_at'),
+            Text::make('phone')->required(),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),

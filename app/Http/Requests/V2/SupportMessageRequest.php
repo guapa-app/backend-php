@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Helpers\Common;
 use App\Http\Requests\SupportMessageRequest as SupportMessageRequestAlias;
+use App\Models\Setting;
 
 /**
  * @bodyParam subject string required Message subject
@@ -30,7 +32,7 @@ class SupportMessageRequest extends SupportMessageRequestAlias
     {
         return parent::rules() +
             [
-                'phone' => 'required|string|min:4|max:30',
+                'phone' => 'required|string|min:4|max:30' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
             ];
     }
 }
