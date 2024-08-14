@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Api\SupportMessageController as ApiSupportMessageController;
-use App\Http\Requests\SupportMessageRequest;
+use App\Http\Requests\V2\SupportMessageRequest;
 use App\Http\Resources\SupportMessageResource;
 
 class SupportMessageController extends ApiSupportMessageController
