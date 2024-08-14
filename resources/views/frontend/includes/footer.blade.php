@@ -104,18 +104,18 @@
 
                     <ul class="links">
                         <li>
-                            <a href="#">
-                                <img src="{{ asset('frontend/assets/images/footer/youtube.svg') }}" loading="lazy"
+                            <a href="https://www.tiktok.com/@guapaapp">
+                                <img src="#" loading="lazy"
                                      alt=""/>
 
                                 <span>
-                      موقع YouTube
+                      TikTok
                     </span>
                             </a>
                         </li>
 
                         <li>
-                            <a href="#">
+                            <a href="https://x.com/Guapaapp">
                                 <img src="{{ asset('frontend/assets/images/footer/x.svg') }}" loading="lazy" alt=""/>
 
                                 <span>
@@ -125,7 +125,7 @@
                         </li>
 
                         <li>
-                            <a href="#">
+                            <a href="https://www.linkedin.com/in/guapa-app-b38b3031a/">
                                 <img src="{{ asset('frontend/assets/images/footer/linked.svg') }}" loading="lazy"
                                      alt=""/>
 
@@ -136,7 +136,7 @@
                         </li>
 
                         <li>
-                            <a href="#">
+                            <a href="https://www.instagram.com/Guapaapp/">
                                 <img src="{{ asset('frontend/assets/images/footer/insta.svg') }}" loading="lazy"
                                      alt=""/>
 
@@ -147,11 +147,11 @@
                         </li>
 
                         <li>
-                            <a href="#">
-                                <img src="{{ asset('frontend/assets/images/footer/facebook.svg') }}" loading="lazy"
+                            <a href="https://snapchat.com/t/6Gx8Jq8a">
+                                <img src="#" loading="lazy"
                                      alt=""/>
                                 <span>
-                      فيسبوك
+                      سناب شات
                     </span>
                             </a>
                         </li>
