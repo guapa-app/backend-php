@@ -12,12 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('support_messages', function (Blueprint $table) {
-            $table->char('type', '12')
-                ->after('body')
+            $table->unsignedBigInteger('support_message_type_id')
+                ->after('user_id')
                 ->nullable();
             $table->char('status', '12')
-                ->after('type')
+                ->after('body')
                 ->nullable();
+        });
+
+        Schema::table('support_messages', function (Blueprint $table) {
+            $table->foreign('support_message_type_id')
+                ->references('id')
+                ->on('support_message_types')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
         });
     }
 
@@ -28,7 +36,7 @@ return new class extends Migration
     {
         Schema::table('support_messages', function (Blueprint $table) {
             $table->dropColumn('status');
-            $table->dropColumn('type');
+            $table->dropColumn('support_message_type_id');
         });
     }
 };

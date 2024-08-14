@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Api\V3;
 
 use App\Http\Controllers\Api\SupportMessageController as ApiSupportMessageController;
 use App\Http\Requests\V3\SupportMessageRequest;
-use App\Http\Resources\SupportMessageResource;
+use App\Http\Resources\V3\SupportMessageCollection;
+use App\Http\Resources\V3\SupportMessageResource;
+use App\Http\Resources\V3\SupportMessageTypeCollection;
+use App\Models\SupportMessageType;
+use Illuminate\Http\Request;
 
 class SupportMessageController extends ApiSupportMessageController
 {
@@ -17,13 +21,17 @@ class SupportMessageController extends ApiSupportMessageController
      * @unauthenticated
      *
      * @param $request
-     * @return SupportMessageResource
+     * @return SupportMessageCollection
      */
-    public function index($request)
+    public function index(Request $request)
     {
-        $record = parent::indexCommon($request);
+        $request->merge([
+            'user_id' => $this->user->id,
+        ]);
 
-        return SupportMessageResource::make($record)
+        $records = parent::indexCommon($request);
+
+        return SupportMessageCollection::make($records)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -45,6 +53,7 @@ class SupportMessageController extends ApiSupportMessageController
     {
         $record = parent::createCommon($request);
 
+        $record->load('supportMessageType');
         return SupportMessageResource::make($record)
             ->additional([
                 'success' => true,
@@ -54,13 +63,23 @@ class SupportMessageController extends ApiSupportMessageController
 
     public function single($id)
     {
-        $item = parent::singleCommon($id);
+        $record = parent::singleCommon($id);
 
-        return SupportMessageResource::make($item)
+        return SupportMessageResource::make($record)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
             ]);
     }
 
+    public function types()
+    {
+        $records = SupportMessageType::all();
+
+        return SupportMessageTypeCollection::make($records)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
 }
