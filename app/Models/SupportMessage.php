@@ -20,6 +20,7 @@ class SupportMessage extends Model implements Listable
      */
     protected $fillable = [
         'subject', 'body', 'phone', 'read_at', 'user_id',
+        'status', 'type'
     ];
 
     /**
