@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('max_uses')->unsigned()->nullable();
             $table->integer('single_user_usage')->default(1);
             $table->foreignId('admin_id')->nullable()->constrained('admins')->nullOnDelete()->comment('The admin who created the coupon');
+            $table->softDeletes();
             $table->timestamps();
 
 

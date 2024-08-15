@@ -32,6 +32,7 @@ class OrderRequest extends FormRequest
             'status'                            => 'sometimes|string',
             'products'                          => 'required|array|min:1',
             'address_id'                        => 'sometimes|integer|exists:addresses,id',
+            'coupon_code'                       => 'sometimes|string|exists:coupons,code',
 
             'products.*'                        => 'required|array',
             'products.*.id'                     => 'required|integer|exists:products,id',

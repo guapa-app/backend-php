@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V3;
 
 use App\Http\Controllers\Api\CouponController as ApiCouponController;
+use App\Http\Requests\ApplyCouponRequest;
 use App\Http\Requests\CouponRequest;
 use App\Http\Resources\CouponCollection;
 use App\Http\Resources\CouponResource;
@@ -38,5 +39,15 @@ class CouponController extends ApiCouponController
         parent::destroy($id);
 
         return $this->successJsonRes([], __('api.success'));
+    }
+
+    public function applyCoupon(ApplyCouponRequest $request)
+    {
+        $result = parent::applyCoupon($request);
+        if ($result['status']) {
+            return $this->successJsonRes($result['data'], __('Coupon applied successfully'));
+        } else {
+            return $this->errorJsonRes([],$result['error']);
+        }
     }
 }
