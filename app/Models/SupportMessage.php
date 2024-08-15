@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\Listable;
+use App\Enums\SupportMessageStatus;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,9 +20,10 @@ class SupportMessage extends Model implements Listable
      * @var array
      */
     protected $fillable = [
-        'subject', 'body', 'phone', 'read_at', 'user_id',
-        'status', 'support_message_type_id'
-    ];
+        'user_id', 'parent_id', 'sender_type',
+        'support_message_type_id', 'subject',
+        'status', 'phone', 'body', 'read_at',
+];
 
     /**
      * Attributes that can be filtered directly
@@ -46,11 +48,22 @@ class SupportMessage extends Model implements Listable
 
     protected $casts = [
         'read_at' => 'datetime',
+        'status' => SupportMessageStatus::class,
     ];
 
     public function getIsReadAttribute()
     {
         return (bool) $this->read_at;
+    }
+
+    public function markAsResolved()
+    {
+        $this->update(['status' => SupportMessageStatus::Resolved]);
+    }
+
+    public function markAsInProgress()
+    {
+        $this->update(['status' => SupportMessageStatus::InProgress]);
     }
 
     public function user()
@@ -61,6 +74,21 @@ class SupportMessage extends Model implements Listable
     public function supportMessageType()
     {
         return $this->belongsTo(SupportMessageType::class);
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function scopeParents(Builder $query) : Builder
+    {
+        return $query->whereNull('parent_id');
     }
 
     public function scopeApplyFilters(Builder $query, Request $request) : Builder
@@ -90,7 +118,8 @@ class SupportMessage extends Model implements Listable
 
     public function scopeWithApiListRelations(Builder $query, Request $request) : Builder
     {
-        $query->with('supportMessageType');
+        $query->with('supportMessageType', 'replies');
+
         return $query;
     }
 
@@ -101,7 +130,8 @@ class SupportMessage extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query) : Builder
     {
-        $query->with('supportMessageType');
+        $query->with('supportMessageType', 'replies');
+
         return $query;
     }
 }
