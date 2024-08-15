@@ -20,6 +20,7 @@ class SupportMessage extends Model implements Listable
      */
     protected $fillable = [
         'subject', 'body', 'phone', 'read_at', 'user_id',
+        'status', 'support_message_type_id'
     ];
 
     /**
@@ -57,6 +58,11 @@ class SupportMessage extends Model implements Listable
         return $this->belongsTo(User::class);
     }
 
+    public function supportMessageType()
+    {
+        return $this->belongsTo(SupportMessageType::class);
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request) : Builder
     {
         $filter = $request->get('filter');
@@ -82,6 +88,12 @@ class SupportMessage extends Model implements Listable
         return $query;
     }
 
+    public function scopeWithApiListRelations(Builder $query, Request $request) : Builder
+    {
+        $query->with('supportMessageType');
+        return $query;
+    }
+
     public function scopeWithListCounts(Builder $query, Request $request) : Builder
     {
         return $query;
@@ -89,6 +101,7 @@ class SupportMessage extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query) : Builder
     {
+        $query->with('supportMessageType');
         return $query;
     }
 }

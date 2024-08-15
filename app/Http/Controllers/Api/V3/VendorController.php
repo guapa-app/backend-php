@@ -16,20 +16,18 @@ class VendorController extends ApiVendorController
      * by add vendor data.
      *
      * @param VendorRequest $request
-     * @return JsonResponse
+     * @return VendorResource|JsonResponse
      */
     public function create(VendorRequest $request)
     {
         try {
-            return DB::transaction(function () use ($request) {
-                $vendor = parent::create($request);
+            $vendor = parent::create($request);
 
-                return VendorResource::make($vendor)
-                    ->additional([
-                        'success' => true,
-                        'message' => __('api.created'),
-                    ]);
-            });
+            return VendorResource::make($vendor)
+                ->additional([
+                    'success' => true,
+                    'message' => __('api.created'),
+                ]);
         } catch (Exception $exception) {
             $this->logReq($exception->getMessage());
 

@@ -51,10 +51,12 @@ class CouponController extends Controller
     {
         $couponCode = $request->input('coupon_code');
         $productIds = $request->input('products');
-
         $result = $this->couponService->applyCoupon($couponCode, $productIds);
-
-        return response()->json($result);
+        if ($result['status']) {
+            return $this->successJsonRes($result['data'], __('Coupon applied successfully'));
+        } else {
+           return $this->errorJsonRes([],$result['error']);
+        }
 
     }
 }

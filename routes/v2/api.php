@@ -34,9 +34,9 @@ Route::prefix("v2")->group(function () {
     Route::prefix('messaging')->group(base_path('routes/v2/api/messaging.php'));
     Route::prefix('taxonomies')->group(base_path('routes/v2/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/v2/api/notifications.php'));
+    Route::prefix('')->group(base_path('routes/v2/api/support.php'));
 
     Route::post('devices',                  [DeviceController::class, 'addDevice'])->middleware('auth:api');
-    Route::post('contact',                  [BaseApiController::class, 'contact'])->middleware('auth:api');
     Route::get('data',                      [DataController::class, 'data']);
     Route::get('address_types',             [DataController::class, 'address_types']);
     Route::get('vendor_types',              [DataController::class, 'vendor_types']);

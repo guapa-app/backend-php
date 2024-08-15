@@ -21,12 +21,18 @@ class CouponService
         $user = auth('api')->user();
 
         if (!$coupon || !$coupon->isActive()) {
-            throw new \Exception(__('Coupon is not valid.'));
+            return [
+                'status' => false,
+                'error' => __('Coupon is not valid.'),
+            ];
         }
 
-        if (!$coupon->hasReachedMaxUsesForUser)
+        if ($coupon->hasReachedMaxUsesForUser($user))
         {
-            throw new \Exception(__('You have reached the maximum usage limit for this coupon.'));
+            return [
+                'status' => false,
+                'error' => __('You have reached the maximum usage limit for this coupon.'),
+            ];
         }
 
         $validProducts = collect();
@@ -34,19 +40,24 @@ class CouponService
 
         foreach ($products as $product) {
             if ($product && $coupon->isCouponValid($product,$user)) {
-                $validProducts->push($product);
+                $validProducts->push($product->id);
             }
         }
-
         if ($validProducts->isEmpty()) {
-            throw new \Exception(__('Coupon is not applicable to the selected products.'));
+            return [
+                'status' => false,
+                'error' => __('Coupon is not applicable to the selected products.'),
+            ];
         }
 
         return [
-            'coupon' => $coupon,
-            'discount_percentage' => $coupon->discount,
-            'discount_source' => $coupon->discount_source,
-            'valid_products' => $validProducts,
+            'status' => true,
+            'data' => [
+                'coupon_id' => $coupon->id,
+                'discount_percentage' => $coupon->discount_percentage,
+                'discount_source' => $coupon->discount_from,
+                'valid_products' => $validProducts,
+            ],
         ];
     }
 }

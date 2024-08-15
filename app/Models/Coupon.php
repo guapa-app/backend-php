@@ -67,17 +67,15 @@ class Coupon extends Model
 
     public function hasReachedMaxUsesForUser(User $user)
     {
-        return $this->single_user_usage && $this->usages->where('user_id', $user->id)->sum('usage_count') >= $this->single_user_usage;
+        return  $this->usages->where('user_id', $user->id)->sum('usage_count') >= $this->single_user_usage;
     }
     public function isCouponApplicableToProduct(Product $product): bool
     {
         $applicable = true;
-
         // Check vendors
         if ($this->vendors->isNotEmpty() && !$this->vendors->contains($product->vendor_id)) {
             $applicable = false;
         }
-
         // Check categories
         if ($applicable && $this->categories->isNotEmpty()) {
             $productCategories = $product->categories->pluck('id');
@@ -85,7 +83,6 @@ class Coupon extends Model
                 $applicable = false;
             }
         }
-
         // Check products
         if ($applicable && $this->products->isNotEmpty() && !$this->products->contains($product->id)) {
             $applicable = false;
@@ -95,8 +92,7 @@ class Coupon extends Model
     }
     public function isCouponValid(Product $product, User $user): bool
     {
-        return $this->isActive() &&
-            !$this->hasReachedMaxUsesForUser($user) &&
+        return !$this->hasReachedMaxUsesForUser($user) &&
             $this->isCouponApplicableToProduct($product);
     }
 

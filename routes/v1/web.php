@@ -21,8 +21,47 @@ Route::get('/.well-known/apple-developer-merchantid-domain-association', functio
 Route::get('/{id}/show-invoice', [OrderController::class, 'showInvoice']);
 
 Route::get('/', function () {
-    return view('landing');
+    return view('frontend.home');
 })->name('landing');
+
+Route::get('/about', function () {
+    return view('frontend.about');
+})->name('about');
+
+Route::get('/about-app', function () {
+    return view('frontend.about-app');
+})->name('about-app');
+
+Route::get('/blogs', [\App\Http\Controllers\PostController::class, 'index'])->name('blogs');
+Route::get('/single-blog/{id}', [\App\Http\Controllers\PostController::class, 'show'])->name('single-blog');
+
+Route::get('/download-app', function () {
+    return view('frontend.download-app');
+})->name('download-app');
+
+Route::get('/login', function () {
+    return view('frontend.login');
+})->name('login');
+
+Route::get('/privacy-policy', function () {
+    return view('frontend.privacy-policy');
+})->name('privacy-policy');
+
+Route::get('/questions', function () {
+    return view('frontend.questions');
+})->name('questions');
+
+Route::get('/login', function () {
+    return view('frontend.login');
+})->name('login');
+
+Route::get('/ready', function () {
+    return view('frontend.ready');
+})->name('ready');
+
+Route::get('/user-terms', function () {
+    return view('frontend.user-terms');
+})->name('user-terms');
 
 Route::get('/register', [RegistrationController::class, 'registerForm'])->name('register.form');
 Route::post('/register', [RegistrationController::class, 'register'])->name('register')->middleware('throttle:10');
