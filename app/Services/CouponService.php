@@ -55,7 +55,7 @@ class CouponService
             'data' => [
                 'coupon_id' => $coupon->id,
                 'discount_percentage' => $coupon->discount_percentage,
-                'discount_source' => $coupon->discount_from,
+                'discount_source' => $coupon->discount_source,
                 'valid_products' => $validProducts,
             ],
         ];

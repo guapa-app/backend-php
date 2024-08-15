@@ -21,11 +21,11 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
-    private $repository;
-    private $paymentService;
-    private $productFees;
-    private $taxesPercentage;
-    private $isService = false;
+    protected $repository;
+    protected $paymentService;
+    protected $productFees;
+    protected $taxesPercentage;
+    protected $isService = false;
 
     public function __construct(OrderRepositoryInterface $repository, PaymentService $payment_service)
     {
