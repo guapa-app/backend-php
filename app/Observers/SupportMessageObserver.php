@@ -12,6 +12,6 @@ class SupportMessageObserver
      */
     public function creating(SupportMessage $supportMessage): void
     {
-        $supportMessage->status = SupportMessageStatus::Pending;
+        $supportMessage->status ??= SupportMessageStatus::Pending;
     }
 }

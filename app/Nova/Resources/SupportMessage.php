@@ -2,11 +2,17 @@
 
 namespace App\Nova\Resources;
 
+use App\Enums\SupportMessageStatus;
+use App\Nova\Actions\ReplyToTicket;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class SupportMessage extends Resource
 {
@@ -30,8 +36,13 @@ class SupportMessage extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'subject', 'body', 'phone'
+        'id', 'subject', 'body', 'phone',
     ];
+
+    public static function authorizedToCreate(Request $request)
+    {
+        return false;
+    }
 
     /**
      * Get the fields displayed by the resource.
@@ -44,10 +55,21 @@ class SupportMessage extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('user'), 'user', User::class),
+            BelongsTo::make(__('user'), 'user', User::class)
+                ->nullable(),
             BelongsTo::make(__('type'), 'supportMessageType', SupportMessageType::class)
                 ->showCreateRelationButton()
-                ->sortable(),
+                ->sortable()
+                ->nullable(),
+
+            Select::make(__('status'), 'status')
+                ->options(SupportMessageStatus::toSelect())
+                ->default(SupportMessageStatus::Pending)
+                ->displayUsingLabels()
+                ->required(),
+
+//            BelongsTo::make('Parent Message', 'parent', self::class)->nullable(),
+            HasMany::make('Replies', 'replies', self::class),
 
             Text::make('subject')->required(),
 
@@ -102,6 +124,17 @@ class SupportMessage extends Resource
      */
     public function actions(Request $request)
     {
-        return [];
+        return [
+            new ReplyToTicket(),
+        ];
+    }
+
+    public static function indexQuery(NovaRequest $request, $query): Builder
+    {
+        if ($request->viaResource() === null) {
+            return $query->parents();
+        }
+
+        return parent::indexQuery($request, $query);
     }
 }
