@@ -13,6 +13,7 @@ class TaxonomyResource extends JsonResource
             'title'                 => (string) $this->title,
             'slug'                  => (string) $this->slug,
             'fees'                  => (float) $this->fees,
+            'fixed_price'           => $this->fixed_price,
             'description'           => (string) $this->description,
             'font_icon'             => (string) $this->font_icon,
             'type'                  => (string) $this->type,
