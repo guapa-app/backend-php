@@ -134,15 +134,14 @@ class OrderService extends BaseOrderService
                 OrderItem::insert($items->toArray());
 
                 $order->load('items', 'address', 'user', 'vendor');
+
+                $this->taxes = ($this->taxesPercentage / 100) * $this->fees;
+                // Generate invoice for the first order (since there's only one order per vendor)
+                $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $this->fees, $this->taxes);
+                $order->invoice_url = $invoice->url;
+
                 $orders->push($order);
-
-                if ($this->isService) {
-                    $this->taxes = ($this->taxesPercentage / 100) * $this->fees;
-
-                    // Generate invoice for the first order (since there's only one order per vendor)
-                    $invoice = $this->paymentService->generateInvoice($orders, $productsTitles, $this->fees, $this->taxes);
-                    $orders->first()->invoice_url = $invoice->url;
-                }
+                $this->fees = $this->taxes = 0;
 
                 // Update coupon usage if a coupon was applied
                 if ($couponResult) {
@@ -160,12 +159,13 @@ class OrderService extends BaseOrderService
 
     private function calculateProductFees($product, $finalPrice)
     {
-        if ($product->type === ProductType::Service) {
-            $this->isService = true;
-            $productFees = optional($product->categories()->first())->fees ?? 0;
-            return ($productFees / 100) * $finalPrice;
+        $productCategory = $product->taxonomies()->first();
+
+        if ($productCategory?->fees) {
+            $productFees = $productCategory->fees;
+            $this->fees += ($productFees / 100) * $finalPrice;
         } else {
-            return ($this->productFees / 100) * $finalPrice;
+            $this->fees += $productCategory?->fixed_price;
         }
     }
 

@@ -47,7 +47,7 @@ class Order extends Model implements Listable
 
     public function getPaidAmountWithTaxesAttribute()
     {
-        return ($this->invoice?->amount ?? 0);
+        return $this->invoice?->amount ?? 0;
     }
 
     public function getPaidAmountAttribute()
@@ -57,7 +57,7 @@ class Order extends Model implements Listable
 
     public function getRemainingAmountAttribute()
     {
-        return ($this->total - ($this->paid_amount));
+        return $this->total - ($this->paid_amount);
     }
 
     public function user()
@@ -78,6 +78,11 @@ class Order extends Model implements Listable
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function products()
+    {
+        return $this->hasManyThrough(Product::class, OrderItem::class);
     }
 
     public function invoice()
@@ -141,7 +146,7 @@ class Order extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('invoice','vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
+        $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
 
         return $query;
     }

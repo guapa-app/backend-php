@@ -19,9 +19,9 @@ class PaymentService
         };
     }
 
-    public function generateInvoice($orders, $description, $fees, $taxes)
+    public function generateInvoice($order, $description, $fees, $taxes)
     {
-        $invoice = $this->storeInvoice($orders, $description, $fees, $taxes);
+        $invoice = $this->storeInvoice($order, $description, $fees, $taxes);
 
         if (($fees + $taxes) > 0) {
             $paymentInvoice = $this->paymentService->create($invoice);
@@ -31,10 +31,10 @@ class PaymentService
         return $invoice;
     }
 
-    public function storeInvoice($orders, $description, $fees = 0, $taxes = 0)
+    public function storeInvoice($order, $description, $fees = 0, $taxes = 0)
     {
         $invoice = Invoice::query()->create([
-            'order_id'     => $orders->first()->id,
+            'order_id'     => $order->id,
             'status'       => 'initiated',
             'taxes'        => $taxes,
             'amount'       => ($fees + $taxes),

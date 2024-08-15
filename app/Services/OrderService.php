@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\OrderStatus;
-use App\Enums\ProductType;
 use App\Models\Appointment;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -21,11 +20,11 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
+
     protected $repository;
     protected $paymentService;
     protected $productFees;
     protected $taxesPercentage;
-    protected $isService = false;
 
     public function __construct(OrderRepositoryInterface $repository, PaymentService $payment_service)
     {
@@ -54,7 +53,7 @@ class OrderService
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
                 $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data) {
-                    $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+                    $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
 
                     if ($product->offer) {
                         $product->price -= ($product->price * ($product->offer->discount / 100));
@@ -63,12 +62,13 @@ class OrderService
 
                     $finalPrice = $inputItem['quantity'] * $product->price;
 
-                    if ($product->type === ProductType::Service) {
-                        $this->isService = true;
-                        $productFees = optional($product->categories()->first())->fees ?? 0;
+                    $productCategory = $product->taxonomies()->first();
+
+                    if ($productCategory?->fees) {
+                        $productFees = $productCategory->fees;
                         $this->fees += ($productFees / 100) * $finalPrice;
                     } else {
-                        $this->fees += ($this->productFees / 100) * $finalPrice;
+                        $this->fees += $productCategory?->fixed_price;
                     }
 
                     return $finalPrice;
@@ -77,7 +77,7 @@ class OrderService
                 $order = $this->repository->create($data);
 
                 $items = $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId) {
-                    $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+                    $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
 
                     if (isset($inputItem['appointment'])) {
                         $appointment = Appointment::find($inputItem['appointment']['id']);
@@ -114,15 +114,14 @@ class OrderService
                 OrderItem::insert($items->toArray());
 
                 $order->load('items', 'address', 'user', 'vendor');
+
+                $this->taxes = ($this->taxesPercentage / 100) * $this->fees;
+                // Generate invoice for the first order (since there's only one order per vendor)
+                $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $this->fees, $this->taxes);
+                $order->invoice_url = $invoice->url;
+
                 $orders->push($order);
-
-                if ($this->isService) {
-                    $this->taxes = ($this->taxesPercentage / 100) * $this->fees;
-
-                    // Generate invoice for the first order (since there's only one order per vendor)
-                    $invoice = $this->paymentService->generateInvoice($orders, $productsTitles, $this->fees, $this->taxes);
-                    $orders->first()->invoice_url = $invoice->url;
-                }
+                $this->fees = $this->taxes = 0;
             }
 
             return $orders;

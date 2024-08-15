@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\SupportMessageRepositoryInterface;
+use App\Enums\SupportMessageSenderType;
 use Illuminate\Database\Eloquent\Model;
 
 class SupportMessageController extends BaseApiController
@@ -40,8 +41,10 @@ class SupportMessageController extends BaseApiController
     public function createCommon($request)
     {
         $data = $request->validated();
+        $isAdmin = $this->isAdmin();
         $data['user_id'] = $this->user?->id;
         $data['phone'] ??= $this->user?->phone;
+        $data['sender_type'] = $isAdmin ? SupportMessageSenderType::Admin : SupportMessageSenderType::User;
 
         return $this->supportMessageRepository->create($data);
     }

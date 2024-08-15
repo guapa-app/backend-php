@@ -31,18 +31,18 @@ class VendorResource extends JsonResource
             'cat_number'                                => (string) $this->cat_number,
             'reg_number'                                => (string) $this->reg_number,
 
-//            'users_count'                               => (int) $this->users_count,
-//            'products_count'                            => (int) $this->products_count,
-//            'offers_count'                              => (int) $this->active_offers_count,
-//            'services_count'                            => (int) $this->services_count,
+            'users_count'                               => (int) $this->users_count,
+            'products_count'                            => (int) $this->products_count,
+            'offers_count'                              => (int) $this->active_offers_count,
+            'services_count'                            => (int) $this->services_count,
 
-//            'likes_count'                               => (int) $this->likes_count,
-//            'views_count'                               => (int) $this->views_count,
-//            'shares_count'                              => (int) $this->shares_count,
+            'likes_count'                               => (int) $this->likes_count,
+            'views_count'                               => (int) $this->views_count,
+            'shares_count'                              => (int) $this->shares_count,
 
-//            'is_liked'                                  => (bool) $this->is_liked,
-//            'specialty_ids'                             => (array) $this->specialty_ids,
-//            'work_days'                                 => $this->work_days,
+            'is_liked'                                  => (bool) $this->is_liked,
+            'specialty_ids'                             => (array) $this->specialty_ids,
+            'work_days'                                 => $this->work_days,
 
             $this->mergeWhen(isset($this->orders_order_count), [
                 'orders_order_count'                        => (int) $this->orders_order_count,
