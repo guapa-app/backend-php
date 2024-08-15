@@ -42,7 +42,7 @@ class CouponController extends Controller
      */
     public function destroy(Coupon $coupon)
     {
-        //
+        return $this->couponRepository->delete($coupon);
     }
     /**
      * Apply coupon to products
