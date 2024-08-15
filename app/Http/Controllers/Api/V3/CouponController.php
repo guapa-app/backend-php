@@ -7,6 +7,7 @@ use App\Http\Requests\ApplyCouponRequest;
 use App\Http\Requests\CouponRequest;
 use App\Http\Resources\CouponCollection;
 use App\Http\Resources\CouponResource;
+use App\Models\Coupon;
 use Illuminate\Http\Request;
 
 
@@ -34,9 +35,9 @@ class CouponController extends ApiCouponController
             ]);
     }
 
-    public function destroy($id)
+    public function destroy(Coupon $coupon)
     {
-        parent::destroy($id);
+        parent::destroy($coupon);
 
         return $this->successJsonRes([], __('api.success'));
     }
