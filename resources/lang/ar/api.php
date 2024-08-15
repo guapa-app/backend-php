@@ -63,6 +63,10 @@ return [
         'Cancel Request'       => 'قيد الإلغاء',
         'Canceled'             => 'تم إلغاؤه',
     ],
+    'coupon_statuses' => [
+        'active'              => 'فعال',
+        'expired'            => 'منتهي',
+    ],
 
     'view_details'             => 'عرض تفاصيل',
     'server_error'             => 'خوادمنا تحت الصيانة. سنعود قريبًا بتجربة أفضل!',

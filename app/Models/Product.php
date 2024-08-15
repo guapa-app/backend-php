@@ -153,6 +153,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->belongsToMany(Address::class, 'product_addresses');
     }
 
+    public function coupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_products');
+    }
+
     public function image()
     {
         return $this->morphOne(Media::class, 'model')
