@@ -32,7 +32,6 @@ class OrderService extends BaseOrderService
 
     public function create(array $data): Collection
     {
-
         return DB::transaction(function () use ($data) {
             $productIds = array_column($data['products'], 'id');
             $products = Product::whereIn('id', $productIds)->get();
@@ -56,10 +55,11 @@ class OrderService extends BaseOrderService
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $this->fees = 0; // Reset fees for each vendor
-                $discountAmount = 0; // Initialize discount amount
+                $this->fees = 0;
+                $discountAmount = 0;
+                $totalAmount = 0;
 
-                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $couponResult, &$discountAmount) {
+                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $couponResult, &$discountAmount, &$totalAmount) {
                     $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
 
                     if ($product->offer) {
@@ -68,28 +68,28 @@ class OrderService extends BaseOrderService
                     }
 
                     $finalPrice = $inputItem['quantity'] * $product->price;
+                    $totalAmount += $finalPrice;
 
-                    // Calculate initial fees
                     $productFees = $this->calculateProductFees($product, $finalPrice);
+                    $this->fees += $productFees;
 
-                    // Apply coupon discount if applicable
                     if ($couponResult && $couponResult['data']['valid_products']->contains($product->id)) {
                         $productDiscountAmount = ($finalPrice * $couponResult['data']['discount_percentage']) / 100;
                         $discountAmount += $productDiscountAmount;
-                        $finalPrice -= $productDiscountAmount;
-                    }
-
-                    // Adjust fees based on discount source
-                    if ($couponResult) {
-                        $discountSource = $couponResult['data']['discount_source'];
-                        $this->adjustFeesBasedOnDiscountSource($productFees, $productDiscountAmount, $discountSource);
-                    } else {
-                        $this->fees += $productFees;
                     }
 
                     return $finalPrice;
                 });
+
+                if ($couponResult) {
+                    $discountResult = $this->applyDiscount($data['total'], $discountAmount, $couponResult['data']['discount_source'], $this->fees);
+                    $data['total'] = $discountResult['total'];
+                    $this->fees = $discountResult['fees'];
+                    $discountAmount = $discountResult['discountAmount'];
+                }
+
                 $orderData = $data;
+                $orderData['fees'] = $this->fees;
                 if ($couponResult) {
                     $orderData['coupon_id'] = $couponResult['data']['coupon_id'];
                     $orderData['discount_amount'] = $discountAmount;
@@ -153,9 +153,11 @@ class OrderService extends BaseOrderService
                     );
                 }
             }
+
             return $orders;
         });
     }
+
     private function calculateProductFees($product, $finalPrice)
     {
         if ($product->type === ProductType::Service) {
@@ -167,22 +169,50 @@ class OrderService extends BaseOrderService
         }
     }
 
-    private function adjustFeesBasedOnDiscountSource($productFees, $productDiscountAmount, $discountSource)
+    private function applyDiscount($totalAmount, $discountAmount, $discountSource, $fees)
     {
+        $newTotal = $totalAmount;
+        $newFees = $fees;
+
         switch ($discountSource) {
             case 'vendor':
-                $this->fees += $productFees; // Calculate fees before applying discount
+                // Apply discount to total amount, fees remain unchanged
+                $newTotal -= $discountAmount;
                 break;
             case 'app':
-                $this->fees += max(0, $productFees - $productDiscountAmount); // Fees minus discount amount, but not less than 0
+                if ($newFees > 0) {
+                    if ($newFees >= $discountAmount) {
+                        $newFees -= $discountAmount;
+                    } else {
+                        $discountAmount = $newFees;
+                        $newFees = 0;
+                    }
+                } else {
+                    $discountAmount = 0;
+                }
                 break;
             case 'both':
-                $this->fees += max(0, $productFees - ($productDiscountAmount /2 )); // Half of the discount amount
+                if ($newFees > 0) {
+                    if ($newFees >= ($discountAmount / 2)) {
+                        $newFees -= ($discountAmount / 2) ;
+                    } else {
+                        $newFees = 0;
+                    }
+
+                    $newTotal -= $discountAmount;
+                } else {
+                    $newTotal -= $discountAmount;
+                }
                 break;
-            default:
-                $this->fees += $productFees; // Default case, no adjustment
         }
+
+        return [
+            'total' => $newTotal,
+            'fees' => $newFees,
+            'discountAmount' => $discountAmount
+        ];
     }
+
 }
 
 
