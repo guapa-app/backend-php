@@ -64,7 +64,10 @@ return [
         'Cancel Request'       => 'Cancel Request',
         'Canceled'             => 'Canceled',
     ],
-
+    'coupon_statuses' => [
+        'active'              => 'Active',
+        'expired'            => 'Expired',
+    ],
     'view_details'             => 'view details',
     'server_error'             => 'Our servers are under maintenance. We\'ll be back shortly with a better experience!',
 ];
