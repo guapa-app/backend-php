@@ -13,10 +13,10 @@ return new class extends Migration {
     {
         Schema::table('support_messages', function (Blueprint $table) {
             $table->unsignedBigInteger('parent_id')
-                ->after('user_id')
+                ->after('id')
                 ->nullable();
             $table->char('sender_type', 12)
-                ->after('parent_id')
+                ->after('user_id')
                 ->nullable();
             $table->unsignedBigInteger('support_message_type_id')
                 ->after('sender_type')
