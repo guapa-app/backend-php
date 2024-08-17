@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.0",
+        "alexwenzel/nova-dependency-container": "^1.12",
         "benwilkins/laravel-fcm-notification": "dev-l10-compatibility",
         "bissolli/nova-phone-field": "^0.0.4",
         "codezero/laravel-unique-translation": "^4.1",
