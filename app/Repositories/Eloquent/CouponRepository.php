@@ -56,6 +56,12 @@ class CouponRepository extends EloquentRepository implements CouponRepositoryInt
         return Coupon::where('code', $code)->first();
     }
 
+    //delete
+    public function destroy(Coupon $coupon)
+    {
+        return $coupon->delete();
+    }
+
 
 
 }
