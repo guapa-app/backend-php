@@ -40,9 +40,9 @@ class CouponController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($coupon)
+    public function destroy($id)
     {
-        return $this->couponRepository->delete($coupon);
+        return $this->couponRepository->delete($id);
     }
     /**
      * Apply coupon to products
