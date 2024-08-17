@@ -1,0 +1,9 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+        "namespace": "android_app",
+        "package_name": "com.app.guapasa_provider",
+        "sha256_cert_fingerprints":
+        ["DE:9B:F2:32:C5:4D:91:7C:93:53:DF:DE:EA:5F:9C:99:B4:90:C3:92:32:53:9B:00:43:BE:6A:84:88:56:18:ED"]
+    }
+}]
