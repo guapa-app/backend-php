@@ -35,7 +35,7 @@ class CouponController extends ApiCouponController
             ]);
     }
 
-    public function destroy($coupon)
+    public function destroy(Coupon $coupon)
     {
         parent::destroy($coupon);
 
