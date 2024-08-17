@@ -18,12 +18,12 @@ class Coupon extends Model
         'max_uses',
         'single_user_usage',
         'admin_id',
-
     ];
 
     protected $casts = [
         'expires_at' => 'datetime',
     ];
+
     public function products()
     {
         return $this->belongsToMany(Product::class, 'coupon_products');
@@ -33,10 +33,12 @@ class Coupon extends Model
     {
         return $this->belongsToMany(Vendor::class, 'coupon_vendors');
     }
+
     public function categories()
     {
         return $this->belongsToMany(Taxonomy::class, 'coupon_taxonomies', 'coupon_id', 'taxonomy_id');
     }
+
     public function usages()
     {
         return $this->hasMany(CouponUsage::class);
@@ -46,6 +48,7 @@ class Coupon extends Model
     {
         return $this->belongsTo(Admin::class);
     }
+
     public function isActive(): bool
     {
         if ($this->isExpired()) {
@@ -58,6 +61,7 @@ class Coupon extends Model
 
         return true;
     }
+
     private function isExpired()
     {
         return now()->gt($this->expires_at);
@@ -70,8 +74,9 @@ class Coupon extends Model
 
     public function hasReachedMaxUsesForUser(User $user)
     {
-        return  $this->usages->where('user_id', $user->id)->sum('usage_count') >= $this->single_user_usage;
+        return $this->usages->where('user_id', $user->id)->sum('usage_count') >= $this->single_user_usage;
     }
+
     public function isCouponApplicableToProduct(Product $product): bool
     {
         $applicable = true;
@@ -93,6 +98,7 @@ class Coupon extends Model
 
         return $applicable;
     }
+
     public function isCouponValid(Product $product, User $user): bool
     {
         return !$this->hasReachedMaxUsesForUser($user) &&
