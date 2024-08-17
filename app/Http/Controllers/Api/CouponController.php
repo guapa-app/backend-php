@@ -42,12 +42,14 @@ class CouponController extends Controller
      */
     public function destroy(Coupon $coupon)
     {
-        if ($coupon->admin_id) {
-            return response()->json(['error' => 'Cant delete Coupons added by admin'], 403);
+        if (!is_null($coupon->admin_id)) {
+             return [
+                'status' => false,
+                'error' => __('You cannot delete this coupon as it is created by admin'),
+            ];
         }
-        dd($coupon);
-        return $coupon->delete();
-//        return $this->couponRepository->destroy($coupon);
+
+        return $this->couponRepository->destroy($coupon);
     }
 
 
