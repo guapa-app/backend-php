@@ -35,14 +35,18 @@ class CouponController extends ApiCouponController
             ]);
     }
 
-    public function destroy(Coupon $coupon)
+    public function destroy($coupon)
     {
-        $result = parent::destroy($coupon);
-        if ($result['status']) {
-            return $this->successJsonRes([], __('api.deleted'));
-        } else {
-            return $this->errorJsonRes([],$result['error']);
+        if (!is_null($coupon->admin_id)) {
+            return [
+                'status' => false,
+                'error' => __('You cannot delete this coupon as it is created by admin'),
+            ];
         }
+
+        parent::destroy($coupon);
+
+        return $this->successJsonRes([], __('api.deleted'));
     }
 
     public function applyCoupon(ApplyCouponRequest $request)

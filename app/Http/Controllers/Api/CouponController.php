@@ -40,16 +40,9 @@ class CouponController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Coupon $coupon)
+    public function destroy($coupon)
     {
-        if (!is_null($coupon->admin_id)) {
-             return [
-                'status' => false,
-                'error' => __('You cannot delete this coupon as it is created by admin'),
-            ];
-        }
-
-        return $this->couponRepository->destroy($coupon);
+        return $this->couponRepository->delete($coupon);
     }
 
 
