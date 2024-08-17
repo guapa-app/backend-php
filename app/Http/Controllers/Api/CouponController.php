@@ -45,8 +45,8 @@ class CouponController extends Controller
         if ($coupon->admin_id) {
             return response()->json(['error' => 'Cant delete Coupons added by admin'], 403);
         }
-
-        return $this->couponRepository->destroy($coupon);
+        return $coupon->delete();
+//        return $this->couponRepository->destroy($coupon);
     }
     /**
      * Apply coupon to products
