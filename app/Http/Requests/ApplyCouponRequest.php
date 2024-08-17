@@ -23,7 +23,9 @@ class ApplyCouponRequest extends FormRequest
     {
         return [
             'coupon_code' => ['required', 'string', 'exists:coupons,code'],
-            'products' => 'array|required',
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|integer|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
         ];
     }
 }

@@ -50,8 +50,10 @@ class CouponController extends Controller
     public function applyCoupon(ApplyCouponRequest $request)
     {
         $couponCode = $request->input('coupon_code');
-        $productIds = $request->input('products');
-        $result = $this->couponService->applyCoupon($couponCode, $productIds);
+        $requestData = [
+            'products' => $request->input('products'),
+        ];
+        $result = $this->couponService->applyCoupon($couponCode, $requestData);
         return $result;
     }
 }

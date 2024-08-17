@@ -39,9 +39,9 @@ class OrderService extends BaseOrderService
             // Apply coupon if provided
             $couponResult = null;
             if (isset($data['coupon_code'])) {
-                $couponResult = $this->couponService->applyCoupon($data['coupon_code'], $productIds);
+                $couponResult = $this->couponService->applyCoupon($data['coupon_code'], $data, true);
                 if (!$couponResult['status']) {
-                    throw new \Exception($couponResult['error']);
+                    abort(400,$couponResult['error']);
                 }
             }
 
@@ -55,74 +55,12 @@ class OrderService extends BaseOrderService
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $this->fees = 0;
-                $discountAmount = 0;
-                $totalAmount = 0;
 
-                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $couponResult, &$discountAmount, &$totalAmount) {
-                    $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+                $orderData = $this->calculateOrderData($vendorProducts, $data, $couponResult);
 
-                    if ($product->offer) {
-                        $product->price -= ($product->price * ($product->offer->discount / 100));
-                        $product->price = round($product->price, 2);
-                    }
-
-                    $finalPrice = $inputItem['quantity'] * $product->price;
-                    $totalAmount += $finalPrice;
-
-                    $productFees = $this->calculateProductFees($product, $finalPrice);
-                    $this->fees += $productFees;
-
-                    if ($couponResult && $couponResult['data']['valid_products']->contains($product->id)) {
-                        $productDiscountAmount = ($finalPrice * $couponResult['data']['discount_percentage']) / 100;
-                        $discountAmount += $productDiscountAmount;
-                    }
-
-                    return $finalPrice;
-                });
-
-                if ($couponResult) {
-                    $discountResult = $this->applyDiscount($data['total'], $discountAmount, $couponResult['data']['discount_source'], $this->fees);
-                    $data['total'] = $discountResult['total'];
-                    $this->fees = $discountResult['fees'];
-                    $discountAmount = $discountResult['discountAmount'];
-                }
-
-                $orderData = $data;
-                $orderData['fees'] = $this->fees;
-                if ($couponResult) {
-                    $orderData['coupon_id'] = $couponResult['data']['coupon_id'];
-                    $orderData['discount_amount'] = $discountAmount;
-                }
                 $order = $this->repository->create($orderData);
 
-                $items = $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId) {
-                    $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
-
-                    if (isset($inputItem['appointment'])) {
-                        $appointment = Appointment::find($inputItem['appointment']['id']);
-
-                        if ($appointment->vendor_id !== $vendorId) {
-                            $order->delete();
-                            abort(400, 'Invalid appointment selected');
-                        }
-
-                        $inputItem['appointment']['from_time'] = $appointment->from_time;
-                        $inputItem['appointment']['to_time'] = $appointment->to_time;
-                    }
-
-                    return [
-                        'order_id' => $order->id,
-                        'product_id' => $product->id,
-                        'offer_id' => optional($product->offer)->id,
-                        'amount' => $product->price,
-                        'quantity' => $inputItem['quantity'],
-                        'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
-                        'user_id' => $inputItem['staff_user_id'] ?? null,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                });
+                $items = $this->createOrderItems($vendorProducts, $data, $order, $now, $vendorId);
 
                 // Check that provided user ids belong to vendor
                 $userIds = $items->pluck('user_id')->filter()->all();
@@ -135,26 +73,93 @@ class OrderService extends BaseOrderService
 
                 $order->load('items', 'address', 'user', 'vendor');
 
-                $this->taxes = ($this->taxesPercentage / 100) * $this->fees;
-                // Generate invoice for the first order (since there's only one order per vendor)
-                $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $this->fees, $this->taxes);
+                $this->taxes = ($this->taxesPercentage / 100) * $orderData['fees'];
+                // Generate invoice for the order
+                $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $orderData['fees'], $this->taxes);
                 $order->invoice_url = $invoice->url;
+                $order->save();
 
                 $orders->push($order);
-                $this->fees = $this->taxes = 0;
 
                 // Update coupon usage if a coupon was applied
                 if ($couponResult) {
-                    $coupon = Coupon::find($couponResult['data']['coupon_id']);
-                    $coupon->usages()->updateOrCreate(
-                        ['user_id' => $data['user_id']],
-                        ['usage_count' => DB::raw('usage_count + 1')]
-                    );
+                    $this->updateCouponUsage($couponResult['data']['coupon_id'], $data['user_id']);
                 }
             }
 
             return $orders;
         });
+    }
+
+    private function calculateOrderData($vendorProducts, $data, $couponResult)
+    {
+        $orderData = $data;
+        $orderData['total'] = 0;
+        $orderData['fees'] = 0;
+        $orderData['discount_amount'] = 0;
+
+        foreach ($vendorProducts as $product) {
+            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+            $quantity = $inputItem['quantity'];
+
+            $price = $this->getDiscountedPrice($product);
+            $finalPrice = $price * $quantity;
+
+            // Apply coupon discount to specific products
+            if ($couponResult && $couponResult['data']['valid_products']->contains($product->id)) {
+                $orderData['total'] +=$couponResult['data']['total'];
+                $orderData['fees'] +=$couponResult['data']['fees'];
+                $orderData['discount_amount'] += $couponResult['data']['discount_amount'];
+            }else{
+                $orderData['total'] += $finalPrice;
+                $orderData['fees'] += $this->calculateProductFees($product, $finalPrice);
+            }
+
+
+        }
+
+        return $orderData;
+    }
+
+    private function createOrderItems($vendorProducts, $data, $order, $now, $vendorId)
+    {
+        return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId) {
+            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+
+            if (isset($inputItem['appointment'])) {
+                $appointment = Appointment::find($inputItem['appointment']['id']);
+
+                if ($appointment->vendor_id !== $vendorId) {
+                    $order->delete();
+                    abort(400, 'Invalid appointment selected');
+                }
+
+                $inputItem['appointment']['from_time'] = $appointment->from_time;
+                $inputItem['appointment']['to_time'] = $appointment->to_time;
+            }
+
+            return [
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'offer_id' => optional($product->offer)->id,
+                'amount' => $this->getDiscountedPrice($product),
+                'quantity' => $inputItem['quantity'],
+                'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
+                'user_id' => $inputItem['staff_user_id'] ?? null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        });
+    }
+
+    private function getDiscountedPrice($product)
+    {
+        $price = $product->price;
+        if ($product->offer) {
+            $price -= ($price * ($product->offer->discount / 100));
+            $price = round($price, 2);
+        }
+        return $price;
     }
 
     private function calculateProductFees($product, $finalPrice)
@@ -163,56 +168,18 @@ class OrderService extends BaseOrderService
 
         if ($productCategory?->fees) {
             $productFees = $productCategory->fees;
-            $this->fees += ($productFees / 100) * $finalPrice;
+            return  ($productFees / 100) * $finalPrice;
         } else {
-            $this->fees += $productCategory?->fixed_price;
+            return $productCategory?->fixed_price ?? 0;
         }
     }
 
-    private function applyDiscount($totalAmount, $discountAmount, $discountSource, $fees)
+    private function updateCouponUsage($couponId, $userId)
     {
-        $newTotal = $totalAmount;
-        $newFees = $fees;
-
-        switch ($discountSource) {
-            case 'vendor':
-                // Apply discount to total amount, fees remain unchanged
-                $newTotal -= $discountAmount;
-                break;
-            case 'app':
-                if ($newFees > 0) {
-                    if ($newFees >= $discountAmount) {
-                        $newFees -= $discountAmount;
-                    } else {
-                        $discountAmount = $newFees;
-                        $newFees = 0;
-                    }
-                } else {
-                    $discountAmount = 0;
-                }
-                break;
-            case 'both':
-                if ($newFees > 0) {
-                    if ($newFees >= ($discountAmount / 2)) {
-                        $newFees -= ($discountAmount / 2) ;
-                    } else {
-                        $newFees = 0;
-                    }
-
-                    $newTotal -= $discountAmount;
-                } else {
-                    $newTotal -= $discountAmount;
-                }
-                break;
-        }
-
-        return [
-            'total' => $newTotal,
-            'fees' => $newFees,
-            'discountAmount' => $discountAmount
-        ];
+        $coupon = Coupon::find($couponId);
+        $coupon->usages()->updateOrCreate(
+            ['user_id' => $userId],
+            ['usage_count' => DB::raw('usage_count + 1')]
+        );
     }
-
 }
-
-
