@@ -42,7 +42,15 @@ class CouponController extends Controller
      */
     public function destroy($coupon)
     {
-        return $this->couponRepository->delete($coupon);
+        $coupon = $this->couponRepository->getOneOrFail($coupon);
+        if (!is_null($coupon->admin_id)) {
+            return [
+                'status' => false,
+                'error' => __('You cannot delete this coupon as it is created by admin'),
+            ];
+        }
+
+        return $this->couponRepository->delete($coupon->id);
     }
     /**
      * Apply coupon to products
