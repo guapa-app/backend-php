@@ -120,6 +120,7 @@ class OrderService
                 // Generate invoice for the first order (since there's only one order per vendor)
                 $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $this->fees, $this->taxes);
                 $order->invoice_url = $invoice->url;
+                $order->save();
 
                 $orders->push($order);
                 $this->fees = $this->taxes = 0;
