@@ -19,4 +19,5 @@ Route::prefix('v3')->group(function () {
     Route::prefix('support-msg')->group(base_path('routes/v3/api/support.php'));
     Route::prefix('pages')->group(base_path('routes/v3/api/pages.php'));
     Route::prefix('cities')->group(base_path('routes/v3/api/cities.php'));
+    Route::prefix('products')->group(base_path('routes/v3/api/products.php'));
 });
