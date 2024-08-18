@@ -48,6 +48,11 @@ class City extends Model implements Listable
         return $query;
     }
 
+    public function scopewithApiListRelations(Builder $query, Request $request): Builder
+    {
+        return $query;
+    }
+
     public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
         return $query;
