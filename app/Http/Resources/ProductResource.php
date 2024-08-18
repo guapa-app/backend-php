@@ -9,7 +9,6 @@ class ProductResource extends JsonResource
 {
     public function toArray($request)
     {
-        $paymentDetails = $this->payment_details;
         $returned_arr = [
             'id'                                    => $this->id,
             'hash_id'                               => (string) $this->hash_id,
@@ -27,7 +26,7 @@ class ProductResource extends JsonResource
             'likes_count'                           => (int) $this->likes_count,
             'is_liked'                              => (bool) $this->is_liked,
 
-            'payment_details'                        => $this->payment_details,
+
 
 
             'offer'                                 => OfferResource::make($this->whenLoaded('offer')),
