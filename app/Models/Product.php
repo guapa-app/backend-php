@@ -27,14 +27,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Product extends Model implements Listable, HasMedia, HasReviews
 {
-    use HasFactory,
-        ListableTrait,
-        InteractsWithMedia,
-        HasTaxonomies,
-        Reviewable,
-        Likable,
-        Relatable,
-        SoftDeletes;
+    use HasFactory, ListableTrait, InteractsWithMedia, HasTaxonomies,
+        Reviewable, Likable, Relatable, SoftDeletes;
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price',
@@ -42,7 +36,8 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     ];
 
     protected $appends = [
-        'likes_count', 'is_liked', 'taxonomy_name',
+        'likes_count', 'is_liked',
+        'taxonomy_name', 'address',
     ];
 
     /**
@@ -94,6 +89,15 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 900, 1500)
             ->performOnCollections('products');
+    }
+
+    public function getAddressAttribute()
+    {
+        $countryName = request()->header('Accept-Language') == 'en' ? 'KSA' : 'السعودية';
+
+        $city = $this->vendor?->address?->city?->name;
+
+        return $city ? "$city - $countryName" : $countryName;
     }
 
     public function getTaxonomyNameAttribute()
