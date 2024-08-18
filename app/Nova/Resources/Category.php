@@ -121,16 +121,17 @@ class Category extends Resource
 
     protected static function fillFields(NovaRequest $request, $model, $fields): array
     {
-        if(isset($request->fixed_price)){
-            $model->forceFill([
-                'fees' => null,
-            ])->save();
-        }else{
-            $model->forceFill([
-                'fixed_price' => null,
-            ])->save();
+        if ($request->editMode == 'update') {
+            if (isset($request->fixed_price)) {
+                $model->forceFill([
+                    'fees' => null,
+                ])->save();
+            } else {
+                $model->forceFill([
+                    'fixed_price' => null,
+                ])->save();
+            }
         }
-
         unset($fields[6]);
         $request->request->remove('guapa_fees');
 
