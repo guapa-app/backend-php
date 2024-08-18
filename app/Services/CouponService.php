@@ -72,41 +72,56 @@ class CouponService
     private function calculateTotals(Collection $products, $coupon, array $requestData)
     {
         $totalAmount = 0;
-        $fees = 0;
-        $discountAmount = 0;
+        $totalFees = 0;
+        $totalDiscountFees = 0;
+        $totalDiscountAmount = 0;
+        $productDiscounts = [];
 
         foreach ($products as $product) {
-            $price = $product->price;
-            if ($product->offer) {
-                $price -= ($price * ($product->offer->discount / 100));
-                $price = round($price, 2);
-            }
-
+            $price = $this->getDiscountedPrice($product);
             $inputItem = Arr::first($requestData['products'], fn($value) => (int) $value['id'] === $product->id);
             $quantity = $inputItem['quantity'] ?? 1;
 
             $finalPrice = $price * $quantity;
-            $totalAmount += $finalPrice;
-
-            // Calculate product fees
             $productFees = $this->calculateProductFees($product, $finalPrice);
-            $fees += $productFees;
 
-            // Apply coupon discount
-            if ($coupon->discount_source !== 'app') {
-                $productDiscountAmount = ($finalPrice * $coupon->discount_percentage) / 100;
-                $discountAmount += $productDiscountAmount;
-            }
+            $totalAmount += $finalPrice;
+            $totalFees += $productFees;
+
+            // Calculate discount for this product
+            $discountResult = $this->applyDiscount($finalPrice, $coupon->discount_percentage, $coupon->discount_source, $productFees);
+
+            $productDiscounts[$product->id] = [
+                'total' => $discountResult['total'],
+                'fees' => $discountResult['fees'],
+                'discount_amount' => $discountResult['discountAmount'],
+            ];
+
+            $totalDiscountAmount += $discountResult['discountAmount'];
+            $totalDiscountFees += $discountResult['fees'];
+
         }
 
-        // Apply discount based on the discount source
-        $discountResult = $this->applyDiscount($totalAmount, $coupon->discount_percentage, $coupon->discount_source, $fees);
-
         return [
-            'total' => $discountResult['total'],
-            'fees' => $discountResult['fees'],
-            'discount_amount' => $discountResult['discountAmount'],
+            'total' => $totalAmount - $totalDiscountAmount,
+            'fees' => $totalDiscountFees,
+            'remaining' => ( $totalAmount - $totalDiscountAmount) - $totalDiscountFees ,
+            'discount_amount' => $totalDiscountAmount,
+            'fees_before_discount' => $totalFees,
+            'total_before_discount' => $totalAmount,
+            'product_discounts' => $productDiscounts,
+
         ];
+    }
+
+    private function getDiscountedPrice($product)
+    {
+        $price = $product->price;
+        if ($product->offer) {
+            $price -= ($price * ($product->offer->discount / 100));
+            $price = round($price, 2);
+        }
+        return $price;
     }
 
     private function calculateProductFees($product, $finalPrice)
@@ -129,7 +144,8 @@ class CouponService
 
         switch ($discountSource) {
             case 'vendor':
-                $discountAmount = ($totalAmount * $discountPercentage) / 100;
+                $amountAfterFees = $totalAmount - $fees;
+                $discountAmount = ($amountAfterFees * $discountPercentage) / 100;
                 $newTotal -= $discountAmount;
                 break;
             case 'app':
@@ -151,5 +167,16 @@ class CouponService
             'fees' => $newFees,
             'discountAmount' => $discountAmount
         ];
+    }
+
+
+    public function delete(int $id)
+    {
+        $coupon = $this->couponRepository->getOneOrFail($id);
+
+        if (!is_null($coupon->admin_id)) {
+            abort(403, "You can't delete this coupon");
+        }
+        $this->couponRepository->delete($coupon->id);
     }
 }

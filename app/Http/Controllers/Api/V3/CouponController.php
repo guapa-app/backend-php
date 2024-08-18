@@ -35,9 +35,9 @@ class CouponController extends ApiCouponController
             ]);
     }
 
-    public function destroy($coupon)
+    public function destroy($id)
     {
-        parent::destroy($coupon);
+        parent::destroy($id);
 
         return $this->successJsonRes([], __('api.deleted'));
     }
