@@ -41,7 +41,7 @@ class OrderService extends BaseOrderService
             if (isset($data['coupon_code'])) {
                 $couponResult = $this->couponService->applyCoupon($data['coupon_code'], $data, true);
                 if (!$couponResult['status']) {
-                    abort(400,$couponResult['error']);
+                    abort(400, $couponResult['error']);
                 }
             }
 
@@ -98,29 +98,31 @@ class OrderService extends BaseOrderService
         $orderData['fees'] = 0;
         $orderData['discount_amount'] = 0;
 
+        $couponProductDiscounts = $couponResult ? $couponResult['data']['product_discounts'] : [];
+
         foreach ($vendorProducts as $product) {
             $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
             $quantity = $inputItem['quantity'];
 
-            $price = $this->getDiscountedPrice($product);
-            $finalPrice = $price * $quantity;
+            if (isset($couponProductDiscounts[$product->id])) {
+                // Use discounted values for coupon-eligible products
+                $discountedProduct = $couponProductDiscounts[$product->id];
+                $orderData['total'] += $discountedProduct['total'];
+                $orderData['fees'] += $discountedProduct['fees'];
+                $orderData['discount_amount'] += $discountedProduct['discount_amount'];
+            } else {
+                // Use regular pricing for non-eligible products
+                $price = $this->getDiscountedPrice($product);
+                $finalPrice = $price * $quantity;
+                $productFees = $this->calculateProductFees($product, $finalPrice);
 
-            // Apply coupon discount to specific products
-            if ($couponResult && $couponResult['data']['valid_products']->contains($product->id)) {
-                $orderData['total'] +=$couponResult['data']['total'];
-                $orderData['fees'] +=$couponResult['data']['fees'];
-                $orderData['discount_amount'] += $couponResult['data']['discount_amount'];
-            }else{
                 $orderData['total'] += $finalPrice;
-                $orderData['fees'] += $this->calculateProductFees($product, $finalPrice);
+                $orderData['fees'] += $productFees;
             }
-
-
         }
 
         return $orderData;
     }
-
     private function createOrderItems($vendorProducts, $data, $order, $now, $vendorId)
     {
         return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId) {
@@ -168,7 +170,7 @@ class OrderService extends BaseOrderService
 
         if ($productCategory?->fees) {
             $productFees = $productCategory->fees;
-            return  ($productFees / 100) * $finalPrice;
+            return ($productFees / 100) * $finalPrice;
         } else {
             return $productCategory?->fixed_price ?? 0;
         }
