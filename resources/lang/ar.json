@@ -801,5 +801,12 @@
     "contacts" : "الاتصال",
     "playstore": "بلاي ستور (اندرويد)",
     "appstore": "اب ستور (ايفون)",
-    "per month": "لكل شهر"
+    "per month": "لكل شهر",
+    "Coupon applied successfully": "تم تطبيق الكوبون بنجاح",
+    "Coupon is not valid.": "كود الكوبون غير صالح",
+    "Coupon has expired.": "انتهى صلاحية الكوبون",
+    "Coupon usage limit has been reached.": "تم الوصول إلى حد استخدام الكوبون",
+    "You have reached the maximum usage limit for this coupon.": "لقد وصلت إلى الحد الأقصى لاستخدام هذا الكوبون",
+    "Coupon is not applicable to the selected products.": "الكوبون غير قابل للتطبيق على المنتجات المحددة"
+
 }

@@ -22,12 +22,12 @@
                             </p>
 
                             <div class="mobile-button">
-                                <a href="#" class="download-btn">
+                                <a href="https://apps.apple.com/sa/app/guapa/id1552554758" class="download-btn">
                                     <img src="{{ asset('frontend/assets/images/icons/app-store.svg') }}" loading="lazy"
                                         alt="" />
                                 </a>
 
-                                <a href="#" class="download-btn">
+                                <a href="https://play.google.com/store/apps/details?id=com.guapanozom.app&pli=1" class="download-btn">
                                     <img src="{{ asset('frontend/assets/images/icons/google_play.svg') }}" loading="lazy"
                                         alt="" />
                                 </a>
@@ -241,12 +241,12 @@
                         <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
                             aria-labelledby="pills-home-tab">
                             <div class="mobile-button">
-                                <a href="#" class="download-btn">
+                                <a href="https://apps.apple.com/sa/app/guapa/id1552554758" class="download-btn">
                                     <img src="{{ asset('frontend/assets/images/icons/app-store.svg') }}" loading="lazy"
                                         alt="" />
                                 </a>
 
-                                <a href="#" class="download-btn">
+                                <a href="https://play.google.com/store/apps/details?id=com.guapanozom.app&pli=1" class="download-btn">
                                     <img src="{{ asset('frontend/assets/images/icons/google_play.svg') }}" loading="lazy"
                                         alt="" />
                                 </a>
@@ -256,12 +256,12 @@
                         <div class="tab-pane fade" id="pills-profile" role="tabpanel"
                             aria-labelledby="pills-profile-tab">
                             <div class="mobile-button">
-                                <a href="#" class="download-btn">
+                                <a href="https://apps.apple.com/sa/app/guapa/id1552554758" class="download-btn">
                                     <img src="{{ asset('frontend/assets/images/icons/app-store.svg') }}" loading="lazy"
                                         alt="" />
                                 </a>
 
-                                <a href="#" class="download-btn">
+                                <a href="https://play.google.com/store/apps/details?id=com.guapanozom.app&pli=1" class="download-btn">
                                     <img src="{{ asset('frontend/assets/images/icons/google_play.svg') }}" loading="lazy"
                                         alt="" />
                                 </a>

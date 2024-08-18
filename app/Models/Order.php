@@ -17,7 +17,7 @@ class Order extends Model implements Listable
 
     protected $fillable = [
         'hash_id', 'user_id', 'vendor_id', 'address_id', 'total', 'status',
-        'note', 'name', 'phone', 'invoice_url', 'cancellation_reason',
+        'note', 'name', 'phone', 'invoice_url', 'cancellation_reason','coupon_id','coupon_discount'
     ];
 
     /**
@@ -88,6 +88,10 @@ class Order extends Model implements Listable
     public function invoice()
     {
         return $this->hasOne(Invoice::class);
+    }
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
     }
 
     public function scopeCurrentVendor($query, $value)

@@ -35,6 +35,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(Repositories\UserRepositoryInterface::class, Eloquent\UserRepository::class);
         $this->app->bind(Repositories\VendorRepositoryInterface::class, Eloquent\VendorRepository::class);
         $this->app->bind(Repositories\DatabaseNotificationRepositoryInterface::class, Eloquent\DatabaseNotificationRepository::class);
+        $this->app->bind(Repositories\CouponRepositoryInterface::class, Eloquent\CouponRepository::class);
 
         $this->app->singleton('cosmo', function ($app) {
             return new Cosmo;
