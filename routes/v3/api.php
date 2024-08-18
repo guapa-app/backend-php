@@ -21,4 +21,5 @@ Route::prefix('v3')->group(function () {
     Route::prefix('cities')->group(base_path('routes/v3/api/cities.php'));
     Route::prefix('coupons')->group(base_path('routes/v3/api/coupons.php'));
     Route::prefix('orders')->group(base_path('routes/v3/api/orders.php'));
+    Route::prefix('products')->group(base_path('routes/v3/api/products.php'));
 });

@@ -22,12 +22,12 @@ abstract class GeneralCollection extends ResourceCollection
             ];
     }
 
-    private function prepareAddiitonal($request)
+    protected function prepareAddiitonal($request)
     {
         return $request->has('perPage') ? $this->additional : [];
     }
 
-    private function preparePayload($request)
+    protected function preparePayload($request)
     {
         if ($request->has('perPage') || $request->has('per_page')) {
             $payload = [
