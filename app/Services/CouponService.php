@@ -4,16 +4,19 @@ namespace App\Services;
 
 use App\Contracts\Repositories\CouponRepositoryInterface;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
 
 class CouponService
 {
     protected $couponRepository;
+    protected $taxesPercentage;
 
     public function __construct(CouponRepositoryInterface $couponRepository)
     {
         $this->couponRepository = $couponRepository;
+        $this->taxesPercentage = Setting::getTaxes();
     }
 
     public function applyCoupon(string $couponCode, array $requestData, $calculateTotals = true)
@@ -101,10 +104,13 @@ class CouponService
             $totalDiscountFees += $discountResult['fees'];
 
         }
-
+        $taxes = ($this->taxesPercentage / 100)  * $totalDiscountFees;
         return [
             'total' => $totalAmount - $totalDiscountAmount,
             'fees' => $totalDiscountFees,
+            'taxes' => $taxes,
+            'tax_percentage' => $this->taxesPercentage,
+            'fees_with_taxes'=> $totalDiscountFees + $taxes,
             'remaining' => ( $totalAmount - $totalDiscountAmount) - $totalDiscountFees ,
             'discount_amount' => $totalDiscountAmount,
             'fees_before_discount' => $totalFees,
