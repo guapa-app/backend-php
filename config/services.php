@@ -34,4 +34,10 @@ return [
         'key' => env('FCM_SERVER_KEY'),
     ],
 
+    'connectly' => [
+        'url' => env('CONNECTLY_API_URL'),
+        'key' => env('CONNECTLY_API_KEY'),
+        'business_id' => env('CONNECTLY_BUSINESS_ID'),
+    ],
+
 ];
