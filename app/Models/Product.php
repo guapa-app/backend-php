@@ -132,6 +132,50 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             0;
     }
 
+    public function getOfferPriceAttribute()
+    {
+        $price = $this->price;
+        if ($this->offer) {
+            $price -= ($price * ($this->offer->discount / 100));
+            $price = round($price, 2);
+        }
+        return $price;
+    }
+    public function getPaymentDetailsAttribute()
+    {
+        $finalPrice = $this->offer_price; // Use the getOfferPriceAttribute method
+        $fees = $this->calculateProductFees($finalPrice);
+        $taxPercentage = Setting::getTaxes(); // Example tax percentage
+        $taxes = ($taxPercentage / 100) * $fees;
+        $remaining = $finalPrice - $fees;
+        $feesWithTaxes = $fees + $taxes;
+
+        return [
+            'fees' => $fees,
+            'taxes' => $taxes,
+            'remaining' => $remaining,
+            'fees_with_taxes' => $feesWithTaxes,
+            'tax_percentage' => $taxPercentage,
+        ];
+    }
+
+    public function getTaxesAttribute()
+    {
+        $taxPercentage = 10; // Example tax percentage
+        return ($taxPercentage / 100) * $this->fees;
+    }
+
+    public function getRemainingAttribute()
+    {
+        return $this->price - $this->fees - $this->taxes;
+    }
+
+    public function getFeesWithTaxesAttribute()
+    {
+        return $this->fees + $this->taxes;
+    }
+
+
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
@@ -360,5 +404,17 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         ]);
 
         return $query;
+    }
+
+    public function calculateProductFees($finalPrice)
+    {
+        $productCategory = $this->taxonomies()->first();
+
+        if ($productCategory?->fees) {
+            $productFees = $productCategory->fees;
+            return ($productFees / 100) * $finalPrice;
+        } else {
+            return $productCategory?->fixed_price ?? 0;
+        }
     }
 }
