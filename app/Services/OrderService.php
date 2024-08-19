@@ -98,6 +98,7 @@ class OrderService
                         'amount'        => $product->price,
                         'amount_to_pay' => $itemAmountToPay,
                         'taxes'         => $this->taxesPercentage,
+                        'title'         => $product->title,
                         'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
                         'created_at'    => $now,
                         'updated_at'    => $now,
