@@ -156,23 +156,9 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             'remaining' => $remaining,
             'fees_with_taxes' => $feesWithTaxes,
             'tax_percentage' => $taxPercentage,
+            'price_after_discount' => $this->offer ? $this->offer_price : 0,
+            'discount_percentage' => $this->offer?->discount ?? 0,
         ];
-    }
-
-    public function getTaxesAttribute()
-    {
-        $taxPercentage = 10; // Example tax percentage
-        return ($taxPercentage / 100) * $this->fees;
-    }
-
-    public function getRemainingAttribute()
-    {
-        return $this->price - $this->fees - $this->taxes;
-    }
-
-    public function getFeesWithTaxesAttribute()
-    {
-        return $this->fees + $this->taxes;
     }
 
 
