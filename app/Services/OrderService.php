@@ -42,18 +42,32 @@ class OrderService
             $productIds = array_column($data['products'], 'id');
             $products = Product::whereIn('id', $productIds)->get();
 
-            $productsTitles = $products->pluck('title')->implode(' - ');
-
             // Group products by vendor to create an order for each vendor
             $keyedProducts = $products->groupBy('vendor_id');
 
             $orders = new Collection;
             $now = now();
+            $orderItems = [];
+            $userIds = [];
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data) {
+
+                $productsTitles = $vendorProducts->pluck('title')->implode(' - ');
+
+                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $now, $vendorId, &$orderItems, &$userIds) {
                     $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
+
+                    if (isset($inputItem['appointment'])) {
+                        $appointment = Appointment::find($inputItem['appointment']['id']);
+
+                        if ($appointment->vendor_id !== $vendorId) {
+                            abort(400, 'Invalid appointment selected');
+                        }
+
+                        $inputItem['appointment']['from_time'] = $appointment->from_time;
+                        $inputItem['appointment']['to_time'] = $appointment->to_time;
+                    }
 
                     if ($product->offer) {
                         $product->price -= ($product->price * ($product->offer->discount / 100));
@@ -66,52 +80,46 @@ class OrderService
 
                     if ($productCategory?->fees) {
                         $productFees = $productCategory->fees;
-                        $this->fees += ($productFees / 100) * $finalPrice;
+                        $itemAmountToPay = ($productFees / 100) * $finalPrice;
+                        $this->fees += $itemAmountToPay;
                     } else {
-                        $this->fees += $productCategory?->fixed_price;
+                        $itemAmountToPay = $productCategory?->fixed_price;
+                        $this->fees += $itemAmountToPay;
                     }
+
+                    $userIds[] = $inputItem['staff_user_id'] ?? null;
+
+                    $orderItems[] = [
+                        'user_id'       => $inputItem['staff_user_id'] ?? null,
+                        'product_id'    => $product->id,
+                        'offer_id'      => optional($product->offer)->id,
+                        'quantity'      => $inputItem['quantity'],
+                        'amount'        => $product->price,
+                        'amount_to_pay' => $itemAmountToPay,
+                        'taxes'         => $this->taxesPercentage,
+                        'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
+                        'created_at'    => $now,
+                        'updated_at'    => $now,
+                    ];
 
                     return $finalPrice;
                 });
 
-                $order = $this->repository->create($data);
-
-                $items = $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId) {
-                    $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
-
-                    if (isset($inputItem['appointment'])) {
-                        $appointment = Appointment::find($inputItem['appointment']['id']);
-
-                        if ($appointment->vendor_id !== $vendorId) {
-                            $order->delete();
-                            abort(400, 'Invalid appointment selected');
-                        }
-
-                        $inputItem['appointment']['from_time'] = $appointment->from_time;
-                        $inputItem['appointment']['to_time'] = $appointment->to_time;
-                    }
-
-                    return [
-                        'order_id' => $order->id,
-                        'product_id' => $product->id,
-                        'offer_id' => optional($product->offer)->id,
-                        'amount' => $product->price,
-                        'quantity' => $inputItem['quantity'],
-                        'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
-                        'user_id' => $inputItem['staff_user_id'] ?? null,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                });
-
                 // Check that provided user ids belong to vendor
-                $userIds = $items->pluck('user_id')->filter()->all();
+                $userIds = array_unique($userIds);
 
                 if (!$this->checkVendorUsers($vendorId, $userIds)) {
                     abort(400, 'Invalid staff provided for vendor');
                 }
 
-                OrderItem::insert($items->toArray());
+                $order = $this->repository->create($data);
+
+                $orderItems = array_map(function ($item) use ($order) {
+                    $item['order_id'] = $order->id; // Merge the order ID into each item
+                    return $item;
+                }, $orderItems);
+
+                OrderItem::query()->insert($orderItems);
 
                 $order->load('items', 'address', 'user', 'vendor');
 
