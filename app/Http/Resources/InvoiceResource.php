@@ -16,6 +16,7 @@ class InvoiceResource extends JsonResource
             'amount'        => (float)$this->amount,
             'currency'      => (string)$this->currency,
             'amount_format' => (string)$this->amount_format,
+            'url'           => (string)$this->url,
 
             'created_at'  => Carbon::parse($this->created_at)->diffForHumans(),
             'updated_at'  => Carbon::parse($this->updated_at)->diffForHumans(),
