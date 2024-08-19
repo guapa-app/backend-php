@@ -79,14 +79,14 @@ class OfferNotification extends Notification implements ShouldQueue
     {
         return [
             'client' => $notifiable->phone,
-            'campaignName' => 'new offer campaign',
+            'campaignName' => 'offersprovidersservices',
             'variables' => [
                 'username' => $notifiable->name,
                 'discount' => $this->offer->discount_string,
-                'vendor_name' => $this->offer->product->vendor->name,
-                'product' => $this->offer->product->title,
+                'image' => $offer->image?->getUrl() ?? $this->offer->product->image?->getUrl(),
+                'title' => $this->offer->product->title,
             ],
-            "campaignVersion"=> "01911402-be2b-f214-7ee4-b504eaf403cc"
+            "campaignVersion"=> "01916c78-2738-877c-032a-6200d8561815"
 
         ];
     }

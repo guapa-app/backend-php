@@ -31,8 +31,7 @@ class OfferService
 
         $imageData = Arr::only($data, ['image']);
         $this->updateImage($offer, $imageData);
-
-        event(new OfferCreated($offer));
+//        event(new OfferCreated($offer));
 
         return $offer;
     }
