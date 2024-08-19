@@ -105,7 +105,7 @@
                     <ul class="links">
                         <li>
                             <a href="https://www.tiktok.com/@guapaapp">
-                                <img src="#" loading="lazy"
+                                <img src="{{ asset('frontend/assets/images/footer/tiktok.svg') }}" loading="lazy"
                                      alt=""/>
 
                                 <span>
@@ -148,7 +148,7 @@
 
                         <li>
                             <a href="https://snapchat.com/t/6Gx8Jq8a">
-                                <img src="#" loading="lazy"
+                                <img src="{{ asset('frontend/assets/images/footer/snapchat.svg') }}" loading="lazy"
                                      alt=""/>
                                 <span>
                       سناب شات
