@@ -26,6 +26,8 @@ class FavoritesService
             $query->with('logo');
         })->when($type == 'product', function ($query) {
             $query->with('vendor', 'media');
+        })->when($type == 'offer', function ($query) {
+            $query->with('product', 'product.media');
         })->when($type == 'post', function ($query) {
             $query->with('media', 'admin', 'category');
         })->paginate(10);
