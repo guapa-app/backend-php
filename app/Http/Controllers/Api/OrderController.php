@@ -181,10 +181,9 @@ class OrderController extends BaseApiController
         $vat = Setting::getTaxes();
 
         $order_items = $order->items->map(function ($item) use ($vat) {
-            $product = $item->product;
-            $arr['name'] = $product->title;
-            $arr['price'] = $product->categories->first()->fees / 100 * $item->amount;
-            $arr['vat'] = $arr['price'] * $vat / 100;
+            $arr['name'] = $item->title;
+            $arr['price'] = $item->amount_to_pay;
+            $arr['vat'] = $arr['price'] * $item->taxes / 100;
             $arr['qty'] = $item->quantity;
             $arr['subtotal_with_vat'] = ($arr['price'] + $arr['vat']) * $arr['qty'];
 
