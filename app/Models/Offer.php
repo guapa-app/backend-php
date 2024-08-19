@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Helpers\Common;
+use App\Traits\Likable;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +21,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Offer extends Model implements Listable, HasMedia
 {
-    use HasFactory, ListableTrait, InteractsWithMedia;
+    use HasFactory, ListableTrait, InteractsWithMedia ,Likable;
 
     protected $fillable = [
         'product_id', 'discount', 'title', 'description',

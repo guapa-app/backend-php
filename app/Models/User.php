@@ -36,6 +36,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         'vendor',
         'product',
         'post',
+        'offer'
     ];
 
     /**
