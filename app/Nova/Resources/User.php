@@ -2,9 +2,11 @@
 
 namespace App\Nova\Resources;
 
+use App\Helpers\Common;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
@@ -87,11 +89,6 @@ class User extends Resource
         $returned_arr = [
             ID::make()->sortable(),
 
-//            Images::make(__('photo'), 'photo') // second parameter is the media collection name
-//    ->temporary(now()->addMinutes(5))
-//            ->conversionOnIndexView('small') // conversion used to display the image
-//            ->rules('required'), // validation rules
-
             Text::make('Name')
                 ->sortable()
                 ->rules('required', 'max:255'),
@@ -101,20 +98,6 @@ class User extends Resource
                 ->rules('required', 'email', 'max:254')
                 ->creationRules('unique:users,email')
                 ->updateRules('unique:users,email,{{resourceId}}'),
-
-            PhoneNumber::make(__('phone'), 'phone')
-//                ->resolveUsing(function ($value) {
-//                    return $value;
-//                })
-                ->fillUsing(function (NovaRequest $request, $model, $attribute, $requestAttribute) {
-                    $value = $request[$requestAttribute];
-                    $string = str_replace(' ', '-', $value); // Replaces all spaces with hyphens.
-                    $string = preg_replace('/[^0-9]/', '', $string); // Removes special chars.
-                    $model->{$attribute} = $string;
-                })
-                ->required()
-                ->updateRules('unique:users,phone,{{resourceId}}')
-                ->onlyCountries('SA', 'EG'),
 
             Select::make(__('status'), 'status')
                 ->options([
@@ -130,7 +113,25 @@ class User extends Resource
                 ->creationRules('required', 'string', 'min:8')
                 ->updateRules('nullable', 'string', 'min:8'),
 
-            DateTime::make(__('phone verified at'), 'phone_verified_at'),
+            Text::make(__('phone'), 'phone')
+                ->fillUsing(function (NovaRequest $request, $model, $attribute, $requestAttribute) {
+                    $value = Common::removeZeroFromPhoneNumber($request[$requestAttribute]);
+                    $string = str_replace(' ', '', $value); // Replaces all spaces with hyphens.
+                    $string = preg_replace('/[^0-9]/', '', $string); // Removes special chars.
+                    $model->{$attribute} = $string;
+                })
+                ->required()
+                ->rules('required','unique:users,phone')
+                ->updateRules('unique:users,phone,{{resourceId}}')
+                ->withMeta([
+                    'onlyCountries' => Arr::flatten(['SA', 'EG']),
+                ])->hideFromIndex(),
+
+            DateTime::make(__('phone verified at'), 'phone_verified_at')
+                ->showOnIndex(false),
+            DateTime::make(__('email verified at'), 'email_verified_at')
+                ->showOnIndex(false)
+                ->help('<strong>If you verify email and user is a vendor he will login from CMS, <span class="text-red-500 text-sm">so make sure the email is valid</span></strong>'),
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
 
@@ -148,10 +149,12 @@ class User extends Resource
         return [
             Text::make(__('First Name'), 'profile.first_name')
                 ->sortable()
+                ->hideFromIndex()
                 ->rules('string', 'max:191'),
 
             Text::make(__('Last Name'), 'profile.last_name')
                 ->sortable()
+                ->hideFromIndex()
                 ->rules('string', 'max:191'),
 
             Select::make(__('Gender'), 'profile.gender')
