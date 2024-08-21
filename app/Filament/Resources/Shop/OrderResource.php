@@ -7,9 +7,13 @@ use App\Filament\Resources\Shop\OrderResource\Pages;
 use App\Filament\Resources\Shop\OrderResource\RelationManagers;
 use App\Filament\Resources\Shop\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
+use App\Notifications\PushNotification;
 use App\Traits\FilamentVendorAccess;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Actions;
+
+use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -49,14 +53,57 @@ class OrderResource extends Resource
                     ])
                     ->columnSpan(['lg' => 1])
                     ->hidden(fn (?Order $record) => $record === null),
-            ])
+
+                   Forms\Components\Section::make('Order Items')
+                        ->schema([
+                        Forms\Components\Placeholder::make('')
+                            ->content(fn ($record) =>  view('filament.resources.shop.orders.items', [
+                                'items' => $record->items,
+                            ])),
+                    ])
+                ->columnSpan(['lg' => 3])
+                ->hidden(fn (?Order $record) => $record === null),
+                        ])
             ->columns(3);
+
+    }
+
+    public static function getFormSchema(string $section = null): array
+    {
+        return [
+            Forms\Components\Placeholder::make('id')
+                ->label('Order ID')
+                ->content(fn (Order $record): ?string => $record->id),
+
+            Forms\Components\Placeholder::make('status')
+                ->label('Status')
+                ->content(fn (Order $record): ?string => $record->status->value),
+            Forms\Components\Placeholder::make('total')
+                ->label('Total')
+                ->content(fn (Order $record): ?string => $record->total),
+
+            Forms\Components\Placeholder::make('name')
+                ->label('Customer Name')
+                ->content(fn (Order $record): ?string => $record->name),
+
+            Forms\Components\Placeholder::make('phone')
+                ->label('Phone')
+                ->content(fn (Order $record): ?string => $record->phone),
+
+            Forms\Components\Placeholder::make('note')
+                ->label('Note')
+                ->content(fn (Order $record): ?string => $record->note),
+
+        ];
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('total')
                     ->numeric()
                     ->sortable(),
@@ -77,6 +124,14 @@ class OrderResource extends Resource
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->color('success'),
+                Tables\Actions\Action::make('sendNotification')
+                    ->label('Send Notification')
+                    ->action(fn ($record) => static::sendNotification($record))
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->status === OrderStatus::Pending)
+                    ->icon('heroicon-o-bell')
+                    ->color('warning'),
             ]);
     }
 
@@ -100,35 +155,15 @@ class OrderResource extends Resource
             'index'  => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit'   => Pages\EditOrder::route('/{record}/edit'),
+            'view'   => Pages\ViewOrder::route('/{record}'),
         ];
     }
 
-    public static function getFormSchema(string $section = null): array
+
+    protected function getActions(): array
     {
         return [
-            Forms\Components\Select::make('status')
-                ->options(OrderStatus::availableForUpdateByVendor())
-                ->required()
-                ->native(false),
-            Forms\Components\TextInput::make('total')
-                ->required()
-                ->numeric()
-                ->disabled(),
-            Forms\Components\Textarea::make('note')
-                ->maxLength(65535)
-                ->columnSpanFull()
-                ->disabled(),
-            Forms\Components\TextInput::make('name')
-                ->maxLength(255)
-                ->disabled(),
-            Forms\Components\TextInput::make('phone')
-                ->tel()
-                ->maxLength(255)
-                ->disabled(),
-            Forms\Components\Textarea::make('cancellation_reason')
-                ->maxLength(65535)
-                ->columnSpanFull()
-                ->disabled(),
+            Actions\ViewAction::make(),
         ];
     }
 
@@ -141,4 +176,22 @@ class OrderResource extends Resource
     {
         return false;
     }
+
+    public static function sendNotification($order)
+    {
+        $message = 'تذكير: لديك طلب غير مكتمل. يرجى إكمال البيانات وإتمام الدفع لتأكيد طلبك.';
+
+        // Sending the notification
+        $order->user->notify(new PushNotification(
+            'تذكير بالطلب غير المكتمل',
+            $message,
+            ''
+        ));
+
+        FilamentNotification::make()
+            ->title('Notification sent successfully.')
+            ->success()
+            ->send();
+    }
+
 }

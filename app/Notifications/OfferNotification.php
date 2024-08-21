@@ -83,7 +83,7 @@ class OfferNotification extends Notification implements ShouldQueue
             'variables' => [
                 'username' => $notifiable->name,
                 'discount' => $this->offer->discount_string,
-                'image' => $offer->image?->getUrl() ?? $this->offer->product->image?->getUrl(),
+                'image' => $this->offer->image?->url ?? $this->offer->product->image?->url,
                 'title' => $this->offer->product->title,
             ],
             "campaignVersion"=> "01916c78-2738-877c-032a-6200d8561815"
