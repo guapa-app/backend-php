@@ -279,4 +279,27 @@ class VendorService
     {
         return (int)Redis::hincrby("vendor:{$id}", 'views_count', 1);
     }
+
+    public function addSocialMedia(Vendor $vendor, $data)
+    {
+        return $vendor->socialMedia()
+            ->attach($data['social_media_id'],
+            ['link' => $data['link'],
+        ]);
+    }
+
+    public function updateSocialMedia(Vendor $vendor, $socialMediaId, $data)
+    {
+        return $vendor->socialMedia()
+            ->updateExistingPivot($socialMediaId,
+            ['link' => $data['link'],
+        ]);
+    }
+
+    public function deleteSocialMedia(Vendor $vendor, $socialMediaId)
+    {
+        return $vendor->socialMedia()->detach([
+            $socialMediaId
+        ]);
+    }
 }
