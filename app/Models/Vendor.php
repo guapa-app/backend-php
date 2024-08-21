@@ -198,6 +198,13 @@ class Vendor extends Model implements HasMedia, HasReviews
             ->where('collection_name', 'logos');
     }
 
+    public function socialMedia(): BelongsToMany
+    {
+        return $this->belongsToMany(SocialMedia::class)
+            ->withPivot('link')
+            ->withTimestamps();
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(UserVendor::class);
@@ -381,7 +388,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses');
+        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia', 'socialMedia.icon');
         $query->withCount('products', 'activeOffers', 'services', 'orders_order', 'orders_consultations');
 
         if (\request()->load_products) {

@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\VendorController as ApiVendorController;
 use App\Http\Requests\VendorRequest;
 use App\Http\Resources\VendorResource;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 
 class VendorController extends ApiVendorController

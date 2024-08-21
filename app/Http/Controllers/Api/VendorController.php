@@ -13,8 +13,8 @@ use Illuminate\Http\Request;
  */
 class VendorController extends BaseApiController
 {
-    private $vendorRepository;
-    private $vendorService;
+    protected $vendorRepository;
+    Protected $vendorService;
 
     public function __construct(VendorRepositoryInterface $vendorRepository, VendorService $vendorService)
     {
