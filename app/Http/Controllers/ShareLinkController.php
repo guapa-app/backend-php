@@ -33,7 +33,7 @@ class ShareLinkController extends Controller
 
         $shareLink->save();
 
-        return response()->json(['link' => $link]);
+        return $this->successJsonRes(['link' => $link], __('api.success'));
     }
 
     public function redirect($identifier)
@@ -87,7 +87,7 @@ class ShareLinkController extends Controller
             $androidAppLink = "intent://{$shareLink->shareable_type}/{$shareLink->shareable_id}#Intent;scheme=https;package=com.guapanozom.app;end";
             $playStoreLink = "https://play.google.com/store/apps/details?id=com.guapanozom.app"; //com.yourapp.package
             // iOS
-            $iosAppLink = "1552554758://{$shareLink->shareable_type}/{$shareLink->shareable_id}";
+            $iosAppLink = "guapa://{$shareLink->shareable_type}/{$shareLink->shareable_id}";
             $appStoreLink = "https://apps.apple.com/sa/app/guapa/id1552554758"; //idYOUR_APP_ID
 
             return response()->view('redirect', [
