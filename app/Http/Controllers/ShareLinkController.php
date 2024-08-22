@@ -50,7 +50,6 @@ class ShareLinkController extends Controller
 
     private function getModelClass($type)
     {
-        dd($type);
         $modelClasses = [
             'vendor' => Vendor::class,
             'product' => Product::class,
@@ -85,11 +84,11 @@ class ShareLinkController extends Controller
         // Check if the request comes from a mobile device
         if ($this->isMobile($userAgent)) {
             // Android
-            $androidAppLink = "intent://product/{$shareLink->shareable_id}#Intent;scheme=1:203201234921:android:8e972980a2935c91316d78;package=com.guapa.app;end";
-            $playStoreLink = "https://play.google.com/store/apps/details?id=com.guapa.app"; //com.yourapp.package
+            $androidAppLink = "intent://{$shareLink->shareable_type}/{$shareLink->shareable_id}#Intent;scheme=https;package=com.guapanozom.app;end";
+            $playStoreLink = "https://play.google.com/store/apps/details?id=com.guapanozom.app"; //com.yourapp.package
             // iOS
-            $iosAppLink = "1552554758://product/{$shareLink->shareable_id}";
-            $appStoreLink = "https://apps.apple.com/app/1:203201234921:ios:6e6fab50681af483316d78"; //idYOUR_APP_ID
+            $iosAppLink = "1552554758://{$shareLink->shareable_type}/{$shareLink->shareable_id}";
+            $appStoreLink = "https://apps.apple.com/sa/app/guapa/id1552554758"; //idYOUR_APP_ID
 
             return response()->view('redirect', [
                 'iosAppLink' => $iosAppLink,

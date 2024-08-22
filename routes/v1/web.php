@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/.well-known/apple-developer-merchantid-domain-association', function () {
     return view('apple_pay');
 });
+
 Route::get('/{id}/show-invoice', [OrderController::class, 'showInvoice']);
 
 Route::get('/', function () {
