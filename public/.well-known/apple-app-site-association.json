@@ -1,0 +1,14 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "S48UWD2347.com.nozom.cosmo",
+                "paths": [
+                    "/product/*",
+                    "/vendor/*"
+                ]
+            }
+        ]
+    }
+}
