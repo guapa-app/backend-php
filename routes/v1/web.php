@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/.well-known/apple-developer-merchantid-domain-association', function () {
     return view('apple_pay');
 });
+
 Route::get('/{id}/show-invoice', [OrderController::class, 'showInvoice']);
 
 Route::get('/', function () {
@@ -69,6 +70,9 @@ Route::post('/register', [RegistrationController::class, 'register'])->name('reg
 Route::get('/navigation', function () {
     return view('welcome');
 })->name('navigation');
+
+Route::get('/share-link', [\App\Http\Controllers\ShareLinkController::class, 'generate'])->name('share.link.generate');
+Route::get('/share/{identifier}', [\App\Http\Controllers\ShareLinkController::class, 'redirect'])->name('share.link.redirect');
 
 // Load the app for all requests
 Route::any('{any?}', function () {

@@ -161,6 +161,10 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         ];
     }
 
+    public function shareLinks()
+    {
+        return $this->morphMany(ShareLink::class, 'shareable');
+    }
 
     public function vendor(): BelongsTo
     {
