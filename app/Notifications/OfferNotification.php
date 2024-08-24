@@ -49,6 +49,7 @@ class OfferNotification extends Notification implements ShouldQueue
             'summary'    => $this->getSummary(),
             'type'       => 'new-offer',
             'title'      => 'New offer',
+            'image'      => $this->getImage(),
         ];
     }
 
@@ -83,7 +84,7 @@ class OfferNotification extends Notification implements ShouldQueue
             'variables' => [
                 'username' => $notifiable->name,
                 'discount' => $this->offer->discount_string,
-                'image' => $this->offer->image?->url ?? $this->offer->product->image?->url,
+                'image' => $this->getImage(),
                 'title' => $this->offer->product->title,
             ],
             "campaignVersion"=> "01916c78-2738-877c-032a-6200d8561815"
@@ -94,5 +95,10 @@ class OfferNotification extends Notification implements ShouldQueue
     {
         return 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title . ' من ' .
             $this->offer->product->vendor->name;
+    }
+
+    public function getImage()
+    {
+        return $this->offer->image?->url ?? $this->offer->product->image?->url;
     }
 }
