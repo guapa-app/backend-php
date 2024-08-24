@@ -58,6 +58,7 @@ class OrderNotification extends Notification
             'summary'  => $this->getSummary(),
             'type'     => $this->orderType(),
             'title'    => 'New Order',
+            'image'    => '',
         ];
     }
 

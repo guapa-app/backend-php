@@ -44,9 +44,10 @@ class PushNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => $this->title,
-            'summary' => $this->summary,
-            'image' => $this->image,
+            'title'     => $this->title,
+            'summary'   => $this->summary,
+            'image'     => $this->image,
+            'type'      => 'push-notifications',
         ];
     }
 
