@@ -52,6 +52,7 @@ class ProductNotification extends Notification implements ShouldQueue
             'summary'    => $this->getSummary(),
             'type'       => "new-$this->productType",
             'title'      => "New $this->productType",
+            'image'      => $this->product?->image?->url ?? '',
         ];
     }
 
