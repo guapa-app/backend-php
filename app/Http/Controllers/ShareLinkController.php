@@ -10,33 +10,37 @@ use Illuminate\Support\Str;
 
 class ShareLinkController extends Controller
 {
-    public function generate(Request $request)
+    public function generatelink(Request $request)
     {
-        $type = $request->input('type'); // product or vendor
-        $id = $request->input('id');
+        $data = $this->validate($request, [
+            'type' => 'required|string|in:product,vendor',
+            'id'   => 'required|numeric',
+        ]);
 
         // Validate the type and id
-        $modelClass = $this->getModelClass($type);
-        $shareable = $modelClass::findOrFail($id);
+        $modelClass = $this->getModelClass($data['type']);
+        $shareable = $modelClass::findOrFail($data['id']);
 
         // Generate unique identifier
         $identifier = Str::uuid();
-        $link = url("/share/{$identifier}");
+        $link = url("/s/{$identifier}?ref={$data['type'][0]}&key={$data['id']}");
 
         // Store the link information
-        $shareLink = new ShareLink([
-            'identifier' => $identifier,
-            'link' => $link,
+        $shareLink = ShareLink::query()->firstOrCreate(
+            [
             'shareable_type' => $modelClass, // Store fully qualified class name
             'shareable_id' => $shareable->id, // Store shareable ID
-        ]);
+        ],
+            [
+            'identifier' => $identifier,
+            'link' => $link,
+        ]
+        );
 
-        $shareLink->save();
-
-        return $this->successJsonRes(['link' => $link], __('api.success'));
+        return $this->successJsonRes(['link' => $shareLink->link], __('api.success'));
     }
 
-    public function redirect($identifier)
+    public function redirectLink($identifier)
     {
         // Find the share link by identifier
         $shareLink = ShareLink::where('identifier', $identifier)->firstOrFail();
@@ -66,7 +70,6 @@ class ShareLinkController extends Controller
     {
         $shareable = $shareLink->shareable;
 
-        # TODO replace this with schema after confirm it with mobile.
         switch (get_class($shareable)) {
             case Product::class:
                 return route('products.show', ['id' => $shareLink->shareable->id]);
@@ -85,17 +88,17 @@ class ShareLinkController extends Controller
         if ($this->isMobile($userAgent)) {
             // Android
             $androidAppLink = "intent://{$shareLink->shareable_type}/{$shareLink->shareable_id}#Intent;scheme=https;package=com.guapanozom.app;end";
-            $playStoreLink = "https://play.google.com/store/apps/details?id=com.guapanozom.app"; //com.yourapp.package
+            $playStoreLink = 'https://play.google.com/store/apps/details?id=com.guapanozom.app'; //com.yourapp.package
             // iOS
             $iosAppLink = "guapa://{$shareLink->shareable_type}/{$shareLink->shareable_id}";
-            $appStoreLink = "https://apps.apple.com/sa/app/guapa/id1552554758"; //idYOUR_APP_ID
+            $appStoreLink = 'https://apps.apple.com/sa/app/guapa/id1552554758'; //idYOUR_APP_ID
 
             return response()->view('redirect', [
                 'iosAppLink' => $iosAppLink,
                 'androidAppLink' => $androidAppLink,
                 'appStoreLink' => $appStoreLink,
                 'playStoreLink' => $playStoreLink,
-                'webUrl' => $itemUrl
+                'webUrl' => $itemUrl,
             ]);
         }
 

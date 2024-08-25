@@ -2,23 +2,10 @@
 
 namespace App\Providers;
 
-use App\Events\OfferCreated;
-use App\Events\ProductCreated;
-use App\Listeners\OfferCreatedListener;
-use App\Listeners\ProductCreatedListener;
-use App\Models\Offer;
-use App\Models\Order;
-use App\Models\Product;
-use App\Models\Setting;
-use App\Models\User;
-use App\Models\WorkDay;
-use App\Observers\OfferObserver;
-use App\Observers\OrderObserver;
-use App\Observers\PermissionObserver;
-use App\Observers\ProductObserver;
-use App\Observers\SettingObserver;
-use App\Observers\UserObserver;
-use App\Observers\WorkDayObserver;
+use App\Events;
+use App\Listeners;
+use App\Models;
+use App\Observers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -36,12 +23,12 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
 
-        ProductCreated::class => [
-            ProductCreatedListener::class,
+        Events\ProductCreated::class => [
+            Listeners\ProductCreatedListener::class,
         ],
 
-        OfferCreated::class => [
-            OfferCreatedListener::class,
+        Events\OfferCreated::class => [
+            Listeners\OfferCreatedListener::class,
         ],
     ];
 
@@ -52,12 +39,13 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        User::observe(UserObserver::class);
-        Offer::observe(OfferObserver::class);
-        Product::observe(ProductObserver::class);
-        WorkDay::observe(WorkDayObserver::class);
-        Order::observe(OrderObserver::class);
-        Setting::observe(SettingObserver::class);
-        Permission::observe(PermissionObserver::class);
+        Permission::observe(Observers\PermissionObserver::class);
+        Models\User::observe(Observers\UserObserver::class);
+        Models\Offer::observe(Observers\OfferObserver::class);
+        Models\Order::observe(Observers\OrderObserver::class);
+        Models\Product::observe(Observers\ProductObserver::class);
+        Models\WorkDay::observe(Observers\WorkDayObserver::class);
+        Models\Setting::observe(Observers\SettingObserver::class);
+        Models\ShareLink::observe(Observers\ShareLinkObserver::class);
     }
 }
