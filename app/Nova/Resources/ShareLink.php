@@ -43,8 +43,6 @@ class ShareLink extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('link')->onlyOnDetail(),
-            Text::make('link')->onlyOnDetail(),
             MorphTo::make(__('shareable'), 'shareable')->types([
                 Product::class,
                 Vendor::class,
@@ -55,6 +53,7 @@ class ShareLink extends Resource
                     return $query->product();
                 }
             })->withoutTrashed(),
+            Text::make('link')->exceptOnForms(),
         ];
     }
 
