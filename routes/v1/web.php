@@ -71,8 +71,8 @@ Route::get('/navigation', function () {
     return view('welcome');
 })->name('navigation');
 
-Route::get('/share-link', [\App\Http\Controllers\ShareLinkController::class, 'generate'])->name('share.link.generate');
-Route::get('/share/{identifier}', [\App\Http\Controllers\ShareLinkController::class, 'redirect'])->name('share.link.redirect');
+Route::get('/share-link', [\App\Http\Controllers\ShareLinkController::class, 'generateLink'])->name('share.link.generate');
+Route::get('/s/{identifier}', [\App\Http\Controllers\ShareLinkController::class, 'redirectLink'])->name('share.link.redirect');
 
 // Load the app for all requests
 Route::any('{any?}', function () {
