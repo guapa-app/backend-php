@@ -86,11 +86,14 @@ class ShareLinkController extends Controller
 
         // Check if the request comes from a mobile device
         if ($this->isMobile($userAgent)) {
+            $queryParams = parse_url($shareLink->link)['query'];
+            parse_str($queryParams, $queryParams);
+
             // Android
             $androidAppLink = "intent://{$shareLink->shareable_type}/{$shareLink->shareable_id}#Intent;scheme=https;package=com.guapanozom.app;end";
             $playStoreLink = 'https://play.google.com/store/apps/details?id=com.guapanozom.app'; //com.yourapp.package
             // iOS
-            $iosAppLink = "guapa://share?". parse_url($shareLink->link)['query'];
+            $iosAppLink = "guapa://share?ref={$queryParams['ref']}&key={$queryParams['key']}";
             $appStoreLink = 'https://apps.apple.com/sa/app/guapa/id1552554758'; //idYOUR_APP_ID
 
             return response()->view('redirect', [
