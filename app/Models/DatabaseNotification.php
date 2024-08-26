@@ -10,7 +10,7 @@ use \Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
  */
 class DatabaseNotification extends BaseDatabaseNotification
 {
-    public function scopeFilter(Builder $query, string $type): void
+    public function scopeFilter(Builder $query, ?string $type): void
     {
         $query->when($type, fn(Builder $query) => $query->where('data->type', $type));
     }
