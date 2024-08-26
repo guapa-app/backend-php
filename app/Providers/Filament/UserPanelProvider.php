@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\ContractWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -47,7 +48,8 @@ class UserPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets/GuapaPlus'), for: 'App\\Filament\\Widgets\\GuapaPlus')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                ContractWidget::class,
+//                Widgets\FilamentInfoWidget::class,
             ])
             ->navigationGroups([
                 'Info',

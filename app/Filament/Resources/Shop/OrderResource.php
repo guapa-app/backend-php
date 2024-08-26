@@ -40,20 +40,22 @@ class OrderResource extends Resource
                             ->columns(2),
                     ])
                     ->columnSpan(['lg' => fn (?Order $record) => $record === null ? 3 : 2]),
-
                 Forms\Components\Section::make()
                     ->schema([
-                        Forms\Components\Placeholder::make('created_at')
-                            ->label('Created at')
-                            ->content(fn (Order $record): ?string => $record->created_at?->diffForHumans()),
+                        Forms\Components\Placeholder::make('paid_amount')
+                            ->label('Paid Amount')
+                            ->content(fn (Order $record): ?string => $record->paid_amount),
 
-                        Forms\Components\Placeholder::make('updated_at')
-                            ->label('Last modified at')
-                            ->content(fn (Order $record): ?string => $record->updated_at?->diffForHumans()),
+                        Forms\Components\Placeholder::make('paid_amount_with_taxes')
+                            ->label('Paid Amount with Taxes')
+                            ->content(fn (Order $record): ?string => $record->paid_amount_with_taxes),
+                        Forms\Components\Placeholder::make('remaining_amount')
+                            ->label('Remaining Amount')
+                            ->content(fn (Order $record): ?string => $record->remaining_amount),
                     ])
                     ->columnSpan(['lg' => 1])
                     ->hidden(fn (?Order $record) => $record === null),
-
+                   
                    Forms\Components\Section::make('Order Items')
                         ->schema([
                         Forms\Components\Placeholder::make('')
@@ -93,6 +95,14 @@ class OrderResource extends Resource
             Forms\Components\Placeholder::make('note')
                 ->label('Note')
                 ->content(fn (Order $record): ?string => $record->note),
+
+            Forms\Components\Placeholder::make('created_at')
+                ->label('Created at')
+                ->content(fn (Order $record): ?string => $record->created_at?->diffForHumans()),
+
+            Forms\Components\Placeholder::make('updated_at')
+                ->label('Last modified at')
+                ->content(fn (Order $record): ?string => $record->updated_at?->diffForHumans()),
 
         ];
     }

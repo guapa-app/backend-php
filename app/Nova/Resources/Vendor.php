@@ -3,6 +3,7 @@
 namespace App\Nova\Resources;
 
 use Bissolli\NovaPhoneField\PhoneNumber;
+use Ebess\AdvancedNovaMediaLibrary\Fields\Files;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Inspheric\Fields\Email;
@@ -118,6 +119,11 @@ class Vendor extends Resource
 
             Textarea::make(__('about'), 'about')
                 ->nullable(),
+
+            Files::make(__('Contract'), 'contract')
+                ->temporary(now()->addMinutes(5))
+                ->rules( 'nullable') // Add appropriate validation rules
+                ->help('Upload the vendor contract (PDF, DOC, or DOCX file)'),
 
             Panel::make(__('social media'), $this->socialMediaFields()),
 
