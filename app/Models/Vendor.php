@@ -137,6 +137,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logos')->singleFile();
+        $this->addMediaCollection('contract')->singleFile();
     }
 
     /**
@@ -201,6 +202,12 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         return $this->morphOne('App\Models\Media', 'model')
             ->where('collection_name', 'logos');
+    }
+
+    public function contract(): MorphOne
+    {
+        return $this->morphOne('App\Models\Media', 'model')
+            ->where('collection_name', 'contract');
     }
 
     public function socialMedia(): BelongsToMany
