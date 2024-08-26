@@ -12,6 +12,10 @@ class ShareLink extends Model
 
     protected $fillable = ['identifier', 'shareable_id', 'shareable_type', 'link'];
 
+    protected $filterable = [
+        'shareable_id', 'shareable_type',
+    ];
+
     public function shareable()
     {
         return $this->morphTo();
