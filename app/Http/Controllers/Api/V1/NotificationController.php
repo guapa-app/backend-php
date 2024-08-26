@@ -35,4 +35,9 @@ class NotificationController extends ApiNotificationController
 
         return $this->successJsonRes([], __('api.success'));
     }
+
+    public function types()
+    {
+        return $this->successJsonRes(['types' => parent::types()], __('api.success'));
+    }
 }
