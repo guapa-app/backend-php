@@ -8,6 +8,7 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
@@ -79,6 +80,12 @@ class Post extends Model implements Listable, HasMedia
         return $this->belongsTo(Taxonomy::class, 'category_id');
     }
 
+    public function socialMedia(): BelongsToMany
+    {
+        return $this->belongsToMany(SocialMedia::class)
+            ->withPivot('link');
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
@@ -123,7 +130,7 @@ class Post extends Model implements Listable, HasMedia
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('admin', 'media', 'category');
+        $query->with('admin', 'media', 'category', 'socialMedia', 'socialMedia.icon');
         $query->withCount('comments');
 
         return $query;

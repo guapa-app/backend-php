@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\V3;
 
-use App\Http\Resources\MediaResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +19,7 @@ class SocialMediaResource extends JsonResource
             'name'                  => (string) $this->name,
 
             $this->mergeWhen(isset($this->pivot), [
-                'link'                      => (string)$this->pivot?->link,
+                'link'                      => (string) $this->pivot?->link,
             ]),
 
             'icon'                  => MediaResource::make($this->whenLoaded('icon')),
