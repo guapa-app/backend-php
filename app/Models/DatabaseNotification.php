@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 use \Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
 
 /**
+ * Class DatabaseNotification
+ *
  * @method self filter(string $type)
  */
 class DatabaseNotification extends BaseDatabaseNotification
