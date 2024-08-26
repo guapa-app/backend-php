@@ -30,6 +30,12 @@ class SocialMedia extends Model implements Listable, HasMedia
             ->withTimestamps();
     }
 
+    public function posts(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class)
+            ->withPivot('link');
+    }
+
     public function icon(): MorphOne
     {
         return $this->morphOne(Media::class, 'model')

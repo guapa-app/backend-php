@@ -19,7 +19,6 @@ class PostResource extends JsonResource
             'is_liked'      => $this->is_liked,
 
             'created_at'  => $this->created_at,
-            'updated_at'  => $this->updated_at,
 
             'admin'       => AdminResource::make($this->whenLoaded('admin')),
             'category'    => TaxonomyResource::make($this->whenLoaded('category')),
