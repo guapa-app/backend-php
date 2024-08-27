@@ -16,7 +16,7 @@ class ShareLinkObserver
     {
         Nova::whenServing(function (NovaRequest $request) use ($shareLink) {
             // Only invoked during Nova requests...
-            $shareableType = 'App\Models\\' . ucfirst(preg_replace('/s$/', '', $request->get('shareable_type')));
+            $shareableType = ucfirst(preg_replace('/s$/', '', $request->get('shareable_type')));
             $identifier = Str::uuid();
             $link = url("/s/{$identifier}?ref={$request['shareable_type'][0]}&key={$request['shareable']}");
 
@@ -33,7 +33,6 @@ class ShareLinkObserver
             }
 
             $shareLink->fill([
-                'shareable_type' => $shareableType,
                 'identifier' => $identifier,
                 'link' => $link,
             ]);
