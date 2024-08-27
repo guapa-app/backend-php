@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V3;
 
+use App\Http\Resources\AddressResource;
 use App\Http\Resources\MediaResource;
 use App\Http\Resources\OfferResource;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -23,7 +24,7 @@ class ProductResource extends JsonResource
             'status'                                => $this->status,
 //            'review'                                => $this->review,
 //            'type'                                  => $this->type,
-//            'terms'                                 => (string) $this->terms,
+            'terms'                                 => (string) $this->terms,
 //            'url'                                   => (string) $this->url,
 //            'likes_count'                           => (int) $this->likes_count,
 //            'is_liked'                              => (bool) $this->is_liked,
@@ -31,7 +32,7 @@ class ProductResource extends JsonResource
             'offer'                                 => OfferResource::make($this->whenLoaded('offer')),
 //            'vendor'                                => VendorResource::make($this->whenLoaded('vendor')),
 //            'taxonomies'                            => TaxonomyResource::collection($this->whenLoaded('taxonomies')),
-//            'addresses'                             => AddressResource::collection($this->whenLoaded('addresses')),
+            'addresses'                             => AddressResource::collection($this->whenLoaded('addresses')),
             'images'                                => MediaResource::collection($this->whenLoaded('media')),
         ];
 
