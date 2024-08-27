@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Events\ProductCreated;
 use App\Helpers\Common;
 use App\Models\Product;
+use Illuminate\Support\Str;
 
 class ProductObserver
 {
@@ -27,6 +28,16 @@ class ProductObserver
      */
     public function created(Product $product)
     {
+        // Generate unique identifier
+        $identifier = Str::uuid();
+        $link = url("/s/{$identifier}?ref=p&key=$product->id");
+
+        $product->shareLink()->createQuietly([
+            // Generate unique identifier
+            'identifier' => $identifier,
+            'link' => $link,
+        ]);
+
         event(new ProductCreated($product));
     }
 }

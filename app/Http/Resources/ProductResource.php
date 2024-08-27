@@ -25,9 +25,7 @@ class ProductResource extends JsonResource
             'url'                                   => (string) $this->url,
             'likes_count'                           => (int) $this->likes_count,
             'is_liked'                              => (bool) $this->is_liked,
-
-
-
+            'shared_link'                            => $this->shared_link,
 
             'offer'                                 => OfferResource::make($this->whenLoaded('offer')),
             'vendor'                                => VendorResource::make($this->whenLoaded('vendor')),

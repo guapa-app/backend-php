@@ -23,16 +23,16 @@ class ShareLink extends Model
 
     public function scopeVendor(Builder $query): Builder
     {
-        return $query->where('shareable_type', Vendor::class);
+        return $query->where('shareable_type', 'vendor');
     }
 
     public function scopeProduct(Builder $query): Builder
     {
-        return $query->where('shareable_type', Product::class);
+        return $query->where('shareable_type', 'product');
     }
 
     public function scopeOffer(Builder $query): Builder
     {
-        return $query->where('shareable_type', Offer::class);
+        return $query->where('shareable_type', 'offer');
     }
 }
