@@ -2,7 +2,6 @@
 
 namespace App\Nova\Resources;
 
-use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -42,7 +41,6 @@ class ShareLink extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make()->sortable(),
             MorphTo::make(__('shareable'), 'shareable')->types([
                 Product::class,
                 Vendor::class,
