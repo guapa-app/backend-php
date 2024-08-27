@@ -15,12 +15,14 @@ class OrderUpdatedNotification extends Notification
 
     /**
      * The user who made the order.
+     *
      * @var User
      */
     public $user;
 
     /**
      * Order object.
+     *
      * @var Order
      */
     public $order;
@@ -39,7 +41,7 @@ class OrderUpdatedNotification extends Notification
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return array
      */
     public function via($notifiable)
@@ -54,10 +56,10 @@ class OrderUpdatedNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'order_id' => $this->order->id,
-            'summary'  => $this->getSummary(),
-            'type'     => $this->orderType(),
-            'title'    => 'Update Order',
+            'id' => $this->order->id,
+            'summary' => $this->getSummary(),
+            'type' => $this->orderType(),
+            'title' => 'Update Order',
         ];
     }
 
@@ -73,20 +75,20 @@ class OrderUpdatedNotification extends Notification
     {
         $this->order->loadMissing('vendor');
 
-        return "------------------------\n" .
-            "فريق قوابا يشعركم بوجود تحديث علي طلبكم ارجو التحقق من مركز الطلبات في التطبيق\n" .
-            "------------------------\n" .
-            'نوع الطلب: ' . $this->orderType() . "\n" .
-            'رقم الطلب: ' . $this->order->id . "\n" .
-            'التاجر: ' . $this->order->vendor->name . "\n" .
-            "------------------------\n" .
+        return "------------------------\n".
+            "فريق قوابا يشعركم بوجود تحديث علي طلبكم ارجو التحقق من مركز الطلبات في التطبيق\n".
+            "------------------------\n".
+            'نوع الطلب: '.$this->orderType()."\n".
+            'رقم الطلب: '.$this->order->id."\n".
+            'التاجر: '.$this->order->vendor->name."\n".
+            "------------------------\n".
             'قوابا';
     }
 
     /**
      * Get fcm representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      *
      * @return FcmMessage
      */
@@ -94,15 +96,15 @@ class OrderUpdatedNotification extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title'         => 'Update order',
-            'body'          => $this->getSummary(),
-            'sound'         => 'default',
-            'icon'          => '',
-            'click_action'  => '',
+            'title' => 'Update order',
+            'body' => $this->getSummary(),
+            'sound' => 'default',
+            'icon' => '',
+            'click_action' => '',
         ])->data([
-            'type'          => $this->orderType(),
-            'summary'       => $this->getSummary(),
-            'order_id'      => $this->order->id,
+            'type' => $this->orderType(),
+            'summary' => $this->getSummary(),
+            'order_id' => $this->order->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
@@ -119,10 +121,10 @@ class OrderUpdatedNotification extends Notification
         $this->order->loadMissing('items');
         foreach ($this->order->items as $item) {
             if ($item->appointment != null) {
-                return $type . 'consultation';
+                return $type.'consultation';
             }
         }
 
-        return $type . 'order';
+        return $type.'order';
     }
 }
