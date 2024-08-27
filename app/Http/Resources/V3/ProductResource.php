@@ -5,6 +5,7 @@ namespace App\Http\Resources\V3;
 use App\Http\Resources\AddressResource;
 use App\Http\Resources\MediaResource;
 use App\Http\Resources\OfferResource;
+use App\Http\Resources\V3\VendorResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
 
@@ -15,7 +16,6 @@ class ProductResource extends JsonResource
         $returned_arr = [
             'id'                                    => $this->id,
             'hash_id'                               => (string) $this->hash_id,
-//            'vendor_id'                             => $this->vendor_id,
             'title'                                 => (string) $this->title,
             'description'                           => (string) $this->description,
             'address'                               => (string) $this->address,
@@ -30,7 +30,7 @@ class ProductResource extends JsonResource
 //            'is_liked'                              => (bool) $this->is_liked,
             'payment_details'                        => $this->payment_details,
             'offer'                                 => OfferResource::make($this->whenLoaded('offer')),
-//            'vendor'                                => VendorResource::make($this->whenLoaded('vendor')),
+            'vendor'                                => VendorResource::make($this->whenLoaded('vendor')),
 //            'taxonomies'                            => TaxonomyResource::collection($this->whenLoaded('taxonomies')),
             'addresses'                             => AddressResource::collection($this->whenLoaded('addresses')),
             'images'                                => MediaResource::collection($this->whenLoaded('media')),
