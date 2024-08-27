@@ -75,6 +75,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     protected $appends = [
         'specialty_ids', 'likes_count', 'is_liked',
         'views_count', 'shares_count', 'work_days',
+        'shared_link',
     ];
 
     /**
@@ -102,6 +103,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         }
 
         return [];
+    }
+
+    public function getSharedLinkAttribute()
+    {
+        return $this->shareLink->link;
     }
 
     public function getSharesCountAttribute()
@@ -188,9 +194,9 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->logo();
     }
 
-    public function shareLinks()
+    public function shareLink()
     {
-        return $this->morphMany(ShareLink::class, 'shareable');
+        return $this->morphOne(ShareLink::class, 'shareable');
     }
 
     /**

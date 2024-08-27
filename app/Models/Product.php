@@ -43,6 +43,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     protected $appends = [
         'likes_count', 'is_liked', 'taxonomy_name',
+        'shared_link',
     ];
 
     /**
@@ -96,6 +97,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             ->performOnCollections('products');
     }
 
+    public function getSharedLinkAttribute()
+    {
+        return $this->shareLink->link;
+    }
+
     public function getTaxonomyNameAttribute()
     {
         return $this->getRelations()['taxonomies'][0]->title ?? '';
@@ -128,9 +134,9 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             0;
     }
 
-    public function shareLinks()
+    public function shareLink()
     {
-        return $this->morphMany(ShareLink::class, 'shareable');
+        return $this->morphone(ShareLink::class, 'shareable');
     }
 
     public function vendor(): BelongsTo
