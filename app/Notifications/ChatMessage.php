@@ -31,7 +31,7 @@ class ChatMessage extends Notification
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return array
      */
     public function via($notifiable)
@@ -47,7 +47,7 @@ class ChatMessage extends Notification
     /**
      * Get fcm representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      *
      * @return FcmMessage
      */
@@ -55,17 +55,17 @@ class ChatMessage extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title'         => $this->getSenderName(),
-            'body'          => $this->getMessageBody(),
-            'sound'         => 'default', // Optional
-            'icon'          => '', // Optional
-            'click_action'  => '', // Optional
+            'title' => $this->getSenderName(),
+            'body' => $this->getMessageBody(),
+            'sound' => 'default', // Optional
+            'icon' => '', // Optional
+            'click_action' => '', // Optional
         ])->data([
-            'type'          => 'message',
-            'is_offer'      => $this->message->type === 'offer',
-            'message'       => $this->message,
-            'resource'      => 'conversations',
-            'id'            => $this->message->conversation_id,
+            'type' => 'message',
+            'is_offer' => $this->message->type === 'offer',
+            'message' => $this->message,
+            'resource' => 'conversations',
+            'id' => $this->message->conversation_id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
@@ -74,7 +74,7 @@ class ChatMessage extends Notification
     /**
      * Get the mail representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return MailMessage
      */
     public function toMail($notifiable)
@@ -88,25 +88,25 @@ class ChatMessage extends Notification
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return array
      */
     public function toArray($notifiable)
     {
         return [
-            'type'     => 'message',
+            'type' => 'message',
             'is_offer' => $this->message->type === 'offer',
-            'message'  => $this->message,
+            'message' => $this->message,
             'resource' => 'conversations',
-            'id'       => $this->message->conversation_id,
-            'summary'  => $this->getMessageBody(),
+            'id' => $this->message->conversation_id,
+            'summary' => $this->getMessageBody(),
         ];
     }
 
     /**
      * Get the broadcast representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return BroadcastMessage
      */
     public function toBroadcast($notifiable)
@@ -129,7 +129,7 @@ class ChatMessage extends Notification
     public function getMessageBody()
     {
         if ($this->message->type === 'offer') {
-            return Lang::get('New offer from') . ' ' . $this->getSenderName();
+            return Lang::get('New offer from').' '.$this->getSenderName();
         } else {
             return $this->message->message;
         }
