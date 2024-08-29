@@ -5,14 +5,8 @@ namespace App\Nova\Resources;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Inspheric\Fields\Url;
-use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\HasMany;
-use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
-use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Fields\Trix;
 
 class Post extends Resource
 {
@@ -55,24 +49,28 @@ class Post extends Resource
     public function fields(Request $request)
     {
         return [
-            ID::make(__('ID'), 'id')->sortable(),
+            Images::make(__('images'), 'posts') // second parameter is the media collection name
+                ->temporary(now()->addMinutes(5))
+                ->rules('required'), // validation rules
+
+            Fields\ID::make(__('ID'), 'id')->sortable(),
 
             // TODO: Should this be hidden?
-            BelongsTo::make(__('admin'), 'admin', Admin::class)->showCreateRelationButton(),
+            Fields\BelongsTo::make(__('admin'), 'admin', Admin::class)->showCreateRelationButton(),
 
-            BelongsTo::make(__('category'), 'category', Category::class)->showCreateRelationButton(),
+            Fields\BelongsTo::make(__('category'), 'category', Category::class)->showCreateRelationButton(),
 
-            Text::make(__('title'), 'title')
+            Fields\Text::make(__('title'), 'title')
                 ->required()
                 ->sortable()
                 ->rules('required', 'max:191'),
 
-                Trix::make(__('content'), 'content')
+            Fields\Trix::make(__('content'), 'content')
                 ->required()
                 ->sortable()
                 ->rules('required'),
 
-            Select::make(__('status'), 'status')
+            Fields\Select::make(__('status'), 'status')
                 ->default(2)
                 ->options(\App\Models\Post::STATUSES)
                 ->displayUsingLabels()
@@ -80,15 +78,17 @@ class Post extends Resource
 
             Url::make(__('youtube url'), 'youtube_url')->showOnIndex(false),
 
-            Images::make(__('images'), 'posts') // second parameter is the media collection name
-            ->temporary(now()->addMinutes(5))
-                ->rules('required'), // validation rules
+            Fields\HasMany::make(__('comments'), 'comments'),
 
-            HasMany::make(__('comments'), 'comments'),
+            Fields\BelongsToMany::make(__('social media'))
+                ->fields(function () {
+                    return [
+                        Url::make(__('link'), 'link'),
+                    ];
+                }),
 
-            DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
-
+            Fields\DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
+            Fields\DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),
         ];
     }
 

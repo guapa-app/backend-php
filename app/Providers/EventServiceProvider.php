@@ -43,9 +43,11 @@ class EventServiceProvider extends ServiceProvider
         Models\User::observe(Observers\UserObserver::class);
         Models\Offer::observe(Observers\OfferObserver::class);
         Models\Order::observe(Observers\OrderObserver::class);
+        Models\Vendor::observe(Observers\VendorObserver::class);
         Models\Product::observe(Observers\ProductObserver::class);
         Models\WorkDay::observe(Observers\WorkDayObserver::class);
         Models\Setting::observe(Observers\SettingObserver::class);
         Models\SupportMessage::observe(Observers\SupportMessageObserver::class);
+        Models\ShareLink::observe(Observers\ShareLinkObserver::class);
     }
 }

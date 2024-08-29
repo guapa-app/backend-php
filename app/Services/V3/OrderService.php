@@ -60,7 +60,7 @@ class OrderService extends BaseOrderService
 
                 $order = $this->repository->create($orderData);
 
-                $items = $this->createOrderItems($vendorProducts, $data, $order, $now, $vendorId);
+                $items = $this->createOrderItems($vendorProducts, $data, $order, $now, $vendorId, $couponResult);
 
                 // Check that provided user ids belong to vendor
                 $userIds = $items->pluck('user_id')->filter()->all();
@@ -123,9 +123,9 @@ class OrderService extends BaseOrderService
 
         return $orderData;
     }
-    private function createOrderItems($vendorProducts, $data, $order, $now, $vendorId)
+    private function createOrderItems($vendorProducts, $data, $order, $now, $vendorId, $couponResult)
     {
-        return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId) {
+        return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId , $couponResult) {
             $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
 
             if (isset($inputItem['appointment'])) {
@@ -145,6 +145,8 @@ class OrderService extends BaseOrderService
                 'product_id' => $product->id,
                 'offer_id' => optional($product->offer)->id,
                 'amount' => $this->getDiscountedPrice($product),
+                'amount_to_pay' => $this->productAmountToPay($product,$inputItem['quantity'],$couponResult),
+                'taxes'         => $this->taxesPercentage,
                 'quantity' => $inputItem['quantity'],
                 'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
                 'user_id' => $inputItem['staff_user_id'] ?? null,
@@ -174,6 +176,20 @@ class OrderService extends BaseOrderService
         } else {
             return $productCategory?->fixed_price ?? 0;
         }
+    }
+
+    private function productAmountToPay($product,$quantity,$couponResult)
+    {
+        if ($couponResult && isset($couponResult['data']['product_discounts'][$product->id]))
+        {
+            $discountedProduct = $couponResult['data']['product_discounts'][$product->id];
+            $productFees = $discountedProduct['fees'];
+        } else {
+            $price = $this->getDiscountedPrice($product);
+            $finalPrice = $price * $quantity;
+            $productFees = $this->calculateProductFees($product, $finalPrice);
+        }
+        return $productFees;
     }
 
     private function updateCouponUsage($couponId, $userId)

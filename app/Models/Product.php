@@ -27,8 +27,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Product extends Model implements Listable, HasMedia, HasReviews
 {
-    use HasFactory, ListableTrait, InteractsWithMedia, HasTaxonomies,
-        Reviewable, Likable, Relatable, SoftDeletes;
+    use HasFactory,
+        ListableTrait,
+        InteractsWithMedia,
+        HasTaxonomies,
+        Reviewable,
+        Likable,
+        Relatable,
+        SoftDeletes;
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price',
@@ -38,6 +44,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     protected $appends = [
         'likes_count', 'is_liked',
         'taxonomy_name', 'address',
+        'shared_link'
     ];
 
     /**
@@ -100,6 +107,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $city ? "$city - $countryName" : $countryName;
     }
 
+    public function getSharedLinkAttribute()
+    {
+        return $this->shareLink->link;
+    }
+
     public function getTaxonomyNameAttribute()
     {
         return $this->getRelations()['taxonomies'][0]->title ?? '';
@@ -141,6 +153,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         }
         return $price;
     }
+
     public function getPaymentDetailsAttribute()
     {
         $finalPrice = $this->offer_price; // Use the getOfferPriceAttribute method
@@ -161,6 +174,10 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         ];
     }
 
+    public function shareLink()
+    {
+        return $this->morphone(ShareLink::class, 'shareable');
+    }
 
     public function vendor(): BelongsTo
     {

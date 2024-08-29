@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\UserVendor;
+use App\Notifications\AddVendorClientNotification;
 use App\Notifications\OrderUpdatedNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -152,11 +153,18 @@ class OrderService
 
         $order = $this->repository->update($order, $data);
 
+        $user = $order->user;
+        $vendor = $order->vendor;
+        // add the client to vendor client list if the order is used
+        if ($data['status'] == (OrderStatus::Used)->value) {
+            $vendor->clients()->firstOrCreate(['user_id' =>  $user->id]);
+            Notification::send($user, new AddVendorClientNotification($vendor, false));
+        }
         if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
             $this->paymentService->refund($order);
         }
 
-        Notification::send($order->user, new OrderUpdatedNotification($order));
+        Notification::send($user, new OrderUpdatedNotification($order));
 
         return $order;
     }

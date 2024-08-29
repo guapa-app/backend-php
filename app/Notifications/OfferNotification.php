@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\WhatsAppChannel;
 use App\Models\Offer;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
@@ -34,7 +35,7 @@ class OfferNotification extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return [
-            'database', 'fcm', \App\Channels\WhatsAppChannel::class,
+            'database', 'fcm', WhatsAppChannel::class,
         ];
     }
 
@@ -45,10 +46,11 @@ class OfferNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'product_id' => $this->offer->product->id,
-            'summary'    => $this->getSummary(),
-            'type'       => 'new-offer',
-            'title'      => 'New offer',
+            'id' => $this->offer->product_id,
+            'summary' => $this->getSummary(),
+            'type' => 'new-offer',
+            'title' => 'New offer',
+            'image' => $this->getImage(),
         ];
     }
 
@@ -63,18 +65,19 @@ class OfferNotification extends Notification implements ShouldQueue
     {
         $message = new FcmMessage();
         $message->content([
-            'title'        => 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title,
-            'body'         => $this->getSummary(),
-            'sound'        => 'default', // Optional
-            'icon'         => '', // Optional
+            'title' => 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title,
+            'body' => $this->getSummary(),
+            'sound' => 'default', // Optional
+            'icon' => '', // Optional
             'click_action' => '', // Optional
         ])->data([
-            'type'         => 'new-offer',
-            'product_id'   => $this->offer->product->id,
+            'type' => 'new-offer',
+            'product_id' => $this->offer->product->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
     }
+
     public function toWhatsapp($notifiable)
     {
         return [
@@ -83,16 +86,22 @@ class OfferNotification extends Notification implements ShouldQueue
             'variables' => [
                 'username' => $notifiable->name,
                 'discount' => $this->offer->discount_string,
-                'image' => $offer->image?->getUrl() ?? $this->offer->product->image?->getUrl(),
+                'image' => $this->getImage(),
                 'title' => $this->offer->product->title,
             ],
-            "campaignVersion"=> "01916c78-2738-877c-032a-6200d8561815"
+            "campaignVersion" => "01916c78-2738-877c-032a-6200d8561815"
 
         ];
     }
+
     public function getSummary()
     {
         return 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title . ' من ' .
             $this->offer->product->vendor->name;
+    }
+
+    public function getImage()
+    {
+        return $this->offer->image?->url ?? $this->offer->product->image?->url;
     }
 }

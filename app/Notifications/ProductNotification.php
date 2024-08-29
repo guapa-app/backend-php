@@ -48,10 +48,11 @@ class ProductNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'product_id' => $this->product->id,
-            'summary'    => $this->getSummary(),
-            'type'       => "new-$this->productType",
-            'title'      => "New $this->productType",
+            'id' => $this->product->id,
+            'summary' => $this->getSummary(),
+            'type' => "new-$this->productType",
+            'title' => "New $this->productType",
+            'image' => $this->product?->image?->url ?? '',
         ];
     }
 
@@ -66,15 +67,15 @@ class ProductNotification extends Notification implements ShouldQueue
     {
         $message = new FcmMessage();
         $message->content([
-            'title'         => $this->product->title,
-            'body'          => $this->getSummary(),
-            'sound'         => 'default', // Optional
-            'icon'          => '', // Optional
-            'click_action'  => '', // Optional
+            'title' => $this->product->title,
+            'body' => $this->getSummary(),
+            'sound' => 'default', // Optional
+            'icon' => '', // Optional
+            'click_action' => '', // Optional
         ])->data([
-            'type'          => "new-$this->productType",
-            'summary'       => $this->getSummary(),
-            'product_id'    => $this->product->id,
+            'type' => "new-$this->productType",
+            'summary' => $this->getSummary(),
+            'product_id' => $this->product->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;

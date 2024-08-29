@@ -1,9 +1,16 @@
-[{
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-        "namespace": "android_app",
-        "package_name": "com.app.guapasa_provider",
-        "sha256_cert_fingerprints":
-        ["DE:9B:F2:32:C5:4D:91:7C:93:53:DF:DE:EA:5F:9C:99:B4:90:C3:92:32:53:9B:00:43:BE:6A:84:88:56:18:ED"]
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.guapanozom.app",
+            "sha256_cert_fingerprints": [
+                "6C:B0:14:30:52:8C:54:80:4C:98:D0:B7:30:26:EE:49:8A:25:67:1B:65:99:72:92:79:44:93:11:38:34:66:84",
+                "39:DB:D3:F2:01:ED:3B:D9:04:D0:0A:D5:87:D4:8A:10:AC:A9:71:F6:8F:7B:7A:78:B7:4C:45:74:53:23:4E:3E",
+                "6C:B0:14:30:52:8C:54:80:4C:98:D0:B7:30:26:EE:49:8A:25:67:1B:65:99:72:92:79:44:93:11:38:34:66:84"
+            ]
+        }
     }
-}]
+]

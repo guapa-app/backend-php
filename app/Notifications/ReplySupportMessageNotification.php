@@ -40,6 +40,7 @@ class ReplySupportMessageNotification extends Notification
             'title'      => $this->getTitle(),
             'summary'    => $this->getSummary(),
             'type'       => $this->getType(),
+            'image'      => '',
             'support_message_id' => $this->supportMessage->parent_id,
         ];
     }

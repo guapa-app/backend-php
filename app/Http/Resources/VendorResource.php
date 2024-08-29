@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\V3\SocialMediaResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VendorResource extends JsonResource
@@ -39,6 +40,7 @@ class VendorResource extends JsonResource
             'likes_count'                               => (int) $this->likes_count,
             'views_count'                               => (int) $this->views_count,
             'shares_count'                              => (int) $this->shares_count,
+            'shared_link'                               => $this->shared_link,
 
             'is_liked'                                  => (bool) $this->is_liked,
             'specialty_ids'                             => (array) $this->specialty_ids,
@@ -62,6 +64,8 @@ class VendorResource extends JsonResource
 
             'specialties'                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'appointments'                              => AppointmentResource::collection($this->whenLoaded('appointments')),
+
+            'social_media'                              => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
 
             'products'                                => ProductResource::collection($this->whenLoaded('products')),
             'services'                                => ProductResource::collection($this->whenLoaded('services')),

@@ -56,7 +56,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'phone', 'about', 'whatsapp', 'twitter',
         'instagram', 'snapchat', 'type', 'working_days',
         'working_hours', 'website_url', 'known_url', 'tax_number',
-        'cat_number', 'reg_number',
+        'cat_number', 'reg_number', 'health_declaration',
     ];
 
     /**
@@ -75,6 +75,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     protected $appends = [
         'specialty_ids', 'likes_count', 'is_liked',
         'views_count', 'shares_count', 'work_days',
+        'shared_link',
     ];
 
     /**
@@ -102,6 +103,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         }
 
         return [];
+    }
+
+    public function getSharedLinkAttribute()
+    {
+        return $this->shareLink->link;
     }
 
     public function getSharesCountAttribute()
@@ -137,6 +143,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logos')->singleFile();
+        $this->addMediaCollection('contract')->singleFile();
     }
 
     /**
@@ -188,6 +195,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->logo();
     }
 
+    public function shareLink()
+    {
+        return $this->morphOne(ShareLink::class, 'shareable');
+    }
+
     /**
      * Vendor logo relationship.
      * @return MorphOne
@@ -196,6 +208,19 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         return $this->morphOne('App\Models\Media', 'model')
             ->where('collection_name', 'logos');
+    }
+
+    public function contract(): MorphOne
+    {
+        return $this->morphOne('App\Models\Media', 'model')
+            ->where('collection_name', 'contract');
+    }
+
+    public function socialMedia(): BelongsToMany
+    {
+        return $this->belongsToMany(SocialMedia::class)
+            ->withPivot('link')
+            ->withTimestamps();
     }
 
     public function users(): HasMany
@@ -381,7 +406,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses');
+        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia', 'socialMedia.icon');
         $query->withCount('products', 'activeOffers', 'services', 'orders_order', 'orders_consultations');
 
         if (\request()->load_products) {
