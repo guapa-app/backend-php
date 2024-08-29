@@ -107,7 +107,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function getSharedLinkAttribute()
     {
-        return $this->shareLink->link;
+        return $this->shareLink?->link;
     }
 
     public function getSharesCountAttribute()
