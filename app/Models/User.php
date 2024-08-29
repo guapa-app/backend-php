@@ -287,4 +287,14 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     {
         return $this->userVendors->count() && $this->hasVerifiedEmail() && !is_null($this->phone_verified_at);
     }
+
+    /**
+     * Get the entity's notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function notifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
+    }
 }

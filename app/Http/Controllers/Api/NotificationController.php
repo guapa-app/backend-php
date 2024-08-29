@@ -31,7 +31,7 @@ class NotificationController extends BaseApiController
     public function index(Request $request)
     {
         $perPage = $request->get('perPage');
-        $notifications = $this->user->notifications()->paginate($perPage ?: 15);
+        $notifications = $this->user->notifications()->filter($request->type)->paginate($perPage ?: 15);
 
         $notifications->getCollection()->transform(function ($notification) {
             $data = $notification->data;
