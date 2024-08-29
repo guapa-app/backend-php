@@ -232,6 +232,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         return $this->hasMany(Order::class);
     }
+
     public function clients(): HasMany
     {
         return $this->hasMany(VendorClient::class);
@@ -314,6 +315,11 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
+    }
+
+    public function influencers(): HasMany
+    {
+        return $this->hasMany(Influencer::class);
     }
 
     public function hasUser(User $user, $role = null)
