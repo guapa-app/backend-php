@@ -15,12 +15,14 @@ class OrderUpdatedNotification extends Notification
 
     /**
      * The user who made the order.
+     *
      * @var User
      */
     public $user;
 
     /**
      * Order object.
+     *
      * @var Order
      */
     public $order;
@@ -54,11 +56,12 @@ class OrderUpdatedNotification extends Notification
     public function toArray($notifiable)
     {
         return [
+            'id' => $this->order->id,
             'order_id' => $this->order->id,
-            'summary'  => $this->getSummary(),
-            'type'     => $this->orderType(),
-            'title'    => 'Update Order',
-            'image'    => '',
+            'summary' => $this->getSummary(),
+            'type' => $this->orderType(),
+            'title' => 'Update Order',
+            'image' => '',
         ];
     }
 
@@ -95,15 +98,15 @@ class OrderUpdatedNotification extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title'         => 'Update order',
-            'body'          => $this->getSummary(),
-            'sound'         => 'default',
-            'icon'          => '',
-            'click_action'  => '',
+            'title' => 'Update order',
+            'body' => $this->getSummary(),
+            'sound' => 'default',
+            'icon' => '',
+            'click_action' => '',
         ])->data([
-            'type'          => $this->orderType(),
-            'summary'       => $this->getSummary(),
-            'order_id'      => $this->order->id,
+            'type' => $this->orderType(),
+            'summary' => $this->getSummary(),
+            'order_id' => $this->order->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
