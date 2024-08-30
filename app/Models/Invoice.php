@@ -11,6 +11,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'order_id',
+        'campaign_id',
         'invoice_id',
         'status',
         'amount',
@@ -32,12 +33,14 @@ class Invoice extends Model
 
     public function getVendorNameAttribute()
     {
-        return $this->order->vendor->name;
+        return $this->order ? $this->order->vendor->name :
+            ($this->marketing_campaign ? $this->marketing_campaign->vendor->name : null);
     }
 
     public function getVendorRegNumAttribute()
     {
-        return $this->order->vendor->reg_number;
+        return $this->order ? $this->order->vendor->reg_number :
+            ($this->marketing_campaign ? $this->marketing_campaign->vendor->reg_number : null);
     }
 
     public function getAmountWithoutTaxesAttribute()
@@ -45,13 +48,28 @@ class Invoice extends Model
         return $this->amount - $this->taxes;
     }
 
+
+
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
-
-    public function scopeCurrentVendor($query, $value)
+    public function marketing_campaign()
     {
-        return $query->whereRelation('order', 'vendor_id', '=', $value);
+        return $this->belongsTo(MarketingCampaign::class);
+    }
+//    public function scopeCurrentVendor($query, $value)
+//    {
+//        return $query->whereRelation('order', 'vendor_id', '=', $value);
+//    }
+    public function scopeCurrentVendor($query, $vendorId)
+    {
+        return $query->where(function($query) use ($vendorId) {
+            $query->whereHas('order', function($q) use ($vendorId) {
+                $q->where('vendor_id', $vendorId);
+            })->orWhereHas('campaign', function($q) use ($vendorId) {
+                $q->where('vendor_id', $vendorId);
+            });
+        });
     }
 }

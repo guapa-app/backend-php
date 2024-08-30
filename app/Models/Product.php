@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
@@ -214,7 +215,10 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->morphOne(Media::class, 'model')
             ->where('collection_name', 'products');
     }
-
+    public function marketingCampaigns(): MorphMany
+    {
+        return $this->morphMany(MarketingCampaign::class, 'campaignable');
+    }
     public function scopeCurrentVendor($query, $value)
     {
         return $query->where('vendor_id', $value);

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -138,7 +139,10 @@ class Offer extends Model implements Listable, HasMedia
         return $this->morphOne('App\Models\Media', 'model')
             ->where('collection_name', 'offer_images');
     }
-
+    public function marketingCampaigns(): MorphMany
+    {
+        return $this->morphMany(MarketingCampaign::class, 'campaignable');
+    }
     public function scopeActive($query): Builder
     {
         return $query->whereNull('starts_at')

@@ -48,6 +48,18 @@ class Setting extends Model
 
         return $record->s_value;
     }
+    public static function getMessageCost()
+    {
+        $record = static::firstOrCreate(['s_key' => 'message_cost'], [
+            's_value'           => 1.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min'=> 0],
+            'instructions'      => 'The cost of sending a message to the customer',
+        ]);
+
+        return $record->s_value;
+    }
 
     public static function checkTestingMode()
     {

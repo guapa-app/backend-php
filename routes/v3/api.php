@@ -25,4 +25,5 @@ Route::prefix('v3')->group(function () {
     Route::prefix('favorites')->group(base_path('routes/v3/api/favorites.php'));
     Route::prefix('social-media')->group(base_path('routes/v3/api/social_media.php'));
     Route::prefix('posts')->group(base_path('routes/v3/api/posts.php'));
+    Route::prefix('campaigns')->group(base_path('routes/v3/api/campaigns.php'));
 });

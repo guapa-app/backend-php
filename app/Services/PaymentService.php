@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\Invoice;
+use App\Models\MarketingCampaign;
+use App\Models\Order;
 use App\Models\Setting;
+use InvalidArgumentException;
 
 class PaymentService
 {
@@ -19,9 +22,9 @@ class PaymentService
         };
     }
 
-    public function generateInvoice($order, $description, $fees, $taxes)
+    public function generateInvoice($billable, $description, $fees, $taxes)
     {
-        $invoice = $this->storeInvoice($order, $description, $fees, $taxes);
+        $invoice = $this->createInvoice($billable, $description, $fees, $taxes);
 
         if (($fees + $taxes) > 0) {
             $paymentInvoice = $this->paymentService->create($invoice);
@@ -44,6 +47,31 @@ class PaymentService
         ]);
 
         return $invoice;
+    }
+
+    private function createInvoice($billable, $description, $fees, $taxes)
+    {
+        $invoiceData = [
+            'status'       => 'initiated',
+            'taxes'        => $taxes,
+            'amount'       => ($fees + $taxes),
+            'description'  => $description,
+            'currency'     => config('nova.currency'),
+        ];
+
+        if ($billable instanceof Order) {
+            $invoiceData['order_id'] = $billable->id;
+            $invoiceData['callback_url'] = config('app.url') . '/api/v2/invoices/change-status';
+            $invoiceData['description'] = "Order Invoice: \n" . $description;
+        } elseif ($billable instanceof MarketingCampaign) {
+            $invoiceData['marketing_campaign_id'] = $billable->id;
+            $invoiceData['callback_url'] = config('app.url') . '/api/v3/marketing-campaign-invoices/change-status';
+            $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
+        } else {
+            throw new InvalidArgumentException("Unsupported billable type");
+        }
+
+        return Invoice::query()->create($invoiceData);
     }
 
     public function refund($order)
