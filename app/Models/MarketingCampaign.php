@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Contracts\Listable;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
-class MarketingCampaign extends Model
+class MarketingCampaign extends Model implements Listable
 {
-    use HasFactory;
+    use HasFactory,ListableTrait;
 
     protected $fillable = [
         'vendor_id',
@@ -22,7 +26,9 @@ class MarketingCampaign extends Model
         'campaignable_id',
         'campaignable_type',
     ];
-
+    protected $filterable = [
+        'vendor_id',
+    ];
     const TYPES = [
         'product',
         'offer'
@@ -45,6 +51,34 @@ class MarketingCampaign extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'campaign_user');
+    }
+
+    public function scopeApplyFilters(Builder $builder, Request $request): Builder
+    {
+        if ($request->has('vendor_id')) {
+            $builder->where('vendor_id', (int) $request->get('vendor_id'));
+        }
+        return $builder;
+    }
+
+    public function scopeWithListRelations(Builder $builder, Request $request): Builder
+    {
+        return $builder;
+    }
+
+    public function scopeWithListCounts(Builder $builder, Request $request): Builder
+    {
+        return $builder;
+    }
+
+    public function scopeWithSingleRelations(Builder $builder): Builder
+    {
+        return $builder;
+    }
+
+    public function scopeWithApiListRelations(Builder $builder): Builder
+    {
+        return $builder;
     }
 
 }
