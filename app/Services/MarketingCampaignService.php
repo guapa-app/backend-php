@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Models\Invoice;
 use App\Models\MarketingCampaign;
 use App\Models\Offer;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Vendor;
+use App\Notifications\CampaignNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class MarketingCampaignService
 {
@@ -70,6 +74,44 @@ class MarketingCampaignService
         return $campaign;
     }
 
+    public function changeStatus(Request $request)
+    {
+        $invoice = Invoice::query()
+            ->where('invoice_id', $request->session_id ?? $request->id)
+            ->firstOrFail();
+
+        $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
+
+        if ($invoice->status == 'paid') {
+            $campaign = $invoice->campaign;
+            // handle sending  camping  messages to users here
+            $campaign->updateOrFail(['status' => 'completed']);
+
+            $this->sendCampaignMessages($campaign);
+        }
+
+        logger(
+            "Change Invoice Status By Callback URL\n
+            order { $invoice->order_id } <-> Invoice { $invoice->id }",
+            [
+                "\n***payment gateway***" => $request->all(),
+                "\n***invoice***" => $invoice->attributesToArray(),
+            ]
+        );
+
+        return true;
+    }
+
+    protected function sendCampaignMessages(MarketingCampaign $campaign)
+    {
+        $notification = new CampaignNotification($campaign);
+
+        // Get the users associated with the campaign
+        $users = $campaign->users;
+
+        // Send the notification to all users
+        Notification::send($users, $notification);
+    }
     /**
      * Get the corresponding model class for a given entity type.
      *

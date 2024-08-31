@@ -34,20 +34,20 @@ class PaymentService
         return $invoice;
     }
 
-    public function storeInvoice($order, $description, $fees = 0, $taxes = 0)
-    {
-        $invoice = Invoice::query()->create([
-            'order_id'     => $order->id,
-            'status'       => 'initiated',
-            'taxes'        => $taxes,
-            'amount'       => ($fees + $taxes),
-            'description'  => "You will pay the fees and taxes. \n" . $description,
-            'currency'     => config('nova.currency'),
-            'callback_url' => config('app.url') . '/api/v2/invoices/change-status',
-        ]);
-
-        return $invoice;
-    }
+//    public function storeInvoice($order, $description, $fees = 0, $taxes = 0)
+//    {
+//        $invoice = Invoice::query()->create([
+//            'order_id'     => $order->id,
+//            'status'       => 'initiated',
+//            'taxes'        => $taxes,
+//            'amount'       => ($fees + $taxes),
+//            'description'  => "You will pay the fees and taxes. \n" . $description,
+//            'currency'     => config('nova.currency'),
+//            'callback_url' => config('app.url') . '/api/v2/invoices/change-status',
+//        ]);
+//
+//        return $invoice;
+//    }
 
     private function createInvoice($billable, $description, $fees, $taxes)
     {
@@ -65,7 +65,7 @@ class PaymentService
             $invoiceData['description'] = "Order Invoice: \n" . $description;
         } elseif ($billable instanceof MarketingCampaign) {
             $invoiceData['marketing_campaign_id'] = $billable->id;
-            $invoiceData['callback_url'] = config('app.url') . '/api/v3/marketing-campaign-invoices/change-status';
+            $invoiceData['callback_url'] = config('app.url') . '/api/v3/campaign/change-invoice-status';
             $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
         } else {
             throw new InvalidArgumentException("Unsupported billable type");
