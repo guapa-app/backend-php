@@ -8,6 +8,7 @@ use App\Http\Requests\MarketingCampaignRequest;
 use App\Http\Requests\UpdateMarketingCampaignRequest;
 use App\Http\Resources\MarketingCampaignResource;
 use App\Models\MarketingCampaign;
+use App\Models\Setting;
 use App\Services\MarketingCampaignService;
 
 class MarketingCampaignController extends BaseApiController
@@ -42,12 +43,20 @@ class MarketingCampaignController extends BaseApiController
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(MarketingCampaignRequest $request, MarketingCampaign $marketingCampaign)
+//    availableCustomers
+    public function availableCustomers()
     {
-        //
+        $availableCustomers = Setting::getCampaignAvailableCustomers();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('api.success'),
+            'data' => $availableCustomers,
+        ]);
     }
+
+
+
+
 
 }

@@ -54,11 +54,24 @@ class Setting extends Model
             's_value'           => 1.00,
             's_unit'            => 'float',
             's_validation_type' => 'number',
-            's_validation'      => ['min'=> 0],
+            's_validation'      => ['min'=> 0, 'max'=> 1000],
             'instructions'      => 'The cost of sending a message to the customer',
         ]);
 
         return $record->s_value;
+    }
+    public static function getCampaignAvailableCustomers()
+    {
+        $record = static::firstOrCreate(['s_key' => 'campaign_available_customers'], [
+            's_value'           => '50,100,150,200',
+            's_unit'            => 'string',
+            's_validation_type' => 'string',
+            's_validation'      => null,
+            'instructions'      => 'the count of available customers that will receive the campaign(set , separated values)',
+        ]);
+
+        return explode(',', $record->s_value);
+
     }
 
     public static function checkTestingMode()
