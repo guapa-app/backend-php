@@ -27,6 +27,8 @@ class SettingObserver
         if ($setting->s_validation_type == 'options') {
             return in_array($setting->s_value, $setting->s_validation) ?: false;
         }
+
+        return true;
     }
 
     /**
