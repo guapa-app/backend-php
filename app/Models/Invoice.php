@@ -48,15 +48,13 @@ class Invoice extends Model
         return $this->amount - $this->taxes;
     }
 
-
-
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class)->withDefault();
     }
     public function marketing_campaign()
     {
-        return $this->belongsTo(MarketingCampaign::class);
+        return $this->belongsTo(MarketingCampaign::class)->withDefault();
     }
 //    public function scopeCurrentVendor($query, $value)
 //    {
