@@ -139,4 +139,9 @@ class NotificationController extends BaseApiController
     {
         return NotificationTypeEnum::cases();
     }
+
+    public function delete($id)
+    {
+        return $this->user->notifications()->where('id', $id)->delete();
+    }
 }

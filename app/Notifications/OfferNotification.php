@@ -50,6 +50,8 @@ class OfferNotification extends Notification implements ShouldQueue
             'summary' => $this->getSummary(),
             'type' => 'new-offer',
             'title' => 'New offer',
+            'price'=> $this->offer->product->price,
+            'discount_price'=> $this->offer->price,
             'image' => $this->getImage(),
         ];
     }
