@@ -40,7 +40,7 @@ class VendorResource extends JsonResource
             'likes_count'                               => (int) $this->likes_count,
             'views_count'                               => (int) $this->views_count,
             'shares_count'                              => (int) $this->shares_count,
-//            'shared_link'                               => $this->shared_link,
+            'shared_link'                               => $this->shared_link,
 
             'is_liked'                                  => (bool) $this->is_liked,
             'specialty_ids'                             => (array) $this->specialty_ids,
