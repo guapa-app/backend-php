@@ -65,7 +65,7 @@ class PaymentService
             $invoiceData['description'] = "Order Invoice: \n" . $description;
         } elseif ($billable instanceof MarketingCampaign) {
             $invoiceData['marketing_campaign_id'] = $billable->id;
-            $invoiceData['callback_url'] = config('app.url') . '/api/v3/campaign/change-invoice-status';
+            $invoiceData['callback_url'] = config('app.url') . '/api/v3/campaigns/change-invoice-status';
             $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
         } else {
             throw new InvalidArgumentException("Unsupported billable type");
