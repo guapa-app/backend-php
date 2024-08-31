@@ -55,6 +55,7 @@ class OrderService extends BaseOrderService
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
+                $data['coupon_id'] = $couponResult ? $couponResult['data']['coupon_id']: null;
 
                 $orderData = $this->calculateOrderData($vendorProducts, $data, $couponResult);
 
