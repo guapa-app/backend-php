@@ -8,4 +8,5 @@ enum ListTypeEnum: string
     case MostViewed = 'most_viewed';
     case MostOrdered = 'most_ordered';
     case Offers = 'offers';
+    case Product = 'product';
 }
