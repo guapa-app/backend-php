@@ -89,7 +89,7 @@ class OfferNotification extends Notification implements ShouldQueue
                 'image' => $this->getImage(),
                 'title' => $this->offer->product->title,
             ],
-            "campaignVersion" => "01916c78-2738-877c-032a-6200d8561815"
+            'campaignVersion' => '01916c78-2738-877c-032a-6200d8561815',
 
         ];
     }

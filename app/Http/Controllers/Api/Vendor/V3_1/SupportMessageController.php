@@ -54,6 +54,7 @@ class SupportMessageController extends ApiSupportMessageController
         $record = parent::createCommon($request);
 
         $record->load('supportMessageType');
+
         return SupportMessageResource::make($record)
             ->additional([
                 'success' => true,

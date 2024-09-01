@@ -7,9 +7,7 @@ use App\Http\Requests\ApplyCouponRequest;
 use App\Http\Requests\CouponRequest;
 use App\Http\Resources\CouponCollection;
 use App\Http\Resources\CouponResource;
-use App\Models\Coupon;
 use Illuminate\Http\Request;
-
 
 class CouponController extends ApiCouponController
 {
@@ -28,6 +26,7 @@ class CouponController extends ApiCouponController
     public function store(CouponRequest $request)
     {
         $coupon = parent::store($request);
+
         return CouponResource::make($coupon)
             ->additional([
                 'success' => true,

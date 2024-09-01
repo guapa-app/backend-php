@@ -3,19 +3,16 @@
 namespace App\Filament\Resources\GuapaPlus;
 
 use App\Filament\Resources\GuapaPlus\ClientResource\Pages;
-use App\Filament\Resources\GuapaPlus\RelationManagers;
-use App\Filament\Resources\GuapaPlus\Widgets\ClientCountWidget;
 use App\Filament\Resources\GuapaPlus\Widgets\ClientOrdersWidget;
 use App\Models\VendorClient;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\View;
-
 
 class ClientResource extends Resource
 {
@@ -70,6 +67,7 @@ class ClientResource extends Resource
             ClientOrdersWidget::class,
         ];
     }
+
     public static function getRelations(): array
     {
         return [
@@ -98,6 +96,7 @@ class ClientResource extends Resource
                     }]);
             }]);
     }
+
     public static function getBulkUploadFormSchema(): array
     {
         return [

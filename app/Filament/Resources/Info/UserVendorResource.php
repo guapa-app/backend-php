@@ -4,14 +4,12 @@ namespace App\Filament\Resources\Info;
 
 use App\Filament\Resources\Info\StaffResource\Pages;
 use App\Models\UserVendor;
-use App\Models\Vendor;
 use App\Traits\FilamentVendorAccess;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class UserVendorResource extends Resource
@@ -37,10 +35,10 @@ class UserVendorResource extends Resource
                 Forms\Components\TextInput::make('user.name')
                     ->label('Name')
                     ->required(),
-                Forms\Components\TextInput::make('user.phone')->unique('users','phone')
+                Forms\Components\TextInput::make('user.phone')->unique('users', 'phone')
                     ->label('Phone')
                     ->required(),
-                Forms\Components\TextInput::make('user.email')->unique('users','email')
+                Forms\Components\TextInput::make('user.email')->unique('users', 'email')
                     ->label('Email')
                     ->email()
                     ->required(),
@@ -69,8 +67,7 @@ class UserVendorResource extends Resource
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make()->requiresConfirmation(),
-            ])
-           ;
+            ]);
     }
 
     public static function getRelations(): array
