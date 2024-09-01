@@ -54,6 +54,8 @@ class MarketingCampaignController extends BaseApiController
         ]);
     }
 
+
+
     public function availableCustomers()
     {
         $availableCustomers = Setting::getCampaignAvailableCustomers();
@@ -62,10 +64,15 @@ class MarketingCampaignController extends BaseApiController
 
     public function changeStatus(Request $request)
     {
-
         $marketingCampaign = $this->marketingCampaignService->changeStatus($request);
-
         return true;
     }
 
+    //calculateCampaignPricing
+    public function calculatePricing(MarketingCampaignRequest $request)
+    {
+        $data = $request->all();
+        $pricing = $this->marketingCampaignService->calculatePricingDetails($data);
+        return $this->successJsonRes($pricing, __('api.success'));
+    }
 }
