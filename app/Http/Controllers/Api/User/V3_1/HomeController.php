@@ -2,32 +2,30 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Contracts\Repositories\OfferRepositoryInterface;
-use App\Contracts\Repositories\ProductRepositoryInterface;
-use App\Contracts\Repositories\TaxRepositoryInterface;
-use App\Enums\ListTypeEnum;
-use App\Http\Resources\ProductCollection;
-use App\Http\Resources\TaxonomyResource;
-use Illuminate\Http\Request;
+use App\Contracts\Repositories\V3_1\OfferRepositoryInterface;
+use App\Contracts\Repositories\V3_1\ProductRepositoryInterface;
+use App\Contracts\Repositories\V3_1\TaxonomyRepositoryInterface;
+use App\Http\Resources\V3_1\CategoryResource;
+use App\Http\Resources\V3_1\ProductResource;
 
 class HomeController
 {
     public function index(
-        Request $request,
-        TaxRepositoryInterface $taxRepository,
+        TaxonomyRepositoryInterface $taxRepository,
         OfferRepositoryInterface $offerRepository,
         ProductRepositoryInterface $productRepository
     ) {
-        $categories = $taxRepository->getForApiData(['type' => 'category']);
-        $data['categories'] = TaxonomyResource::collection($categories);
+        $data['categories'] = CategoryResource::collection(
+            $taxRepository->getData(where: ['type' => 'category'], limit: 3)
+        );
 
-        $request->list_type = ListTypeEnum::Offers->value;
-        $offers = $offerRepository->all($request);
-        $data['offers'] = ProductCollection::make($offers);
+        $data['offers'] = ProductResource::collection(
+            $offerRepository->getData(limit: 3)
+        );
 
-        $request->list_type = ListTypeEnum::Default->value;
-        $products = $productRepository->all($request);
-        $data['products'] = ProductCollection::make($products);
+        $data['products'] = ProductResource::collection(
+            $productRepository->getData(with: 'vendor', limit: 3)
+        );
 
         return $data;
     }
