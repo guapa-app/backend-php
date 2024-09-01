@@ -87,7 +87,7 @@ class OfferNotification extends Notification
             'campaignName' => 'good',
             'variables' => [
                 'username' => $notifiable->name,
-                'share_link' =>  $this->offer->product->share_link,
+                'shared_link' =>  $this->offer->product->share_link,
                 'image' => $this->getImage(),
                 'title' => $this->offer->product->title,
             ],
