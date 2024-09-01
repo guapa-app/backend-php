@@ -110,7 +110,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getSharedLinkAttribute()
     {
-        return $this->shareLink->link;
+        return $this->shareLink?->link;
     }
 
     public function getTaxonomyNameAttribute()
