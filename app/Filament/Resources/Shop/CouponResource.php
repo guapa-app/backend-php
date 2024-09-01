@@ -7,12 +7,10 @@ use App\Models\Coupon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\MultiSelect;
-
 
 class CouponResource extends Resource
 {
@@ -47,6 +45,7 @@ class CouponResource extends Resource
                     ->relationship('products', 'title', function (Builder $query) {
                         // Assuming you have a method to get the current vendor
                         $vendorId = auth()->user()->userVendors->first()->vendor_id;
+
                         return $query->where('vendor_id', $vendorId);
                     })
                     ->preload() // Preload the options for better performance

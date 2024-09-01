@@ -36,7 +36,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         'vendor',
         'product',
         'post',
-        'offer'
+        'offer',
     ];
 
     /**
@@ -132,7 +132,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
      */
     public function receivesBroadcastNotificationsOn()
     {
-        return 'user.'.$this->id;
+        return 'user.' . $this->id;
     }
 
     public function getRoleAttribute()

@@ -3,7 +3,6 @@
 namespace App\Http\Resources\V3;
 
 use App\Http\Resources\PostResource;
-use App\Http\Resources\V3\ProductResource;
 use App\Http\Resources\VendorResource;
 use App\Models\Offer;
 use App\Models\Post;
@@ -30,6 +29,7 @@ class FavoriteResource extends JsonResource
         if ($this->resource instanceof Offer) {
             return new ProductResource($this->resource->product);
         }
+
         return [];
     }
 }

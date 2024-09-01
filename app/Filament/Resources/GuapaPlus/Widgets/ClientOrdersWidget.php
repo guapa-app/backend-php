@@ -2,10 +2,8 @@
 
 namespace App\Filament\Resources\GuapaPlus\Widgets;
 
-use App\Models\Order;
 use App\Models\VendorClient;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Card;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class ClientOrdersWidget extends BaseWidget
@@ -13,7 +11,7 @@ class ClientOrdersWidget extends BaseWidget
     protected function getStats(): array
     {
         $vendor = auth()->user()->userVendors->first()->vendor;
-        $clients  = VendorClient::where('vendor_id', $vendor->id);
+        $clients = VendorClient::where('vendor_id', $vendor->id);
         $clientIds = $clients->pluck('user_id');
         $clientCount = $clients->count();
 

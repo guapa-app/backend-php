@@ -15,7 +15,7 @@ class PostSocialMedia extends Model
     protected $table = 'post_social_media';
 
     protected $fillable = [
-        'social_media_id', 'post_id', 'link'
+        'social_media_id', 'post_id', 'link',
     ];
 
     public function post()

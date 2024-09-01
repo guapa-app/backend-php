@@ -1,25 +1,24 @@
 <?php
+
 namespace App\Imports;
 
 use App\Helpers\Common;
 use App\Models\Setting;
+use Maatwebsite\Excel\Concerns\Importable;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\SkipsOnFailure;
-use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Validators\Failure;
 
 class ClientsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
 {
     use Importable;
 
-
     private $failures = [];
 
     public function __construct()
     {
-
     }
 
     public function model(array $row)

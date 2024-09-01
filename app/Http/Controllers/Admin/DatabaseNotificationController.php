@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Contracts\Repositories\DatabaseNotificationRepositoryInterface;
 use App\Http\Requests\NotificationRequest;
-use App\Models\Media;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Services\DatabaseNotificationService;
@@ -28,14 +27,14 @@ class DatabaseNotificationController extends BaseAdminController
     {
         $records = User::all();
 
-        return response()->json(["data" => $records]);
+        return response()->json(['data' => $records]);
     }
 
     public function vendors(Request $request)
     {
         $records = Vendor::all();
 
-        return response()->json(["data" => $records]);
+        return response()->json(['data' => $records]);
     }
 
     public function index(Request $request)

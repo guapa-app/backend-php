@@ -29,7 +29,7 @@ class ConnectlyWhatsAppService implements WhatsAppServiceInterface
             return [
                 'client' => $entry['client'],
                 'campaignName' => $entry['campaignName'],
-                'variables' => $entry['variables']
+                'variables' => $entry['variables'],
             ];
         }, $entries);
 
@@ -43,9 +43,11 @@ class ConnectlyWhatsAppService implements WhatsAppServiceInterface
             ]);
             $result = json_decode($response->getBody(), true);
             \Log::info('WhatsApp campaign sent:', $result);
+
             return $result;
         } catch (\Exception $e) {
             \Log::error('Failed to send WhatsApp campaign: ' . $e->getMessage());
+
             return null;
         }
     }

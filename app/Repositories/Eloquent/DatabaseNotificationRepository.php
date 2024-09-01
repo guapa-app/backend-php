@@ -58,7 +58,7 @@ class DatabaseNotificationRepository extends EloquentRepository implements Datab
         $recipients = match ($data['type']) {
             'user' => empty($data['recipients']) ? User::all() : User::query()->find($data['recipients']),
             'vendor' => empty($data['recipients']) ? Vendor::all() : Vendor::query()->find($data['recipients']),
-            default => User::query()->whereHas('devices', fn($query) => $query->where('type', $data['type']))->get(),
+            default => User::query()->whereHas('devices', fn ($query) => $query->where('type', $data['type']))->get(),
         };
 
         Notification::send($recipients, new PushNotification($data['title'], $data['summary'], $image));

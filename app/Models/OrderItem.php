@@ -12,11 +12,11 @@ class OrderItem extends Model
 
     protected $fillable = [
         'order_id', 'product_id', 'amount', 'quantity',
-        'appointment', 'offer_id', 'title', 'taxes', 'amount_to_pay'
+        'appointment', 'offer_id', 'title', 'taxes', 'amount_to_pay',
     ];
 
     protected $appends = [
-        'coupon_num'
+        'coupon_num',
     ];
 
     public function getAppointmentAttribute($appointment)

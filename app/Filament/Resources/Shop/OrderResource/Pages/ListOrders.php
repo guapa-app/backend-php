@@ -4,12 +4,10 @@ namespace App\Filament\Resources\Shop\OrderResource\Pages;
 
 use App\Enums\OrderStatus;
 use App\Filament\Resources\Shop\OrderResource;
-use App\Models\Order;
 use Filament\Actions;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Components\Tab;
-
+use Filament\Resources\Pages\ListRecords;
 
 class ListOrders extends ListRecords
 {
@@ -24,12 +22,14 @@ class ListOrders extends ListRecords
 
         ];
     }
+
     protected function getTableActions(): array
     {
         return [
 
         ];
     }
+
     protected function getHeaderWidgets(): array
     {
         return OrderResource::getWidgets();
@@ -46,7 +46,7 @@ class ListOrders extends ListRecords
     {
         return [
             'all' => Tab::make('All')
-                ->query(fn ($query) => $query->where('status','!=', OrderStatus::Expired)),
+                ->query(fn ($query) => $query->where('status', '!=', OrderStatus::Expired)),
             'pending' => Tab::make('Pending')
                 ->query(fn ($query) => $query->where('status', OrderStatus::Pending)),
             'accepted' => Tab::make('Accepted')
