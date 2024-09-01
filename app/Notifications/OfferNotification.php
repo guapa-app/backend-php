@@ -84,14 +84,14 @@ class OfferNotification extends Notification
     {
         return [
             'client' => $notifiable->phone,
-            'campaignName' => 'good',
+            'campaignName' => 'offersprovidersservices',
             'variables' => [
                 'username' => $notifiable->name,
-                'shared_link' =>  $this->offer->product->share_link,
+                'discount' => $this->offer->discount_string,
                 'image' => $this->getImage(),
                 'title' => $this->offer->product->title,
             ],
-            "campaignVersion" => "0191af0b-77af-ec17-018c-002cdea773b0"
+            "campaignVersion" => "01916c78-2738-877c-032a-6200d8561815"
 
         ];
     }
