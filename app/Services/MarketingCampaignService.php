@@ -25,6 +25,33 @@ class MarketingCampaignService
         $this->taxesPercentage = Setting::getTaxes();
     }
 
+    public function calculatePricingDetails(array $data)
+    {
+        $type = $data['type'];
+        $typeId = $data['id'];
+
+        // Map entity type to the corresponding model class
+        $modelClass = $this->getModelClass($type);
+        // Find the entity by its ID
+        $model = $modelClass::findOrFail($typeId);
+
+
+        $audienceCount = $data['audience_type'] === 'vendor_customers' && isset($data['users'])
+            ? $this->getVendorClientsCount($type, $model)
+            : $data['audience_count'];
+
+        $cost = $this->messageCost * $audienceCount;
+        $taxes = $cost * ($this->taxesPercentage / 100);
+        $totalCost = $cost + $taxes;
+
+        return [
+            'message_cost' => $this->messageCost,
+            'audience_count' => $audienceCount,
+            'cost' => $cost,
+            'taxes' => number_format($taxes, 2),
+            'total_cost' => $totalCost,
+        ];
+    }
     public function create(array $data)
     {
         $type = $data['type'];
@@ -35,9 +62,17 @@ class MarketingCampaignService
         // Find the entity by its ID
         $model = $modelClass::findOrFail($typeId);
 
+        // Calculate the audience count
+        $audienceCount = $data['audience_type'] === 'vendor_customers' && isset($data['users'])
+            ?$this->getVendorClientsCount($type, $model)
+            : $data['audience_count'];
+
+        // Set campaignable ID and type
         $data['campaignable_id'] = $model->id;
         $data['campaignable_type'] = $type;
-        $cost = $this->messageCost * $data['audience_count'];
+
+        // Calculate costs
+        $cost = $this->messageCost * $audienceCount;
         $data['status'] = 'pending';
         $data['message_cost'] = $this->messageCost;
         $data['taxes'] = $cost * ($this->taxesPercentage / 100);
@@ -48,7 +83,7 @@ class MarketingCampaignService
 
         // Attach users to the campaign
         if ($data['audience_type'] === 'vendor_customers') {
-            $userIds = $data['users'] ?? [];
+            $userIds = $data['users'] ?? $campaign->vendor->clients->pluck('user_id')->toArray();
         } elseif ($data['audience_type'] === 'guapa_customers') {
             $userIds = User::inRandomOrder()->limit($data['audience_count'])->pluck('id')->toArray();
         }
@@ -131,5 +166,12 @@ class MarketingCampaignService
         }
 
         return $modelClasses[$type];
+    }
+
+    private function getVendorClientsCount($type, $model)
+    {
+        return $type === 'offer'
+            ? $model->product->vendor->clients->count()
+            : $model->vendor->clients->count();
     }
 }
