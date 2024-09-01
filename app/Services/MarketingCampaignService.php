@@ -36,7 +36,7 @@ class MarketingCampaignService
         $model = $modelClass::findOrFail($typeId);
 
 
-        $audienceCount = $data['audience_type'] === 'vendor_customers' && isset($data['users'])
+        $audienceCount = $data['audience_type'] === 'vendor_customers' && empty($data['users'])
             ? $this->getVendorClientsCount($type, $model)
             : $data['audience_count'];
 
@@ -63,7 +63,7 @@ class MarketingCampaignService
         $model = $modelClass::findOrFail($typeId);
 
         // Calculate the audience count
-        $audienceCount = $data['audience_type'] === 'vendor_customers' && isset($data['users'])
+        $audienceCount = $data['audience_type'] === 'vendor_customers' && empty($data['users'])
             ?$this->getVendorClientsCount($type, $model)
             : $data['audience_count'];
 
