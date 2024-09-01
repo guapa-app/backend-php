@@ -11,7 +11,6 @@ use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Notification;
 
-
 class ViewOrder extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
@@ -66,6 +65,7 @@ class ViewOrder extends ViewRecord
     public function getRecordTitle(): string
     {
         $order = $this->getRecord();
-        return "Order #" . $order->id;
+
+        return 'Order #' . $order->id;
     }
 }

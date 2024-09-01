@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Exceptions\ApiException;
 use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Models\Setting;
@@ -11,7 +12,6 @@ use App\Services\SMSService;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Exceptions\ApiException;
 
 class OTPController extends BaseApiController
 {
@@ -55,13 +55,13 @@ class OTPController extends BaseApiController
             'firebase_jwt_token' => 'required_without:otp|string|max:2000',
             'for_reset_password' => 'sometimes|required',
         ]);
-        
+
         $user = $this->userRepository->getByPhone($data['phone']);
-        
+
         if (!$user) {
             abort(404, __('api.phone_doesnt_exist'));
         }
-         
+
         if (Setting::checkTestingMode()) {
             $personalAccessToken = $user->createToken('Temp Personal Token', ['*']);
             $token['access_token'] = $personalAccessToken->accessToken;

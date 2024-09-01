@@ -5,18 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Exceptions\ApiException;
 use App\Exceptions\PhoneNotVerifiedException;
-use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\VerifyPhoneRequest;
-use App\Models\Setting;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
-use DB;
 use Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Enums\SupportMessageSenderType;
 use App\Models\SupportMessage;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;

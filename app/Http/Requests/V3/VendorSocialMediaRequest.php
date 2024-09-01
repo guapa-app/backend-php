@@ -26,7 +26,7 @@ class VendorSocialMediaRequest extends FormRequest
         $social_medium = $this->route('social_medium');
 
         $rules = [
-            'social_media_id' => ($social_medium ? 'nullable' : 'required') .'|integer|exists:social_media,id',
+            'social_media_id' => ($social_medium ? 'nullable' : 'required') . '|integer|exists:social_media,id',
             'link'            => 'required|string',
         ];
 

@@ -3,13 +3,11 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Support\Facades\Auth;
+use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
-use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\BelongsToMany;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use ZiffMedia\NovaSelectPlus\SelectPlus;
 
@@ -58,7 +56,6 @@ class Coupon extends Resource
                 return $this->usages()->sum('usage_count');
             })->exceptOnForms(),
 
-
             Number::make('Max Uses')
                 ->min(0)
                 ->step(1)
@@ -69,7 +66,6 @@ class Coupon extends Resource
                 ->step(1)
                 ->default(1)
                 ->rules('required'),
-
 
             SelectPlus::make('Products', 'products', 'App\Nova\Resources\Product')
                 ->label('title')
@@ -87,7 +83,6 @@ class Coupon extends Resource
                 })->readonly($request->isUpdateOrUpdateAttachedRequest()),
         ];
     }
-
 
     public function cards(NovaRequest $request)
     {
@@ -108,6 +103,7 @@ class Coupon extends Resource
     {
         return [];
     }
+
     public static function fill(NovaRequest $request, $model)
     {
         if ($request->isCreateOrAttachRequest()) {

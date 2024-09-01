@@ -45,7 +45,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     protected $appends = [
         'likes_count', 'is_liked',
         'taxonomy_name', 'address',
-        'shared_link'
+        'shared_link',
     ];
 
     /**
@@ -152,6 +152,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $price -= ($price * ($this->offer->discount / 100));
             $price = round($price, 2);
         }
+
         return $price;
     }
 
@@ -413,6 +414,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         if ($productCategory?->fees) {
             $productFees = $productCategory->fees;
+
             return ($productFees / 100) * $finalPrice;
         } else {
             return $productCategory?->fixed_price ?? 0;

@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Http\Resources\V3\UserResource;
@@ -15,8 +13,6 @@ use App\Services\SMSService;
 use App\Services\V3\UserService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AuthController extends ApiAuthController
 {
@@ -43,19 +39,19 @@ class AuthController extends ApiAuthController
     {
         $data = $request->validated();
 
-        # handle user date to manage profile.
+        // handle user date to manage profile.
         $data = $this->userService->handleUserData($data);
 
-        # create user
+        // create user
         $this->userService->create($data);
 
-        # send otp to the user to verify account.
+        // send otp to the user to verify account.
         if (!Setting::checkTestingMode()) {
             $this->smsService->sendOtp($data['phone']);
         }
 
         return $this->successJsonRes([
-            'is_otp_sent' => true
+            'is_otp_sent' => true,
         ], __('api.otp_sent'));
     }
 
@@ -75,6 +71,7 @@ class AuthController extends ApiAuthController
             $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
 
             $this->prepareUserResponse($user, $token);
+
             return UserResource::make($user)
                 ->additional([
                     'success' => true,
