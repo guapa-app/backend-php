@@ -18,6 +18,7 @@ class OrderItemResource extends JsonResource
             'quantity'     => (int) $this->quantity,
             'order_id'     => $this->order_id,
             'appointment'  => $this->appointment,
+            'qr_code_link'  => $this->qr_code_link,
 
             'product'      => ProductResource::make($this->whenLoaded('product')),
             'vendor'       => VendorResource::make($this->whenLoaded('vendor')),
