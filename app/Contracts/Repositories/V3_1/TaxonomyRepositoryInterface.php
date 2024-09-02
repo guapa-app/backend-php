@@ -2,21 +2,23 @@
 
 namespace App\Contracts\Repositories\V3_1;
 
+use App\Contracts\Repositories\TaxRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Taxonomy Repository Interface.
  */
-interface TaxonomyRepositoryInterface
+interface TaxonomyRepositoryInterface extends TaxRepositoryInterface
 {
     /**
      * Get categories list for api common data.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection|LengthAwarePaginator
      */
     public function getData(
-        array $where = [],
         array $with = [],
-        int $limit = null
-    ): Collection;
+        array $where = [],
+        bool $isPaginated = false
+    ): Collection|LengthAwarePaginator;
 }

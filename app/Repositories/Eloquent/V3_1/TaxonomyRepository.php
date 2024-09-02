@@ -4,29 +4,36 @@ namespace App\Repositories\Eloquent\V3_1;
 
 use App\Contracts\Repositories\V3_1\TaxonomyRepositoryInterface;
 use App\Models\Taxonomy;
+use App\Repositories\Eloquent\TaxRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Taxonomy Repository.
  */
-class TaxonomyRepository implements TaxonomyRepositoryInterface
+class TaxonomyRepository extends TaxRepository implements TaxonomyRepositoryInterface
 {
     /**
-     * Construct an instance of the repo.
+     * Items per page for pagination.
      *
-     * @param  \App\Models\Taxonomy  $model
+     * @var int
      */
-    public function __construct(public Taxonomy $model)
-    {
-    }
+    public $perPage = 4;
 
     /**
      * Get categories list for api common data.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection|LengthAwarePaginator
      */
-    public function getData(array $where = [], array $with = [], int $limit = null): Collection
-    {
-        return $this->model->isRoot()->with($with)->where($where)->limit($limit)->get();
+    public function getData(
+        array $with = [],
+        array $where = [],
+        bool $isPaginated = false
+    ): Collection|LengthAwarePaginator {
+        $taxonomy = Taxonomy::isRoot()->with($with)->where($where);
+
+        $isPaginated ? $taxonomy = $taxonomy->paginate($this->perPage) : $taxonomy = $taxonomy->get();
+
+        return $taxonomy;
     }
 }

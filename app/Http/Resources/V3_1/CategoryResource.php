@@ -11,8 +11,6 @@ class CategoryResource extends JsonResource
         return [
             'id' => (int) $this->id,
             'title' => $this->title,
-            'fixed_price' => $this->fixed_price,
-            'description' => (string) $this->description,
             'icon' => MediaResource::make($this->whenLoaded('icon')),
         ];
     }

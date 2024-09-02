@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\V3_1;
 
-use App\Http\Resources\VendorResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
