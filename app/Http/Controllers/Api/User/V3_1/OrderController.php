@@ -5,25 +5,16 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
-use App\Http\Resources\OrderCollection;
-use App\Http\Resources\OrderResource;
-use App\Services\V3\OrderService;
+use App\Http\Resources\V3_1\OrderResource;
 use Illuminate\Http\Request;
 
 class OrderController extends ApiOrderController
 {
-    protected $orderService;
-
-    public function __construct(OrderService $orderService)
-    {
-        $this->orderService = $orderService;
-    }
-
     public function index(GetOrdersRequest $request)
     {
         $orders = parent::index($request);
 
-        return OrderCollection::make($orders)
+        return OrderResource::collection($orders)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -47,7 +38,7 @@ class OrderController extends ApiOrderController
         $data['user_id'] = auth('api')->user()->id;
         $orders = $this->orderService->create($data);
 
-        return OrderCollection::make($orders)
+        return OrderResource::make($orders)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
