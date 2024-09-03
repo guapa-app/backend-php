@@ -9,7 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class OfferNotification extends Notification
+class OfferNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -19,7 +19,7 @@ class OfferNotification extends Notification
     private $offer;
 
     /**
-     * @param Offer $offer
+     * @param  Offer  $offer
      */
     public function __construct(Offer $offer)
     {
@@ -29,7 +29,7 @@ class OfferNotification extends Notification
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return array
      */
     public function via($notifiable)
@@ -49,17 +49,17 @@ class OfferNotification extends Notification
             'id' => $this->offer->product_id,
             'summary' => $this->getSummary(),
             'type' => 'new-offer',
-            'title' => 'New offer',
-            'price'=> $this->offer->product->price,
-            'discount_price'=> $this->offer->price,
+            'username' => $notifiable->name,
+            'discount' => $this->offer->discount_string,
             'image' => $this->getImage(),
+            'title' => $this->offer->product->title,
         ];
     }
 
     /**
      * Get fcm representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      *
      * @return FcmMessage
      */
@@ -67,14 +67,14 @@ class OfferNotification extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title' => 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title,
+            'title' => 'خصم '.$this->offer->discount_string.' على '.$this->offer->product->title,
             'body' => $this->getSummary(),
             'sound' => 'default', // Optional
             'icon' => '', // Optional
             'click_action' => '', // Optional
         ])->data([
             'type' => 'new-offer',
-            'product_id' => $this->offer->product->id,
+            'id' => $this->offer->product->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
@@ -98,7 +98,7 @@ class OfferNotification extends Notification
 
     public function getSummary()
     {
-        return 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title . ' من ' .
+        return 'خصم '.$this->offer->discount_string.' على '.$this->offer->product->title.' من '.
             $this->offer->product->vendor->name;
     }
 
