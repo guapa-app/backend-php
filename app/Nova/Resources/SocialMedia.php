@@ -30,7 +30,7 @@ class SocialMedia extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'name'
+        'id', 'name',
     ];
 
     /**

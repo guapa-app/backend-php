@@ -21,7 +21,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(WhatsAppServiceInterface::class, ConnectlyWhatsAppService::class);
-
     }
 
     /**
@@ -50,7 +49,6 @@ class AppServiceProvider extends ServiceProvider
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(365));
 
         $this->app['request']->server->set('HTTPS', $this->app->environment() != 'local');
-
 
         Notification::extend('whatsapp', function ($app) {
             return new WhatsAppChannel($app->make(WhatsAppServiceInterface::class));

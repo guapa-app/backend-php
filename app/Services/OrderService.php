@@ -21,7 +21,6 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
-
     protected $repository;
     protected $paymentService;
     protected $productFees;
@@ -118,6 +117,7 @@ class OrderService
 
                 $orderItems = array_map(function ($item) use ($order) {
                     $item['order_id'] = $order->id; // Merge the order ID into each item
+
                     return $item;
                 }, $orderItems);
 

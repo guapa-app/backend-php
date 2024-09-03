@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Resources\V3;
+namespace App\Http\Resources\V3_1\User;
 
 use App\Http\Resources\PostResource;
+use App\Http\Resources\V3_1\User\ProductResource;
 use App\Http\Resources\VendorResource;
 use App\Models\Offer;
 use App\Models\Post;

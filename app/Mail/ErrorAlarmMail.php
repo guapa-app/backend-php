@@ -20,7 +20,7 @@ class ErrorAlarmMail extends Mailable
      * Create a new message instance.
      * @param $errorMessage
      */
-    public function __construct(string $errorMessage = "Error", $exception = [])
+    public function __construct(string $errorMessage = 'Error', $exception = [])
     {
         $this->errorMessage = $errorMessage;
         $this->exception = $exception;
@@ -46,7 +46,7 @@ class ErrorAlarmMail extends Mailable
             markdown: 'emails.errors',
             with: [
                 'message' => $this->errorMessage,
-                'exception' => $this->exception
+                'exception' => $this->exception,
             ],
         );
     }

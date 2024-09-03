@@ -19,7 +19,11 @@ use Illuminate\Support\Facades\DB;
 class VendorClientController extends ApiVendorClientController
 {
     /**
+<<<<<<< HEAD
      * Get vendor clients
+=======
+     * Get vendor clients.
+>>>>>>> refactor/favorite-addresss
      *
      * @param  Request  $request
      * @param  Vendor  $vendor
@@ -28,6 +32,10 @@ class VendorClientController extends ApiVendorClientController
     public function index(Request $request, Vendor $vendor): VendorClientCollection
     {
         $clients = parent::index($request, $vendor);
+<<<<<<< HEAD
+=======
+
+>>>>>>> refactor/favorite-addresss
         return VendorClientCollection::make($clients)
             ->additional([
                 'success' => true,
@@ -36,7 +44,11 @@ class VendorClientController extends ApiVendorClientController
     }
 
     /**
+<<<<<<< HEAD
      * Add new client to vendor
+=======
+     * Add new client to vendor.
+>>>>>>> refactor/favorite-addresss
      *
      * @param  VendorClientRequest  $request
      * @param  Vendor  $vendor
@@ -74,6 +86,10 @@ class VendorClientController extends ApiVendorClientController
     public function getClientOrders(GetClientOrdersRequest $request, $vendor_id, $client_id): OrderCollection
     {
         $orders = $this->vendorClientService->getClientOrders($vendor_id, $client_id);
+<<<<<<< HEAD
+=======
+
+>>>>>>> refactor/favorite-addresss
         return OrderCollection::make($orders)
             ->additional([
                 'success' => true,

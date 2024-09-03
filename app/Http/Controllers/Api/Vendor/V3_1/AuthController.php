@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
+<<<<<<< HEAD
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\PhoneRequest;
+=======
+>>>>>>> refactor/favorite-addresss
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Http\Resources\V3\UserResource;
@@ -15,8 +18,11 @@ use App\Services\SMSService;
 use App\Services\V3\UserService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
+<<<<<<< HEAD
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+=======
+>>>>>>> refactor/favorite-addresss
 
 class AuthController extends ApiAuthController
 {
@@ -43,6 +49,7 @@ class AuthController extends ApiAuthController
     {
         $data = $request->validated();
 
+<<<<<<< HEAD
         # handle user date to manage profile.
         $data = $this->userService->handleUserData($data);
 
@@ -50,12 +57,25 @@ class AuthController extends ApiAuthController
         $this->userService->create($data);
 
         # send otp to the user to verify account.
+=======
+        // handle user date to manage profile.
+        $data = $this->userService->handleUserData($data);
+
+        // create user
+        $this->userService->create($data);
+
+        // send otp to the user to verify account.
+>>>>>>> refactor/favorite-addresss
         if (!Setting::checkTestingMode()) {
             $this->smsService->sendOtp($data['phone']);
         }
 
         return $this->successJsonRes([
+<<<<<<< HEAD
             'is_otp_sent' => true
+=======
+            'is_otp_sent' => true,
+>>>>>>> refactor/favorite-addresss
         ], __('api.otp_sent'));
     }
 
@@ -75,6 +95,10 @@ class AuthController extends ApiAuthController
             $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
 
             $this->prepareUserResponse($user, $token);
+<<<<<<< HEAD
+=======
+
+>>>>>>> refactor/favorite-addresss
             return UserResource::make($user)
                 ->additional([
                     'success' => true,

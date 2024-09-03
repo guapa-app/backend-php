@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\V3;
+namespace App\Http\Resources\V3_1\User;
 
 use App\Http\Resources\MediaResource;
 use App\Http\Resources\OfferResource;

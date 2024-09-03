@@ -4,8 +4,6 @@ namespace App\Services\V3;
 
 use App\Models\User;
 use App\Services\UserService as BaseUserService;
-use DB;
-use Hash;
 
 class UserService extends BaseUserService
 {
@@ -25,7 +23,7 @@ class UserService extends BaseUserService
 
         // Update profile
         if (isset($data['profile'])) {
-            $this->updateProfile($user, (array)$data['profile']);
+            $this->updateProfile($user, (array) $data['profile']);
         }
 
         return $user;

@@ -12,7 +12,7 @@ class SocialMediaVendor extends Model
     protected $table = 'social_media_vendor';
 
     protected $fillable = [
-        'social_media_id', 'vendor_id', 'link'
+        'social_media_id', 'vendor_id', 'link',
     ];
 
     public function vendor()
