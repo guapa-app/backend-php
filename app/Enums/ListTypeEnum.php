@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
+
 enum ListTypeEnum: string
 {
     case Default = 'default';

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 use App\Contracts\Repositories\OrderRepositoryInterface;
 =======
 >>>>>>> refactor/favorite-addresss
+=======
+>>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
@@ -59,9 +62,12 @@ class OrderController extends ApiOrderController
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> refactor/favorite-addresss
+=======
+>>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
     public function update($id, Request $request)
     {
         $item = parent::update($id, $request);

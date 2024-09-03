@@ -40,6 +40,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(Repositories\InfluencerRepositoryInterface::class, Eloquent\InfluencerRepository::class);
         $this->app->bind(Repositories\MarketingCampaignRepositoryInterface::class, Eloquent\MarketingCampaignRepository::class);
 
+
+        $this->app->bind(Repositories\V3_1\TaxonomyRepositoryInterface::class, Eloquent\V3_1\TaxonomyRepository::class);
+        $this->app->bind(Repositories\V3_1\OfferRepositoryInterface::class, Eloquent\V3_1\OfferRepository::class);
+        $this->app->bind(Repositories\V3_1\ProductRepositoryInterface::class, Eloquent\V3_1\ProductRepository::class);
+
         $this->app->singleton('cosmo', function ($app) {
             return new Cosmo;
         });

@@ -8,6 +8,7 @@ use App\Http\Requests\CouponRequest;
 use App\Http\Resources\CouponCollection;
 use App\Http\Resources\CouponResource;
 <<<<<<< HEAD
+<<<<<<< HEAD
 use App\Models\Coupon;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Request;
 
 >>>>>>> refactor/favorite-addresss
+=======
+use Illuminate\Http\Request;
+
+>>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
 class CouponController extends ApiCouponController
 {
     /**
@@ -34,9 +39,13 @@ class CouponController extends ApiCouponController
     {
         $coupon = parent::store($request);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> refactor/favorite-addresss
+=======
+
+>>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
         return CouponResource::make($coupon)
             ->additional([
                 'success' => true,

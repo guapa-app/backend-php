@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\User\V3_1\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("user/v3.1")->group(function () {
-    Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
+    Route::get('home', [HomeController::class, 'index']);
 
     Route::prefix('auth')->group(base_path('routes/user/v3_1/api/auth.php'));
     Route::prefix('users')->group(base_path('routes/user/v3_1/api/users.php'));
