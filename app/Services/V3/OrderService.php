@@ -2,20 +2,18 @@
 
 namespace App\Services\V3;
 
-use App\Enums\ProductType;
+use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Models\Appointment;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Services\CouponService;
+use App\Services\OrderService as BaseOrderService;
 use App\Services\PaymentService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use App\Contracts\Repositories\OrderRepositoryInterface;
-
-use \App\Services\OrderService as BaseOrderService;
 
 class OrderService extends BaseOrderService
 {
@@ -102,7 +100,7 @@ class OrderService extends BaseOrderService
         $couponProductDiscounts = $couponResult ? $couponResult['data']['product_discounts'] : [];
 
         foreach ($vendorProducts as $product) {
-            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+            $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
             $quantity = $inputItem['quantity'];
 
             if (isset($couponProductDiscounts[$product->id])) {
@@ -124,10 +122,11 @@ class OrderService extends BaseOrderService
 
         return $orderData;
     }
+
     private function createOrderItems($vendorProducts, $data, $order, $now, $vendorId, $couponResult)
     {
-        return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId , $couponResult) {
-            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+        return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId, $couponResult) {
+            $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
 
             if (isset($inputItem['appointment'])) {
                 $appointment = Appointment::find($inputItem['appointment']['id']);
@@ -146,7 +145,7 @@ class OrderService extends BaseOrderService
                 'product_id' => $product->id,
                 'offer_id' => optional($product->offer)->id,
                 'amount' => $this->getDiscountedPrice($product),
-                'amount_to_pay' => $this->productAmountToPay($product,$inputItem['quantity'],$couponResult),
+                'amount_to_pay' => $this->productAmountToPay($product, $inputItem['quantity'], $couponResult),
                 'taxes'         => $this->taxesPercentage,
                 'quantity' => $inputItem['quantity'],
                 'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
@@ -164,6 +163,7 @@ class OrderService extends BaseOrderService
             $price -= ($price * ($product->offer->discount / 100));
             $price = round($price, 2);
         }
+
         return $price;
     }
 
@@ -173,16 +173,16 @@ class OrderService extends BaseOrderService
 
         if ($productCategory?->fees) {
             $productFees = $productCategory->fees;
+
             return ($productFees / 100) * $finalPrice;
         } else {
             return $productCategory?->fixed_price ?? 0;
         }
     }
 
-    private function productAmountToPay($product,$quantity,$couponResult)
+    private function productAmountToPay($product, $quantity, $couponResult)
     {
-        if ($couponResult && isset($couponResult['data']['product_discounts'][$product->id]))
-        {
+        if ($couponResult && isset($couponResult['data']['product_discounts'][$product->id])) {
             $discountedProduct = $couponResult['data']['product_discounts'][$product->id];
             $productFees = $discountedProduct['fees'];
         } else {
@@ -190,6 +190,7 @@ class OrderService extends BaseOrderService
             $finalPrice = $price * $quantity;
             $productFees = $this->calculateProductFees($product, $finalPrice);
         }
+
         return $productFees;
     }
 

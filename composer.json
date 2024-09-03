@@ -38,6 +38,7 @@
         "moyasar/moyasar": "^1.1",
         "predis/predis": "^2.2",
         "prgayman/laravel-zatca": "^1.0",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-medialibrary": "^10.12",
         "spatie/laravel-permission": "^5.11",
         "spatie/laravel-translatable": "^6.5",

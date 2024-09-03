@@ -3,7 +3,6 @@
 namespace App\Nova\Resources;
 
 use App\Helpers\Common;
-use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -121,7 +120,7 @@ class User extends Resource
                     $model->{$attribute} = $string;
                 })
                 ->required()
-                ->rules('required','unique:users,phone')
+                ->rules('required', 'unique:users,phone')
                 ->updateRules('unique:users,phone,{{resourceId}}')
                 ->withMeta([
                     'onlyCountries' => Arr::flatten(['SA', 'EG']),

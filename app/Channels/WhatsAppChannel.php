@@ -2,8 +2,8 @@
 
 namespace App\Channels;
 
-use Illuminate\Notifications\Notification;
 use App\Contracts\WhatsAppServiceInterface;
+use Illuminate\Notifications\Notification;
 
 class WhatsAppChannel
 {

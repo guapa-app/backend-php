@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b53cfd5a0ee97e4112d61eccd6c4333d",
+    "content-hash": "9391e0419602e0d4cf10b0e75b1b27bf",
     "packages": [
         {
             "name": "alexwenzel/nova-dependency-container",

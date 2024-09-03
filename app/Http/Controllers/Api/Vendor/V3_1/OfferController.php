@@ -13,7 +13,7 @@ class OfferController extends ApiOfferController
     /**
      * This API for vendors ONLY.
      * To display all products that has offer
-     * even offers expired, active or incoming
+     * even offers expired, active or incoming.
      *
      * @param Request $request
      * @return ProductCollection|object

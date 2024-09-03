@@ -21,7 +21,6 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
-
     protected $repository;
     protected $paymentService;
     protected $productFees;
@@ -90,6 +89,13 @@ class OrderService
 
                     $userIds[] = $inputItem['staff_user_id'] ?? null;
 
+                    $qrcodeData = [
+                        'hash_id' => $product->hash_id,
+                        'title' => $product->title,
+                        'amount_to_pay' => $itemAmountToPay,
+                        'vendor_name' => $product->vendor->name,
+                    ];
+
                     $orderItems[] = [
                         'user_id'       => $inputItem['staff_user_id'] ?? null,
                         'product_id'    => $product->id,
@@ -99,6 +105,7 @@ class OrderService
                         'amount_to_pay' => $itemAmountToPay,
                         'taxes'         => $this->taxesPercentage,
                         'title'         => $product->title,
+                        'qr_code_link'  => (new QrCodeService())->generate($qrcodeData),
                         'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
                         'created_at'    => $now,
                         'updated_at'    => $now,
@@ -118,6 +125,7 @@ class OrderService
 
                 $orderItems = array_map(function ($item) use ($order) {
                     $item['order_id'] = $order->id; // Merge the order ID into each item
+
                     return $item;
                 }, $orderItems);
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V3;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
@@ -14,10 +13,12 @@ use Illuminate\Http\Request;
 class OrderController extends ApiOrderController
 {
     protected $orderService;
+
     public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
     }
+
     public function index(GetOrdersRequest $request)
     {
         $orders = parent::index($request);
@@ -39,11 +40,12 @@ class OrderController extends ApiOrderController
                 'message' => __('api.success'),
             ]);
     }
+
     public function create(OrderRequest $request)
     {
         $data = $request->validated();
-        $data['user_id'] =  auth('api')->user()->id;
-        $orders =  $this->orderService->create($data);
+        $data['user_id'] = auth('api')->user()->id;
+        $orders = $this->orderService->create($data);
 
         return OrderCollection::make($orders)
             ->additional([
@@ -51,7 +53,6 @@ class OrderController extends ApiOrderController
                 'message' => __('api.success'),
             ]);
     }
-
 
     public function update($id, Request $request)
     {
