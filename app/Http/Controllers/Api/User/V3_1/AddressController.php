@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Http\Controllers\Api\AddressController as ApiAddressController;
 use App\Http\Requests\AddressListRequest;
 use App\Http\Requests\AddressRequest;
-use App\Http\Resources\AddressCollection;
-use App\Http\Resources\AddressResource;
+use App\Http\Resources\V3_1\User\AddressCollection;
+use App\Http\Resources\V3_1\User\AddressResource;
 use Illuminate\Http\Request;
 
 /**

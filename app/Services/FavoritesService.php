@@ -21,11 +21,16 @@ class FavoritesService
     {
         $type = $filters['type'] ?? 'product';
         $class = $this->getFavorableClass($type);
-
-        return $user->favorites($class)->when($type == 'vendor', function ($query) {
+        if ($type === 'service') {
+            $class = $this->getFavorableClass('product');
+        }
+        return $user->favorites($class)
+            ->when($type == 'vendor', function ($query) {
             $query->with('logo');
         })->when($type == 'product', function ($query) {
-            $query->with('vendor', 'media');
+            $query->where('type', 'product')->with('vendor', 'media');
+        })->when($type == 'service', function ($query) {
+            $query->where('type', 'service')->with('vendor', 'media');
         })->when($type == 'offer', function ($query) {
             $query->with('product', 'product.media');
         })->when($type == 'post', function ($query) {
