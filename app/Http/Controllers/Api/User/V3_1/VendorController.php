@@ -12,7 +12,7 @@ class VendorController extends ApiVendorController
     {
         $index = parent::index($request);
 
-        return VendorResource::make($index)
+        return VendorResource::collection($index)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
