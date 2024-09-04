@@ -10,9 +10,12 @@ class OfferResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'title' => $this->title,
+            'discount_string' => $this->discount_string,
             'discount' => $this->discount,
             'starts_at' => $this->starts_at,
             'expires_at' => $this->expires_at,
+            'image' => MediaResource::make($this->whenLoaded('image')),
         ];
     }
 }

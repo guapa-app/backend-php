@@ -19,15 +19,7 @@ use Illuminate\Support\Facades\DB;
 class VendorClientController extends ApiVendorClientController
 {
     /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-     * Get vendor clients
-=======
      * Get vendor clients.
->>>>>>> refactor/favorite-addresss
-=======
-     * Get vendor clients.
->>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
      *
      * @param  Request  $request
      * @param  Vendor  $vendor
@@ -36,14 +28,7 @@ class VendorClientController extends ApiVendorClientController
     public function index(Request $request, Vendor $vendor): VendorClientCollection
     {
         $clients = parent::index($request, $vendor);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> refactor/favorite-addresss
-=======
-
->>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
         return VendorClientCollection::make($clients)
             ->additional([
                 'success' => true,
@@ -52,15 +37,7 @@ class VendorClientController extends ApiVendorClientController
     }
 
     /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-     * Add new client to vendor
-=======
      * Add new client to vendor.
->>>>>>> refactor/favorite-addresss
-=======
-     * Add new client to vendor.
->>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
      *
      * @param  VendorClientRequest  $request
      * @param  Vendor  $vendor
@@ -98,14 +75,7 @@ class VendorClientController extends ApiVendorClientController
     public function getClientOrders(GetClientOrdersRequest $request, $vendor_id, $client_id): OrderCollection
     {
         $orders = $this->vendorClientService->getClientOrders($vendor_id, $client_id);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> refactor/favorite-addresss
-=======
-
->>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
         return OrderCollection::make($orders)
             ->additional([
                 'success' => true,

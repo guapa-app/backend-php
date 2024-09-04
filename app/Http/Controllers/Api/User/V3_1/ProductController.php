@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\ProductController as ApiProductController;
 use App\Http\Requests\ProductListRequest;
-use App\Http\Requests\ProductRequest;
-use App\Http\Resources\V3\ProductCollection;
-use App\Http\Resources\V3\ProductResource;
+use App\Http\Resources\V3_1\ProductResource;
 
 class ProductController extends ApiProductController
 {
@@ -14,7 +12,7 @@ class ProductController extends ApiProductController
     {
         $index = parent::index($request);
 
-        return ProductCollection::make($index)
+        return ProductResource::collection($index)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -30,34 +28,5 @@ class ProductController extends ApiProductController
                 'success' => true,
                 'message' => __('api.success'),
             ]);
-    }
-
-    public function create(ProductRequest $request)
-    {
-        $item = parent::create($request);
-
-        return ProductResource::make($item)
-            ->additional([
-                'success' => true,
-                'message' => __('api.created'),
-            ]);
-    }
-
-    public function update($id, ProductRequest $request)
-    {
-        $item = parent::update($id, $request);
-
-        return ProductResource::make($item)
-            ->additional([
-                'success' => true,
-                'message' => __('api.updated'),
-            ]);
-    }
-
-    public function delete($id)
-    {
-        parent::delete($id);
-
-        return $this->successJsonRes([], __('api.deleted'));
     }
 }
