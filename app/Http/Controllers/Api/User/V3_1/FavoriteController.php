@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\FavoriteController as ApiFavoriteController;
 use App\Http\Requests\FavoriteRequest;
-use App\Http\Resources\V3_1\FavoriteCollection;
-use App\Http\Resources\V3_1\FavoriteResource;
+use App\Http\Resources\V3_1\User\FavoriteCollection;
+use App\Http\Resources\V3_1\User\FavoriteResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
