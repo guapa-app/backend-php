@@ -130,7 +130,7 @@ class OrderController extends BaseApiController
 
         $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
 
-        if ($invoice->status == 'paid' && $invoice->isDirty('status')) {
+        if ($invoice->status == 'paid') {
             $order = $invoice->order;
             $order->status = 'Accepted';
             if (!str_contains($order->invoice_url, '.s3.')) {
