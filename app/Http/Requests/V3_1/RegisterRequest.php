@@ -47,7 +47,6 @@ class RegisterRequest extends FormRequest
             'email' => 'sometimes|required|email|unique:users,email',
             'phone' => 'required|unique:users,phone|'.(Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
             'gender' => 'nullable|string|in:'.implode(',', UserProfile::GENDER),
-            'password' => 'required|confirmed|min:6|max:100',
         ];
     }
 }

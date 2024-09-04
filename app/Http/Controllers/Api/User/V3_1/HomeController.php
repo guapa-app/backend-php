@@ -6,7 +6,7 @@ use App\Contracts\Repositories\OfferRepositoryInterface;
 use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Contracts\Repositories\V3_1\TaxonomyRepositoryInterface;
 use App\Enums\ProductType;
-use App\Http\Resources\V3_1\CategoryResource;
+use App\Http\Resources\V3_1\TaxonomyResource;
 use App\Http\Resources\V3_1\ProductResource;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,7 @@ class HomeController
         OfferRepositoryInterface $offerRepository,
         ProductRepositoryInterface $productRepository
     ) {
-        $data['categories'] = CategoryResource::collection(
+        $data['categories'] = TaxonomyResource::collection(
             $taxRepository->getData(with: ['icon'], where: ['type' => 'category'], isPaginated: true)
         );
 
