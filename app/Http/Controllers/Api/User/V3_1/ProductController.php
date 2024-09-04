@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Http\Controllers\Api\ProductController as ApiProductController;
 use App\Http\Requests\ProductListRequest;
 use App\Http\Requests\ProductRequest;
-use App\Http\Resources\V3\ProductCollection;
-use App\Http\Resources\V3\ProductResource;
+use App\Http\Resources\V3_1\ProductResource;
 
 class ProductController extends ApiProductController
 {
@@ -14,7 +13,7 @@ class ProductController extends ApiProductController
     {
         $index = parent::index($request);
 
-        return ProductCollection::make($index)
+        return ProductResource::make($index)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
