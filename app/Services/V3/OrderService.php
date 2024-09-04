@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Services\CouponService;
 use App\Services\OrderService as BaseOrderService;
 use App\Services\PaymentService;
+use App\Services\QrCodeService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -140,6 +141,13 @@ class OrderService extends BaseOrderService
                 $inputItem['appointment']['to_time'] = $appointment->to_time;
             }
 
+            $qrcodeData = [
+                'hash_id' => $product->hash_id,
+                'title' => $product->title,
+                'amount_to_pay' => $this->productAmountToPay($product, $inputItem['quantity'], $couponResult),
+                'vendor_name' => $product->vendor->name,
+            ];
+
             return [
                 'order_id' => $order->id,
                 'product_id' => $product->id,
@@ -150,6 +158,7 @@ class OrderService extends BaseOrderService
                 'quantity' => $inputItem['quantity'],
                 'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
                 'user_id' => $inputItem['staff_user_id'] ?? null,
+                'qr_code_link'  => (new QrCodeService())->generate($qrcodeData),
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
