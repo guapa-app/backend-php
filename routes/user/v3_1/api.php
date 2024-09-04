@@ -14,6 +14,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::prefix('users')->group(base_path('routes/user/v3_1/api/users.php'));
     Route::prefix('staff')->group(base_path('routes/user/v3_1/api/staff.php'));
     Route::prefix('posts')->group(base_path('routes/user/v3_1/api/posts.php'));
+    Route::prefix('pages')->group(base_path('routes/user/v3_1/api/pages.php'));
     Route::prefix('offers')->group(base_path('routes/user/v3_1/api/offers.php'));
     Route::prefix('orders')->group(base_path('routes/user/v3_1/api/orders.php'));
     Route::prefix('vendors')->group(base_path('routes/user/v3_1/api/vendors.php'));
@@ -26,7 +27,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::prefix('messaging')->group(base_path('routes/user/v3_1/api/messaging.php'));
     Route::prefix('taxonomies')->group(base_path('routes/user/v3_1/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/user/v3_1/api/notifications.php'));
-    Route::prefix('')->group(base_path('routes/user/v3_1/api/support.php'));
+    Route::prefix('support-msg')->group(base_path('routes/user/v3_1/api/support.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
