@@ -46,7 +46,7 @@ class OrderController extends ApiOrderController
     {
         $orders = parent::create($request);
 
-        return OrderResource::make($orders)
+        return OrderResource::collection($orders)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
