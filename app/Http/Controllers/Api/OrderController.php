@@ -130,9 +130,13 @@ class OrderController extends BaseApiController
 
         $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
 
-        if ($invoice->status == 'paid') {
+        if ($invoice->status == 'paid' && $invoice->isDirty('status')) {
             $order = $invoice->order;
-            $order->updateOrFail(['status' => 'Accepted']);
+            $order->status = 'Accepted';
+            if (!str_contains($order->invoice_url, '.s3.')) {
+                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+            }
+            $order->save();
             Notification::send($order->vendor->staff, new OrderNotification($order));
         }
 
