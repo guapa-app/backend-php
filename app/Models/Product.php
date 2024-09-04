@@ -44,13 +44,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     protected $appends = [
         'likes_count', 'is_liked',
-        'taxonomy_name', 'address',
-        'shared_link',
+        'taxonomy_name', 'taxonomy_id',
+        'address', 'shared_link',
     ];
 
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable = [
@@ -59,6 +60,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -66,13 +68,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     ];
 
     protected $casts = [
-        'type'   => ProductType::class,
+        'type' => ProductType::class,
         'status' => ProductStatus::class,
         'review' => ProductReview::class,
     ];
 
     /**
      * Register media collections.
+     *
      * @return void
      */
     public function registerMediaCollections(): void
@@ -82,6 +85,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     /**
      * Register media conversions.
+     *
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -116,6 +120,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function getTaxonomyNameAttribute()
     {
         return $this->getRelations()['taxonomies'][0]->title ?? '';
+    }
+
+    public function getTaxonomyIdAttribute()
+    {
+        return $this->getRelations()['taxonomies'][0]->id ?? '';
     }
 
     public function getCategoryIdsAttribute()
@@ -216,10 +225,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->morphOne(Media::class, 'model')
             ->where('collection_name', 'products');
     }
+
     public function marketingCampaigns(): MorphMany
     {
         return $this->morphMany(MarketingCampaign::class, 'campaignable');
     }
+
     public function scopeCurrentVendor($query, $value)
     {
         return $query->where('vendor_id', $value);
@@ -320,10 +331,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     /**
      * Scope the query to return only products nearby a specific location by specific distance.
-     * @param Builder $query
-     * @param float $lat
-     * @param float $lng
-     * @param int $dist
+     *
+     * @param  Builder  $query
+     * @param  float  $lat
+     * @param  float  $lng
+     * @param  int  $dist
      * @return Builder
      */
     public function scopeNearBy($query, $lat, $lng, $dist = 50)
@@ -340,7 +352,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         $distance_aggregate = "(6371 * acos(cos(radians($lat)) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians($lng)) + sin(radians($lat)) * sin(radians(addresses.lat))))";
 
-        $query->addSelect(DB::raw($distance_aggregate . ' AS distance'));
+        $query->addSelect(DB::raw($distance_aggregate.' AS distance'));
 
         $query->join('addresses', function ($join) use ($lat, $lng, $dist) {
             $join->on('addresses.id', '=', 'product_addresses.address_id');
