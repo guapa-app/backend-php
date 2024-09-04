@@ -43,7 +43,7 @@ class OrderController extends ApiOrderController
     public function create(OrderRequest $request)
     {
         $data = $request->validated();
-        $data['user_id'] = auth('api')->user()?->id;
+        $data['user_id'] = auth('api')->user()->id;
         $orders = $this->orderService->create($data);
 
         return OrderResource::make($orders)

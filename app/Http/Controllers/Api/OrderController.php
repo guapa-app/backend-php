@@ -48,7 +48,7 @@ class OrderController extends BaseApiController
     {
         if (!$request->has('vendor_id')) {
             $request->merge([
-                'user_id' => $this->user->id,
+                'user_id' => $this->user?->id,
             ]);
         } elseif (!$this->user->hasVendor((int) $request->get('vendor_id'))) {
             abort(403, 'Forbidden');
