@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
 use App\Http\Resources\V3_1\OrderResource;
-use App\Services\V3\OrderService;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 
 class OrderController extends ApiOrderController
 {
     protected $orderService;
 
-    public function __construct(OrderService $orderService)
+    public function __construct(OrderRepositoryInterface $orderRepository, OrderService $orderService)
     {
+        parent::__construct($orderRepository, $orderService);
         $this->orderService = $orderService;
     }
 

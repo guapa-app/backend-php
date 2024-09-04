@@ -41,14 +41,14 @@ class OrderController extends BaseApiController
      * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return Collection
      */
     public function index(GetOrdersRequest $request)
     {
         if (!$request->has('vendor_id')) {
             $request->merge([
-                'user_id' => $this->user?->id,
+                'user_id' => $this->user->id,
             ]);
         } elseif (!$this->user->hasVendor((int) $request->get('vendor_id'))) {
             abort(403, 'Forbidden');
@@ -68,7 +68,7 @@ class OrderController extends BaseApiController
      *
      * @urlParam id required Order id
      *
-     * @param int $id
+     * @param  int  $id
      * @return Order
      */
     public function single($id)
@@ -83,7 +83,7 @@ class OrderController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param OrderRequest $request
+     * @param  OrderRequest  $request
      * @return Collection
      */
     public function create(OrderRequest $request)
@@ -105,8 +105,8 @@ class OrderController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param int $id
-     * @param OrderRequest $request
+     * @param  int  $id
+     * @param  OrderRequest  $request
      *
      * @return Order
      */
@@ -115,7 +115,7 @@ class OrderController extends BaseApiController
         $this->logReq("Update order number - $id");
 
         $data = $this->validate($request, [
-            'status' => 'required|in:' . implode(',', OrderStatus::availableForUpdate()),
+            'status' => 'required|in:'.implode(',', OrderStatus::availableForUpdate()),
             'cancellation_reason' => 'required_if:status,Cancel Request',
         ]);
 
