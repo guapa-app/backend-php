@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Requests\V3_1\User;
+
+use App\Http\Requests\AddressListRequest as BaseAddressListRequest;
+use Illuminate\Support\Facades\Auth;
+
+class AddressListRequest extends BaseAddressListRequest
+{
+
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return $this->user();
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'addressable_id'    => 'required|integer',
+            'addressable_type'  => 'required|string|in:vendor,user',
+            'perPage'           => 'nullable|numeric',
+            'page'              => 'nullable|numeric',
+            'order'             => 'nullable|string|in:asc,desc',
+            'sort'              => 'nullable',
+        ];
+    }
+
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'addressable_type' => 'user',
+            'addressable_id' =>  Auth::id(),
+        ]);
+    }
+}
