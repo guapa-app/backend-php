@@ -54,14 +54,7 @@ class SupportMessageController extends ApiSupportMessageController
         $record = parent::createCommon($request);
 
         $record->load('supportMessageType');
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> refactor/favorite-addresss
-=======
-
->>>>>>> bc42c8a48fdc214d6b0494e77c6ddda120cf383b
         return SupportMessageResource::make($record)
             ->additional([
                 'success' => true,
