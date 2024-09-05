@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\OfferController as ApiOfferController;
-use App\Http\Resources\ProductResource;
+use App\Http\Resources\V3_1\ProductResource;
 use Illuminate\Http\Request;
 
 class OfferController extends ApiOfferController
