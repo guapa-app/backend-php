@@ -11,6 +11,7 @@ class TaxonomyResource extends JsonResource
         return [
             'id' => (int) $this->id,
             'title' => $this->title,
+            'type' => $this->type,
             'icon' => MediaResource::make($this->whenLoaded('icon')),
         ];
     }

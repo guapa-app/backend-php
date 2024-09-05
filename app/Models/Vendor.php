@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
@@ -231,6 +232,11 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function invoices(): HasManyThrough
+    {
+        return $this->hasManyThrough(Invoice::class, Order::class);
     }
 
     public function clients(): HasMany

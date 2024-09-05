@@ -19,6 +19,10 @@ class DownloadInvoice extends Action
     {
         // Implement your download logic here
         foreach ($models as $model) {
+            if (str_contains($model->order->invoice_url, '.s3.')) {
+                return Action::openInNewTab($model->order->invoice_url);
+            }
+
             return Action::openInNewTab(config('app.url') . '/' . $model->order->hash_id . '/show-invoice');
         }
     }
