@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Http\Requests\ChangePhoneRequest;
 use App\Http\Requests\UserRequest;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +43,12 @@ class UserController extends BaseApiController
         return $user;
     }
 
+    public function updatePhone(ChangePhoneRequest $request)
+    {
+        $user = $request->user();
+        $this->userService->updatePhoneNumber($user, $request->phone);
+        return $user;
+    }
     /**
      * Get user by id.
      *
@@ -58,4 +65,5 @@ class UserController extends BaseApiController
 
         return $user;
     }
+
 }
