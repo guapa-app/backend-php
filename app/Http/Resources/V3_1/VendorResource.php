@@ -3,6 +3,7 @@
 namespace App\Http\Resources\V3_1;
 
 use App\Http\Resources\AddressResource;
+use App\Http\Resources\V3\SocialMediaResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VendorResource extends JsonResource
@@ -22,6 +23,8 @@ class VendorResource extends JsonResource
             'logo' => MediaResource::make($this->whenLoaded('logo')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'services' => ProductResource::collection($this->whenLoaded('services')),
+            'social_media' => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
+
         ];
     }
 }
