@@ -23,18 +23,18 @@ class HomeController
             $taxRepository->getData(with: ['icon'], where: ['type' => 'category'], isPaginated: true)
         );
 
-        $request->list_type = ListTypeEnum::Offers->value;
+        $request['list_type'] = ListTypeEnum::Offers->value;
         $data['offers'] = ProductResource::collection(
             $offerRepository->all($request)
         );
 
-        $request->type = ProductType::Product->value;
-        $request->list_type = ListTypeEnum::Default->value;
+        $request['type'] = ProductType::Product->value;
+        $request['list_type'] = ListTypeEnum::Default->value;
         $data['products'] = ProductResource::collection(
             $productRepository->all($request)
         );
 
-        $request->type = ProductType::Service->value;
+        $request['type'] = ProductType::Service->value;
         $data['services'] = ProductResource::collection(
             $productRepository->all($request)
         );
