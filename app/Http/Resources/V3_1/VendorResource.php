@@ -24,7 +24,6 @@ class VendorResource extends JsonResource
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'services' => ProductResource::collection($this->whenLoaded('services')),
             'social_media' => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
-
         ];
     }
 }
