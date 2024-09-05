@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\OfferController as ApiOfferController;
 use App\Http\Requests\OfferRequest;
-use App\Http\Resources\OfferResource;
-use App\Http\Resources\ProductCollection;
+use App\Http\Resources\V3_1\OfferResource;
+use App\Http\Resources\V3_1\ProductResource;
 use Illuminate\Http\Request;
 
 class OfferController extends ApiOfferController
@@ -15,14 +15,14 @@ class OfferController extends ApiOfferController
      * To display all products that has offer
      * even offers expired, active or incoming.
      *
-     * @param Request $request
-     * @return ProductCollection|object
+     * @param  Request  $request
+     * @return ProductResource|object
      */
     public function index(Request $request)
     {
         $index = parent::index($request);
 
-        return ProductCollection::make($index)
+        return ProductResource::collection($index)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
