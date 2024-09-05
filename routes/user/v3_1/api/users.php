@@ -5,6 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/{id}', [UserController::class, 'single']);
-    Route::match(['put', 'patch', 'post'], '/{id}', [UserController::class, 'update'])->name('users.update');
-    Route::match(['put', 'patch', 'post'], '/change-phone', [UserController::class, 'updatePhone'])->name('users.update_phone');
+    Route::post('/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::put('/change-phone', [UserController::class, 'updatePhone'])->name('users.update_phone');
 });
