@@ -29,6 +29,7 @@ class HomeController
         );
 
         $request->type = ProductType::Product->value;
+        $request->list_type = ListTypeEnum::Default->value;
         $data['products'] = ProductResource::collection(
             $productRepository->all($request)
         );
