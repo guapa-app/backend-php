@@ -12,6 +12,7 @@ use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\HasManyThrough;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
@@ -135,6 +136,8 @@ class Vendor extends Resource
             HasMany::make(__('products'), 'products', Product::class),
 
             HasMany::make(__('orders'), 'orders', Order::class),
+
+            HasManyThrough::make(__('invoices'), 'invoices', Invoice::class),
 
             BelongsToMany::make(__('staff'), 'staff', User::class)->fields(function () {
                 return [
