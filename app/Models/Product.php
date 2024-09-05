@@ -45,7 +45,8 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     protected $appends = [
         'likes_count', 'is_liked',
         'taxonomy_name', 'taxonomy_id',
-        'address', 'shared_link',
+        'taxonomy_type', 'address',
+        'shared_link'
     ];
 
     /**
@@ -125,6 +126,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function getTaxonomyIdAttribute()
     {
         return $this->getRelations()['taxonomies'][0]->id ?? '';
+    }
+
+    public function getTaxonomyTypeAttribute()
+    {
+        return $this->getRelations()['taxonomies'][0]->type ?? '';
     }
 
     public function getCategoryIdsAttribute()

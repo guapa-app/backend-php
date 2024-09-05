@@ -16,6 +16,7 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'taxonomy_id' => $this->taxonomy_id,
             'taxonomy_name' => $this->taxonomy_name,
+            'taxonomy_type' => $this->taxonomy_type,
             'price' => (float) $this->price,
             'review' => $this->review,
             'terms' => $this->terms,
