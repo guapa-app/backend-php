@@ -11,7 +11,7 @@ class ChangePhoneRequest extends FailedValidationRequest
      */
     public function authorize(): bool
     {
-        return $this->user();
+        return true;
     }
 
     /**
