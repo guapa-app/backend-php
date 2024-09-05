@@ -139,7 +139,7 @@ class UserService
     {
         if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
             $profile->addMedia($data['photo'])->toMediaCollection('avatars');
-        } elseif ($this->userRepository->isAdmin() && !isset($data['photo'])) {
+        } elseif (!isset($data['photo'])) {
             // Delete all profile media
             // As there is only one collection - avatars
             $profile->media()->delete();
