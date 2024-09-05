@@ -195,6 +195,20 @@ class UserService
         return $user;
     }
 
+    public function updatePhoneNumber(User $user, $phone): User
+    {
+        if ($user->phone !== $phone) {
+            $user->phone_verified_at = null;
+            $user->phone = $phone;
+            $user->save();
+
+            // Send OTP to the new phone number
+            $smsService = new SMSService();
+            $smsService->sendOtp($phone);
+        }
+
+        return $user;
+    }
     public function setPassword(User $user, $password): User
     {
         // Set user password
