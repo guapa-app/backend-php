@@ -3,7 +3,6 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Actions;
 use Laravel\Nova\Actions\ExportAsCsv;
 use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\BelongsTo;
@@ -136,7 +135,7 @@ class Invoice extends Resource
                     ];
                 }),
 
-            (new \App\Nova\Actions\DownloadInvoice)->showInline(),
+            (new \App\Nova\Actions\DownloadInvoice)->onlyInline(),
         ];
     }
 
@@ -147,6 +146,10 @@ class Invoice extends Resource
 
     public function authorizedToUpdate(Request $request): bool
     {
+        if ($request->action == 'download-invoice') {
+            return true;
+        }
+
         return false;
     }
 
