@@ -59,7 +59,7 @@ class MarketingCampaignController extends BaseApiController
     public function availableCustomers()
     {
         $availableCustomers = Setting::getCampaignAvailableCustomers();
-        return  $this->successJsonRes(['available_customers' => $availableCustomers], __('api.success'));
+        return  $this->successJsonRes(['items' => $availableCustomers], __('api.success'));
     }
 
     public function changeStatus(Request $request)
