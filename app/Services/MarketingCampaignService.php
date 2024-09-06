@@ -45,11 +45,11 @@ class MarketingCampaignService
         $totalCost = $cost + $taxes;
 
         return [
-            'message_cost' => $this->messageCost,
-            'audience_count' => $audienceCount,
-            'cost' => $cost,
+            'message_cost' => (string)$this->messageCost,
+            'audience_count' => (string) $audienceCount,
+            'cost' => (string) $cost,
             'taxes' => number_format($taxes, 2),
-            'total_cost' => $totalCost,
+            'total_cost' => (string) $totalCost,
         ];
     }
     public function create(array $data)
