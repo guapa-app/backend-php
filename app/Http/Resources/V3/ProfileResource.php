@@ -17,7 +17,7 @@ class ProfileResource extends JsonResource
             'birth_date'            => Carbon::parse($this->birth_date)->format('Y-m-d'),
             'about'                 => (string) $this->about,
             'settings'              => $this->settings,
-            'photo'                 => PhotoResource::make($this->whenLoaded('photo')),
+            'photo'                 => MediaResource::make($this->whenLoaded('photo')),
         ];
     }
 }

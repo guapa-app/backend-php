@@ -13,7 +13,7 @@ class AuthController extends ApiAuthController
 {
     public function register(RegisterRequest $request)
     {
-        list($token, $user) = parent::register($request);
+        list($token, $user) = parent::registerCommon($request);
 
         return response()->json([
             'token' => $token,

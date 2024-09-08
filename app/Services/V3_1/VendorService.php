@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\V3_1;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Contracts\Repositories\VendorRepositoryInterface;
@@ -9,23 +9,17 @@ use App\Models\User;
 use App\Models\UserVendor;
 use App\Models\Vendor;
 use App\Models\WorkDay;
+use App\Services\VendorService as BaseVendorService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
-/**
- * Vendor service.
- */
-class VendorService
+class VendorService extends BaseVendorService
 {
-    protected $vendorRepository;
-    protected $userRepository;
-
     public function __construct(VendorRepositoryInterface $vendorRepository, UserRepositoryInterface $userRepository)
     {
-        $this->vendorRepository = $vendorRepository;
-        $this->userRepository = $userRepository;
+        parent::__construct($vendorRepository, $userRepository);
     }
 
     /**
@@ -36,44 +30,17 @@ class VendorService
      */
     public function create(array $data): Vendor
     {
-        /*
-        * overwrite default status value from migration file.
-        * should remove default values from migrations
-        */
         return DB::transaction(function () use ($data) {
-            $data['status'] = array_flip(Vendor::STATUSES)['active'];
-
             // Create vendor
             $vendor = $this->vendorRepository->create($data);
 
-            // Update logo
-            if (isset($data['logo'])) {
-                $this->updateLogo($vendor, ['logo' => $data['logo']]);
-            }
-
-            if (isset($data['specialty_ids'])) {
-                $this->updateSpecialties($vendor, $data['specialty_ids']);
-            }
-
-            if (isset($data['address'])) {
-                $this->createAddress($vendor, $data['address']);
-            }
-
             if (!$this->vendorRepository->isAdmin()) {
                 $vendor->users()->create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $data['id'],
+                    'email' => $data['email'],
                     'role' => 'manager',
-                    'email' => auth()->user()->email,
                 ]);
-
-                auth()->user()->assignRole('manager');
             }
-
-            $this->updateWorkingDaysAndAppointments($vendor, $data);
-
-            $this->updateStaff($vendor, $data);
-
-            $vendor->loadMissing('staff', 'logo', 'addresses', 'workDays');
 
             return $vendor;
         });
