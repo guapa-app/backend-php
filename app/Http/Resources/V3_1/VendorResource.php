@@ -11,6 +11,7 @@ class VendorResource extends JsonResource
     {
         $returned_arr = [
             'id'                                        => $this->id,
+            'staff_id'                                  => $this->staff_id,
             'name'                                      => (string) $this->name,
             'verified'                                  => (bool) $this->verified,
             'is_deleted'                                => (bool) $this->deleted_at,
