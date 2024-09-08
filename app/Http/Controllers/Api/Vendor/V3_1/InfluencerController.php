@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\InfluencerController as ApiInfluencerController;
 use App\Http\Requests\V3\InfluencerRequest;
+use App\Http\Resources\V3\InfluencerCollection;
 use App\Http\Resources\V3_1\InfluencerResource;
 use App\Models\Vendor;
 use Exception;
@@ -16,7 +17,7 @@ class InfluencerController extends ApiInfluencerController
     {
         $records = parent::indexCommon($request, $vendor);
 
-        return InfluencerResource::collection($records)
+        return InfluencerCollection::make($records)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
