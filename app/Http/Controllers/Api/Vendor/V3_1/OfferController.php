@@ -20,6 +20,7 @@ class OfferController extends ApiOfferController
      */
     public function index(Request $request)
     {
+        $request->merge(['vendor_id' => $this->user->managerVendorId()]);
         $index = parent::index($request);
 
         return ProductResource::collection($index)
