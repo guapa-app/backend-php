@@ -11,6 +11,7 @@ class VendorResource extends JsonResource
     {
         $returned_arr = [
             'id'                                        => $this->id,
+            'staff_id'                                  => $this->staff_id,
             'name'                                      => (string) $this->name,
             'type'                                      => $this->resource::TYPES[$this->type],
             'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),

@@ -76,7 +76,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     protected $appends = [
         'specialty_ids', 'likes_count', 'is_liked',
         'views_count', 'shares_count', 'work_days',
-        'shared_link',
+        'shared_link', 'staff_id'
     ];
 
     /**
@@ -95,6 +95,11 @@ class Vendor extends Model implements HasMedia, HasReviews
     protected $search_attributes = [
         'name', 'email', 'phone', 'about',
     ];
+
+    public function getStaffIdAttribute()
+    {
+        return $this->staff()?->first()?->id;
+    }
 
     public function getSpecialtyIdsAttribute()
     {
