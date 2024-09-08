@@ -17,6 +17,7 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::prefix('offers')->group(base_path('routes/vendor/v3_1/api/offers.php'));
     Route::prefix('orders')->group(base_path('routes/vendor/v3_1/api/orders.php'));
     Route::prefix('vendors')->group(base_path('routes/vendor/v3_1/api/vendors.php'));
+    Route::prefix('clients')->group(base_path('routes/vendor/v3_1/api/clients.php'));
     Route::prefix('history')->group(base_path('routes/vendor/v3_1/api/history.php'));
     Route::prefix('reviews')->group(base_path('routes/vendor/v3_1/api/reviews.php'));
     Route::prefix('products')->group(base_path('routes/vendor/v3_1/api/products.php'));

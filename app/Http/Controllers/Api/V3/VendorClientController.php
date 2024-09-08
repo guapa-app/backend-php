@@ -21,13 +21,12 @@ class VendorClientController extends ApiVendorClientController
     /**
      * Get vendor clients.
      *
-     * @param Request $request
-     * @param Vendor $vendor
+     * @param  Request  $request
      * @return VendorClientCollection
      */
-    public function index(Request $request, Vendor $vendor) : VendorClientCollection
+    public function index(Request $request): VendorClientCollection
     {
-        $clients = parent::index($request, $vendor);
+        $clients = parent::index($request);
 
         return VendorClientCollection::make($clients)
             ->additional([
@@ -39,15 +38,15 @@ class VendorClientController extends ApiVendorClientController
     /**
      * Add new client to vendor.
      *
-     * @param VendorClientRequest $request
-     * @param Vendor $vendor
+     * @param  VendorClientRequest  $request
+     * @param  Vendor  $vendor
      * @return JsonResponse
      */
-    public function store(VendorClientRequest $request, Vendor $vendor) : JsonResponse
+    public function store(VendorClientRequest $request): JsonResponse
     {
         try {
-            return DB::transaction(function () use ($request, $vendor) {
-                $result = parent::store($request, $vendor);
+            return DB::transaction(function () use ($request) {
+                $result = parent::store($request);
 
                 return $this->successJsonRes($result, __('api.created'));
             });
@@ -62,19 +61,18 @@ class VendorClientController extends ApiVendorClientController
      * Get client orders for a vendor.
      *
      * @group VendorClient
-     * @urlParam vendor int required The ID of the vendor. Example: 1
      * @urlParam client int required The ID of the client. Example: 1
      * @queryParam product_type string The product type to filter by (product or service). Example: product
      * @responseFile responses/getClientOrders.json
      *
-     * @param GetClientOrdersRequest $request
+     * @param  GetClientOrdersRequest  $request
      * @param  $vendor_id
      * @param  $client_id
      * @return OrderCollection
      */
-    public function getClientOrders(GetClientOrdersRequest $request, $vendor_id, $client_id) : OrderCollection
+    public function getClientOrders(GetClientOrdersRequest $request,$client_id): OrderCollection
     {
-        $orders = $this->vendorClientService->getClientOrders($vendor_id, $client_id);
+        $orders = $this->vendorClientService->getClientOrders($client_id);
 
         return OrderCollection::make($orders)
             ->additional([
@@ -83,10 +81,10 @@ class VendorClientController extends ApiVendorClientController
             ]);
     }
 
-    public function destroy(Vendor $vendor, $clientId)
+    public function destroy($clientId)
     {
         try {
-            parent::destroy($vendor, $clientId);
+            parent::destroy($clientId);
 
             return $this->successJsonRes(message: __('api.deleted'));
         } catch (Exception $exception) {
