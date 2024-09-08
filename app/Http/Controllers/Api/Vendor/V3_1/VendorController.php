@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\VendorController as ApiVendorController;
 use App\Http\Requests\VendorRequest;
-use App\Http\Resources\VendorResource;
+use App\Http\Resources\V3_1\VendorResource;
 use Exception;
 use Illuminate\Http\JsonResponse;
 

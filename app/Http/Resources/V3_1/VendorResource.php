@@ -23,6 +23,8 @@ class VendorResource extends JsonResource
             'logo' => MediaResource::make($this->whenLoaded('logo')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'services' => ProductResource::collection($this->whenLoaded('services')),
+            'staff' => StaffResource::collection($this->whenLoaded('staff')),
+            'specialties' => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'social_media' => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
         ];
     }
