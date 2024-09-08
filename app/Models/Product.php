@@ -173,20 +173,20 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getPaymentDetailsAttribute()
     {
-        $finalPrice = $this->offer_price; // Use the getOfferPriceAttribute method
-        $fees = $this->calculateProductFees($finalPrice);
-        $taxPercentage = Setting::getTaxes(); // Example tax percentage
+        $finalPrice = (float) $this->offer_price; // Use the getOfferPriceAttribute method
+        $fees = (float) $this->calculateProductFees($finalPrice);
+        $taxPercentage = (float) Setting::getTaxes(); // Example tax percentage
         $taxes = ($taxPercentage / 100) * $fees;
         $remaining = $finalPrice - $fees;
         $feesWithTaxes = $fees + $taxes;
 
         return [
-            'fees' => (float) $fees,
-            'taxes' => (float) $taxes,
-            'remaining' => (float) $remaining,
-            'fees_with_taxes' => (float) $feesWithTaxes,
-            'tax_percentage' => (float) $taxPercentage,
-            'price_after_discount' => (float) $this->offer ? $this->offer_price : $this->price,
+            'fees' => $fees,
+            'taxes' => $taxes,
+            'remaining' => $remaining,
+            'fees_with_taxes' => $feesWithTaxes,
+            'tax_percentage' => $taxPercentage,
+            'price_after_discount' => $this->offer ? $this->offer_price : (float) $this->price,
             'discount_percentage' => (float) $this->offer?->discount ?? 0,
         ];
     }
