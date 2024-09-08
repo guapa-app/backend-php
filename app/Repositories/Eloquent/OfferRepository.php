@@ -42,12 +42,6 @@ class OfferRepository extends EloquentRepository implements OfferRepositoryInter
         if ('enduser' === strtolower($request->header('X-App-Type'))) {
             $query->whereHas('offer');
         } else {
-            if (empty($request->vendor_id)) {
-                $request->merge([
-                    'vendor_id' => $this->user->managerVendorId(),
-                ]);
-            }
-
             $query->withAllVendorOffers($request);
         }
 

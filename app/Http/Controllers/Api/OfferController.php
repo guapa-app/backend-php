@@ -79,6 +79,6 @@ class OfferController extends BaseApiController
      */
     public function delete($id)
     {
-        return $this->offerRepository->delete($id);
+        return $this->offerService->delete($id);
     }
 }
