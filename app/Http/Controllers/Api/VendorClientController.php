@@ -21,10 +21,9 @@ class VendorClientController extends Controller
     public function index(Request $request, Vendor $vendor)
     {
         $request->validate([
-            'name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:255',
+            'search' => 'nullable|string|max:255',
         ]);
-        $filters = $request->only(['name', 'phone']);
+        $filters = $request->only(['search']);
 
         return $this->vendorClientService->listClientsWithOrderCount($vendor, $filters);
     }

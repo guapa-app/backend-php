@@ -84,14 +84,11 @@ class VendorClientService
 
     private function applyFilters($query, array $filters): void
     {
-        if (!empty($filters['name']) || !empty($filters['phone'])) {
+        if (!empty($filters['search'])) {
             $query->whereHas('user', function ($query) use ($filters) {
-                if (!empty($filters['name'])) {
-                    $query->where('name', 'like', '%' . $filters['name'] . '%');
-                }
-                if (!empty($filters['phone'])) {
-                    $query->where('phone', 'like', '%' . $filters['phone'] . '%');
-                }
+                $search = '%' . $filters['search'] . '%';
+                $query->where('name', 'like', $search)
+                    ->orWhere('phone', 'like', $search);
             });
         }
     }
