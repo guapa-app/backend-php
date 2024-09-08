@@ -181,13 +181,13 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $feesWithTaxes = $fees + $taxes;
 
         return [
-            'fees' => $fees,
-            'taxes' => $taxes,
-            'remaining' => $remaining,
-            'fees_with_taxes' => $feesWithTaxes,
-            'tax_percentage' => $taxPercentage,
-            'price_after_discount' => $this->offer ? $this->offer_price : $this->price,
-            'discount_percentage' => $this->offer?->discount ?? 0,
+            'fees' => (float) $fees,
+            'taxes' => (float) $taxes,
+            'remaining' => (float) $remaining,
+            'fees_with_taxes' => (float) $feesWithTaxes,
+            'tax_percentage' => (float) $taxPercentage,
+            'price_after_discount' => (float) $this->offer ? $this->offer_price : $this->price,
+            'discount_percentage' => (float) $this->offer?->discount ?? 0,
         ];
     }
 

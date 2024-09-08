@@ -24,7 +24,7 @@ class ProductResource extends JsonResource
             'likes_count' => (int) $this->likes_count,
             'is_liked' => (bool) $this->is_liked,
             'shared_link' => $this->shared_link,
-            'payment_details' => (float) $this->payment_details,
+            'payment_details' => $this->payment_details,
             'offer' => OfferResource::make($this->whenLoaded('offer')),
             'vendor' => VendorResource::make($this->whenLoaded('vendor')),
             'images' => MediaResource::collection($this->whenLoaded('media')),
