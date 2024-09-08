@@ -168,6 +168,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->hasOne(UserVendor::class);
     }
 
+    public function vendor()
+    {
+        return $this->hasOneThrough(Vendor::class, UserVendor::class, 'user_id', 'id', 'id', 'vendor_id');
+    }
+
     public function userVendors()
     {
         return $this->hasMany(UserVendor::class);

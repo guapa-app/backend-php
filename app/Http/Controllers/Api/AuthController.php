@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Exceptions\ApiException;
 use App\Exceptions\PhoneNotVerifiedException;
-use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
@@ -43,9 +42,9 @@ class AuthController extends BaseApiController
      * @responseFile 200 responses/auth/register.json
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      *
-     * @param RegisterRequest $request
+     * @param $request
      */
-    public function register(RegisterRequest $request)
+    public function registerCommon($request)
     {
         $data = $request->validated();
 

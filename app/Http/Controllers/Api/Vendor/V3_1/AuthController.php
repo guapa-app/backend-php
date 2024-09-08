@@ -4,24 +4,33 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
-use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\Vendor\V3_1\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
-use App\Http\Resources\V3\UserResource;
+use App\Http\Resources\V3_1\LoginResource;
 use App\Models\Setting;
 use App\Services\AuthService;
 use App\Services\SMSService;
 use App\Services\V3\UserService;
+use App\Services\V3_1\VendorService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends ApiAuthController
 {
     private $smsService;
+    private $vendorService;
 
-    public function __construct(UserRepositoryInterface $userRepository, AuthService $authService, UserService $userService, SMSService $smsService)
-    {
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        AuthService $authService,
+        UserService $userService,
+        SMSService $smsService,
+        VendorService $vendorService
+    ) {
         parent::__construct($userRepository, $authService, $userService);
         $this->smsService = $smsService;
+        $this->vendorService = $vendorService;
     }
 
     /**
@@ -38,17 +47,23 @@ class AuthController extends ApiAuthController
     public function register(RegisterRequest $request)
     {
         $data = $request->validated();
+        DB::transaction(function () use ($data) {
+            // handle user date to manage profile.
+            $user_data = $this->userService->handleUserData($data);
 
-        // handle user date to manage profile.
-        $data = $this->userService->handleUserData($data);
+            // create user
+            $user = $this->userService->create($user_data);
 
-        // create user
-        $this->userService->create($data);
+            // create vendor
+            $this->vendorService->create($user->attributesToArray() + $data);
 
-        // send otp to the user to verify account.
-        if (!Setting::checkTestingMode()) {
-            $this->smsService->sendOtp($data['phone']);
-        }
+            $user->assignRole('manager');
+
+            // send otp to the user to verify account.
+            if (!Setting::checkTestingMode()) {
+                $this->smsService->sendOtp($data['phone']);
+            }
+        });
 
         return $this->successJsonRes([
             'is_otp_sent' => true,
@@ -67,12 +82,14 @@ class AuthController extends ApiAuthController
 
         $this->checkIfUserDeleted($user->status);
 
+        $user->loadMissing('vendor');
+
         if (Setting::checkTestingMode()) {
             $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
 
             $this->prepareUserResponse($user, $token);
 
-            return UserResource::make($user)
+            return LoginResource::make($user)
                 ->additional([
                     'success' => true,
                     'message' => __('api.success'),
@@ -91,7 +108,7 @@ class AuthController extends ApiAuthController
         if ($token) {
             $user = $this->prepareUserResponse($user, $token);
 
-            return UserResource::make($user)
+            return LoginResource::make($user)
                 ->additional([
                     'success' => true,
                     'message' => __('api.success'),
