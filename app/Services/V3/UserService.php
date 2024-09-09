@@ -2,8 +2,11 @@
 
 namespace App\Services\V3;
 
+use App\Exceptions\ApiException;
+use App\Exceptions\PhoneNotVerifiedException;
 use App\Models\User;
 use App\Services\UserService as BaseUserService;
+use Illuminate\Http\Request;
 
 class UserService extends BaseUserService
 {
@@ -47,5 +50,46 @@ class UserService extends BaseUserService
                 'gender'        => $data['gender'] ?? null,
             ],
         ];
+    }
+
+    public function checkUserCredentials($token)
+    {
+        if ($token == null) {
+            throw new ApiException(__('api.invalid_credentials'), 401);
+        }
+    }
+
+    public function checkUserVerified($phone_verified_at, $username)
+    {
+        if ($phone_verified_at == null && strpos($username, '@') === false) {
+            throw new PhoneNotVerifiedException();
+        }
+    }
+
+    public function checkIfUserDeleted($status)
+    {
+        if ($status == User::STATUS_DELETED) {
+            throw new ApiException(__('api.account_deleted'), 401);
+        }
+    }
+
+    public function user($user)
+    {
+        $user->loadProfileFields();
+
+        $this->checkIfUserDeleted($user->status);
+
+        $user->append('user_vendors_ids');
+
+        return $user;
+    }
+
+    public function checkIfPhoneExist(Request $request)
+    {
+        $data = $this->validate($request, [
+            'phone' => 'required|string|max:40',
+        ]);
+
+        return $this->userRepository->getByPhone($data['phone']);
     }
 }

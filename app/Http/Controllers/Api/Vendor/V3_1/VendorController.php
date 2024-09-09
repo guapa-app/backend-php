@@ -2,43 +2,32 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Controllers\Api\VendorController as ApiVendorController;
+use App\Contracts\Repositories\VendorRepositoryInterface;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\VendorRequest;
-use App\Http\Resources\VendorResource;
-use Exception;
-use Illuminate\Http\JsonResponse;
+use App\Http\Resources\Vendor\V3_1\VendorResource;
+use App\Services\VendorService;
 
-class VendorController extends ApiVendorController
+class VendorController extends BaseApiController
 {
-    /**
-     * After register a user he can have a vendor access
-     * by add vendor data.
-     *
-     * @param  VendorRequest  $request
-     * @return VendorResource|JsonResponse
-     */
-    public function create(VendorRequest $request)
+
+    protected $vendorRepository;
+    protected $vendorService;
+
+    public function __construct(VendorRepositoryInterface $vendorRepository, VendorService $vendorService)
     {
-        try {
-            $vendor = parent::create($request);
+        parent::__construct();
 
-            return VendorResource::make($vendor)
-                ->additional([
-                    'success' => true,
-                    'message' => __('api.created'),
-                ]);
-        } catch (Exception $exception) {
-            $this->logReq($exception->getMessage());
-
-            return $this->errorJsonRes(message: 'something went wrong');
-        }
+        $this->vendorRepository = $vendorRepository;
+        $this->vendorService = $vendorService;
     }
 
     public function update(VendorRequest $request, $id)
     {
-        $item = parent::update($request, $id);
+        // Complete and update vendor data
+        $record = $this->vendorService->update($id, $request->validated());
 
-        return VendorResource::make($item)
+        return VendorResource::make($record)
             ->additional([
                 'success' => true,
                 'message' => __('api.updated'),

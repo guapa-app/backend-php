@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
-use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Exceptions\ApiException;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\Vendor\V3_1\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
-use App\Http\Resources\V3_1\LoginResource;
+use App\Http\Resources\Vendor\V3_1\LoginResource;
+use App\Http\Resources\Vendor\V3_1\VendorProfileResource;
 use App\Models\Setting;
 use App\Services\AuthService;
 use App\Services\SMSService;
@@ -14,12 +16,16 @@ use App\Services\V3\UserService;
 use App\Services\V3_1\VendorService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class AuthController extends ApiAuthController
+class AuthController extends BaseApiController
 {
     private $smsService;
     private $vendorService;
+    protected $authService;
+    protected $userService;
+    protected $userRepository;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -28,7 +34,11 @@ class AuthController extends ApiAuthController
         SMSService $smsService,
         VendorService $vendorService
     ) {
-        parent::__construct($userRepository, $authService, $userService);
+        parent::__construct();
+
+        $this->authService = $authService;
+        $this->userService = $userService;
+        $this->userRepository = $userRepository;
         $this->smsService = $smsService;
         $this->vendorService = $vendorService;
     }
@@ -80,7 +90,7 @@ class AuthController extends ApiAuthController
             abort(404, __('api.phone_doesnt_exist'));
         }
 
-        $this->checkIfUserDeleted($user->status);
+        $this->userService->checkIfUserDeleted($user->status);
 
         $user->loadMissing('vendor');
 
@@ -120,6 +130,23 @@ class AuthController extends ApiAuthController
         }
     }
 
+    public function userVendor()
+    {
+        $vendor = $this->user->vendor;
+
+        $vendor->loadMissing('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia', 'socialMedia.icon');;
+
+        $this->userService->checkIfUserDeleted($this->user->status);
+
+        $this->user->append('user_vendors_ids');
+
+        return VendorProfileResource::make($vendor)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
     private function prepareUserResponse($user, $token)
     {
         $user->update(['phone_verified_at' => now()->toDateTimeString()]);
@@ -132,4 +159,59 @@ class AuthController extends ApiAuthController
 
         return $user;
     }
+
+    public function user()
+    {
+        $this->user->loadProfileFields();
+
+        $this->userService->checkIfUserDeleted($this->user->status);
+
+        $this->user->append('user_vendors_ids');
+
+        return $this->user;
+    }
+
+    public function refreshToken(Request $request)
+    {
+        $this->validate($request, [
+            'refresh_token' => 'required|string',
+        ]);
+
+        // Get access token from oauth server
+        $res = $this->authService->authenticate([
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $request->get('refresh_token'),
+            'scope' => '*',
+        ]);
+
+        if ($res == null) {
+            throw new ApiException(__('api.invalid_refresh_token'), 401);
+        }
+
+        return $res;
+    }
+
+    public function logout(Request $request)
+    {
+        $this->authService->logout($this->user);
+
+        return true;
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $this->userService->deleteAccount($this->user->getKey());
+
+        return $this->logout($request);
+    }
+
+    public function checkIfPhoneExist(Request $request)
+    {
+        $data = $this->validate($request, [
+            'phone' => 'required|string|max:40',
+        ]);
+
+        return $this->userService->checkIfPhoneExist($data['phone']);
+    }
+
 }
