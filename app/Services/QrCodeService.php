@@ -16,7 +16,7 @@ class QrCodeService
 
         $file = QrCode::size(200)->generate(utf8_encode($qrCodeString));
 
-        $path = '/public/qrcode/'.$data['hash_id'].'_'.rand(1000, 9999).'.png';
+        $path = '/public/qrcode/'.$data['hash_id'].'_'.rand(1000, 9999).'.svg';
 
         Storage::disk('s3')->put($path, $file, 'public');
 
