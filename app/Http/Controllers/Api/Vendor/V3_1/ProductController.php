@@ -11,6 +11,7 @@ class ProductController extends ApiProductController
 {
     public function index(ProductListRequest $request)
     {
+        $request['vendor_id'] = $this->user->userVendor?->vendor_id;
         $index = parent::index($request);
 
         return ProductResource::collection($index)
