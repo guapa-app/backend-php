@@ -4,15 +4,14 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\StaffController as ApiStaffController;
 use App\Http\Requests\StaffRequest;
-use App\Http\Resources\StaffCollection;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\V3_1\UserResource;
 use Illuminate\Http\Request;
 
 class StaffController extends ApiStaffController
 {
     public function index(Request $request)
     {
-        return StaffCollection::make(parent::index($request))
+        return UserResource::collection(parent::index($request))
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),

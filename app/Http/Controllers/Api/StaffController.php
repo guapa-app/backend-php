@@ -40,7 +40,7 @@ class StaffController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 404 scenario="Vendor not found" responses/errors/404.json
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      */
     public function index(Request $request)
@@ -69,6 +69,10 @@ class StaffController extends BaseApiController
     {
         $data = $request->validated();
 
+        isset($data['vendor_id']) ?
+            $data['vendor_id'] :
+            $data['vendor_id'] = auth('api')->user()->userVendor?->vendor_id;
+
         $vendor = $this->vendorRepository->getOneOrFail($data['vendor_id']);
 
         $this->validateVendorManager($vendor);
@@ -88,6 +92,10 @@ class StaffController extends BaseApiController
     public function update(StaffRequest $request, $userId)
     {
         $data = $request->validated();
+
+        isset($data['vendor_id']) ?
+            $data['vendor_id'] :
+            $data['vendor_id'] = auth('api')->user()->userVendor?->vendor_id;
 
         $userToUpdate = $this->userRepository->getOneOrFail($userId);
         $vendor = $this->vendorRepository->getOneOrFail($data['vendor_id']);
@@ -118,7 +126,7 @@ class StaffController extends BaseApiController
     /**
      * Validate that current user manages given vendor.
      *
-     * @param Vendor $vendor
+     * @param  Vendor  $vendor
      * @return void
      */
     public function validateVendorManager($vendor): void
@@ -133,7 +141,7 @@ class StaffController extends BaseApiController
     /**
      * Validate that current vendor can update requested user.
      *
-     * @param Vendor $vendor
+     * @param  Vendor  $vendor
      * @return void
      */
     public function validateUserBelongsToVendor($vendor, $user): void
