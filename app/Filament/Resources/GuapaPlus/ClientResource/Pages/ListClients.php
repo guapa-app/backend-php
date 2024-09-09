@@ -7,9 +7,9 @@ use App\Jobs\ProcessClientImport;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Storage;
-use Filament\Pages\Concerns\ExposesTableToWidgets;
 
 class ListClients extends ListRecords
 {
@@ -25,7 +25,7 @@ class ListClients extends ListRecords
                 ->form(ClientResource::getBulkUploadFormSchema())
                 ->action(function (array $data): void {
 //                    $path = Storage::path($data['excel_file'], 'public');
-                    $path =  Storage::disk('public')->path($data['excel_file']);
+                    $path = Storage::disk('public')->path($data['excel_file']);
 
                     // Handle the bulk upload here
                     $vendor = auth()->user()->userVendors->first()->vendor;
@@ -37,7 +37,6 @@ class ListClients extends ListRecords
                         ->body('Your data will be processed shortly.')
                         ->success()
                         ->send();
-
                 }),
         ];
     }
@@ -53,6 +52,4 @@ class ListClients extends ListRecords
     {
         return ClientResource::getWidgets();
     }
-
-
 }

@@ -13,6 +13,4 @@ class CouponProduct extends Model
         'coupon_id',
         'product_id',
     ];
-
-
 }

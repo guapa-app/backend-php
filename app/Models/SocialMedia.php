@@ -20,7 +20,7 @@ class SocialMedia extends Model implements Listable, HasMedia
     use ListableTrait, InteractsWithMedia;
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 
     public function vendors(): BelongsToMany
@@ -59,7 +59,6 @@ class SocialMedia extends Model implements Listable, HasMedia
             ->fit(Manipulations::FIT_MAX, 300, 500)
             ->performOnCollections('social_media_icons');
     }
-
 
     public function scopeApplyFilters(Builder $builder, Request $request): Builder
     {

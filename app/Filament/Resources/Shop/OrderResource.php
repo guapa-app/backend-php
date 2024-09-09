@@ -9,10 +9,9 @@ use App\Filament\Resources\Shop\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
 use App\Notifications\PushNotification;
 use App\Traits\FilamentVendorAccess;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Actions;
-
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -55,7 +54,7 @@ class OrderResource extends Resource
                     ])
                     ->columnSpan(['lg' => 1])
                     ->hidden(fn (?Order $record) => $record === null),
-                   
+
                    Forms\Components\Section::make('Order Items')
                         ->schema([
                         Forms\Components\Placeholder::make('')
@@ -67,7 +66,6 @@ class OrderResource extends Resource
                 ->hidden(fn (?Order $record) => $record === null),
                         ])
             ->columns(3);
-
     }
 
     public static function getFormSchema(string $section = null): array
@@ -169,7 +167,6 @@ class OrderResource extends Resource
         ];
     }
 
-
     protected function getActions(): array
     {
         return [
@@ -203,5 +200,4 @@ class OrderResource extends Resource
             ->success()
             ->send();
     }
-
 }

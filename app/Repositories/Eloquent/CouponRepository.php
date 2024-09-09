@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Eloquent;
 
-
 use App\Contracts\Repositories\CouponRepositoryInterface;
 use App\Models\Coupon;
 use Illuminate\Http\Request;
@@ -34,6 +33,7 @@ class CouponRepository extends EloquentRepository implements CouponRepositoryInt
             return $query->get();
         }
     }
+
     public function create(array $data) : Coupon
     {
         return DB::transaction(function () use ($data) {

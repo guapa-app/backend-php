@@ -122,7 +122,7 @@ class Vendor extends Resource
 
             Files::make(__('Contract'), 'contract')
                 ->temporary(now()->addMinutes(5))
-                ->rules( 'nullable') // Add appropriate validation rules
+                ->rules('nullable') // Add appropriate validation rules
                 ->help('Upload the vendor contract (PDF, DOC, or DOCX file)'),
 
             Panel::make(__('social media'), $this->socialMediaFields()),

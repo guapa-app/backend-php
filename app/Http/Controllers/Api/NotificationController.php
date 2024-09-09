@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\NotificationTypeEnum;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class NotificationController extends BaseApiController
      * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
      *
-     * @param Request $request
+     * @param  Request  $request
      *
      * @return LengthAwarePaginator
      */
@@ -124,5 +125,18 @@ class NotificationController extends BaseApiController
             ->update([
                 'read_at' => Carbon::now(),
             ]);
+    }
+
+    /**
+     * Show notifications types.
+     *
+     * @responseFile 200 responses/notifications/types.json
+     * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
+     *
+     * @return array
+     */
+    public function types()
+    {
+        return NotificationTypeEnum::cases();
     }
 }

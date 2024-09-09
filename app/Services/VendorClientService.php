@@ -8,14 +8,12 @@ use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorClient;
 use App\Notifications\AddVendorClientNotification;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Collection;
-
 
 class VendorClientService
 {
-
     public function addClient(Vendor $vendor, array $data)
     {
         return DB::transaction(function () use ($vendor, $data) {
@@ -61,16 +59,18 @@ class VendorClientService
 
         return $user->orders->count();
     }
+
     public function listClientsWithOrderCount(Vendor $vendor, array $filters = []): Collection
     {
         $query = $vendor->clients()
-            ->with(['user' => function ($query) use ($vendor){
+            ->with(['user' => function ($query) use ($vendor) {
                 $query->select('id', 'name', 'email', 'phone')
                     ->withCount(['orders' => function ($query) use ($vendor) {
-                    $query->where('vendor_id', $vendor->id);
-                }]);
+                        $query->where('vendor_id', $vendor->id);
+                    }]);
             }]);
         $this->applyFilters($query, $filters);
+
         return $query->get()->map(function ($client) {
             return [
                 'id' => $client->user->id,
@@ -81,7 +81,8 @@ class VendorClientService
             ];
         });
     }
-    private function applyFilters( $query, array $filters): void
+
+    private function applyFilters($query, array $filters): void
     {
         if (!empty($filters['name']) || !empty($filters['phone'])) {
             $query->whereHas('user', function ($query) use ($filters) {
@@ -94,16 +95,17 @@ class VendorClientService
             });
         }
     }
-    public function getClientOrders($vendor_id,$client_id, ?ProductType $productType = null): Collection
+
+    public function getClientOrders($vendor_id, $client_id, ?ProductType $productType = null): Collection
     {
         $query = Order::where('vendor_id', $vendor_id)
-            ->where('user_id',$client_id);
+            ->where('user_id', $client_id);
         if ($productType) {
             $query->hasProductType($productType);
         }
+
         return $query->get();
     }
-
 
     public function deleteClient(Vendor $vendor, $clientId)
     {
@@ -121,7 +123,7 @@ class VendorClientService
         ]);
     }
 
-    private function sendNotification(User $user, Vendor $vendor,  $isNewClient = false)
+    private function sendNotification(User $user, Vendor $vendor, $isNewClient = false)
     {
 //        Notification::send($user, new AddVendorClientNotification($vendor, $isNewClient));
     }
