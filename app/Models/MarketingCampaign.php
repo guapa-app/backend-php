@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Contracts\Listable;
+use App\Enums\MarketingCampaignAudienceType;
+use App\Enums\MarketingCampaignChannel;
+use App\Enums\MarketingCampaignStatus;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,6 +29,13 @@ class MarketingCampaign extends Model implements Listable
         'campaignable_id',
         'campaignable_type',
     ];
+
+    protected $casts = [
+        'status' => MarketingCampaignStatus::class,
+        'channel' => MarketingCampaignChannel::class,
+        'audience_type' => MarketingCampaignAudienceType::class,
+    ];
+
     protected $filterable = [
         'vendor_id',
     ];
@@ -33,10 +43,6 @@ class MarketingCampaign extends Model implements Listable
         'product',
         'offer'
     ];
-    const CHANNEL = [
-        'whatsapp',
-    ];
-
 
     public function vendor()
     {

@@ -12,16 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('invoices', function (Blueprint $table) {
-            Schema::table('invoices', function (Blueprint $table) {
-                $table->unsignedBigInteger('marketing_campaign_id')->nullable()->after('order_id');
-                $table->unsignedBigInteger('order_id')->nullable()->change();
+            $table->unsignedBigInteger('marketing_campaign_id')->nullable()->after('order_id');
+            $table->unsignedBigInteger('order_id')->nullable()->change();
 
-                $table->foreign('marketing_campaign_id')
-                    ->references('id')
-                    ->on('marketing_campaigns')
-                    ->cascadeOnUpdate()
-                    ->cascadeOnDelete();
-            });
+            $table->foreign('marketing_campaign_id')
+                ->references('id')
+                ->on('marketing_campaigns')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
         });
     }
 
