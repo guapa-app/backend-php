@@ -12,13 +12,13 @@ class MoyasarService
     {
         $data = $data->attributesToArray();
 
-        /**
+        /*
          * Convert the amount to the smallest currency unit as an integer.
          * For example, 1 Riyal = 100 Halals.
          * Use number_format to avoid floating-point precision issues and convert the result to an integer.
          * Examples: 167.56 becomes 16756, and 9.2 becomes 920.
          */
-        $data['amount'] = (int)number_format($data['amount'] * 100, decimal_separator: '', thousands_separator: '');
+        $data['amount'] = (int) number_format($data['amount'] * 100, decimal_separator: '', thousands_separator: '');
 
         return $data;
     }

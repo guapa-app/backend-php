@@ -104,5 +104,4 @@ class Coupon extends Model
         return !$this->hasReachedMaxUsesForUser($user) &&
             $this->isCouponApplicableToProduct($product);
     }
-
 }

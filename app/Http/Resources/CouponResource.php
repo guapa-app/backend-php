@@ -29,8 +29,8 @@ class CouponResource extends JsonResource
                         'title' => $product->title,
                     ];
                 });
-             }),
-            'created_at' => $this->created_at->toDateTimeString()
+            }),
+            'created_at' => $this->created_at->toDateTimeString(),
             ];
     }
 }

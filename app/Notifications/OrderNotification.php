@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use App\Models\User;
-use App\Notifications\Channels\WhatsappChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -15,12 +14,14 @@ class OrderNotification extends Notification
 
     /**
      * The user who made the order.
+     *
      * @var User
      */
     public $user;
 
     /**
      * Order object.
+     *
      * @var Order
      */
     public $order;
@@ -54,11 +55,11 @@ class OrderNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'order_id' => $this->order->id,
-            'summary'  => $this->getSummary(),
-            'type'     => $this->orderType(),
-            'title'    => 'New Order',
-            'image'    => '',
+            'id' => $this->order->id,
+            'summary' => $this->getSummary(),
+            'type' => $this->orderType(),
+            'title' => 'New Order',
+            'image' => '',
         ];
     }
 
@@ -66,7 +67,7 @@ class OrderNotification extends Notification
     {
         return [
             'message' => $this->getWhatsappMessage(),
-            'phones'  => [$notifiable->phone],
+            'phones' => [$notifiable->phone],
         ];
     }
 
@@ -106,15 +107,15 @@ class OrderNotification extends Notification
     {
         $message = new FcmMessage();
         $message->content([
-            'title'         => 'New order',
-            'body'          => 'New order from ' . $this->user->name . ' #' . $this->order->id,
-            'sound'         => 'default',
-            'icon'          => '',
-            'click_action'  => '',
+            'title' => 'New order',
+            'body' => 'New order from ' . $this->user->name . ' #' . $this->order->id,
+            'sound' => 'default',
+            'icon' => '',
+            'click_action' => '',
         ])->data([
-            'type'          => $this->orderType(),
-            'summary'       => $this->getSummary(),
-            'order_id'      => $this->order->id,
+            'type' => $this->orderType(),
+            'summary' => $this->getSummary(),
+            'order_id' => $this->order->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;

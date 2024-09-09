@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\Info\StaffResource\Pages;
 
 use App\Contracts\Repositories\VendorRepositoryInterface;
-use App\Filament\Resources\Info\StaffResource;
 use App\Filament\Resources\Info\UserVendorResource;
-use App\Http\Requests\StaffRequest;
 use App\Services\VendorService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -19,12 +17,12 @@ class CreateUserVendor extends CreateRecord
     {
         $data['user']['password'] = Hash::make($data['user']['password']);
         $data['vendor_id'] = UserVendorResource::getCurrentUserVendorId();
+
         return $data;
     }
 
     protected function handleRecordCreation(array $data): Model
     {
-
         $data['vendor_id'] = UserVendorResource::getCurrentUserVendorId();
         $user = app(VendorService::class)->addStaff(app(VendorRepositoryInterface::class)->getOneOrFail($data['vendor_id']), $data['user']);
 

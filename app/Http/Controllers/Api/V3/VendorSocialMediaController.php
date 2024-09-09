@@ -32,7 +32,7 @@ class VendorSocialMediaController extends BaseApiController
     {
         $data = $request->validated();
 
-        $this->vendorService->updateSocialMedia($vendor,$socialMedium->id, $data);
+        $this->vendorService->updateSocialMedia($vendor, $socialMedium->id, $data);
 
         return $this->successJsonRes(message: __('success'));
     }

@@ -36,7 +36,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         'vendor',
         'product',
         'post',
-        'offer'
+        'offer',
     ];
 
     /**
@@ -78,6 +78,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable_attributes = [
@@ -86,6 +87,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -94,6 +96,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
 
     /**
      * Attributes to be appended to each user.
+     *
      * @var array
      */
     protected $appends = [
@@ -119,7 +122,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $isEmail ?
             $this->where('email', $username)->first() :
             $this->whereIn('phone', Common::getPhoneVariations($username))
-            ->first();
+                ->first();
     }
 
     /**
@@ -158,6 +161,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function support_messages()
     {
         return $this->hasMany(SupportMessage::class);
+    }
+
+    public function userVendor()
+    {
+        return $this->hasOne(UserVendor::class);
     }
 
     public function userVendors()
@@ -220,8 +228,9 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     {
         $this->load('profile', 'profile.photo', 'roles');
 
-        if (isset($this->profile))
+        if (isset($this->profile)) {
             $this->profile->about = strip_tags($this->profile->about);
+        }
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder

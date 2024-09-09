@@ -8,7 +8,6 @@ use App\Services\VendorClientService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
-
 class CreateClient extends CreateRecord
 {
     protected static string $resource = ClientResource::class;
@@ -30,6 +29,7 @@ class CreateClient extends CreateRecord
 
         return $vendorClient;
     }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

@@ -2,11 +2,8 @@
 
 namespace App\Http\Resources\V3;
 
-use App\Http\Resources\AddressResource;
 use App\Http\Resources\MediaResource;
 use App\Http\Resources\OfferResource;
-use App\Http\Resources\TaxonomyResource;
-use App\Http\Resources\VendorResource;
 use Illuminate\Http\Resources\MissingValue;
 
 class ProductCollection extends GeneralCollection
@@ -25,11 +22,11 @@ class ProductCollection extends GeneralCollection
                         'price'                                 => (float) $product->price,
                         'type'                                  => $product->type,
                         'is_liked'                              => (bool) $product->is_liked,
-                        'offer'                                 => (object)[],
+                        'offer'                                 => (object) [],
                         'images'                                => MediaResource::collection($product->whenLoaded('media')),
                     ];
 
-                    if(!($product->whenLoaded('offer') instanceof MissingValue) && ($product->whenLoaded('offer') != null)){
+                    if (!($product->whenLoaded('offer') instanceof MissingValue) && ($product->whenLoaded('offer') != null)) {
                         $returned_arr = array_merge($returned_arr, [
                             'offer'                             => OfferResource::make($product->offer),
                         ]);
