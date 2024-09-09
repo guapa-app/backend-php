@@ -27,6 +27,7 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::prefix('messaging')->group(base_path('routes/vendor/v3_1/api/messaging.php'));
     Route::prefix('taxonomies')->group(base_path('routes/vendor/v3_1/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/vendor/v3_1/api/notifications.php'));
+    Route::prefix('coupons')->group(base_path('routes/vendor/v3_1/api/coupons.php'));
     Route::prefix('')->group(base_path('routes/vendor/v3_1/api/support.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');

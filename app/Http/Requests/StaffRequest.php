@@ -34,7 +34,7 @@ class StaffRequest extends FormRequest
         $id = $this->route('id');
 
         $rules = [
-            'vendor_id' => 'required|integer|exists:vendors,id',
+            'vendor_id' => 'nullable|integer|exists:vendors,id',
             'name'      => 'required|string|min:3|max:100',
             'email'     => ['nullable', 'email', Rule::unique('users')],
             'phone'     => 'required|string|min:4|max:30|unique:users,phone',

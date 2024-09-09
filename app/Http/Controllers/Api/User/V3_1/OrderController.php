@@ -22,6 +22,7 @@ class OrderController extends ApiOrderController
 
     public function index(GetOrdersRequest $request)
     {
+        $request->merge(['user_id' => $this->user->id]);
         $orders = parent::index($request);
 
         return OrderResource::collection($orders)
