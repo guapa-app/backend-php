@@ -70,6 +70,7 @@ class CampaignNotification extends Notification implements ShouldQueue
 
     protected function getWhatsAppCampaignName()
     {
+        // name of template in Connectly
         $campaignNames = [
             'offer' => 'offersprovidersservices',
             'product' => 'offersprovidersservices',
@@ -101,10 +102,10 @@ class CampaignNotification extends Notification implements ShouldQueue
 
     protected function getWhatsAppCampaignVersion()
     {
+        // campaign version  of template in Connectly
         $campaignVersions = [
             'offer' => '01916c78-2738-877c-032a-6200d8561815',
             'product' => '01916c78-2738-877c-032a-6200d8561815',
-            // Add more campaign versions for different types as needed
         ];
 
         return $campaignVersions[$this->type] ?? 'default-version';

@@ -33,12 +33,12 @@ class Invoice extends Model
 
     public function getVendorNameAttribute()
     {
-        return $this->order->vendor->name ?? $this->marketing_campaign->vendor->name ?? null;
+        return $this->order?->vendor?->name ?? $this->marketing_campaign?->vendor?->name ?? '';
     }
 
     public function getVendorRegNumAttribute()
     {
-        return $this->order->vendor->reg_number ?? $this->marketing_campaign->vendor->reg_number ?? null;
+        return $this->order?->vendor?->reg_number ?? $this->marketing_campaign?->vendor?->reg_number ?? '';
     }
 
     public function getAmountWithoutTaxesAttribute()

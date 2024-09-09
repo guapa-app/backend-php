@@ -2,6 +2,7 @@
 
 namespace App\Nova\Resources;
 
+use App\Traits\NovaReadOnly;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\MorphTo;
@@ -18,6 +19,7 @@ use Laravel\Nova\Panel;
 
 class MarketingCampaign extends Resource
 {
+    use NovaReadOnly;
     public static $model =  MarketingCampaignModel::class;
 
     public static $title = 'id';
@@ -126,22 +128,5 @@ class MarketingCampaign extends Resource
     {
         return [];
     }
-    public static function authorizedToCreate(Request $request)
-    {
-        return false;
-    }
 
-    public function authorizedToUpdate(Request $request)
-    {
-        return false;
-    }
-
-    public function authorizedToDelete(Request $request)
-    {
-        return false;
-    }
-    public function authorizedToReplicate(Request $request)
-    {
-        return false;
-    }
 }

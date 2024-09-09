@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\MarketingCampaignAudienceType;
+use App\Enums\MarketingCampaignChannel;
 use App\Models\MarketingCampaign;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class MarketingCampaignRequest extends FormRequest
 {
@@ -24,8 +27,8 @@ class MarketingCampaignRequest extends FormRequest
     {
         return [
             'vendor_id'          => 'required|exists:vendors,id',
-            'channel'            => 'required|string|in:'. implode(',', MarketingCampaign::CHANNEL),
-            'audience_type'      => 'required|string|in:guapa_customers,vendor_customers',
+            'channel'       => ['required', new Enum(MarketingCampaignChannel::class)],
+            'audience_type' => ['required', new Enum(MarketingCampaignAudienceType::class)],
             'audience_count'     => 'required|integer|min:1',
             'type'  => 'required|string|in:'. implode(',', MarketingCampaign::TYPES),
             'id'    => 'required|integer',

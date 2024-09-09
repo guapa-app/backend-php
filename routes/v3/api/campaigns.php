@@ -11,8 +11,8 @@ Route::group(['middleware' => 'auth:api', 'as' => 'campaigns.'], function () {
     Route::post('/',                  [MarketingCampaignController::class, 'store'])->name('store');
 
     // get campaign getCampaignAvailableCustomers count
-    Route::get('/available-customers', [MarketingCampaignController::class, 'availableCustomers'])->name('availableCustomers');
-    Route::post('/calculate-pricing', [MarketingCampaignController::class, 'calculatePricing'])->name('calculatePricing');
+    Route::get('/available-customers', [MarketingCampaignController::class, 'availableCustomers'])->name('available_customers');
+    Route::post('/calculate-pricing', [MarketingCampaignController::class, 'calculatePricing'])->name('calculate_pricing');
 //
 });
 

@@ -4,22 +4,17 @@ namespace App\Http\Controllers\Api\V3;
 
 use App\Contracts\Repositories\MarketingCampaignRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\MarketingCampaignRequest;
-use App\Http\Requests\UpdateMarketingCampaignRequest;
-use App\Http\Resources\MarketingCampaignCollection;
-use App\Http\Resources\MarketingCampaignResource;
-use App\Models\MarketingCampaign;
+use App\Http\Resources\V3\MarketingCampaignCollection;
+use App\Http\Resources\V3\MarketingCampaignResource;
 use App\Models\Setting;
 use App\Services\MarketingCampaignService;
 use Illuminate\Http\Request;
 
 class MarketingCampaignController extends BaseApiController
 {
-
     protected $marketingCampaignService;
     protected $marketingCampaignRepository;
-
     public function __construct(MarketingCampaignService $marketingCampaignService, MarketingCampaignRepositoryInterface $marketingCampaignRepository)
     {
         $this->marketingCampaignService = $marketingCampaignService;
@@ -31,14 +26,12 @@ class MarketingCampaignController extends BaseApiController
     public function index(Request $request)
     {
         $marketingCampaigns = $this->marketingCampaignRepository->all($request);
-
         return MarketingCampaignCollection::make($marketingCampaigns)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
             ]);
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -53,22 +46,19 @@ class MarketingCampaignController extends BaseApiController
             'message' => __('api.success'),
         ]);
     }
-
-
-
     public function availableCustomers()
     {
         $availableCustomers = Setting::getCampaignAvailableCustomers();
         return  $this->successJsonRes(['items' => $availableCustomers], __('api.success'));
     }
-
     public function changeStatus(Request $request)
     {
-        $marketingCampaign = $this->marketingCampaignService->changeStatus($request);
+        $this->marketingCampaignService->changeStatus($request);
         return true;
     }
-
-    //calculateCampaignPricing
+    /**
+     * calculate Campaign Pricing
+     */
     public function calculatePricing(MarketingCampaignRequest $request)
     {
         $data = $request->all();
