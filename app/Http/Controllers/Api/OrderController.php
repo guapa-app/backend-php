@@ -46,14 +46,6 @@ class OrderController extends BaseApiController
      */
     public function index(GetOrdersRequest $request)
     {
-        if (!$request->has('vendor_id')) {
-            $request->merge([
-                'user_id' => $this->user->id,
-            ]);
-        } elseif (!$this->user->hasVendor((int) $request->get('vendor_id'))) {
-            abort(403, 'Forbidden');
-        }
-
         return $this->orderRepository->all($request);
     }
 

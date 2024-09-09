@@ -3,20 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\CouponRepositoryInterface;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\ApplyCouponRequest;
 use App\Http\Requests\CouponRequest;
-use App\Models\Coupon;
 use App\Services\CouponService;
 use Illuminate\Http\Request;
 
-class CouponController extends Controller
+class CouponController extends BaseApiController
 {
     private $couponRepository;
     private $couponService;
 
     public function __construct(CouponRepositoryInterface $couponRepository, CouponService $couponService)
     {
+        parent::__construct();
         $this->couponRepository = $couponRepository;
         $this->couponService = $couponService;
     }
