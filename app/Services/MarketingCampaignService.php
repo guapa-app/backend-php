@@ -11,6 +11,8 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\CampaignNotification;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 
@@ -33,6 +35,10 @@ class MarketingCampaignService
         $modelClass = $this->getModelClass($type);
         // Find the entity by its ID
         $model = $modelClass::findOrFail($typeId);
+        // Check if the user has permission to create a campaign for this entity
+        if (!$this->checkModelOwnership($model, $data['vendor_id'])) {
+            throw new AuthorizationException('You do not have permission to create a campaign for this ' . $type);
+        }
 
         $audienceCount = $data['audience_type'] === MarketingCampaignAudienceType::VENDOR_CUSTOMERS->value && empty($data['users'])
             ? $this->getVendorClientsCount($type, $model)
@@ -59,7 +65,10 @@ class MarketingCampaignService
         $modelClass = $this->getModelClass($type);
         // Find the entity by its ID
         $model = $modelClass::findOrFail($typeId);
-
+        // Check if the user has permission to create a campaign for this entity
+        if (!$this->checkModelOwnership($model, $data['vendor_id'])) {
+            throw new AuthorizationException('You do not have permission to create a campaign for this ' . $type);
+        }
         // Calculate the audience count
         $audienceCount = $data['audience_type'] === MarketingCampaignAudienceType::VENDOR_CUSTOMERS->value && empty($data['users'])
             ?$this->getVendorClientsCount($type, $model)
@@ -165,5 +174,13 @@ class MarketingCampaignService
         return $type === 'offer'
             ? $model->product->vendor->clients->count()
             : $model->vendor->clients->count();
+    }
+    private function checkModelOwnership(Model $model, int $vendorId): bool
+    {
+        if ($model instanceof Offer) {
+            return $model->product->vendor_id === $vendorId;
+        }else {
+            return $model->vendor_id === $vendorId;
+        }
     }
 }
