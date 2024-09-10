@@ -21,12 +21,14 @@ class MarketingCampaignService
     protected $messageCost;
     protected $taxesPercentage;
     protected $paymentService;
+
     public function __construct(PaymentService $paymentService)
     {
         $this->paymentService = $paymentService;
         $this->messageCost = Setting::getMessageCost();
         $this->taxesPercentage = Setting::getTaxes();
     }
+
     public function calculatePricingDetails(array $data)
     {
         $type = $data['type'];
@@ -37,6 +39,7 @@ class MarketingCampaignService
         $model = $modelClass::findOrFail($typeId);
         // Check if the user has permission to create a campaign for this entity
         if (!$this->checkModelOwnership($model, $data['vendor_id'])) {
+            // TODO make msg localized
             throw new AuthorizationException('You do not have permission to create a campaign for this ' . $type);
         }
 
@@ -49,13 +52,14 @@ class MarketingCampaignService
         $totalCost = $cost + $taxes;
 
         return [
-            'message_cost' => (string)$this->messageCost,
+            'message_cost' => (string) $this->messageCost,
             'audience_count' => (string) $audienceCount,
             'cost' => (string) $cost,
             'taxes' => number_format($taxes, 2),
             'total_cost' => (string) $totalCost,
         ];
     }
+
     public function create(array $data)
     {
         $type = $data['type'];
@@ -67,11 +71,12 @@ class MarketingCampaignService
         $model = $modelClass::findOrFail($typeId);
         // Check if the user has permission to create a campaign for this entity
         if (!$this->checkModelOwnership($model, $data['vendor_id'])) {
+            // TODO make msg localized
             throw new AuthorizationException('You do not have permission to create a campaign for this ' . $type);
         }
         // Calculate the audience count
         $audienceCount = $data['audience_type'] === MarketingCampaignAudienceType::VENDOR_CUSTOMERS->value && empty($data['users'])
-            ?$this->getVendorClientsCount($type, $model)
+            ? $this->getVendorClientsCount($type, $model)
             : $data['audience_count'];
 
         // Set campaignable ID and type
@@ -110,9 +115,9 @@ class MarketingCampaignService
         $campaign->invoice_url = $invoice->url;
         $campaign->save();
 
-
         return $campaign;
     }
+
     public function changeStatus(Request $request)
     {
         $invoice = Invoice::query()
@@ -150,6 +155,7 @@ class MarketingCampaignService
         // Send the notification to all users
         Notification::send($users, $notification);
     }
+
     /**
      * Get the corresponding model class for a given entity type.
      *
@@ -169,17 +175,19 @@ class MarketingCampaignService
 
         return $modelClasses[$type];
     }
+
     private function getVendorClientsCount($type, $model)
     {
         return $type === 'offer'
             ? $model->product->vendor->clients->count()
             : $model->vendor->clients->count();
     }
+
     private function checkModelOwnership(Model $model, int $vendorId): bool
     {
         if ($model instanceof Offer) {
             return $model->product->vendor_id === $vendorId;
-        }else {
+        } else {
             return $model->vendor_id === $vendorId;
         }
     }

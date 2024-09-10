@@ -9,7 +9,6 @@ enum MarketingCampaignAudienceType: string implements HasLabel
     case VENDOR_CUSTOMERS = 'vendor_customers';
     case GUAPA_CUSTOMERS = 'guapa_customers';
 
-
     public function getLabel(): string
     {
         return match ($this) {

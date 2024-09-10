@@ -10,19 +10,9 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_id',
-        'marketing_campaign_id',
-        'invoice_id',
-        'status',
-        'amount',
-        'currency',
-        'amount_format',
-        'description',
-        'expired_at',
-        'logo_url',
-        'url',
-        'callback_url',
-        'taxes',
+        'order_id', 'marketing_campaign_id', 'invoice_id', 'status',
+        'amount', 'currency', 'amount_format', 'description',
+        'expired_at', 'logo_url', 'url', 'callback_url', 'taxes',
     ];
 
     protected $appends = [
@@ -50,20 +40,18 @@ class Invoice extends Model
     {
         return $this->belongsTo(Order::class)->withDefault();
     }
+
     public function marketing_campaign()
     {
         return $this->belongsTo(MarketingCampaign::class)->withDefault();
     }
-//    public function scopeCurrentVendor($query, $value)
-//    {
-//        return $query->whereRelation('order', 'vendor_id', '=', $value);
-//    }
+
     public function scopeCurrentVendor($query, $vendorId)
     {
-        return $query->where(function($query) use ($vendorId) {
-            $query->whereHas('order', function($q) use ($vendorId) {
+        return $query->where(function ($query) use ($vendorId) {
+            $query->whereHas('order', function ($q) use ($vendorId) {
                 $q->where('vendor_id', $vendorId);
-            })->orWhereHas('campaign', function($q) use ($vendorId) {
+            })->orWhereHas('campaign', function ($q) use ($vendorId) {
                 $q->where('vendor_id', $vendorId);
             });
         });

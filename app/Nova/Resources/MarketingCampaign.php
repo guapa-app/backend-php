@@ -2,25 +2,25 @@
 
 namespace App\Nova\Resources;
 
+use App\Models\MarketingCampaign as MarketingCampaignModel;
 use App\Traits\NovaReadOnly;
-use Illuminate\Http\Request;
-use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\MorphTo;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Number;
-use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Currency;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\MorphTo;
+use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use \App\Models\MarketingCampaign as MarketingCampaignModel;
 use Laravel\Nova\Panel;
 
 class MarketingCampaign extends Resource
 {
     use NovaReadOnly;
-    public static $model =  MarketingCampaignModel::class;
+
+    public static $model = MarketingCampaignModel::class;
 
     public static $title = 'id';
 
@@ -90,10 +90,9 @@ class MarketingCampaign extends Resource
                 ->sortable()
                 ->hideFromIndex(),
             new Panel('Item Details', $this->productOfferFields()),
-
-
         ];
     }
+
     protected function productOfferFields()
     {
         return [
@@ -105,10 +104,12 @@ class MarketingCampaign extends Resource
                 ->readonly(),
         ];
     }
+
     public static function indexQuery(NovaRequest $request, $query)
     {
-        return $query->with(['campaignable','vendor','users']);
+        return $query->with(['campaignable', 'vendor', 'users']);
     }
+
     public function cards(NovaRequest $request)
     {
         return [];
@@ -128,5 +129,4 @@ class MarketingCampaign extends Resource
     {
         return [];
     }
-
 }

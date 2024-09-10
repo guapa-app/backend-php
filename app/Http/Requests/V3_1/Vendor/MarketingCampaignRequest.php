@@ -1,5 +1,8 @@
 <?php
 
+// TODO: refactor structure to follow Vendor\V* - User\V*
+// our application focuses more on the user or vendor logic
+
 namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Enums\MarketingCampaignAudienceType;
@@ -29,7 +32,7 @@ class MarketingCampaignRequest extends FormRequest
             'channel'       => ['required', new Enum(MarketingCampaignChannel::class)],
             'audience_type' => ['required', new Enum(MarketingCampaignAudienceType::class)],
             'audience_count'     => 'required|integer|min:1',
-            'type'  => 'required|string|in:'. implode(',', MarketingCampaign::TYPES),
+            'type'  => 'required|string|in:' . implode(',', MarketingCampaign::TYPES),
             'id'    => 'required|integer',
             'users' => 'nullable|array',
             'users.*' => 'integer|exists:users,id',

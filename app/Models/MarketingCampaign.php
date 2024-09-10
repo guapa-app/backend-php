@@ -14,20 +14,18 @@ use Illuminate\Http\Request;
 
 class MarketingCampaign extends Model implements Listable
 {
-    use HasFactory,ListableTrait;
+    use HasFactory, ListableTrait;
+
+    // TODO use Enum class
+    const TYPES = [
+        'product',
+        'offer',
+    ];
 
     protected $fillable = [
-        'vendor_id',
-        'channel',
-        'audience_type',
-        'audience_count',
-        'message_cost',
-        'taxes',
-        'total_cost',
-        'status',
-        'invoice_url',
-        'campaignable_id',
-        'campaignable_type',
+        'vendor_id', 'channel', 'audience_type', 'audience_count',
+        'message_cost', 'taxes', 'total_cost', 'status',
+        'invoice_url', 'campaignable_id', 'campaignable_type',
     ];
 
     protected $casts = [
@@ -38,10 +36,6 @@ class MarketingCampaign extends Model implements Listable
 
     protected $filterable = [
         'vendor_id',
-    ];
-    const TYPES = [
-        'product',
-        'offer'
     ];
 
     public function vendor()
@@ -64,6 +58,7 @@ class MarketingCampaign extends Model implements Listable
         if ($request->has('vendor_id')) {
             $builder->where('vendor_id', (int) $request->get('vendor_id'));
         }
+
         return $builder;
     }
 
@@ -86,5 +81,4 @@ class MarketingCampaign extends Model implements Listable
     {
         return $builder;
     }
-
 }
