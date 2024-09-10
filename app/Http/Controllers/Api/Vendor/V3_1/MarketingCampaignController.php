@@ -26,7 +26,7 @@ class MarketingCampaignController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $request->merge(['vendor_id' => auth()->user->managerVendorId()]);
+        $request->merge(['vendor_id' => auth()->user()->managerVendorId()]);
         $marketingCampaigns = $this->marketingCampaignRepository->all($request);
         return MarketingCampaignCollection::make($marketingCampaigns)
             ->additional([
