@@ -4,7 +4,7 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-enum MarketingCampaignStatus :string implements HasLabel
+enum MarketingCampaignStatus: string implements HasLabel
 {
     case PENDING = 'pending';
     case COMPLETED = 'completed';

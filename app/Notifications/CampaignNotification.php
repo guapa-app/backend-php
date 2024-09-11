@@ -8,7 +8,6 @@ use App\Models\Offer;
 use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class CampaignNotification extends Notification
@@ -37,10 +36,6 @@ class CampaignNotification extends Notification
         if ($this->campaign->channel === 'whatsapp') {
             $channels[] = WhatsAppChannel::class;
         }
-        // Future channel additions can be made here
-        // if ($this->campaign->channel === 'email') {
-        //     $channels[] = 'mail';
-        // }
 
         return $channels;
     }
@@ -50,8 +45,8 @@ class CampaignNotification extends Notification
         return [
             'client' => $notifiable->phone,
             'campaignName' => $this->getWhatsAppCampaignName(),
-            "campaignVersion" => $this->getWhatsAppCampaignVersion(),
-            'variables' => $this->getWhatsAppVariables($notifiable)
+            'campaignVersion' => $this->getWhatsAppCampaignVersion(),
+            'variables' => $this->getWhatsAppVariables($notifiable),
         ];
     }
 
@@ -65,7 +60,7 @@ class CampaignNotification extends Notification
             return 'product';
         }
 
-        throw new \Exception("Unsupported campaign type: " . get_class($campaignable));
+        throw new \Exception('Unsupported campaign type: ' . get_class($campaignable));
     }
 
     protected function getWhatsAppCampaignName()
@@ -74,7 +69,6 @@ class CampaignNotification extends Notification
         $campaignNames = [
             'offer' => 'offersprovidersservices',
             'product' => 'offersprovidersservices',
-            // Add more campaign names for different types as needed
         ];
 
         return $campaignNames[$this->type];
@@ -93,7 +87,6 @@ class CampaignNotification extends Notification
             $variables['title'] = $campaignable->product->title;
         } elseif ($this->type === 'product') {
             $variables['title'] = $campaignable->title;
-//            $variables['price'] = $campaignable->price;
             $variables['discount'] = $campaignable->price;
         }
 
@@ -114,6 +107,7 @@ class CampaignNotification extends Notification
     protected function getImage()
     {
         $campaignable = $this->campaign->campaignable;
+
         return $campaignable->image?->url ?? ($this->type === 'offer' ? $campaignable->product->image?->url : null);
     }
 }

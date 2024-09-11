@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('marketing_campaigns', function (Blueprint $table) {
-            // Modify existing columns
-            $table->string('channel', 20)->change();
-            $table->string('audience_type', 20)->change();
+            $table->char('channel', 20)->change();
+            $table->char('audience_type', 20)->change();
             $table->char('status', 12)->change();
         });
     }

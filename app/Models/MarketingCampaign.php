@@ -6,6 +6,7 @@ use App\Contracts\Listable;
 use App\Enums\MarketingCampaignAudienceType;
 use App\Enums\MarketingCampaignChannel;
 use App\Enums\MarketingCampaignStatus;
+use App\Enums\MarketingCampaignType;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,34 +15,24 @@ use Illuminate\Http\Request;
 
 class MarketingCampaign extends Model implements Listable
 {
-    use HasFactory,ListableTrait;
+    use HasFactory, ListableTrait;
+
 
     protected $fillable = [
-        'vendor_id',
-        'channel',
-        'audience_type',
-        'audience_count',
-        'message_cost',
-        'taxes',
-        'total_cost',
-        'status',
-        'invoice_url',
-        'campaignable_id',
-        'campaignable_type',
+        'vendor_id', 'channel', 'audience_type', 'audience_count',
+        'message_cost', 'taxes', 'total_cost', 'status',
+        'invoice_url', 'campaignable_id', 'campaignable_type',
     ];
 
     protected $casts = [
         'status' => MarketingCampaignStatus::class,
         'channel' => MarketingCampaignChannel::class,
         'audience_type' => MarketingCampaignAudienceType::class,
+        'type' => MarketingCampaignType::class,
     ];
 
     protected $filterable = [
         'vendor_id',
-    ];
-    const TYPES = [
-        'product',
-        'offer'
     ];
 
     public function vendor()
@@ -64,6 +55,7 @@ class MarketingCampaign extends Model implements Listable
         if ($request->has('vendor_id')) {
             $builder->where('vendor_id', (int) $request->get('vendor_id'));
         }
+
         return $builder;
     }
 
@@ -86,5 +78,4 @@ class MarketingCampaign extends Model implements Listable
     {
         return $builder;
     }
-
 }
