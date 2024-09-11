@@ -67,6 +67,7 @@ class UserRequest extends FailedValidationRequest
             'profile.birth_date'    => 'nullable|date|before:today',
             'profile.about'         => 'nullable|string|min:10|max:1024',
             'profile.photo'         => ['nullable', new ImageOrArray(), 'max:10240'],
+            'profile.remove_photo'  => 'nullable|boolean',
             'password'              => 'required|string|min:6|confirmed',
         ];
 
@@ -88,10 +89,20 @@ class UserRequest extends FailedValidationRequest
         }
 
         return $rules;
+
     }
 
     public function messages()
     {
         return [];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'profile' => array_merge($this->input('profile', []), [
+                'remove_photo' => $this->input('profile.remove_photo', false),
+            ]),
+        ]);
     }
 }
