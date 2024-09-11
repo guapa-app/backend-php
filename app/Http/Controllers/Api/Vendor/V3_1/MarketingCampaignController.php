@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\MarketingCampaignRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\V3_1\Vendor\MarketingCampaignRequest;
-use App\Http\Resources\V3\MarketingCampaignCollection;
-use App\Http\Resources\V3\MarketingCampaignResource;
+use App\Http\Requests\Vendor\V3_1\MarketingCampaignRequest;
+use App\Http\Resources\Vendor\MarketingCampaignCollection;
+use App\Http\Resources\Vendor\MarketingCampaignResource;
 use App\Models\Setting;
 use App\Services\MarketingCampaignService;
 use Exception;
@@ -20,6 +20,7 @@ class MarketingCampaignController extends BaseApiController
 
     public function __construct(MarketingCampaignService $marketingCampaignService, MarketingCampaignRepositoryInterface $marketingCampaignRepository)
     {
+        parent::__construct();
         $this->marketingCampaignService = $marketingCampaignService;
         $this->marketingCampaignRepository = $marketingCampaignRepository;
     }
@@ -29,7 +30,7 @@ class MarketingCampaignController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $request->merge(['vendor_id' => auth()->user()->managerVendorId()]);
+        $request->merge(['vendor_id' =>  $this->user->managerVendorId()]);
         $marketingCampaigns = $this->marketingCampaignRepository->all($request);
 
         return MarketingCampaignCollection::make($marketingCampaigns)
@@ -46,7 +47,7 @@ class MarketingCampaignController extends BaseApiController
     {
         try {
             $data = $request->validated();
-            $data['vendor_id'] = auth()->user()->managerVendorId();
+            $data['vendor_id'] =  $this->user->managerVendorId();
             $marketingCampaign = $this->marketingCampaignService->create($data);
 
             return MarketingCampaignResource::make($marketingCampaign)
@@ -86,7 +87,7 @@ class MarketingCampaignController extends BaseApiController
     {
         try {
             $data = $request->validated();
-            $data['vendor_id'] = auth()->user()->managerVendorId();
+            $data['vendor_id'] =  $this->user->managerVendorId();
             $pricing = $this->marketingCampaignService->calculatePricingDetails($data);
 
             return $this->successJsonRes($pricing, __('api.success'));

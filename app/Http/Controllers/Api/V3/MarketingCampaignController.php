@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V3;
 use App\Contracts\Repositories\MarketingCampaignRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\MarketingCampaignRequest;
-// TODO where is MC collection and resource
 use App\Http\Resources\V3\MarketingCampaignCollection;
 use App\Http\Resources\V3\MarketingCampaignResource;
 use App\Models\Setting;
@@ -19,7 +18,7 @@ class MarketingCampaignController extends BaseApiController
 
     public function __construct(MarketingCampaignService $marketingCampaignService, MarketingCampaignRepositoryInterface $marketingCampaignRepository)
     {
-        // TODO you should call parent constructor here -> parent::__construct();
+        parent::__construct();
         $this->marketingCampaignService = $marketingCampaignService;
         $this->marketingCampaignRepository = $marketingCampaignRepository;
     }

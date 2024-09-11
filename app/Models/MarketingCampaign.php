@@ -6,6 +6,7 @@ use App\Contracts\Listable;
 use App\Enums\MarketingCampaignAudienceType;
 use App\Enums\MarketingCampaignChannel;
 use App\Enums\MarketingCampaignStatus;
+use App\Enums\MarketingCampaignType;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,11 +17,6 @@ class MarketingCampaign extends Model implements Listable
 {
     use HasFactory, ListableTrait;
 
-    // TODO use Enum class
-    const TYPES = [
-        'product',
-        'offer',
-    ];
 
     protected $fillable = [
         'vendor_id', 'channel', 'audience_type', 'audience_count',
@@ -32,6 +28,7 @@ class MarketingCampaign extends Model implements Listable
         'status' => MarketingCampaignStatus::class,
         'channel' => MarketingCampaignChannel::class,
         'audience_type' => MarketingCampaignAudienceType::class,
+        'type' => MarketingCampaignType::class,
     ];
 
     protected $filterable = [

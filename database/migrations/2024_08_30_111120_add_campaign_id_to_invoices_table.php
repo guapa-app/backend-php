@@ -28,12 +28,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // TODO nested schema here too. (to be removed)
         Schema::table('invoices', function (Blueprint $table) {
-            Schema::table('invoices', function (Blueprint $table) {
-                $table->dropColumn('campaign_id');
-                $table->unsignedBigInteger('order_id')->nullable(false)->change();
-            });
+            $table->dropColumn('campaign_id');
+            $table->unsignedBigInteger('order_id')->nullable(false)->change();
         });
     }
 };

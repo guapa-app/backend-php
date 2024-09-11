@@ -39,8 +39,7 @@ class MarketingCampaignService
         $model = $modelClass::findOrFail($typeId);
         // Check if the user has permission to create a campaign for this entity
         if (!$this->checkModelOwnership($model, $data['vendor_id'])) {
-            // TODO make msg localized
-            throw new AuthorizationException('You do not have permission to create a campaign for this ' . $type);
+            throw new AuthorizationException(__('You do not have permission to create a campaign for this product.'));
         }
 
         $audienceCount = $data['audience_type'] === MarketingCampaignAudienceType::VENDOR_CUSTOMERS->value && empty($data['users'])
@@ -71,8 +70,7 @@ class MarketingCampaignService
         $model = $modelClass::findOrFail($typeId);
         // Check if the user has permission to create a campaign for this entity
         if (!$this->checkModelOwnership($model, $data['vendor_id'])) {
-            // TODO make msg localized
-            throw new AuthorizationException('You do not have permission to create a campaign for this ' . $type);
+            throw new AuthorizationException(__('You do not have permission to create a campaign for this product.'));
         }
         // Calculate the audience count
         $audienceCount = $data['audience_type'] === MarketingCampaignAudienceType::VENDOR_CUSTOMERS->value && empty($data['users'])
