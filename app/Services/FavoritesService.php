@@ -32,7 +32,7 @@ class FavoritesService
         })->when($type == 'service', function ($query) {
             $query->where('type', 'service')->with('vendor', 'media');
         })->when($type == 'offer', function ($query) {
-            $query->with('product', 'product.media');
+            $query->whereHas('product')->with('product', 'product.media');
         })->when($type == 'post', function ($query) {
             $query->with('media', 'admin', 'category');
         })->paginate(10);
