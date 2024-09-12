@@ -142,6 +142,8 @@ class NotificationController extends BaseApiController
 
     public function delete($id)
     {
-        return $this->user->notifications()->where('id', $id)->delete();
+        $notifcation = $this->user->notifications()->findOrFail($id);
+
+        return $notifcation->delete();
     }
 }
