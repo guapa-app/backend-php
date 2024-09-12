@@ -9,6 +9,7 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 
 class Order extends Model implements Listable
@@ -183,5 +184,12 @@ class Order extends Model implements Listable
                             ->where('orders.status', '!=', OrderStatus::Pending);
                     });
             });
+    }
+
+    public function appointments(): BelongsToMany
+    {
+        return $this->belongsToMany(AppointmentForm::class, 'order_appointments')
+            ->withPivot('key', 'answers', 'value_id')
+            ->withTimestamps();
     }
 }

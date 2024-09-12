@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\OrderStatus;
+use App\Enums\OrderTypeEnum;
 use App\Models\Appointment;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -12,6 +13,7 @@ use App\Models\Setting;
 use App\Models\UserVendor;
 use App\Notifications\AddVendorClientNotification;
 use App\Notifications\OrderUpdatedNotification;
+use App\Services\V3_1\AppointmentService;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -130,6 +132,10 @@ class OrderService
                 }, $orderItems);
 
                 OrderItem::query()->insert($orderItems);
+
+                if ($data['type'] == OrderTypeEnum::Appointment->value) {
+                    (new AppointmentService())->createAppointment($order, $data['appointments']);
+                }
 
                 $order->load('items', 'address', 'user', 'vendor');
 

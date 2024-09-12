@@ -32,7 +32,7 @@ class AppointmentForm extends Model
     public function orders(): BelongsToMany
     {
         return $this->belongsToMany(Order::class, 'order_appointments')
-            ->withPivot('value', 'answers', 'value_id')
+            ->withPivot('key', 'answers', 'value_id')
             ->withTimestamps();
     }
 }
