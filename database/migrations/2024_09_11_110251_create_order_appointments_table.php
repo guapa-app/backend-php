@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->foreignIdFor(Order::class)->constrained();
             $table->foreignIdFor(AppointmentForm::class)->constrained();
             $table->foreignIdFor(AppointmentFormValue::class)->constrained();
-            $table->string('value')->nullable();
+            $table->string('key')->nullable();
             $table->string('answer')->nullable();
             $table->timestamps();
         });
