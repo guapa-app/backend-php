@@ -28,6 +28,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::prefix('taxonomies')->group(base_path('routes/user/v3_1/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/user/v3_1/api/notifications.php'));
     Route::prefix('support-msg')->group(base_path('routes/user/v3_1/api/support.php'));
+    Route::prefix('appointments')->group(base_path('routes/user/v3_1/api/appointments.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
