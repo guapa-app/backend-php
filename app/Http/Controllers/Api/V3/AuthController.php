@@ -105,13 +105,14 @@ class AuthController extends ApiAuthController
 
     private function prepareUserResponse($user, $token)
     {
-        $user->update(['phone_verified_at' => now()->toDateTimeString()]);
+        if ($user->phone_verified_at == null) {
+            $user->update(['phone_verified_at' => now()->toDateTimeString()]);
+            event(new Registered($user));
+        }
 
         $user->loadProfileFields();
         $user->append('user_vendors_ids');
         $user->access_token = $token;
-
-        event(new Registered($user));
 
         return $user;
     }
