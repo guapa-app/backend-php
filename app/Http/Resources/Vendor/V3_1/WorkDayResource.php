@@ -9,9 +9,10 @@ class WorkDayResource extends JsonResource
 {
     public function toArray($request)
     {
+//        dd($this);
         $returned_arr = [
-            'id'                   => $this->id,
-            'day'                  => $this->day->name,
+            'id'                   => $this->value,
+            'day'                  => $this->name,
         ];
 
         return $returned_arr;

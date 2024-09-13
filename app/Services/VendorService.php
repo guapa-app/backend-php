@@ -139,7 +139,11 @@ class VendorService
         $vendor = $this->vendorRepository->update($id, $data);
 
         // Update logo
-        $logoData = Arr::only($data, ['logo']);
+        if (isset($data['specialty_ids'])) {
+            $logoData = Arr::only($data, ['logo', 'remove_logo']);
+        }else{
+            $logoData = Arr::only($data, ['logo']);
+        }
         $this->updateLogo($vendor, $logoData);
 
         $this->updateStaff($vendor, $data);
@@ -173,7 +177,7 @@ class VendorService
     {
         if (isset($data['logo']) && $data['logo'] instanceof UploadedFile) {
             $vendor->addMedia($data['logo'])->toMediaCollection('logos');
-        } elseif ($this->vendorRepository->isAdmin() && !isset($data['logo'])) {
+        } elseif ($this->vendorRepository->isAdmin() && !isset($data['logo']) || isset($data['remove_logo']) && $data['remove_logo'] === true) {
             // Delete all vendor media
             // As there is only one collection - logos
             $vendor->media()->delete();

@@ -32,10 +32,8 @@ class VendorProfileResource extends JsonResource
 
             'shared_link'                               => (string) $this->shared_link,
 
-            // TODO: to be handled
-//            'work_days'                                 => WorkDayResource::collection($this->whenLoaded('workDays')),
+            'work_days'                                 => WorkDayResource::collection($this->whenLoaded('workDays')),
             'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),
-            'staff'                                     => StaffResource::collection($this->whenLoaded('staff')),
             'logo'                                      => MediaResource::make($this->whenLoaded('logo')),
             'specialties'                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'appointments'                              => AppointmentResource::collection($this->whenLoaded('appointments')),
