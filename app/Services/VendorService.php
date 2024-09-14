@@ -139,7 +139,7 @@ class VendorService
         $vendor = $this->vendorRepository->update($id, $data);
 
         // Update logo
-        if (isset($data['specialty_ids'])) {
+        if (isset($data['remove_logo'])) {
             $logoData = Arr::only($data, ['logo', 'remove_logo']);
         }else{
             $logoData = Arr::only($data, ['logo']);
