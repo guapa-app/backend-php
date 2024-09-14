@@ -110,7 +110,9 @@ class UserService
         ], $data);
 
         // Update user photo
-        $photoData = Arr::only($data, ['photo','remove_photo']);
+        $photoData = isset($data['remove_photo'])
+            ? Arr::only($data, ['photo', 'remove_photo'])
+            : Arr::only($data, ['photo']);
         $this->updatePhoto($profile, $photoData);
 
         $user->setRelation('profile', $profile);
@@ -139,7 +141,7 @@ class UserService
     {
         if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
             $profile->addMedia($data['photo'])->toMediaCollection('avatars');
-        } elseif ($this->userRepository->isAdmin() && !isset($data['photo']) || $data['remove_photo']  ) {
+        } elseif ($this->userRepository->isAdmin() && !isset($data['photo']) || isset($data['remove_photo']) && $data['remove_photo'] === true ) {
             // Delete all profile media
             // As there is only one collection - avatars
             $profile->media()->delete();
