@@ -16,9 +16,4 @@ class ListVendors extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-
-    public function mount(): void
-    {
-        abort_if(auth()->user()->Vendor->isChild(), 403);
-    }
 }

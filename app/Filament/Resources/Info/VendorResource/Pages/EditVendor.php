@@ -16,9 +16,4 @@ class EditVendor extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-
-    public function mount(int|string $record): void
-    {
-        abort_if(auth()->user()->Vendor->isChild(), 403);
-    }
 }

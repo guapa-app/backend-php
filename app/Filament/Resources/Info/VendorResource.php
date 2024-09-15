@@ -24,6 +24,11 @@ class VendorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
+    public static function canViewAny(): bool
+    {
+        return (bool) auth()->user()?->Vendor?->isParent();
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

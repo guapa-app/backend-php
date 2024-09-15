@@ -20,7 +20,7 @@ class CreateVendor extends CreateRecord
         // create user
         $this->user = $userService->create($data);
 
-        $data['parent_id'] = auth()->user()->vendor?->id;
+        $data['parent_id'] = auth()->user()?->vendor?->id;
 
         return $data;
     }
@@ -35,10 +35,5 @@ class CreateVendor extends CreateRecord
             'role' => 'doctor',
             'email' => $this->user->email,
         ]);
-    }
-
-    public function mount(): void
-    {
-        abort_if(auth()->user()->Vendor->isChild(), 403);
     }
 }
