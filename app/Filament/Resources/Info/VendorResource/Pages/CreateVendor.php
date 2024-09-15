@@ -12,6 +12,7 @@ class CreateVendor extends CreateRecord
 
     protected $user;
 
+    protected static bool $canCreateAnother = false;
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $userService = app(UserService::class);

@@ -66,7 +66,7 @@ class Vendor extends Resource
         $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('provider'), 'parent', self::class)->withoutTrashed(),
+            BelongsTo::make(__('provider'), 'parent', self::class)->withoutTrashed()->nullable(),
 
             Images::make(__('logo'), 'logos') // second parameter is the media collection name
                 ->temporary(now()->addMinutes(5))
