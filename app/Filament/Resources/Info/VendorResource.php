@@ -103,6 +103,6 @@ class VendorResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()->Vendor->isParent();
+        return (bool) auth()->user()?->Vendor?->isParent();
     }
 }
