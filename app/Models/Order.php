@@ -9,6 +9,7 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 
 class Order extends Model implements Listable
@@ -18,11 +19,13 @@ class Order extends Model implements Listable
     protected $fillable = [
         'hash_id', 'user_id', 'vendor_id', 'address_id', 'total', 'status',
         'note', 'name', 'phone', 'invoice_url', 'cancellation_reason', 'coupon_id', 'coupon_discount',
+        "type", "staff_id"
     ];
 
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable = [
@@ -31,6 +34,7 @@ class Order extends Model implements Listable
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -52,7 +56,8 @@ class Order extends Model implements Listable
 
     public function getPaidAmountAttribute()
     {
-        return number_format(($this->invoice?->amount - $this->invoice?->taxes), decimal_separator: '', thousands_separator: '');
+        return number_format(($this->invoice?->amount - $this->invoice?->taxes), decimal_separator: '',
+            thousands_separator: '');
     }
 
     public function getRemainingAmountAttribute()
@@ -135,7 +140,8 @@ class Order extends Model implements Listable
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies', 'items.product.media');
+        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies',
+            'items.product.media', 'appointments.values', 'staff');
 
         return $query;
     }
@@ -147,7 +153,8 @@ class Order extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
+        $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user',
+            'appointments.values', 'staff');
 
         return $query;
     }
@@ -167,7 +174,8 @@ class Order extends Model implements Listable
     /**
      * Filter user orders to return all product orders
      * And all service orders except pending.
-     * @param Builder $query
+     *
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeForUserWithFilteredItems(Builder $query): Builder
@@ -183,5 +191,17 @@ class Order extends Model implements Listable
                             ->where('orders.status', '!=', OrderStatus::Pending);
                     });
             });
+    }
+
+    public function staff()
+    {
+        return $this->belongsTo(User::class, 'staff_id');
+    }
+
+    public function appointments(): BelongsToMany
+    {
+        return $this->belongsToMany(AppointmentForm::class, 'order_appointments')
+            ->withPivot('key', 'answer', 'appointment_form_value_id')
+            ->withTimestamps();
     }
 }

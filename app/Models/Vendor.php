@@ -82,6 +82,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable = [
@@ -90,6 +91,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -146,6 +148,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     // =========== Methods Section ===========
     /**
      * Register media collections.
+     *
      * @return void
      */
     public function registerMediaCollections(): void
@@ -156,6 +159,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     /**
      * Register media conversions.
+     *
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -180,14 +184,14 @@ class Vendor extends Model implements HasMedia, HasReviews
      */
     public function receivesBroadcastNotificationsOn()
     {
-        return 'vendor.' . $this->id;
+        return 'vendor.'.$this->id;
     }
 
     /**
      * Route notifications for the FCM channel.
      * return array of fcm tokens to send the notification to.
      *
-     * @param Notification $notification
+     * @param  Notification  $notification
      *
      * @return array
      */
@@ -270,6 +274,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     /**
      * Vendor logo relationship.
+     *
      * @return MorphOne
      */
     public function logo(): MorphOne
@@ -466,7 +471,8 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia', 'socialMedia.icon');
+        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia',
+            'socialMedia.icon');
         $query->withCount('products', 'activeOffers', 'services', 'orders_order', 'orders_consultations');
 
         if (\request()->load_products) {
@@ -499,5 +505,10 @@ class Vendor extends Model implements HasMedia, HasReviews
         }
 
         return $query;
+    }
+
+    public function appointmentForm(): BelongsToMany
+    {
+        return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
     }
 }
