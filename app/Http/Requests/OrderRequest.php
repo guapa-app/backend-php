@@ -45,6 +45,7 @@ class OrderRequest extends FormRequest
             'products.*.staff_user_id' => 'sometimes|required|integer|exists:users,id',
 
             'type' => ['required', Rule::in(OrderTypeEnum::getValues())],
+            'staff_id' => ['required', Rule::exists('users', 'id')],
 
             'appointments.*' => 'required|array',
             'appointments.*.appointment_form_id' => [

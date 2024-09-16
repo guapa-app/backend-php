@@ -17,6 +17,7 @@ class OrderResource extends JsonResource
             'paid_amount' => (float) $this->paid_amount,
             'remaining_amount' => (float) $this->remaining_amount,
             'status' => $this->status,
+            'type' => $this->type,
             'invoice_url' => (string) $this->invoice_url,
             'cancellation_reason' => (string) $this->cancellation_reason,
             'created_at' => Carbon::parse($this->created_at)->diffForHumans(),
@@ -24,6 +25,8 @@ class OrderResource extends JsonResource
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'address' => AddressResource::make($this->whenLoaded('address')),
             'vendor' => VendorResource::make($this->whenLoaded('vendor')),
+            'staff' => UserResource::make($this->whenLoaded('staff')),
+            'appointments' => AppointmentFormResource::collection($this->whenLoaded('appointments')),
         ];
     }
 }

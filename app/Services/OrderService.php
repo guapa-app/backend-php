@@ -57,8 +57,15 @@ class OrderService
 
                 $productsTitles = $vendorProducts->pluck('title')->implode(' - ');
 
-                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $now, $vendorId, &$orderItems, &$userIds) {
-                    $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
+                $data['total'] = (float) $vendorProducts->sum(function ($product) use (
+                    $data,
+                    $now,
+                    $vendorId,
+                    &
+                    $orderItems,
+                    &$userIds
+                ) {
+                    $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
 
                     if (isset($inputItem['appointment'])) {
                         $appointment = Appointment::find($inputItem['appointment']['id']);
@@ -99,18 +106,18 @@ class OrderService
                     ];
 
                     $orderItems[] = [
-                        'user_id'       => $inputItem['staff_user_id'] ?? null,
-                        'product_id'    => $product->id,
-                        'offer_id'      => optional($product->offer)->id,
-                        'quantity'      => $inputItem['quantity'],
-                        'amount'        => $product->price,
+                        'user_id' => $inputItem['staff_user_id'] ?? null,
+                        'product_id' => $product->id,
+                        'offer_id' => optional($product->offer)->id,
+                        'quantity' => $inputItem['quantity'],
+                        'amount' => $product->price,
                         'amount_to_pay' => $itemAmountToPay,
-                        'taxes'         => $this->taxesPercentage,
-                        'title'         => $product->title,
-                        'qr_code_link'  => (new QrCodeService())->generate($qrcodeData),
-                        'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
-                        'created_at'    => $now,
-                        'updated_at'    => $now,
+                        'taxes' => $this->taxesPercentage,
+                        'title' => $product->title,
+                        'qr_code_link' => (new QrCodeService())->generate($qrcodeData),
+                        'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
                     ];
 
                     return $finalPrice;
@@ -171,7 +178,7 @@ class OrderService
         $vendor = $order->vendor;
         // add the client to vendor client list if the order is used
         if ($data['status'] == (OrderStatus::Used)->value) {
-            $vendor->clients()->firstOrCreate(['user_id' =>  $user->id]);
+            $vendor->clients()->firstOrCreate(['user_id' => $user->id]);
             Notification::send($user, new AddVendorClientNotification($vendor, false));
         }
         if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
@@ -216,18 +223,21 @@ class OrderService
             if ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
             } elseif (in_array($order->status->value, OrderStatus::notAvailableForCancle())) {
-                $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
+                $error = __('api.not_available_for_action',
+                    ['status' => __('api.order_statuses.'.$order->status->value)]);
             }
         } elseif ($req_status == (OrderStatus::Return_Request)->value) {
             $error = $this->checkUserAuthorization($order, $user);
 
             if ($order->status != OrderStatus::Delivered) {
-                $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
+                $error = __('api.not_available_for_action',
+                    ['status' => __('api.order_statuses.'.$order->status->value)]);
             }
         }
 
         if ($order->status->value === $req_status) {
-            $error = __('api.order_status_req_status_error', ['status' => __('api.order_statuses.' . $order->status->value)]);
+            $error = __('api.order_status_req_status_error',
+                ['status' => __('api.order_statuses.'.$order->status->value)]);
         }
 
         if (isset($error)) {
