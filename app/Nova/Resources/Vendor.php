@@ -129,8 +129,6 @@ class Vendor extends Resource
                 ->rules('nullable') // Add appropriate validation rules
                 ->help('Upload the vendor contract (PDF, DOC, or DOCX file)'),
 
-            Panel::make(__('social media'), $this->socialMediaFields()),
-
             Text::make(__('working hours'), 'working_hours')
                 ->required(),
 
@@ -165,6 +163,14 @@ class Vendor extends Resource
                 return $request->isResourceDetailRequest() && $this->resource?->isParent();
             }),
 
+            BelongsToMany::make(__('socialMedia'), 'socialMedia', SocialMedia::class)
+                ->fields(function () {
+                return [
+                    Text::make('Url', 'link')
+                        ->rules('required'),
+                ];
+            }),
+
             Boolean::make(__('verified'), 'verified')->default(false),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
@@ -172,27 +178,6 @@ class Vendor extends Resource
         ];
 
         return $returned_arr;
-    }
-
-    public function socialMediaFields(): array
-    {
-        return [
-            Url::make(__('twitter'), 'twitter')->showOnIndex(false),
-
-            Url::make(__('instagram'), 'instagram')->showOnIndex(false),
-
-            Url::make(__('snapchat'), 'snapchat')->showOnIndex(false),
-
-            Url::make(__('snapchat'), 'snapchat')->showOnIndex(false),
-
-            Url::make(__('website_url'), 'website_url')
-                ->nullable()
-                ->showOnIndex(false),
-
-            Url::make(__('known_url'), 'known_url')
-                ->nullable()
-                ->showOnIndex(false),
-        ];
     }
 
     /**
