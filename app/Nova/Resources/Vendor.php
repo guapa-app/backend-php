@@ -8,6 +8,7 @@ use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Inspheric\Fields\Email;
 use Inspheric\Fields\Url;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
@@ -65,10 +66,12 @@ class Vendor extends Resource
         $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
+            BelongsTo::make(__('provider'), 'parent', self::class)->withoutTrashed()->nullable(),
+
             Images::make(__('logo'), 'logos') // second parameter is the media collection name
-            ->temporary(now()->addMinutes(5))
-                ->conversionOnIndexView('small') // conversion used to display the image
-                ->rules('required'), // validation rules
+                ->temporary(now()->addMinutes(5))
+                    ->conversionOnIndexView('small') // conversion used to display the image
+                    ->rules('required'), // validation rules
 
             Text::make(__('name'), 'name')
                 ->sortable()
@@ -157,6 +160,11 @@ class Vendor extends Resource
                         ]),
                 ];
             }),
+
+            HasMany::make(__('doctors'), 'children', self::class)->canSee(function () use ($request) {
+                return $request->isResourceDetailRequest() && $this->resource?->isParent();
+            }),
+
             Boolean::make(__('verified'), 'verified')->default(false),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),

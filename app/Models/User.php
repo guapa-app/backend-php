@@ -13,6 +13,7 @@ use Hamedov\Favorites\HasFavorites;
 use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -305,7 +306,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     /**
      * Get the entity's notifications.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function notifications()
     {

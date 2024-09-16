@@ -53,7 +53,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     ];
 
     protected $fillable = [
-        'name', 'email', 'status', 'verified',
+        'parent_id', 'name', 'email', 'status', 'verified',
         'phone', 'about', 'whatsapp', 'twitter',
         'instagram', 'snapchat', 'type', 'working_days',
         'working_hours', 'website_url', 'known_url', 'tax_number',
@@ -96,6 +96,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'name', 'email', 'phone', 'about',
     ];
 
+    // =========== Attributes Section ===========
     public function getStaffIdAttribute()
     {
         return $this->staff()?->first()?->id;
@@ -142,6 +143,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $days;
     }
 
+    // =========== Methods Section ===========
     /**
      * Register media collections.
      * @return void
@@ -201,6 +203,66 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->logo();
     }
 
+    public function specialties()
+    {
+        return $this->taxonomies('specialty');
+    }
+
+    public function productsHasOffers()
+    {
+        return $this->allProducts()->whereHas('offer');
+    }
+
+    public function products()
+    {
+        return $this->allProducts()->where('type', 'product');
+    }
+
+    public function services()
+    {
+        return $this->allProducts()->where('type', 'service');
+    }
+
+    public function activeOffers()
+    {
+        return $this->offers()->active();
+    }
+
+    public function hasUser(User $user, $role = null)
+    {
+        return $this->users()->where([
+                'user_id' => $user->id,
+            ])->when($role != null, function ($query) use ($role) {
+                $query->where('role', $role);
+            })->first() != null;
+    }
+
+    public function hasManager(User $user)
+    {
+        return $this->hasUser($user, 'manager');
+    }
+
+    public function hasDoctor(User $user)
+    {
+        return $this->hasUser($user, 'doctor');
+    }
+
+    public function hasStaff(User $user)
+    {
+        return $this->hasUser($user, 'staff');
+    }
+
+    public function isChild()
+    {
+        return (bool) $this->parent_id;
+    }
+
+    public function isParent()
+    {
+        return $this->parent_id == null;
+    }
+
+    // =========== Relations Section ===========
     public function shareLink()
     {
         return $this->morphOne(ShareLink::class, 'shareable');
@@ -283,39 +345,14 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->staff()->wherePivot('role', 'doctor');
     }
 
-    public function specialties()
-    {
-        return $this->taxonomies('specialty');
-    }
-
     public function allProducts()
     {
         return $this->hasMany(Product::class);
     }
 
-    public function productsHasOffers()
-    {
-        return $this->allProducts()->whereHas('offer');
-    }
-
-    public function products()
-    {
-        return $this->allProducts()->where('type', 'product');
-    }
-
-    public function services()
-    {
-        return $this->allProducts()->where('type', 'service');
-    }
-
     public function offers()
     {
         return $this->hasManyThrough(Offer::class, Product::class);
-    }
-
-    public function activeOffers()
-    {
-        return $this->offers()->active();
     }
 
     public function workDays()
@@ -333,28 +370,30 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(Influencer::class);
     }
 
-    public function hasUser(User $user, $role = null)
+    /*
+     * sub-vendors
+     * with doctor role
+     * they can't be managers
+     */
+    public function children()
     {
-        return $this->users()->where([
-                'user_id' => $user->id,
-            ])->when($role != null, function ($query) use ($role) {
-                $query->where('role', $role);
-            })->first() != null;
+        return $this->hasMany(self::class, 'parent_id');
     }
 
-    public function hasManager(User $user)
+    public function parent()
     {
-        return $this->hasUser($user, 'manager');
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
-    public function hasDoctor(User $user)
+    // =========== Scopes Section ===========
+    public function scopeSubVendors(Builder $query, $parent): Builder
     {
-        return $this->hasUser($user, 'doctor');
+        return $query->where('parent_id', $parent);
     }
 
-    public function hasStaff(User $user)
+    public function scopeParents(Builder $query): Builder
     {
-        return $this->hasUser($user, 'staff');
+        return $query->whereNull('parent_id');
     }
 
     public function scopeCurrentVendor($query, $value)

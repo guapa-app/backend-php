@@ -120,7 +120,7 @@ class User extends Resource
                     $model->{$attribute} = $string;
                 })
                 ->required()
-                ->rules('required', 'unique:users,phone')
+                ->creationRules('required', 'unique:users,phone')
                 ->updateRules('unique:users,phone,{{resourceId}}')
                 ->withMeta([
                     'onlyCountries' => Arr::flatten(['SA', 'EG']),
