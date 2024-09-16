@@ -26,7 +26,7 @@ class AppointmentForm extends Model
 
     public function vendors(): BelongsToMany
     {
-        return $this->belongsToMany(Vendor::class);
+        return $this->belongsToMany(Vendor::class)->withTimestamps();
     }
 
     public function orders(): BelongsToMany
