@@ -21,6 +21,7 @@ class MarketingCampaignController extends BaseApiController
     public function __construct(MarketingCampaignService $marketingCampaignService, MarketingCampaignRepositoryInterface $marketingCampaignRepository)
     {
         parent::__construct();
+
         $this->marketingCampaignService = $marketingCampaignService;
         $this->marketingCampaignRepository = $marketingCampaignRepository;
     }
@@ -47,7 +48,7 @@ class MarketingCampaignController extends BaseApiController
     {
         try {
             $data = $request->validated();
-            $data['vendor_id'] =  $this->user->managerVendorId();
+            $data['vendor_id'] = $this->user->managerVendorId();
             $marketingCampaign = $this->marketingCampaignService->create($data);
 
             return MarketingCampaignResource::make($marketingCampaign)
@@ -87,7 +88,7 @@ class MarketingCampaignController extends BaseApiController
     {
         try {
             $data = $request->validated();
-            $data['vendor_id'] =  $this->user->managerVendorId();
+            $data['vendor_id'] = $this->user->managerVendorId();
             $pricing = $this->marketingCampaignService->calculatePricingDetails($data);
 
             return $this->successJsonRes($pricing, __('api.success'));

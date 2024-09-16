@@ -17,7 +17,6 @@ class MarketingCampaign extends Model implements Listable
 {
     use HasFactory, ListableTrait;
 
-
     protected $fillable = [
         'vendor_id', 'channel', 'audience_type', 'audience_count',
         'message_cost', 'taxes', 'total_cost', 'status',
