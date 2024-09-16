@@ -373,6 +373,10 @@ class Vendor extends Model implements HasMedia, HasReviews
         if ($request->has('lat') && $request->has('lng')) {
             $query->nearBy($request->get('lat'), $request->get('lng'), $request->get('distance'));
         }
+        // get vendors for specific city
+        if ($request->has('city_id')) {
+            $query->hasCity((int) $request->get('city_id'));
+        }
 
         // Only logged-in users/admins can use this filter
         $user = auth()->user();
