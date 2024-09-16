@@ -6,6 +6,7 @@ use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
+use App\Http\Resources\V3_1\OrderCollection;
 use App\Http\Resources\V3_1\OrderResource;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class OrderController extends ApiOrderController
         $request->merge(['user_id' => $this->user->id]);
         $orders = parent::index($request);
 
-        return OrderResource::collection($orders)
+        return OrderCollection::make($orders)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
