@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
+use App\Http\Resources\V3_1\OrderCollection;
 use App\Http\Resources\V3_1\OrderResource;
 use App\Services\V3\OrderService;
 
@@ -23,7 +24,7 @@ class OrderController extends ApiOrderController
         $request->merge(['vendor_id' => $this->user->userVendor?->vendor_id]);
         $orders = parent::index($request);
 
-        return OrderResource::collection($orders)
+        return OrderCollection::make($orders)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
