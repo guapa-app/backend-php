@@ -10,7 +10,7 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_id', 'marketing_campaign_id', 'invoice_id', 'status',
+        'invoiceable_id', 'invoiceable_type', 'invoice_id', 'status',
         'amount', 'currency', 'amount_format', 'description',
         'expired_at', 'logo_url', 'url', 'callback_url', 'taxes',
     ];
@@ -21,14 +21,19 @@ class Invoice extends Model
         'amount_without_taxes',
     ];
 
+    public function invoiceable()
+    {
+        return $this->morphTo();
+    }
+
     public function getVendorNameAttribute()
     {
-        return $this->order?->vendor?->name ?? $this->marketing_campaign?->vendor?->name ?? '';
+        return $this->invoiceable?->vendor?->name ?? '';
     }
 
     public function getVendorRegNumAttribute()
     {
-        return $this->order?->vendor?->reg_number ?? $this->marketing_campaign?->vendor?->reg_number ?? '';
+        return $this->invoiceable?->vendor?->reg_number ?? '';
     }
 
     public function getAmountWithoutTaxesAttribute()
@@ -48,12 +53,8 @@ class Invoice extends Model
 
     public function scopeCurrentVendor($query, $vendorId)
     {
-        return $query->where(function ($query) use ($vendorId) {
-            $query->whereHas('order', function ($q) use ($vendorId) {
-                $q->where('vendor_id', $vendorId);
-            })->orWhereHas('campaign', function ($q) use ($vendorId) {
-                $q->where('vendor_id', $vendorId);
-            });
+        return $query->whereHasMorph('invoiceable', [Order::class, MarketingCampaign::class], function ($q) use ($vendorId) {
+            $q->where('vendor_id', $vendorId);
         });
     }
 }

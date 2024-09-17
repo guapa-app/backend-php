@@ -87,7 +87,7 @@ class Order extends Model implements Listable
 
     public function invoice()
     {
-        return $this->hasOne(Invoice::class);
+        return $this->morphOne(Invoice::class, 'invoiceable');
     }
 
     public function coupon()

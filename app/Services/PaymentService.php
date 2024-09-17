@@ -22,9 +22,9 @@ class PaymentService
         };
     }
 
-    public function generateInvoice($billable, $description, $fees, $taxes)
+    public function generateInvoice($invoiceable, $description, $fees, $taxes)
     {
-        $invoice = $this->createInvoice($billable, $description, $fees, $taxes);
+        $invoice = $this->createInvoice($invoiceable, $description, $fees, $taxes);
 
         if (($fees + $taxes) > 0) {
             $paymentInvoice = $this->paymentService->create($invoice);
@@ -34,41 +34,26 @@ class PaymentService
         return $invoice;
     }
 
-//    public function storeInvoice($order, $description, $fees = 0, $taxes = 0)
-//    {
-//        $invoice = Invoice::query()->create([
-//            'order_id'     => $order->id,
-//            'status'       => 'initiated',
-//            'taxes'        => $taxes,
-//            'amount'       => ($fees + $taxes),
-//            'description'  => "You will pay the fees and taxes. \n" . $description,
-//            'currency'     => config('nova.currency'),
-//            'callback_url' => config('app.url') . '/api/v2/invoices/change-status',
-//        ]);
-//
-//        return $invoice;
-//    }
-
-    private function createInvoice($billable, $description, $fees, $taxes)
+    private function createInvoice($invoiceable, $description, $fees, $taxes)
     {
         $invoiceData = [
-            'status'       => 'initiated',
-            'taxes'        => $taxes,
-            'amount'       => ($fees + $taxes),
-            'description'  => $description,
-            'currency'     => config('nova.currency'),
+            'invoiceable_id'   => $invoiceable->id,
+            'invoiceable_type' => get_class($invoiceable),
+            'status'           => 'initiated',
+            'taxes'            => $taxes,
+            'amount'           => ($fees + $taxes),
+            'description'      => $description,
+            'currency'         => config('nova.currency'),
         ];
 
-        if ($billable instanceof Order) {
-            $invoiceData['order_id'] = $billable->id;
+        if ($invoiceable instanceof Order) {
             $invoiceData['callback_url'] = config('app.url') . '/api/v2/invoices/change-status';
             $invoiceData['description'] = "Order Invoice: \n" . $description;
-        } elseif ($billable instanceof MarketingCampaign) {
-            $invoiceData['marketing_campaign_id'] = $billable->id;
+        } elseif ($invoiceable instanceof MarketingCampaign) {
             $invoiceData['callback_url'] = config('app.url') . '/api/v3/campaigns/change-invoice-status';
             $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
         } else {
-            throw new InvalidArgumentException("Unsupported billable type");
+            throw new InvalidArgumentException(__('Unsupported invoice type'));
         }
 
         return Invoice::query()->create($invoiceData);
