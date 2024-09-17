@@ -5,7 +5,6 @@ namespace App\Http\Requests\Vendor\V3_1;
 use App\Enums\MarketingCampaignAudienceType;
 use App\Enums\MarketingCampaignChannel;
 use App\Enums\MarketingCampaignType;
-use App\Models\MarketingCampaign;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
@@ -30,7 +29,7 @@ class MarketingCampaignRequest extends FormRequest
             'channel'       => ['required', new Enum(MarketingCampaignChannel::class)],
             'audience_type' => ['required', new Enum(MarketingCampaignAudienceType::class)],
             'audience_count'     => 'required|integer|min:1',
-            'type'  => ['required','string', new Enum(MarketingCampaignType::class)],
+            'type'  => ['required', 'string', new Enum(MarketingCampaignType::class)],
             'id'    => 'required|integer',
             'users' => 'nullable|array',
             'users.*' => 'integer|exists:users,id',

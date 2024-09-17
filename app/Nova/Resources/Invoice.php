@@ -8,6 +8,7 @@ use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
@@ -49,8 +50,12 @@ class Invoice extends Resource
         $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('order'), 'order', Order::class),
-
+            MorphTo::make(__('Invoiceable'), 'invoiceable')
+                ->types([
+                    Order::class,
+                    MarketingCampaign::class,
+                ])
+                ->searchable(),
             Text::make(__('invoice id'), 'invoice_id')->required(),
             Text::make(__('url'), 'url')->nullable(),
             Textarea::make(__('description'), 'description')->required(),

@@ -19,6 +19,7 @@ class MarketingCampaignController extends BaseApiController
     public function __construct(MarketingCampaignService $marketingCampaignService, MarketingCampaignRepositoryInterface $marketingCampaignRepository)
     {
         parent::__construct();
+
         $this->marketingCampaignService = $marketingCampaignService;
         $this->marketingCampaignRepository = $marketingCampaignRepository;
     }

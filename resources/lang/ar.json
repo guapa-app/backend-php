@@ -808,6 +808,6 @@
     "Coupon usage limit has been reached.": "تم الوصول إلى حد استخدام الكوبون",
     "You have reached the maximum usage limit for this coupon.": "لقد وصلت إلى الحد الأقصى لاستخدام هذا الكوبون",
     "Coupon is not applicable to the selected products.": "الكوبون غير قابل للتطبيق على المنتجات المحددة",
-    "You do not have permission to create a campaign for this product.": "ليس لديك الإذن لإنشاء حملة لهذا المنتج"
-
+    "You do not have permission to create a campaign for this product.": "ليس لديك الإذن لإنشاء حملة لهذا المنتج",
+    "Unsupported invoice type": "نوع الفاتورة غير مدعوم"
 }

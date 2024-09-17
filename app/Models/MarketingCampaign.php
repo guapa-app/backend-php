@@ -17,7 +17,6 @@ class MarketingCampaign extends Model implements Listable
 {
     use HasFactory, ListableTrait;
 
-
     protected $fillable = [
         'vendor_id', 'channel', 'audience_type', 'audience_count',
         'message_cost', 'taxes', 'total_cost', 'status',
@@ -43,6 +42,11 @@ class MarketingCampaign extends Model implements Listable
     public function campaignable()
     {
         return $this->morphTo();
+    }
+
+    public function invoice()
+    {
+        return $this->morphOne(Invoice::class, 'invoiceable');
     }
 
     public function users()

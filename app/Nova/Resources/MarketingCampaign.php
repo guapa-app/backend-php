@@ -2,6 +2,7 @@
 
 namespace App\Nova\Resources;
 
+use App\Enums\MarketingCampaignChannel;
 use App\Models\MarketingCampaign as MarketingCampaignModel;
 use App\Traits\NovaReadOnly;
 use Laravel\Nova\Fields\BelongsTo;
@@ -44,7 +45,7 @@ class MarketingCampaign extends Resource
             })->readonly(),
 
             Select::make('Channel')
-                ->options(MarketingCampaignModel::CHANNEL)
+                ->options(MarketingCampaignChannel::class)
                 ->displayUsingLabels(),
 
             Select::make('Audience Type', 'audience_type')
