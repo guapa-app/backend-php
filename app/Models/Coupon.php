@@ -107,6 +107,8 @@ class Coupon extends Model
 
     public function scopeCurrentVendor($query, $value)
     {
-        return $query->where('vendor_id', $value);
+        $query->whereHas('vendors', function ($q) use ($value) {
+            $q->where('vendor_id', $value);
+        });
     }
 }
