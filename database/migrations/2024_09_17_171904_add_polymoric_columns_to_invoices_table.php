@@ -33,11 +33,6 @@ return new class extends Migration
 //            $table->dropColumn('order_id');
 //            $table->dropColumn('marketing_campaign_id');
 //        });
-
-        // Add index to new columns
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->index(['invoiceable_type', 'invoiceable_id']);
-        });
     }
 
     public function down()
