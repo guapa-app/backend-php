@@ -44,6 +44,11 @@ class MarketingCampaign extends Model implements Listable
         return $this->morphTo();
     }
 
+    public function invoice()
+    {
+        return $this->morphOne(Invoice::class, 'invoiceable');
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'campaign_user');

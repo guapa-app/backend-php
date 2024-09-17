@@ -428,5 +428,7 @@
     "invalid credentials": "Phone number or password is incorrect",
     "invalid otp": "OTP is incorrect",
     "phone or email not verified": "Your email address & phone number is not verified.",
-    "You do not have permission to create a campaign for this product.": "You do not have permission to create a campaign for this type."
+    "You do not have permission to create a campaign for this product.": "You do not have permission to create a campaign for this type.",
+    "Unsupported invoice type": "Unsupported invoice type"
 }
+
