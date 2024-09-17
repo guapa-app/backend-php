@@ -104,4 +104,9 @@ class Coupon extends Model
         return !$this->hasReachedMaxUsesForUser($user) &&
             $this->isCouponApplicableToProduct($product);
     }
+
+    public function scopeCurrentVendor($query, $value)
+    {
+        return $query->where('vendor_id', $value);
+    }
 }
