@@ -19,30 +19,30 @@ class VendorClientController extends Controller
         $this->vendorClientService = $vendorClientService;
     }
 
-    public function index(Request $request)
+    public function index(Request $request, Vendor $vendor)
     {
         $request->validate([
             'search' => 'nullable|string|max:255',
         ]);
         $filters = $request->only(['search']);
 
-        return $this->vendorClientService->listClientsWithOrderCount($filters);
+        return $this->vendorClientService->listClientsWithOrderCount($vendor, $filters);
     }
 
-    public function store(VendorClientRequest $request)
+    public function store(VendorClientRequest $request, Vendor $vendor)
     {
-        return $this->vendorClientService->addClient($request->validated());
+        return $this->vendorClientService->addClient($vendor, $request->validated());
     }
 
-    public function getClientOrders(GetClientOrdersRequest $request,User $client)
+    public function getClientOrders(GetClientOrdersRequest $request, Vendor $vendor, User $client)
     {
         $productType = $request->input('product_type', null);
 
-        return $this->vendorClientService->getClientOrders( $client, $productType);
+        return $this->vendorClientService->getClientOrders($vendor, $client, $productType);
     }
 
-    public function destroy($clientId)
+    public function destroy(Vendor $vendor, $clientId)
     {
-        return $this->vendorClientService->deleteClient($clientId);
+        return $this->vendorClientService->deleteClient($vendor, $clientId);
     }
 }

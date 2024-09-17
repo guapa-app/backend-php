@@ -14,10 +14,9 @@ use Illuminate\Support\Facades\Notification;
 
 class VendorClientService
 {
-    public function addClient(array $data)
+    public function addClient(Vendor $vendor, array $data)
     {
-        return DB::transaction(function () use ( $data) {
-            $vendor = $this->getVendor();
+        return DB::transaction(function () use ($vendor, $data) {
             $user = $this->findOrCreateUser($data);
             $isNewClient = $user->wasRecentlyCreated;
 
@@ -28,7 +27,7 @@ class VendorClientService
                 'user_id' => $user->id,
             ]);
 
-            $orders_count = $this->getUserOrdersCount($user, $isNewClient);
+            $orders_count = $this->getUserOrdersCount($user, $vendor, $isNewClient);
 
             return [
                 'id' => $user->id,
@@ -48,12 +47,11 @@ class VendorClientService
         );
     }
 
-    private function getUserOrdersCount(User $user, bool $isNewClient): int
+    private function getUserOrdersCount(User $user, Vendor $vendor, bool $isNewClient): int
     {
         if ($isNewClient) {
             return 0;
         }
-        $vendor = $this->getVendor();
 
         $user->load(['orders' => function ($query) use ($vendor) {
             $query->where('vendor_id', $vendor->id);
@@ -62,9 +60,8 @@ class VendorClientService
         return $user->orders->count();
     }
 
-    public function listClientsWithOrderCount(array $filters = []): Collection
+    public function listClientsWithOrderCount(Vendor $vendor, array $filters = []): Collection
     {
-        $vendor = $this->getVendor();
         $query = $vendor->clients()
             ->with(['user' => function ($query) use ($vendor) {
                 $query->select('id', 'name', 'email', 'phone')
@@ -87,19 +84,21 @@ class VendorClientService
 
     private function applyFilters($query, array $filters): void
     {
-        if (!empty($filters['search'])) {
+        if (!empty($filters['name']) || !empty($filters['phone'])) {
             $query->whereHas('user', function ($query) use ($filters) {
-                $search = '%' . $filters['search'] . '%';
-                $query->where('name', 'like', $search)
-                    ->orWhere('phone', 'like', $search);
+                if (!empty($filters['name'])) {
+                    $query->where('name', 'like', '%' . $filters['name'] . '%');
+                }
+                if (!empty($filters['phone'])) {
+                    $query->where('phone', 'like', '%' . $filters['phone'] . '%');
+                }
             });
         }
     }
 
-    public function getClientOrders($client_id, ?ProductType $productType = null): Collection
+    public function getClientOrders($vendor_id, $client_id, ?ProductType $productType = null): Collection
     {
-        $vendor = $this->getVendor();
-        $query = Order::where('vendor_id', $vendor->id)
+        $query = Order::where('vendor_id', $vendor_id)
             ->where('user_id', $client_id);
         if ($productType) {
             $query->hasProductType($productType);
@@ -108,9 +107,8 @@ class VendorClientService
         return $query->get();
     }
 
-    public function deleteClient($clientId)
+    public function deleteClient(Vendor $vendor, $clientId)
     {
-        $vendor = $this->getVendor();
         return VendorClient::where('vendor_id', $vendor->id)
             ->where('user_id', $clientId)
             ->delete();
@@ -128,9 +126,5 @@ class VendorClientService
     private function sendNotification(User $user, Vendor $vendor, $isNewClient = false)
     {
 //        Notification::send($user, new AddVendorClientNotification($vendor, $isNewClient));
-    }
-    private function getVendor(): Vendor
-    {
-        return auth()->user()->userVendor?->vendor;
     }
 }
