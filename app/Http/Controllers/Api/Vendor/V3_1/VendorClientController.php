@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Controllers\Api\VendorClientController as ApiVendorClientController;
 use App\Http\Requests\GetClientOrdersRequest;
 use App\Http\Requests\VendorClientRequest;
 use App\Http\Resources\OrderCollection;
@@ -13,7 +12,6 @@ use App\Services\VendorClientService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @group Vendor Clients
