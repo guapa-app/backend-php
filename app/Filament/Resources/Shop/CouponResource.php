@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Shop;
 
 use App\Filament\Resources\Shop\CouponResource\Pages;
 use App\Models\Coupon;
+use App\Traits\FilamentVendorAccess;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CouponResource extends Resource
 {
+    use FilamentVendorAccess;
     protected static ?string $model = Coupon::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
@@ -26,7 +28,9 @@ class CouponResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('code')
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignoreRecord: true)
+                    ->minLength(4)
+                    ->maxLength(12),
                 Forms\Components\TextInput::make('discount_percentage')
                     ->required()
                     ->numeric()
