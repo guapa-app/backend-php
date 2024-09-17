@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('taxonomy', function (Blueprint $table) {
+        Schema::table('taxonomies', function (Blueprint $table) {
             $table->decimal('appointment_price')->default(0)->after('is_appointment');
         });
     }
