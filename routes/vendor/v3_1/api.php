@@ -30,6 +30,7 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::prefix('coupons')->group(base_path('routes/vendor/v3_1/api/coupons.php'));
     Route::prefix('campaigns')->group(base_path('routes/vendor/v3_1/api/campaigns.php'));
     Route::prefix('support-msg')->group(base_path('routes/vendor/v3_1/api/support.php'));
+    Route::prefix('appointments')->group(base_path('routes/vendor/v3_1/api/appointments.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);

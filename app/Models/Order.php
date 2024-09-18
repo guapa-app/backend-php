@@ -141,7 +141,7 @@ class Order extends Model implements Listable
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies',
-            'items.product.media', 'appointments.values', 'staff');
+            'items.product.media', 'appointmentForms.values', 'staff');
 
         return $query;
     }
@@ -154,7 +154,7 @@ class Order extends Model implements Listable
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user',
-            'appointments.values', 'staff');
+            'appointmentForms.values', 'staff');
 
         return $query;
     }
@@ -198,7 +198,7 @@ class Order extends Model implements Listable
         return $this->belongsTo(User::class, 'staff_id');
     }
 
-    public function appointments(): BelongsToMany
+    public function appointmentForms(): BelongsToMany
     {
         return $this->belongsToMany(AppointmentForm::class, 'order_appointments')
             ->withPivot('key', 'answer', 'appointment_form_value_id')

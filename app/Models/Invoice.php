@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Invoice extends Model
 {
@@ -13,6 +14,7 @@ class Invoice extends Model
         'invoiceable_id', 'invoiceable_type', 'invoice_id', 'status',
         'amount', 'currency', 'amount_format', 'description',
         'expired_at', 'logo_url', 'url', 'callback_url', 'taxes',
+        'invoiceable_id', 'invoiceable_type'
     ];
 
     protected $appends = [
@@ -49,6 +51,14 @@ class Invoice extends Model
     public function marketing_campaign()
     {
         return $this->belongsTo(MarketingCampaign::class)->withDefault();
+    }
+
+    /**
+     * Get the parent invoiceable model.
+     */
+    public function invoiceable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     public function scopeCurrentVendor($query, $vendorId)

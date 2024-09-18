@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\User\V3_1\DeviceController;
-use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
 use Illuminate\Support\Facades\Route;

@@ -390,6 +390,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->belongsTo(self::class, 'parent_id');
     }
 
+    public function appointmentForm(): BelongsToMany
+    {
+        return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
+    }
+
     // =========== Scopes Section ===========
     public function scopeSubVendors(Builder $query, $parent): Builder
     {
@@ -505,10 +510,5 @@ class Vendor extends Model implements HasMedia, HasReviews
         }
 
         return $query;
-    }
-
-    public function appointmentForm(): BelongsToMany
-    {
-        return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
     }
 }

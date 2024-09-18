@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AppointmentOffer;
 use App\Models\Invoice;
 use App\Models\MarketingCampaign;
 use App\Models\Order;
@@ -52,6 +53,8 @@ class PaymentService
         } elseif ($invoiceable instanceof MarketingCampaign) {
             $invoiceData['callback_url'] = config('app.url') . '/api/v3/campaigns/change-invoice-status';
             $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
+        } elseif ($invoiceable instanceof AppointmentOffer) {
+            $invoiceData['callback_url'] = config('app.url').'/api/v3.1/invoices/change-status';
         } else {
             throw new InvalidArgumentException(__('Unsupported invoice type'));
         }
