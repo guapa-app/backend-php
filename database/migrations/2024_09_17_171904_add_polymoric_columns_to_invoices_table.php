@@ -26,6 +26,7 @@ return new class extends Migration
                     'invoiceable_id' => DB::raw('order_id')
                 ]);
                 // Drop old column
+                $table->dropForeign('invoices_order_id_foreign');
                 $table->dropColumn('order_id');
             }
             if (Schema::hasColumn('invoices', 'marketing_campaign_id')) {
@@ -35,6 +36,7 @@ return new class extends Migration
                     'invoiceable_id' => DB::raw('marketing_campaign_id')
                 ]);
                 // Drop old column
+                $table->dropForeign('invoices_marketing_campaign_id_foreign');
                 $table->dropColumn('marketing_campaign_id');
             }
         });
