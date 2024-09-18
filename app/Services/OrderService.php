@@ -57,14 +57,7 @@ class OrderService
 
                 $productsTitles = $vendorProducts->pluck('title')->implode(' - ');
 
-                $data['total'] = (float) $vendorProducts->sum(function ($product) use (
-                    $data,
-                    $now,
-                    $vendorId,
-                    &
-                    $orderItems,
-                    &$userIds
-                ) {
+                $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $now, $vendorId, &$orderItems, &$userIds) {
                     $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
 
                     if (isset($inputItem['appointment'])) {
@@ -139,10 +132,6 @@ class OrderService
                 }, $orderItems);
 
                 OrderItem::query()->insert($orderItems);
-
-                if ($data['type'] == OrderTypeEnum::Appointment->value) {
-                    (new AppointmentService())->createAppointment($order, $data['appointments']);
-                }
 
                 $order->load('items', 'address', 'user', 'vendor');
 
