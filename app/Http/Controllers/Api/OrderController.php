@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
+use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderStatus;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Models\User;
+use App\Models\UserVendor;
+use App\Models\Vendor;
+use App\Notifications\AppointmentOfferNotification;
 use App\Notifications\OrderNotification;
 use App\Services\OrderService;
 use App\Services\PDFService;
@@ -123,23 +128,25 @@ class OrderController extends BaseApiController
         $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
 
         if ($invoice->status == 'paid') {
-            $order = $invoice->order;
-            $order->status = 'Accepted';
-            if (!str_contains($order->invoice_url, '.s3.')) {
-                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
-            }
-            $order->save();
-            Notification::send($order->vendor->staff, new OrderNotification($order));
+            $invoiceable = $invoice->invoiceable;
+            $invoiceable->update(['status' => AppointmentOfferEnum::Paid_Application_Fees->value]);
+
+            $userVendors = UserVendor::query()
+                ->whereIn('vendor_id', $invoice->invoiceable->details->pluck('sub_vendor_id'))
+                ->pluck('user_id');
+            $users = User::whereIn('id', $userVendors)->get();
+
+            Notification::send($users, new AppointmentOfferNotification($invoiceable));
         }
 
-        logger(
-            "Change Invoice Status By Callback URL\n
-            order { $invoice->order_id } <-> Invoice { $invoice->id }",
-            [
-                "\n***payment gateway***" => $request->all(),
-                "\n***invoice***" => $invoice->attributesToArray(),
-            ]
-        );
+//        logger(
+//            "Change Invoice Status By Callback URL\n
+//            order { $invoice->order_id } <-> Invoice { $invoice->id }",
+//            [
+//                "\n***payment gateway***" => $request->all(),
+//                "\n***invoice***" => $invoice->attributesToArray(),
+//            ]
+//        );
 
         return true;
     }

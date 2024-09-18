@@ -1,6 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\User\V3_1\AppointmentController;
+use App\Http\Controllers\Api\User\V3_1\AppointmentFormController;
+use App\Http\Controllers\Api\User\V3_1\AppointmentOfferController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [AppointmentController::class, 'index']);
+Route::get('/form', [AppointmentFormController::class, 'index']);
+Route::prefix('offers')->controller(AppointmentOfferController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::post('/reject', 'reject');
+});

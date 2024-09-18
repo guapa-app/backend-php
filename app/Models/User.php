@@ -13,6 +13,7 @@ use Hamedov\Favorites\HasFavorites;
 use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
@@ -311,5 +312,10 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function notifications()
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
+    }
+
+    public function appointmentOffers(): HasMany
+    {
+        return $this->hasMany(AppointmentOffer::class);
     }
 }
