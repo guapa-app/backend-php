@@ -53,14 +53,6 @@ class Invoice extends Model
         return $this->belongsTo(MarketingCampaign::class)->withDefault();
     }
 
-    /**
-     * Get the parent invoiceable model.
-     */
-    public function invoiceable(): MorphTo
-    {
-        return $this->morphTo();
-    }
-
     public function scopeCurrentVendor($query, $vendorId)
     {
         return $query->whereHasMorph('invoiceable', [Order::class, MarketingCampaign::class], function ($q) use ($vendorId) {
