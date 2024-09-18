@@ -43,29 +43,6 @@ class OrderRequest extends FormRequest
             'products.*.appointment.id' => 'sometimes|required|integer|exists:appointments,id',
             'products.*.appointment.date' => 'sometimes|required|date|after_or_equal:today',
             'products.*.staff_user_id' => 'sometimes|required|integer|exists:users,id',
-
-            'type' => ['required', Rule::in(OrderTypeEnum::getValues())],
-            'staff_id' => ['required', Rule::exists('users', 'id')],
-
-            'appointments.*' => 'required|array',
-            'appointments.*.appointment_form_id' => [
-                'required_if:type,'.OrderTypeEnum::Appointment->value,
-                Rule::exists('appointment_forms', 'id')
-            ],
-            'appointments.*.appointment_form_value_id' => [
-                'required_if:type,'.OrderTypeEnum::Appointment->value,
-                Rule::exists('appointment_form_values', 'id')
-            ],
-            'appointments.*.key' => [
-                'required_if:type,'.OrderTypeEnum::Appointment->value,
-                'string',
-                'max:255',
-            ],
-            'appointments.*.answer' => [
-                'required_if:type,'.OrderTypeEnum::Appointment->value,
-                'string',
-                'max:255',
-            ],
         ];
 
         if ($this->user() && $this->user()->isAdmin()) {
