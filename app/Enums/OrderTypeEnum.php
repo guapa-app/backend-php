@@ -8,6 +8,7 @@ enum OrderTypeEnum: string
 {
     use EnumValuesTrait;
 
-    case Order = 'order';
+    case Product = 'product';
+    case Service = 'service';
     case Appointment = 'appointment';
 }

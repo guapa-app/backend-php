@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->foreignIdFor(User::class)->constrained();
             $table->foreignIdFor(Vendor::class)->constrained();
             $table->foreignIdFor(Taxonomy::class)->constrained();
-            $table->enum('status', AppointmentOfferEnum::getValues())->default(AppointmentOfferEnum::Pending->value);
+            $table->char('status', 30);
             $table->decimal('total')->default(0);
             $table->text('notes')->nullable();
             $table->string('invoice_url')->nullable();
