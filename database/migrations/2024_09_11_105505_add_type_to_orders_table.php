@@ -14,9 +14,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->foreignIdFor(Vendor::class, 'sub_vendor_id')
-                ->constrained('vendors')->nullable()->after('address_id');
-            $table->enum('type', OrderTypeEnum::getValues())->after('sub_vendor_id');
+            $table->char('type', 15)->after('address_id');
         });
     }
 
@@ -26,7 +24,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropForeignIdFor(Vendor::class, 'sub_vendor_id');
             $table->dropColumn('type');
         });
     }

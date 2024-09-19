@@ -41,12 +41,13 @@ return new class extends Migration
             }
         });
     }
+
     public function down()
     {
         // Add old columns
         Schema::table('invoices', function (Blueprint $table) {
             $table->unsignedBigInteger('order_id')->nullable()->after('id');
-                $table->unsignedBigInteger('marketing_campaign_id')->nullable()->after('order_id');
+            $table->unsignedBigInteger('marketing_campaign_id')->nullable()->after('order_id');
 
             $table->foreign('order_id')
                 ->references('id')
@@ -75,6 +76,5 @@ return new class extends Migration
             $table->dropColumn('invoiceable_type');
             $table->dropColumn('invoiceable_id');
         });
-
     }
 };

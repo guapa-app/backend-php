@@ -14,7 +14,7 @@ return new class extends Migration {
         Schema::create('appointment_forms', function (Blueprint $table) {
             $table->id();
             $table->string('key')->nullable();
-            $table->enum('type', AppointmentTypeEnum::getValues());
+            $table->char('type', 20);
             $table->timestamps();
         });
     }

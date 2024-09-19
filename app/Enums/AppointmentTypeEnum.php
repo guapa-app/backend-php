@@ -11,5 +11,5 @@ enum AppointmentTypeEnum: string
     case SmallText = 'small_text';
     case LargeText = 'large_text';
     case SingleCheck = 'single_check';
-    case DoubleCheck = 'double_check';
+    case MultipleCheck = 'multiple_check';
 }
