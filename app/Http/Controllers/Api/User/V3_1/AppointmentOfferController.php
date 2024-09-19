@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\AppointmentOfferRequest;
+use App\Http\Resources\V3_1\OrderResource;
 use App\Http\Resources\V3_1\User\AppointmentOfferResource;
 use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
@@ -54,11 +55,14 @@ class AppointmentOfferController extends BaseApiController
 
     public function accept(Request $request)
     {
-        $this->appointmentOfferService->accept(
-            AppointmentOfferDetail::findOrfail($request->appointment_offer_detail_id)
-        );
-
-        return $this->successJsonRes([], __('api.success'));
+        return OrderResource::make(
+            $this->appointmentOfferService->accept(
+                AppointmentOfferDetail::findOrfail($request->appointment_offer_detail_id)
+            )
+        )->additional([
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
     }
 
     public function reject(Request $request)

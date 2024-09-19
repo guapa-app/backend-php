@@ -75,9 +75,9 @@ class AppointmentOfferService
         return $this->loadAppointmentOffer($appointmentOffer);
     }
 
-    public function accept(AppointmentOfferDetail $appointmentOfferDetail): void
+    public function accept(AppointmentOfferDetail $appointmentOfferDetail): Order
     {
-        DB::transaction(function () use ($appointmentOfferDetail) {
+        return DB::transaction(function () use ($appointmentOfferDetail) {
             $appointmentOffer = $appointmentOfferDetail->appointmentOffer;
 
             $description = "Order invoice";
@@ -101,6 +101,8 @@ class AppointmentOfferService
                 'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value,
                 'total' => $total
             ]);
+
+            return $order;
         });
     }
 
