@@ -8,5 +8,6 @@ Route::get('/form', [AppointmentFormController::class, 'index']);
 Route::prefix('offers')->controller(AppointmentOfferController::class)->group(function () {
     Route::get('/', 'index');
     Route::post('/', 'store');
+    Route::post('/accept', 'accept');
     Route::post('/reject', 'reject');
 });

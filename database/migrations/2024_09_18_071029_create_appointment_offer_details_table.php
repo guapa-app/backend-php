@@ -16,8 +16,7 @@ return new class extends Migration {
         Schema::create('appointment_offer_details', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(AppointmentOffer::class)->constrained();
-            $table->foreignIdFor(Vendor::class, 'vendor_id')
-                ->constrained('vendors'); // here we assign it to sub vendor
+            $table->foreignIdFor(Vendor::class)->constrained(); // here we assign it to sub vendor
             $table->char('status', 30);
             $table->decimal('offer_price')->default(0);
             $table->text('reject_reason')->nullable();
