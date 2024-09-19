@@ -129,7 +129,7 @@ class OrderController extends BaseApiController
         $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
 
         if ($invoice->status == 'paid') {
-            $order = $invoice->order;
+            $order = $invoice->invoiceable;
             $order->status = 'Accepted';
             if (!str_contains($order->invoice_url, '.s3.')) {
                 $order->invoice_url = (new PDFService)->addInvoicePDF($order);
