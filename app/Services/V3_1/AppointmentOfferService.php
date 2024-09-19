@@ -85,7 +85,7 @@ class AppointmentOfferService
             $fees = $this->calculateOrderFees($appointmentOffer, 'taxonomy', $appointmentOfferDetail->offer_price);
             $total = $appointmentOfferDetail->offer_price + $taxes + $fees;
 
-            $order = $appointmentOffer->order()->create([
+            $order = $appointmentOfferDetail->order()->create([
                 'user_id' => $appointmentOffer->user_id,
                 'vendor_id' => $appointmentOffer->vendor_id,
                 'type' => OrderTypeEnum::Appointment->value,

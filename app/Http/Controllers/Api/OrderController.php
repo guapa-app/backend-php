@@ -137,7 +137,7 @@ class OrderController extends BaseApiController
             $order->save();
 
             if($order->type == OrderTypeEnum::Appointment->value) {
-                $order->appointmentForm->update([
+                $order->appointmentFormDetail->appointmentForm->update([
                     'status' => AppointmentOfferEnum::Paid_Application_Fees->value
                 ]);
             }

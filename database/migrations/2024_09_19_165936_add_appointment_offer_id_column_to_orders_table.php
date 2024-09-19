@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\AppointmentOffer;
+use App\Models\AppointmentOfferDetail;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +12,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->foreignIdFor(AppointmentOffer::class)->nullable()->after('type')->constrained();
+            $table->foreignIdFor(AppointmentOfferDetail::class)->nullable()->after('type')->constrained();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropForeignIdFor(AppointmentOffer::class);
+            $table->dropForeignIdFor(AppointmentOfferDetail::class);
         });
     }
 };

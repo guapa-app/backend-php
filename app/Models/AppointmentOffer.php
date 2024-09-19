@@ -44,11 +44,6 @@ class AppointmentOffer extends Model implements HasMedia
             ->performOnCollections('products');
     }
 
-    public function order(): HasOne
-    {
-        return $this->hasOne(Order::class);
-    }
-
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);

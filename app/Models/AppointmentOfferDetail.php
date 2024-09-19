@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\AppointmentOfferEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AppointmentOfferDetail extends Model
 {
@@ -15,6 +16,11 @@ class AppointmentOfferDetail extends Model
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
     ];
+
+    public function order(): HasOne
+    {
+        return $this->hasOne(Order::class);
+    }
 
     public function appointmentOffer(): BelongsTo
     {
