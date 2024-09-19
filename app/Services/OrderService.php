@@ -71,9 +71,13 @@ class OrderService
                         $inputItem['appointment']['to_time'] = $appointment->to_time;
                     }
 
+                    $itemPrice = $product->price;
+
                     if ($product->offer) {
                         $product->price -= ($product->price * ($product->offer->discount / 100));
                         $product->price = round($product->price, 2);
+
+                        $itemPriceAfterDiscount = $product->price;
                     }
 
                     $finalPrice = $inputItem['quantity'] * $product->price;
@@ -93,9 +97,15 @@ class OrderService
 
                     $qrcodeData = [
                         'hash_id' => $product->hash_id,
-                        'title' => $product->title,
-                        'amount_to_pay' => $itemAmountToPay,
+                        'client_name' => auth()->user()?->name,
+                        'client_phone' => auth()->user()?->phone,
                         'vendor_name' => $product->vendor->name,
+                        'paid_amount' => $itemAmountToPay,
+                        'remain_amount' => ($product->price - $itemAmountToPay),
+                        'title' => $product->title,
+                        'item_price' => $itemPrice,
+                        'item_price_after_discount' => $itemPriceAfterDiscount ?? null,
+                        'item_image' => $product->image?->url,
                     ];
 
                     $orderItems[] = [

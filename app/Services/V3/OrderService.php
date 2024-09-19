@@ -141,26 +141,35 @@ class OrderService extends BaseOrderService
                 $inputItem['appointment']['to_time'] = $appointment->to_time;
             }
 
+            $itemAmountToPay =  $this->productAmountToPay($product, $inputItem['quantity'], $couponResult);
+            $itemPriceAfterDiscount = $this->getDiscountedPrice($product);
+
             $qrcodeData = [
-                'hash_id' => $product->hash_id,
-                'title' => $product->title,
-                'amount_to_pay' => $this->productAmountToPay($product, $inputItem['quantity'], $couponResult),
-                'vendor_name' => $product->vendor->name,
+                'hash_id'                   => $product->hash_id,
+                'client_name'               => $order->name,
+                'client_phone'              => $product->phone,
+                'vendor_name'               => $product->vendor?->name,
+                'paid_amount'               => $itemAmountToPay,
+                'remain_amount'             => ($product->price - $itemAmountToPay),
+                'title'                     => $product->title,
+                'item_price'                => $product->price,
+                'item_price_after_discount' => $itemPriceAfterDiscount ?? null,
+                'item_image'                => $product->image?->url,
             ];
 
             return [
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'offer_id' => optional($product->offer)->id,
-                'amount' => $this->getDiscountedPrice($product),
-                'amount_to_pay' => $this->productAmountToPay($product, $inputItem['quantity'], $couponResult),
+                'order_id'      => $order->id,
+                'product_id'    => $product->id,
+                'offer_id'      => optional($product->offer)->id,
+                'amount'        => $itemPriceAfterDiscount,
+                'amount_to_pay' => $itemAmountToPay,
                 'taxes'         => $this->taxesPercentage,
-                'quantity' => $inputItem['quantity'],
-                'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
-                'user_id' => $inputItem['staff_user_id'] ?? null,
+                'quantity'      => $inputItem['quantity'],
+                'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
+                'user_id'       => $inputItem['staff_user_id'] ?? null,
                 'qr_code_link'  => (new QrCodeService())->generate($qrcodeData),
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at'    => $now,
+                'updated_at'    => $now,
             ];
         });
     }
