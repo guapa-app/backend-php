@@ -43,8 +43,8 @@ class Offer extends Model implements Listable, HasMedia
     ];
 
     protected $casts = [
-        'starts_at'  => 'datetime',
-        'expires_at' => 'datetime',
+        'starts_at' => 'datetime:Y-m-d H:i:s',
+        'expires_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     /**
