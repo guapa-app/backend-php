@@ -43,8 +43,8 @@ class Offer extends Model implements Listable, HasMedia
     ];
 
     protected $casts = [
-        'starts_at' => 'datetime:Y-m-d H:i:s',
-        'expires_at' => 'datetime:Y-m-d H:i:s',
+        'starts_at' => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
     /**
@@ -84,6 +84,16 @@ class Offer extends Model implements Listable, HasMedia
         $daysString = Common::getLocalizedUnitString($difference->days, 'day');
 
         return __('api.the_offer_expires_in', ['countdown' => $daysString]);
+    }
+
+    public function getStartsAtAttribute($value)
+    {
+        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
+    }
+
+    public function getExpiresAtAttribute($value)
+    {
+        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
     }
 
     public function getPriceAttribute(): float
