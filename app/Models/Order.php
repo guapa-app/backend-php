@@ -198,6 +198,11 @@ class Order extends Model implements Listable
         return $this->belongsTo(User::class, 'staff_id');
     }
 
+    public function appointmentForm()
+    {
+        return $this->belongsTo(AppointmentOffer::class);
+    }
+
     public function appointmentForms(): BelongsToMany
     {
         return $this->belongsToMany(AppointmentForm::class, 'order_appointments')

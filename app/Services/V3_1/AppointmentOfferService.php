@@ -58,7 +58,7 @@ class AppointmentOfferService
         $appointmentOfferDetails = $appointmentOffer
             ->details()
             ->where('vendor_id', $request->sub_vendor_id)
-            ->first();
+            ->firstOrFail();
 
         switch ($request->status) {
             case AppointmentOfferEnum::Accept->value:
@@ -93,12 +93,7 @@ class AppointmentOfferService
             ]);
 
             // Generate invoice for the order
-            $invoice = (new PaymentService())->generateInvoice(
-                $order,
-                $description,
-                $fees,
-                $taxes
-            );
+            $invoice = (new PaymentService())->generateInvoice($order, $description, $fees, $taxes);
             $order->invoice_url = $invoice->url;
             $order->save();
 
