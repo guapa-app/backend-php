@@ -39,9 +39,13 @@ class AppointmentOfferController extends BaseApiController
         ]);
     }
 
-    public function accept()
+    public function accept(Request $request)
     {
+        $this->appointmentOfferService->accept(
+            AppointmentOfferDetail::findOrfail($request->appointment_offer_detail_id)
+        );
 
+        return $this->successJsonRes([], __('api.success'));
     }
 
     public function reject(Request $request)

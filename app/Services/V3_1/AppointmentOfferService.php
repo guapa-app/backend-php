@@ -3,12 +3,16 @@
 namespace App\Services\V3_1;
 
 use App\Enums\AppointmentOfferEnum;
+use App\Enums\OrderTypeEnum;
 use App\Http\Requests\V3_1\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
+use App\Models\Order;
+use App\Models\Setting;
 use App\Models\Taxonomy;
 use App\Services\MediaService;
 use App\Services\PaymentService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class AppointmentOfferService
@@ -26,7 +30,7 @@ class AppointmentOfferService
                 ]);
 
                 $transformedArray = array_map(function ($value) {
-                    return ['sub_vendor_id' => $value];
+                    return ['vendor_id' => $value, 'status' => AppointmentOfferEnum::Pending->value];
                 }, $request->sub_vendor_ids);
                 $appointmentOffer->details()->createMany($transformedArray);
 
@@ -53,7 +57,7 @@ class AppointmentOfferService
         $appointmentOffer = AppointmentOffer::find($request->appointment_offer_id);
         $appointmentOfferDetails = $appointmentOffer
             ->details()
-            ->where('sub_vendor_id', $request->sub_vendor_id)
+            ->where('vendor_id', $request->sub_vendor_id)
             ->first();
 
         switch ($request->status) {
@@ -71,9 +75,54 @@ class AppointmentOfferService
         return $this->loadAppointmentOffer($appointmentOffer);
     }
 
+    public function accept(AppointmentOfferDetail $appointmentOfferDetail): void
+    {
+        DB::transaction(function () use ($appointmentOfferDetail) {
+            $appointmentOffer = $appointmentOfferDetail->appointmentOffer;
+
+            $description = "Order invoice";
+            $taxes = (Setting::getTaxes() / 100) * $appointmentOfferDetail->offer_price;
+            $fees = $this->calculateOrderFees($appointmentOffer, 'taxonomy', $appointmentOfferDetail->offer_price);
+            $total = $appointmentOfferDetail->offer_price + $taxes + $fees;
+
+            $order = $appointmentOffer->order()->create([
+                'user_id' => $appointmentOffer->user_id,
+                'vendor_id' => $appointmentOffer->vendor_id,
+                'type' => OrderTypeEnum::Appointment->value,
+                'total' => $total
+            ]);
+
+            // Generate invoice for the order
+            $invoice = (new PaymentService())->generateInvoice(
+                $order,
+                $description,
+                $fees,
+                $taxes
+            );
+            $order->invoice_url = $invoice->url;
+            $order->save();
+
+            $appointmentOffer->update([
+                'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value,
+                'total' => $total
+            ]);
+        });
+    }
+
     public function reject(AppointmentOfferDetail $appointmentOfferDetail): void
     {
         $appointmentOfferDetail->update(['status' => AppointmentOfferEnum::Reject->value]);
+    }
+
+    private function calculateOrderFees(Model $model, string $relation, float $price)
+    {
+        $taxonomy = $model->$relation()->first();
+
+        if ($taxonomy?->fees) {
+            return ($taxonomy->fees / 100) * $price;
+        } else {
+            return $taxonomy?->fixed_price ?? 0;
+        }
     }
 
     /**
