@@ -23,6 +23,6 @@ class AppointmentOfferDetail extends Model
 
     public function subVendor(): BelongsTo
     {
-        return $this->belongsTo(Vendor::class, 'sub_vendor_id');
+        return $this->belongsTo(Vendor::class);
     }
 }

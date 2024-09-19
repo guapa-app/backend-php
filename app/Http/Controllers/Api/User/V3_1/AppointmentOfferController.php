@@ -44,9 +44,12 @@ class AppointmentOfferController extends BaseApiController
 
     public function store(AppointmentOfferRequest $request)
     {
-        $this->appointmentOfferService->create($request);
-
-        return $this->successJsonRes([], __('api.success'));
+        return AppointmentOfferResource::make(
+            $this->appointmentOfferService->create($request)
+        )->additional([
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
     }
 
     public function accept(Request $request)

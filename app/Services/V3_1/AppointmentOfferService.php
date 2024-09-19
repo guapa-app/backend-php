@@ -155,7 +155,7 @@ class AppointmentOfferService
      */
     public function loadAppointmentOffer(AppointmentOffer $appointmentOffer): AppointmentOffer
     {
-        return $appointmentOffer->load('vendor', 'taxonomy', 'details.subVendor', 'appointmentForms', 'media');
+        return $appointmentOffer->load('vendor', 'taxonomy', 'appointmentForms', 'media');
     }
 
     /**
