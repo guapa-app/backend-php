@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\AppointmentOfferRequest;
 use App\Http\Resources\V3_1\AppointmentOfferResource;
+use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
 use App\Services\V3_1\AppointmentOfferService;
 use Illuminate\Http\Request;
@@ -29,14 +30,23 @@ class AppointmentOfferController extends BaseApiController
         ]);
     }
 
-    public function store(AppointmentOfferRequest $request): AppointmentOfferResource
+    public function show(int $id)
     {
         return AppointmentOfferResource::make(
-            $this->appointmentOfferService->create($request)
+            AppointmentOffer::query()
+                ->with('vendor', 'taxonomy', 'details.subVendor', 'appointmentForms')
+                ->findOrFail($id)
         )->additional([
             'success' => true,
             'message' => __('api.success'),
         ]);
+    }
+
+    public function store(AppointmentOfferRequest $request)
+    {
+        $this->appointmentOfferService->create($request);
+
+        return $this->successJsonRes([], __('api.success'));
     }
 
     public function accept(Request $request)

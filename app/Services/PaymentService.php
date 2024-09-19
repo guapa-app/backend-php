@@ -54,7 +54,7 @@ class PaymentService
             $invoiceData['callback_url'] = config('app.url') . '/api/v3/campaigns/change-invoice-status';
             $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
         } elseif ($invoiceable instanceof AppointmentOffer) {
-            $invoiceData['callback_url'] = config('app.url').'/api/v3.1/invoices/change-status';
+            $invoiceData['callback_url'] = config('app.url').'/api/user/v3.1/invoices/change-status';
         } else {
             throw new InvalidArgumentException(__('Unsupported invoice type'));
         }
