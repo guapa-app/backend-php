@@ -116,17 +116,6 @@ class UpdateVendorRequest extends FormRequest
             'appointments.*'        => 'required|array|min:2',
             'appointments.*.from_time' => 'required|date_format:H:i:s',
             'appointments.*.to_time'   => 'required|date_format:H:i:s',
-
-            // Address validation (optional)
-//            'address.title'       => 'sometimes|required|integer|exists:cities,id',
-//            'address.city_id'       => 'sometimes|required|integer|exists:cities,id',
-//            'address.address_1'     => 'sometimes|required|string|max:250',
-//            'address.address_2'     => 'sometimes|nullable|string|max:250',
-//            'address.postal_code'   => 'sometimes|nullable|string|max:20',
-//            'address.lat'           => 'sometimes|nullable|numeric',
-//            'address.lng'           => 'sometimes|nullable|numeric',
-//            'address.phone'         => 'sometimes|nullable|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
-//            'address.type'          => 'sometimes|required|integer|in:' . implode(',', array_keys(Address::TYPES)),
         ];
         return $rules;
     }

@@ -95,39 +95,37 @@ class AuthController extends BaseApiController
         $user->loadMissing('vendor');
 
         if (Setting::checkTestingMode()) {
-            $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
-
-            $this->prepareUserResponse($user, $token);
-
-            return LoginResource::make($user)
-                ->additional([
-                    'success' => true,
-                    'message' => __('api.success'),
-                ]);
-        }
-
-        $requestPayload = [
-            'grant_type' => 'otp_verify',
-            'phone_number' => $data['phone'],
-            'otp' => $data['otp'],
-            'scope' => '*',
-        ];
-
-        $token = $this->authService->authenticate($requestPayload);
-
-        if ($token) {
-            $user = $this->prepareUserResponse($user, $token);
-
-            return LoginResource::make($user)
-                ->additional([
-                    'success' => true,
-                    'message' => __('api.success'),
-                ]);
+            $token = $user->createToken('Temp Personal Token', ['*']);
+            $tokenData = [
+                'token_type' => 'Bearer',
+                'expires_in' => $token->token->expires_at->diffInSeconds(now()),
+                'access_token' => $token->accessToken,
+                'refresh_token' => null, // In testing mode, we don't have a refresh token
+            ];
         } else {
-            return $this->errorJsonRes([
-                'otp' => [__('api.incorrect_otp')],
-            ], __('api.incorrect_otp'), 406);
+            $requestPayload = [
+                'grant_type' => 'otp_verify',
+                'phone_number' => $data['phone'],
+                'otp' => $data['otp'],
+                'scope' => '*',
+            ];
+
+            $tokenData = $this->authService->authenticate($requestPayload);
+
+            if (!$tokenData) {
+                return $this->errorJsonRes([
+                    'otp' => [__('api.incorrect_otp')],
+                ], __('api.incorrect_otp'), 406);
+            }
         }
+
+        $user = $this->prepareUserResponse($user, $tokenData);
+
+        return LoginResource::make($user)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
     public function userVendor()

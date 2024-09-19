@@ -8,6 +8,9 @@ Route::post('register',   [AuthController::class, 'register'])->name('auth.regis
 Route::post('verify-otp', [AuthController::class, 'verifyOtp'])->name('auth.verify-otp');
 Route::post('send-otp',   [OTPController::class, 'sendOtp'])->name('auth.send-otp');
 
+Route::post('refresh_token',                                [AuthController::class, 'refreshToken'])->name('auth.refresh');
+Route::post('check-phone',                                  [AuthController::class, 'checkIfPhoneExist'])->name('auth.check-phone');
+
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('user',        [AuthController::class, 'userVendor']);
