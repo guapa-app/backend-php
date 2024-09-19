@@ -129,6 +129,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         return (int) Redis::hget("vendor:{$this->id}", 'views_count');
     }
 
+    // TODO to be removed after make sure no use for it, it effects the relation
     public function getWorkDaysAttribute()
     {
         $relations = $this->getRelations();

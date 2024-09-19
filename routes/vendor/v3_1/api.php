@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\Vendor\V3_1\DataController;
 use App\Http\Controllers\Api\Vendor\V3_1\HomeController;
+use App\Http\Controllers\Api\Vendor\V3_1\VendorController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("vendor/v3.1")->group(function () {

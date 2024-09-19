@@ -36,6 +36,7 @@ return [
     'deleted'               => 'تم الحذف.',
     'updated'               => 'تم التحديث.',
     'created'               => 'تم الأضافة.',
+    'something_went_wrong'  => 'حدث خطأ ما.',
 
     'the_offer_expires_in'  => ':countdown',
     'no_days'               => 'انتهي',

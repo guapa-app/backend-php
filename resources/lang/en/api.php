@@ -36,6 +36,7 @@ return [
     'deleted'               => 'Deleted.',
     'updated'               => 'Updated.',
     'created'               => 'Created.',
+    'something_went_wrong'  => 'Something went wrong.',
 
     'the_offer_expires_in'  => ':countdown',
     'no_days'               => '',
