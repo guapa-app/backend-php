@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Resources\V3_1;
+namespace App\Http\Resources\V3_1\User;
 
+use App\Http\Resources\V3_1\VendorResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppointmentOfferDetailsResource extends JsonResource
