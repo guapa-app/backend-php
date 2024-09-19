@@ -98,7 +98,7 @@ class AppointmentOfferService
             $order->save();
 
             $appointmentOffer->update([
-                'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value,
+                'status' => AppointmentOfferEnum::Paid_Application_Fees->value,
                 'total' => $total
             ]);
 
