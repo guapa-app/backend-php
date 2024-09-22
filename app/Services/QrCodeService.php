@@ -15,7 +15,7 @@ class QrCodeService
             . "&client_phone={$data['client_phone']}"
             . "&vendor_name={$data['vendor_name']}"
             . "&paid_amount={$data['paid_amount']}"
-            . "&remain_amount={$data['amount_to_pay']}"
+            . "&remain_amount={$data['remain_amount']}"
             . "&title={$data['title']}"
             . "&item_price={$data['item_price']}"
             . "&item_price_after_discount={$data['item_price_after_discount']}"
