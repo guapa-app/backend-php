@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\Channels\WhatsappChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class OrderNotification extends Notification
@@ -44,7 +45,7 @@ class OrderNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database', WhatsappChannel::class];
+        return ['fcm', 'database', 'mail'];
     }
 
     /**
@@ -67,6 +68,28 @@ class OrderNotification extends Notification
             'message' => $this->getWhatsappMessage(),
             'phones'  => [$notifiable->phone],
         ];
+    }
+
+    public function toMail($notifiable)
+    {
+        $recipientType = $this->getRecipientType($notifiable);
+        $mailMessage = (new MailMessage)
+            ->subject('تأكيد استلام الدفع - ' .  $this->order->id)
+            ->view(
+                'emails.order_confirmation',
+                [
+                    'order' => $this->order,
+                    'recipientType' => $recipientType,
+                ]
+            );
+
+        if ($recipientType == 'customer') {
+            $mailMessage->attach($this->order->invoice_url, [
+                'as' => 'invoice.pdf',
+                'mime' => 'application/pdf',
+            ]);
+        }
+        return $mailMessage;
     }
 
     public function getWhatsappMessage(): string
@@ -135,5 +158,14 @@ class OrderNotification extends Notification
         }
 
         return $type . 'order';
+    }
+
+    private function getRecipientType($notifiable): string
+    {
+        if ($notifiable instanceof User && $notifiable->id === $this->order->user_id) {
+            return 'customer';
+        }
+
+        return 'vendor-admin';
     }
 }
