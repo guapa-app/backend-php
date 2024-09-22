@@ -99,6 +99,10 @@ class Taxonomy extends BaseTaxonomy implements Listable
             $query->tree();
         }
 
+        if ($request->has('is_appointment')) {
+            $query->whereIsAppointment((bool) $request->get('is_appointment'));
+        }
+
         return $query;
     }
 

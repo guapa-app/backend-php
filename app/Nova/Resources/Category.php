@@ -8,6 +8,7 @@ use App\Models\Taxonomy;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
@@ -113,6 +114,13 @@ class Category extends Resource
                 ->rules('required'),
 
             BelongsTo::make('parent', 'parent', self::class)->showCreateRelationButton()->nullable(),
+
+            Boolean::make(__('Is Appointment'), 'is_appointment'),
+            DependencyContainer::make([
+                Number::make(__('Appointment Price'), 'appointment_price')
+                    ->step(1)
+                    ->min(0),
+            ])->dependsOn('is_appointment', true),
 
             DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),

@@ -371,6 +371,16 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(Appointment::class);
     }
 
+    public function appointmentOffers(): HasMany
+    {
+        return $this->hasMany(AppointmentOffer::class);
+    }
+
+    public function appointmentOfferDetails(): HasMany
+    {
+        return $this->hasMany(AppointmentOfferDetail::class);
+    }
+
     public function influencers(): HasMany
     {
         return $this->hasMany(Influencer::class);
@@ -450,6 +460,10 @@ class Vendor extends Model implements HasMedia, HasReviews
             })->when(!$user->isAdmin(), function ($q) {
                 $q->with('addresses');
             });
+        }
+
+        if ($request->has('accept_appointment')) {
+            $query->whereAcceptAppointment((bool) $request->get('accept_appointment'));
         }
 
         return $query;
