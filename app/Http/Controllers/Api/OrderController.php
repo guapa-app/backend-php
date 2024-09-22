@@ -8,6 +8,7 @@ use App\Enums\OrderStatus;
 use App\Enums\OrderTypeEnum;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
+use App\Models\Admin;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Setting;
@@ -142,7 +143,8 @@ class OrderController extends BaseApiController
                 ]);
             }
 
-            Notification::send($order->vendor->staff, new OrderNotification($order));
+            // Send email notifications
+            $this->sendOrderNotifications($order);
         }
 
         logger(
@@ -201,5 +203,19 @@ class OrderController extends BaseApiController
         });
 
         return view('invoice', compact('invoice', 'cus_name', 'order_items', 'vat'));
+    }
+
+    protected function sendOrderNotifications(Order $order)
+    {
+        // Send email to admin
+        $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+        Notification::route('mail', $adminEmails)
+            ->notify(new OrderNotification($order));
+
+        // Send email to vendor staff
+        Notification::send($order->vendor->staff, new OrderNotification($order));
+
+        // Send email to customer
+        $order->user->notify(new OrderNotification($order));
     }
 }
