@@ -4,13 +4,13 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use App\Models\User;
-use App\Notifications\Channels\WhatsappChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderNotification extends Notification
+class OrderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
