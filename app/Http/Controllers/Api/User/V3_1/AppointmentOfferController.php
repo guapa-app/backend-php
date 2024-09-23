@@ -35,7 +35,7 @@ class AppointmentOfferController extends BaseApiController
     {
         return AppointmentOfferResource::make(
             AppointmentOffer::query()
-                ->with('vendor', 'taxonomy', 'details.subVendor', 'appointmentForms')
+                ->with('vendor', 'taxonomy', 'details.subVendor', 'appointmentForms', 'media')
                 ->findOrFail($id)
         )->additional([
             'success' => true,

@@ -466,6 +466,10 @@ class Vendor extends Model implements HasMedia, HasReviews
             $query->whereAcceptAppointment((bool) $request->get('accept_appointment'));
         }
 
+        if ($request->has('parent_id')) {
+            $query->whereParentId($request->get('parent_id'));
+        }
+
         return $query;
     }
 
