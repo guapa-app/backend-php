@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Contracts\Repositories\PageRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\V3\PageResource;
+use App\Http\Resources\V3_1\User\PageResource;
 
 class PageController extends BaseApiController
 {
@@ -37,6 +37,23 @@ class PageController extends BaseApiController
     public function terms()
     {
         $page = $this->pageRepository->getFirst(['slug' => 'terms']);
+
+        return PageResource::make($page)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
+    /**
+     * Show page.
+     *
+     * @param $id
+     * @return PageResource
+     */
+    public function show($id)
+    {
+        $page = $this->pageRepository->getOneWithRelations($id);
 
         return PageResource::make($page)
             ->additional([
