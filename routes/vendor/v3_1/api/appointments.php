@@ -3,5 +3,9 @@
 use App\Http\Controllers\Api\Vendor\V3_1\AppointmentOfferController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/offers', [AppointmentOfferController::class, 'index']);
-Route::post('/offers', [AppointmentOfferController::class, 'store']);
+Route::prefix('offers')->controller(AppointmentOfferController::class)
+    ->middleware('auth:api')->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::post('/', 'store');
+    });
