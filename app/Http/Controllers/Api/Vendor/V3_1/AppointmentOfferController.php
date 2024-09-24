@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
-use App\Http\Resources\V3_1\Vendor\AppointmentOfferResource;
+use App\Http\Resources\Vendor\V3_1\AppointmentOfferResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AppointmentOfferController extends BaseApiController

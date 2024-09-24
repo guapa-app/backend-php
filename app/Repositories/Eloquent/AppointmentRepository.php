@@ -26,7 +26,7 @@ class AppointmentRepository implements AppointmentOfferRepositoryInterface
     public function show(int $id): AppointmentOffer|Model
     {
         return AppointmentOffer::query()
-            ->with('vendor', 'taxonomy', 'details.subVendor', 'appointmentForms', 'media')
+            ->with('vendor', 'taxonomy', 'details.subVendor', 'appointmentForms.values', 'media')
             ->findOrFail($id);
     }
 
