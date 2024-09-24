@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\DeviceController as ApiDeviceController;
 use App\Http\Requests\DeviceRequest;
-use App\Http\Resources\DeviceResource;
+use App\Http\Resources\User\V3_1\DeviceResource;
 use App\Services\UserService;
 
 class DeviceController extends ApiDeviceController

@@ -7,8 +7,8 @@ use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Contracts\Repositories\V3_1\TaxonomyRepositoryInterface;
 use App\Enums\ListTypeEnum;
 use App\Enums\ProductType;
-use App\Http\Resources\V3_1\TaxonomyResource;
-use App\Http\Resources\V3_1\ProductResource;
+use App\Http\Resources\Vendor\V3_1\TaxonomyResource;
+use App\Http\Resources\Vendor\V3_1\ProductResource;
 use Illuminate\Http\Request;
 
 class HomeController

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\ProductController as ApiProductController;
 use App\Http\Requests\ProductListRequest;
-use App\Http\Resources\V3_1\ProductResource;
+use App\Http\Resources\User\V3_1\ProductResource;
 
 class ProductController extends ApiProductController
 {

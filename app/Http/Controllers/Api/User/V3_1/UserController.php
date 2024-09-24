@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Http\Controllers\Api\UserController as ApiUserController;
 use App\Http\Requests\ChangePhoneRequest;
 use App\Http\Requests\UserRequest;
-use App\Http\Resources\UserResource;
-use App\Models\Setting;
+use App\Http\Resources\User\V3_1\UserResource;
 use Illuminate\Http\Request;
 
 class UserController extends ApiUserController

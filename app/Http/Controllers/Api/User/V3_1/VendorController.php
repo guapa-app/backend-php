@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\VendorController as ApiVendorController;
-use App\Http\Resources\V3_1\VendorResource;
+use App\Http\Resources\User\V3_1\VendorResource;
 use Illuminate\Http\Request;
 
 class VendorController extends ApiVendorController

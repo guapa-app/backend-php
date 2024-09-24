@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\PageRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\V3\PageResource;
+use App\Http\Resources\Vendor\V3_1\PageResource;
 
 class PageController extends BaseApiController
 {

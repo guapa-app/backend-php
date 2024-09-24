@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Http\Controllers\Api\ReviewController as ApiReviewController;
 use App\Http\Requests\GetReviewsRequest;
 use App\Http\Requests\ReviewRequest;
-use App\Http\Resources\ReviewCollection;
-use App\Http\Resources\ReviewResource;
+use App\Http\Resources\User\V3_1\ReviewCollection;
+use App\Http\Resources\User\V3_1\ReviewResource;
 
 class ReviewController extends ApiReviewController
 {

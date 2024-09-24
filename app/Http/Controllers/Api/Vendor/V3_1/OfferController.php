@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\OfferController as ApiOfferController;
 use App\Http\Requests\OfferRequest;
-use App\Http\Resources\V3_1\OfferResource;
-use App\Http\Resources\V3_1\ProductResource;
+use App\Http\Resources\Vendor\V3_1\OfferResource;
+use App\Http\Resources\Vendor\V3_1\ProductResource;
 use Illuminate\Http\Request;
 
 class OfferController extends ApiOfferController

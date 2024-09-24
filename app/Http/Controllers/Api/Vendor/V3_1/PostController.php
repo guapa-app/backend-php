@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\PostController as ApiPostController;
-use App\Http\Resources\PostCollection;
-use App\Http\Resources\PostResource;
+use App\Http\Resources\Vendor\V3_1\PostCollection;
+use App\Http\Resources\Vendor\V3_1\PostResource;
 use Illuminate\Http\Request;
 
 class PostController extends ApiPostController

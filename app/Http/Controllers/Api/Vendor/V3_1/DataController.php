@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\DataResource;
+use App\Http\Resources\Vendor\V3_1\DataResource;
 
 class DataController extends BaseApiController
 {

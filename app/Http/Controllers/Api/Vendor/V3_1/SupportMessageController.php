@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\SupportMessageController as ApiSupportMessageController;
 use App\Http\Requests\V3\SupportMessageRequest;
-use App\Http\Resources\V3\SupportMessageCollection;
-use App\Http\Resources\V3\SupportMessageResource;
-use App\Http\Resources\V3\SupportMessageTypeCollection;
+use App\Http\Resources\Vendor\V3_1\SupportMessageCollection;
+use App\Http\Resources\Vendor\V3_1\SupportMessageResource;
+use App\Http\Resources\Vendor\V3_1\SupportMessageTypeCollection;
 use App\Models\SupportMessageType;
 use Illuminate\Http\Request;
 

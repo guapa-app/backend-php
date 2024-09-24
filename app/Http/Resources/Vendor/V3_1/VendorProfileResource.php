@@ -2,10 +2,6 @@
 
 namespace App\Http\Resources\Vendor\V3_1;
 
-use App\Http\Resources\AddressResource;
-use App\Http\Resources\AppointmentResource;
-use App\Http\Resources\StaffResource;
-use App\Http\Resources\V3\SocialMediaResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VendorProfileResource extends JsonResource

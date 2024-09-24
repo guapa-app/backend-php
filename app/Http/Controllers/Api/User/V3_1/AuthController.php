@@ -10,7 +10,7 @@ use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\V3_1\LoginRequest;
 use App\Http\Requests\V3_1\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
-use App\Http\Resources\V3_1\UserResource;
+use App\Http\Resources\User\V3_1\UserResource;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\AuthService;

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Contracts\Repositories\SocialMediaRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\V3\SocialMediaCollection;
-use App\Http\Resources\V3\SocialMediaResource;
+use App\Http\Resources\User\V3_1\SocialMediaCollection;
+use App\Http\Resources\User\V3_1\SocialMediaResource;
 use Illuminate\Http\Request;
 
 class SocialMediaController extends BaseApiController

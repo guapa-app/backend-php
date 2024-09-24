@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\TaxRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\V3_1\TaxonomyResource;
+use App\Http\Resources\Vendor\V3_1\TaxonomyResource;
 use Illuminate\Http\Request;
 
 class TaxonomyController extends BaseApiController

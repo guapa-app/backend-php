@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\V3_1\AppointmentFormResource;
+use App\Http\Resources\User\V3_1\AppointmentFormResource;
 use App\Services\V3_1\AppointmentFormService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;

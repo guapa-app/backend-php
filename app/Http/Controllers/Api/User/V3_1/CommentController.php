@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\CommentController as ApiCommentController;
 use App\Http\Requests\CommentRequest;
-use App\Http\Resources\CommentCollection;
-use App\Http\Resources\CommentResource;
+use App\Http\Resources\User\V3_1\CommentCollection;
+use App\Http\Resources\User\V3_1\CommentResource;
 use Illuminate\Http\Request;
 
 class CommentController extends ApiCommentController

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api\User\Vendor;
+namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\CityRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\V3\CityCollection;
+use App\Http\Resources\Vendor\V3_1\CityCollection;
 use Illuminate\Http\Request;
 
 class CityController extends BaseApiController

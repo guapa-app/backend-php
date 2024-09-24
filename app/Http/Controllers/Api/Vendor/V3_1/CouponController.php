@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 use App\Http\Controllers\Api\CouponController as ApiCouponController;
 use App\Http\Requests\ApplyCouponRequest;
 use App\Http\Requests\CouponRequest;
-use App\Http\Resources\CouponResource;
+use App\Http\Resources\Vendor\V3_1\CouponCollection;
+use App\Http\Resources\Vendor\V3_1\CouponResource;
 use Illuminate\Http\Request;
 
 class CouponController extends ApiCouponController
@@ -15,7 +16,7 @@ class CouponController extends ApiCouponController
      */
     public function index(Request $request)
     {
-        return CouponResource::collection(parent::index($request))
+        return CouponCollection::make(parent::index($request))
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Vendor\V3_1;
 
-use App\Http\Resources\V3\ProfileResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LoginResource extends JsonResource
