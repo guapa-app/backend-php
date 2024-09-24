@@ -19,6 +19,7 @@ class AppointmentOfferResource extends JsonResource
             'details' => AppointmentOfferDetailsResource::collection($this->whenLoaded('details')),
             'appointment_form' => AppointmentFormResource::collection($this->whenLoaded('appointmentForms')),
             'images' => MediaResource::collection($this->whenLoaded('media')),
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }
 }
