@@ -11,7 +11,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('taxonomies', function (Blueprint $table) {
-            $table->decimal('appointment_price')->default(0)->after('is_appointment');
+            $table->boolean('is_appointment')
+                ->default(false)
+                ->after('type');
+            $table->decimal('appointment_price')
+                ->default(0)
+                ->after('is_appointment');
         });
     }
 
@@ -21,6 +26,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('taxonomies', function (Blueprint $table) {
+            $table->dropColumn('is_appointment');
             $table->dropColumn('appointment_price');
         });
     }
