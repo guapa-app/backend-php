@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 class OrderService extends BaseOrderService
 {
     protected $couponService;
+    protected $qrCodeData;
 
     public function __construct(
         OrderRepositoryInterface $repository,
@@ -54,7 +55,7 @@ class OrderService extends BaseOrderService
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
-                $data['coupon_id'] = $couponResult ? $couponResult['data']['coupon_id']: null;
+                $data['coupon_id'] = $couponResult ? $couponResult['data']['coupon_id'] : null;
 
                 $orderData = $this->calculateOrderData($vendorProducts, $data, $couponResult);
 
@@ -69,7 +70,13 @@ class OrderService extends BaseOrderService
                     abort(400, 'Invalid staff provided for vendor');
                 }
 
-                OrderItem::insert($items->toArray());
+                $items->map(function ($item) use ($order) {
+                    $orderItem = OrderItem::create($item);
+
+                    $qrCodeImage = (new QrCodeService())->generate($this->qrCodeData[$item['product_id']]);
+
+                    $orderItem->addMediaFromString($qrCodeImage)->toMediaCollection('order_items');
+                });
 
                 $order->load('items', 'address', 'user', 'vendor');
 
@@ -141,10 +148,10 @@ class OrderService extends BaseOrderService
                 $inputItem['appointment']['to_time'] = $appointment->to_time;
             }
 
-            $itemAmountToPay =  $this->productAmountToPay($product, $inputItem['quantity'], $couponResult);
+            $itemAmountToPay = $this->productAmountToPay($product, $inputItem['quantity'], $couponResult);
             $itemPriceAfterDiscount = $this->getDiscountedPrice($product);
 
-            $qrcodeData = [
+            $this->qrCodeData[$product->id] = [
                 'hash_id'                   => $product->hash_id,
                 'client_name'               => $order->name,
                 'client_phone'              => $product->phone,
@@ -167,7 +174,6 @@ class OrderService extends BaseOrderService
                 'quantity'      => $inputItem['quantity'],
                 'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
                 'user_id'       => $inputItem['staff_user_id'] ?? null,
-                'qr_code_link'  => (new QrCodeService())->generate($qrcodeData),
                 'created_at'    => $now,
                 'updated_at'    => $now,
             ];
