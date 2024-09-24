@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
@@ -12,7 +11,7 @@ use Illuminate\Validation\Rule;
  * @bodyParam phone string required Phone number
  * @bodyParam role string required One of manager, doctor
  **/
-class StaffRequest extends FormRequest
+class StaffRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

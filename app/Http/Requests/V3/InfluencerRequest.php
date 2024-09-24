@@ -5,7 +5,7 @@ namespace App\Http\Requests\V3;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class InfluencerRequest extends FormRequest
+class InfluencerRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

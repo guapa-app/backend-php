@@ -7,10 +7,9 @@ use App\Models\Address;
 use App\Models\Setting;
 use App\Models\Vendor;
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\App;
 
-class RegisterVendorRequest extends FormRequest
+class RegisterVendorRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

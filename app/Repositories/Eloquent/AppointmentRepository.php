@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
-use App\Http\Requests\V3_1\AppointmentOfferRequest;
+use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
 use App\Models\Order;

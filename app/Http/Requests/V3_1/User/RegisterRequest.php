@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\V3_1;
+namespace App\Http\Requests\V3_1\User;
 
 use App\Helpers\Common;
+use App\Http\Requests\FailedValidationRequest;
 use App\Models\Setting;
 use App\Models\UserProfile;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @bodyParam name string Full name (required if firstname is absent). Example: Mohamed Ahmed
@@ -14,7 +14,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @bodyParam password string required Password. Example: 445566332255
  * @bodyParam password_confirmation string required Password confirmation. Example 445566332255
  */
-class RegisterRequest extends FormRequest
+class RegisterRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

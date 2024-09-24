@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use App\Helpers\Common;
 use App\Models\Setting;
-use Illuminate\Foundation\Http\FormRequest;
 
-class VendorClientRequest extends FormRequest
+class VendorClientRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

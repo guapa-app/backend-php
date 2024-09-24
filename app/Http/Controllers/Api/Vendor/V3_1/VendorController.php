@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\Vendor\V3_1\CreateVendorRequest;
-use App\Http\Requests\Vendor\V3_1\UpdateVendorRequest;
+use App\Http\Requests\V3_1\Vendor\CreateVendorRequest;
+use App\Http\Requests\V3_1\Vendor\UpdateVendorRequest;
 use App\Http\Resources\Vendor\V3_1\VendorProfileResource;
 use App\Services\VendorService;
 use Exception;

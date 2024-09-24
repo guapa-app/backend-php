@@ -4,7 +4,7 @@ namespace App\Services\V3_1;
 
 use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderTypeEnum;
-use App\Http\Requests\V3_1\AppointmentOfferRequest;
+use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
 use App\Models\Order;

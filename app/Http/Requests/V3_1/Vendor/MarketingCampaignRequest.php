@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Vendor\V3_1;
+namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Enums\MarketingCampaignAudienceType;
 use App\Enums\MarketingCampaignChannel;
@@ -8,7 +8,7 @@ use App\Enums\MarketingCampaignType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
-class MarketingCampaignRequest extends FormRequest
+class MarketingCampaignRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

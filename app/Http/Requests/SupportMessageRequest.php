@@ -2,14 +2,12 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
 /**
  * @bodyParam subject string required Message subject
  * @bodyParam body    string required Message body
  * @bodyParam phone   string required Phone number
  */
-class SupportMessageRequest extends FormRequest
+class SupportMessageRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

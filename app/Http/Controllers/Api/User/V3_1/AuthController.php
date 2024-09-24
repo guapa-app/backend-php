@@ -7,8 +7,8 @@ use App\Exceptions\ApiException;
 use App\Exceptions\PhoneNotVerifiedException;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\PhoneRequest;
-use App\Http\Requests\V3_1\LoginRequest;
-use App\Http\Requests\V3_1\RegisterRequest;
+use App\Http\Requests\V3_1\User\LoginRequest;
+use App\Http\Requests\V3_1\User\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Http\Resources\User\V3_1\UserResource;
 use App\Models\Setting;
@@ -19,7 +19,6 @@ use App\Services\V3\UserService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends BaseApiController
 {
