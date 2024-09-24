@@ -2,9 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-
 /**
  * @bodyParam category_id int required Category id for this product.
  * @bodyParam title string required Product title 191 characters max.
@@ -17,7 +14,7 @@ use Illuminate\Validation\Rule;
  * @bodyParam keep_media array required Array of media ids to keep (Update only).
  * @bodyParam keep_media.* int required Media id returned from server.
  */
-class ProductRequest extends FormRequest
+class ProductRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

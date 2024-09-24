@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Models\Review;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @bodyParam reviewable_type string required Object type (vendor or product). Example: product
@@ -11,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @bodyParam stars int required Number of stars. Example: 5
  * @bodyParam comment string Review comment. Example: Very good product
  */
-class ReviewRequest extends FormRequest
+class ReviewRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Vendor\V3_1;
+namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Helpers\Common;
 use App\Models\Setting;
@@ -8,7 +8,7 @@ use App\Models\UserProfile;
 use App\Models\Vendor;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+class RegisterRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

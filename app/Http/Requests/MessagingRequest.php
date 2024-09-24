@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Rules\ChatMessage;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @bodyParam product_id int Product id, required if `conversation_id` is absent
@@ -11,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @bodyParam vendor_id int Vendor id, required for vendor app.
  * @bodyParam message string required The message can be a string, image, array of images.
  */
-class MessagingRequest extends FormRequest
+class MessagingRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

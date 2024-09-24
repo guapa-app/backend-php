@@ -3,14 +3,13 @@
 namespace App\Http\Requests;
 
 use App\Models\Device;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @bodyParam fcmtoken string required Fcm token
  * @bodyParam guid     string required Unique identifier for device
  * @bodyParam type     string required Device type `android`, `ios`, `desktop`
  */
-class DeviceRequest extends FormRequest
+class DeviceRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\V3_1\User;
 
-use App\Http\Requests\AddressListRequest as BaseAddressListRequest;
+use App\Http\Requests\FailedValidationRequest;
 use Illuminate\Support\Facades\Auth;
 
-class AddressListRequest extends BaseAddressListRequest
+class AddressListRequest extends FailedValidationRequest
 {
 
     /**
@@ -26,12 +26,12 @@ class AddressListRequest extends BaseAddressListRequest
     public function rules()
     {
         return [
-            'addressable_id'    => 'required|integer',
-            'addressable_type'  => 'required|string|in:vendor,user',
-            'perPage'           => 'nullable|numeric',
-            'page'              => 'nullable|numeric',
-            'order'             => 'nullable|string|in:asc,desc',
-            'sort'              => 'nullable',
+            'addressable_id' => 'required|integer',
+            'addressable_type' => 'required|string|in:vendor,user',
+            'perPage' => 'nullable|numeric',
+            'page' => 'nullable|numeric',
+            'order' => 'nullable|string|in:asc,desc',
+            'sort' => 'nullable',
         ];
     }
 
@@ -39,7 +39,7 @@ class AddressListRequest extends BaseAddressListRequest
     {
         $this->merge([
             'addressable_type' => 'user',
-            'addressable_id' =>  Auth::id(),
+            'addressable_id' => Auth::id(),
         ]);
     }
 }

@@ -3,10 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Contracts\Repositories\AdminRepositoryInterface;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class AdminRequest extends FormRequest
+class AdminRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

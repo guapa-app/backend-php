@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Repositories;
 
-use App\Http\Requests\V3_1\AppointmentOfferRequest;
+use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Model;
