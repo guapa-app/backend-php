@@ -20,10 +20,7 @@ class AppointmentRepository implements AppointmentOfferRepositoryInterface
 
     public function index(): LengthAwarePaginator
     {
-        return auth('api')->user()->appointmentOffers()
-            ->with('vendor', 'taxonomy', 'appointmentForms')
-            ->latest('id')
-            ->paginate();
+        return $this->appointmentOfferService->index()->latest('id')->paginate();
     }
 
     public function show(int $id): AppointmentOffer|Model
