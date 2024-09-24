@@ -2,74 +2,61 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\AppointmentOfferRequest;
 use App\Http\Resources\User\V3_1\AppointmentOfferResource;
 use App\Http\Resources\User\V3_1\OrderResource;
-use App\Models\AppointmentOffer;
-use App\Models\AppointmentOfferDetail;
-use App\Services\V3_1\AppointmentOfferService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AppointmentOfferController extends BaseApiController
 {
-    public function __construct(public AppointmentOfferService $appointmentOfferService)
+    public function __construct(public AppointmentOfferRepositoryInterface $appointmentOfferRepository)
     {
         parent::__construct();
     }
 
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        return AppointmentOfferResource::collection(
-            $this->user->appointmentOffers()
-                ->with('vendor', 'taxonomy', 'appointmentForms')
-                ->latest('id')
-                ->paginate()
-        )->additional([
-            'success' => true,
-            'message' => __('api.success'),
-        ]);
+        return AppointmentOfferResource::collection($this->appointmentOfferRepository->index())
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
-    public function show(int $id)
+    public function show(int $id): AppointmentOfferResource
     {
-        return AppointmentOfferResource::make(
-            AppointmentOffer::query()
-                ->with('vendor', 'taxonomy', 'details.subVendor', 'appointmentForms', 'media')
-                ->findOrFail($id)
-        )->additional([
-            'success' => true,
-            'message' => __('api.success'),
-        ]);
+        return AppointmentOfferResource::make($this->appointmentOfferRepository->show($id))
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
-    public function store(AppointmentOfferRequest $request)
+    public function store(AppointmentOfferRequest $request): AppointmentOfferResource
     {
-        return AppointmentOfferResource::make(
-            $this->appointmentOfferService->create($request)
-        )->additional([
-            'success' => true,
-            'message' => __('api.success'),
-        ]);
+        return AppointmentOfferResource::make($this->appointmentOfferRepository->store($request))
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
-    public function accept(Request $request)
+    public function accept(Request $request): OrderResource
     {
-        return OrderResource::make(
-            $this->appointmentOfferService->accept(
-                AppointmentOfferDetail::findOrfail($request->appointment_offer_detail_id)
-            )
-        )->additional([
-            'success' => true,
-            'message' => __('api.success'),
-        ]);
+        return OrderResource::make($this->appointmentOfferRepository->accept($request))
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
-    public function reject(Request $request)
+    public function reject(Request $request): JsonResponse
     {
-        $this->appointmentOfferService->reject(
-            AppointmentOfferDetail::findOrfail($request->appointment_offer_detail_id)
-        );
+        $this->appointmentOfferRepository->reject($request);
 
         return $this->successJsonRes([], __('api.success'));
     }
