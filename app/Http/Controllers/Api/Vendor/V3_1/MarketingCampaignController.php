@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\MarketingCampaignRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\Vendor\V3_1\MarketingCampaignRequest;
+use App\Http\Requests\V3_1\Vendor\MarketingCampaignRequest;
 use App\Http\Resources\Vendor\V3_1\MarketingCampaignResource;
 use App\Http\Resources\Vendor\V3_1\MarketingCampaignCollection;
 use App\Models\Setting;
@@ -18,8 +18,10 @@ class MarketingCampaignController extends BaseApiController
     protected $marketingCampaignService;
     protected $marketingCampaignRepository;
 
-    public function __construct(MarketingCampaignService $marketingCampaignService, MarketingCampaignRepositoryInterface $marketingCampaignRepository)
-    {
+    public function __construct(
+        MarketingCampaignService $marketingCampaignService,
+        MarketingCampaignRepositoryInterface $marketingCampaignRepository
+    ) {
         parent::__construct();
 
         $this->marketingCampaignService = $marketingCampaignService;
@@ -31,7 +33,7 @@ class MarketingCampaignController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $request->merge(['vendor_id' =>  $this->user->managerVendorId()]);
+        $request->merge(['vendor_id' => $this->user->managerVendorId()]);
         $marketingCampaigns = $this->marketingCampaignRepository->all($request);
 
         return MarketingCampaignCollection::make($marketingCampaigns)
