@@ -36,7 +36,7 @@ class Influencer extends Model implements Listable
         'status' => InfluencerStatus::class,
     ];
 
-    public function getIsReadAttribute()
+    public function getIsReadAttribute(): bool
     {
         return (bool) $this->read_at;
     }

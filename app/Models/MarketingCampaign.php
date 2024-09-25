@@ -11,6 +11,10 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 
 class MarketingCampaign extends Model implements Listable
@@ -34,22 +38,22 @@ class MarketingCampaign extends Model implements Listable
         'vendor_id',
     ];
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function campaignable()
+    public function campaignable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function invoice()
+    public function invoice(): MorphOne
     {
         return $this->morphOne(Invoice::class, 'invoiceable');
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'campaign_user');
     }

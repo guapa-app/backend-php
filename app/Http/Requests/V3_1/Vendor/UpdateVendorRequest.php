@@ -3,10 +3,10 @@
 namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Helpers\Common;
+use App\Http\Requests\FailedValidationRequest;
 use App\Models\Setting;
 use App\Models\Vendor;
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**

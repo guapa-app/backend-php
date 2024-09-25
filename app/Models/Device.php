@@ -24,6 +24,7 @@ class Device extends Model
 
     /**
      * Get user for this device.
+     *
      * @return MorphTo
      */
     public function user(): MorphTo

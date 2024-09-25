@@ -6,6 +6,7 @@ use App\Contracts\Listable;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -41,6 +42,7 @@ class Admin extends Authenticatable implements Listable
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -65,7 +67,8 @@ class Admin extends Authenticatable implements Listable
 
     /**
      * User profile photo relationship.
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     *
+     * @return MorphOne
      */
     public function photo(): MorphOne
     {
@@ -92,24 +95,24 @@ class Admin extends Authenticatable implements Listable
         return $query;
     }
 
-    public function scopeWithListRelations(Builder $query, Request $request) : Builder
+    public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         $query->with('roles');
 
         return $query;
     }
 
-    public function scopeWithApiListRelations(Builder $query, Request $request) : Builder
+    public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         return $query;
     }
 
-    public function scopeWithListCounts(Builder $query, Request $request) : Builder
+    public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
         return $query;
     }
 
-    public function scopeWithSingleRelations(Builder $query) : Builder
+    public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('roles');
 

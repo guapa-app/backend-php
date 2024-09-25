@@ -9,7 +9,11 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
 
 class Order extends Model implements Listable
@@ -60,49 +64,49 @@ class Order extends Model implements Listable
             thousands_separator: '');
     }
 
-    public function getRemainingAmountAttribute()
+    public function getRemainingAmountAttribute(): float
     {
         return $this->total - ($this->paid_amount);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function address()
+    public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }
 
-    public function items()
+    public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function products()
+    public function products(): HasManyThrough
     {
         return $this->hasManyThrough(Product::class, OrderItem::class);
     }
 
-    public function invoice()
+    public function invoice(): MorphOne
     {
         return $this->morphOne(Invoice::class, 'invoiceable');
     }
 
-    public function coupon()
+    public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->where('vendor_id', $value);
+        $query->where('vendor_id', $value);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
@@ -193,12 +197,12 @@ class Order extends Model implements Listable
             });
     }
 
-    public function staff()
+    public function staff(): BelongsTo
     {
         return $this->belongsTo(User::class, 'staff_id');
     }
 
-    public function appointmentForm()
+    public function appointmentForm(): BelongsTo
     {
         return $this->belongsTo(AppointmentOffer::class);
     }
