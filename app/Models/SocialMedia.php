@@ -25,15 +25,12 @@ class SocialMedia extends Model implements Listable, HasMedia
 
     public function vendors(): BelongsToMany
     {
-        return $this->belongsToMany(Vendor::class)
-            ->withPivot('link')
-            ->withTimestamps();
+        return $this->belongsToMany(Vendor::class)->withPivot('link')->withTimestamps();
     }
 
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class)
-            ->withPivot('link');
+        return $this->belongsToMany(Post::class)->withPivot('link');
     }
 
     public function icon(): MorphOne
@@ -49,7 +46,8 @@ class SocialMedia extends Model implements Listable, HasMedia
 
     /**
      * Register media conversions.
-     * @param BaseMedia|null $media
+     *
+     * @param  BaseMedia|null  $media
      * @return void
      * @throws InvalidManipulation
      */

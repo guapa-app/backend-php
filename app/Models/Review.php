@@ -6,6 +6,8 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 
 class Review extends Model
@@ -30,12 +32,12 @@ class Review extends Model
         'vendor',
     ];
 
-    public function reviewable()
+    public function reviewable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -49,17 +51,17 @@ class Review extends Model
         });
     }
 
-    public function scopeVendor($query)
+    public function scopeVendor($query): void
     {
-        return $query->whereHasMorph('reviewable', [Vendor::class]);
+        $query->whereHasMorph('reviewable', [Vendor::class]);
     }
 
-    public function scopeProduct($query)
+    public function scopeProduct($query): void
     {
-        return $query->whereHasMorph('reviewable', [Product::class]);
+        $query->whereHasMorph('reviewable', [Product::class]);
     }
 
-    public function scopeApplyFilters(Builder $query, Request $request) : Builder
+    public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');
         if (is_array($filter)) {
@@ -75,26 +77,26 @@ class Review extends Model
         return $query;
     }
 
-    public function scopeWithListRelations(Builder $query, Request $request) : Builder
+    public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         $query->with('user', 'reviewable');
 
         return $query;
     }
 
-    public function scopeWithApiListRelations(Builder $query, Request $request) : Builder
+    public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('user');
 
         return $query;
     }
 
-    public function scopeWithListCounts(Builder $query, Request $request) : Builder
+    public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
         return $query;
     }
 
-    public function scopeWithSingleRelations(Builder $query) : Builder
+    public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('user', 'reviewable');
 
