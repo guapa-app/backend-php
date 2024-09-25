@@ -79,7 +79,8 @@ class AppointmentOffer extends Model implements HasMedia
     public function scopeWithSingleRelations(Builder $query): void
     {
         $query->with([
-            'vendor.logo', 'taxonomy', 'details.subVendor', 'appointmentForms.values', 'media'
+            'vendor.logo', 'vendor.specialties', 'taxonomy', 'details.subVendor.logo', 'appointmentForms.values',
+            'media'
         ]);
     }
 }
