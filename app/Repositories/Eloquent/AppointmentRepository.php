@@ -8,26 +8,18 @@ use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
 use App\Models\Order;
 use App\Services\V3_1\AppointmentOfferService;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
-class AppointmentRepository implements AppointmentOfferRepositoryInterface
+class AppointmentRepository extends EloquentRepository implements AppointmentOfferRepositoryInterface
 {
-    public function __construct(public AppointmentOfferService $appointmentOfferService)
+    public function __construct(public AppointmentOfferService $appointmentOfferService, AppointmentOffer $model)
     {
+        parent::__construct($model);
     }
 
-    public function index(): LengthAwarePaginator
+    public function all(Request $request): object
     {
         return $this->appointmentOfferService->index()->latest('id')->paginate();
-    }
-
-    public function show(int $id): AppointmentOffer|Model
-    {
-        return AppointmentOffer::query()
-            ->with('vendor.logo', 'taxonomy', 'details.subVendor', 'appointmentForms.values', 'media')
-            ->findOrFail($id);
     }
 
     public function store(AppointmentOfferRequest $request): AppointmentOffer
