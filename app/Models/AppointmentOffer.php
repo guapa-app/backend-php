@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AppointmentOfferEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -73,5 +74,12 @@ class AppointmentOffer extends Model implements HasMedia
     public function invoices(): MorphOne
     {
         return $this->morphOne(Invoice::class, 'invoiceable');
+    }
+
+    public function scopeWithSingleRelations(Builder $query): void
+    {
+        $query->with([
+            'vendor.logo', 'taxonomy', 'details.subVendor', 'appointmentForms.values', 'media'
+        ]);
     }
 }
