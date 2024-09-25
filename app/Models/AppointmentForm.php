@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\AppointmentTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AppointmentForm extends Model
 {
@@ -14,21 +15,33 @@ class AppointmentForm extends Model
         'type' => AppointmentTypeEnum::class
     ];
 
-    public function values()
+    /**
+     * @return HasMany
+     */
+    public function values(): HasMany
     {
         return $this->hasMany(AppointmentFormValue::class);
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function taxonomies(): BelongsToMany
     {
         return $this->belongsToMany(Taxonomy::class);
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function vendors(): BelongsToMany
     {
         return $this->belongsToMany(Vendor::class)->withTimestamps();
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function orders(): BelongsToMany
     {
         return $this->belongsToMany(Order::class, 'order_appointments')

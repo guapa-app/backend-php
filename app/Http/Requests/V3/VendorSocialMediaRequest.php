@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\V3;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\FailedValidationRequest;
 
 class VendorSocialMediaRequest extends FailedValidationRequest
 {

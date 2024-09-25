@@ -17,8 +17,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
@@ -191,7 +193,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         ];
     }
 
-    public function shareLink()
+    public function shareLink(): MorphOne
     {
         return $this->morphone(ShareLink::class, 'shareable');
     }
@@ -216,17 +218,17 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->taxonomies('specialty');
     }
 
-    public function addresses()
+    public function addresses(): BelongsToMany
     {
         return $this->belongsToMany(Address::class, 'product_addresses');
     }
 
-    public function coupons()
+    public function coupons(): BelongsToMany
     {
         return $this->belongsToMany(Coupon::class, 'coupon_products');
     }
 
-    public function image()
+    public function image(): MorphOne
     {
         return $this->morphOne(Media::class, 'model')
             ->where('collection_name', 'products');
@@ -237,19 +239,19 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->morphMany(MarketingCampaign::class, 'campaignable');
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->where('vendor_id', $value);
+        $query->where('vendor_id', $value);
     }
 
-    public function scopeService($query)
+    public function scopeService($query): void
     {
-        return $query->where('type', ProductType::Service);
+        $query->where('type', ProductType::Service);
     }
 
-    public function scopeProduct($query)
+    public function scopeProduct($query): void
     {
-        return $query->where('type', ProductType::Product);
+        $query->where('type', ProductType::Product);
     }
 
     public function scopePriceRange($query, $minPrice, $maxPrice)

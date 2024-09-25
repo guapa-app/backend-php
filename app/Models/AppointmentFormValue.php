@@ -2,19 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class AppointmentFormValue extends Model
 {
     protected $guarded = ['id'];
 
-    public function appointmentForm()
+    /**
+     * @return BelongsTo
+     */
+    public function appointmentForm(): BelongsTo
     {
         return $this->belongsTo(AppointmentForm::class);
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function orders(): BelongsToMany
     {
         return $this->belongsToMany(Order::class, 'order_appointments', 'value_id')

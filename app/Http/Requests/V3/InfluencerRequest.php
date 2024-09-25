@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\V3;
 
+use App\Http\Requests\FailedValidationRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
 class InfluencerRequest extends FailedValidationRequest
 {
