@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\WorkDay as EnumsWorkDay;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WorkDay extends Model
 {
@@ -20,13 +21,13 @@ class WorkDay extends Model
         'day' => EnumsWorkDay::class,
     ];
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->where('vendor_id', '=', $value);
+        $query->where('vendor_id', '=', $value);
     }
 }

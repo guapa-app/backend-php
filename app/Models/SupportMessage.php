@@ -8,6 +8,8 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 
 class SupportMessage extends Model implements Listable
@@ -23,11 +25,12 @@ class SupportMessage extends Model implements Listable
         'user_id', 'parent_id', 'sender_type',
         'support_message_type_id', 'subject',
         'status', 'phone', 'body', 'read_at',
-];
+    ];
 
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable = [
@@ -36,6 +39,7 @@ class SupportMessage extends Model implements Listable
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -51,47 +55,47 @@ class SupportMessage extends Model implements Listable
         'status' => SupportMessageStatus::class,
     ];
 
-    public function getIsReadAttribute()
+    public function getIsReadAttribute(): bool
     {
         return (bool) $this->read_at;
     }
 
-    public function markAsResolved()
+    public function markAsResolved(): void
     {
         $this->update(['status' => SupportMessageStatus::Resolved]);
     }
 
-    public function markAsInProgress()
+    public function markAsInProgress(): void
     {
         $this->update(['status' => SupportMessageStatus::InProgress]);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function supportMessageType()
+    public function supportMessageType(): BelongsTo
     {
         return $this->belongsTo(SupportMessageType::class);
     }
 
-    public function replies()
+    public function replies(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id');
     }
 
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
 
-    public function scopeParents(Builder $query) : Builder
+    public function scopeParents(Builder $query): Builder
     {
         return $query->whereNull('parent_id');
     }
 
-    public function scopeApplyFilters(Builder $query, Request $request) : Builder
+    public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');
         if (is_array($filter)) {
@@ -111,24 +115,24 @@ class SupportMessage extends Model implements Listable
         return $query;
     }
 
-    public function scopeWithListRelations(Builder $query, Request $request) : Builder
+    public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         return $query;
     }
 
-    public function scopeWithApiListRelations(Builder $query, Request $request) : Builder
+    public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('supportMessageType', 'replies');
 
         return $query;
     }
 
-    public function scopeWithListCounts(Builder $query, Request $request) : Builder
+    public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
         return $query;
     }
 
-    public function scopeWithSingleRelations(Builder $query) : Builder
+    public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('supportMessageType', 'replies');
 
