@@ -89,16 +89,16 @@ class OrderController extends BaseApiController
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
      * @param  OrderRequest  $request
-     * @return OrderResource
+     * @return OrderCollection
      */
     public function create(OrderRequest $request)
     {
         $data = $request->validated();
         $data['user_id'] = $this->user->id;
 
-        $order = $this->orderService->create($data);
+        $orders = $this->orderService->create($data);
 
-        return OrderResource::make($order)
+        return OrderCollection::make($orders)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -141,6 +141,7 @@ class OrderController extends BaseApiController
 
     public function showInvoice($id)
     {
+
         $order = Order::query()
             ->where('hash_id', $id)
             ->firstOrFail();
