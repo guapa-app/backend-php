@@ -159,7 +159,6 @@ class OrderController extends BaseApiController
         return true;
     }
 
-
     public function printPDF($id)
     {
         $order = Order::query()->findOrFail($id);
