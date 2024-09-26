@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 
 class AppointmentRepository extends EloquentRepository implements AppointmentOfferRepositoryInterface
 {
+    public $perPage = 10;
+
     public function __construct(public AppointmentOfferService $appointmentOfferService, AppointmentOffer $model)
     {
         parent::__construct($model);
@@ -19,7 +21,18 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
 
     public function all(Request $request): object
     {
-        return $this->appointmentOfferService->index()->latest('id')->paginate();
+        $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
+
+        if ($perPage > 50) {
+            $perPage = 50;
+        }
+
+        $query = $this->appointmentOfferService->index()->latest('id');
+
+        if ($request->has('perPage')) {
+            return $query->paginate($perPage);
+        }
+        return $query->get();
     }
 
     public function store(AppointmentOfferRequest $request): AppointmentOffer

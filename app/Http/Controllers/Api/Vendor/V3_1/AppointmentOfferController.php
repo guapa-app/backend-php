@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
+use App\Http\Resources\Vendor\V3_1\AppointmentOfferCollection;
 use App\Http\Resources\Vendor\V3_1\AppointmentOfferResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AppointmentOfferController extends BaseApiController
 {
@@ -16,9 +16,9 @@ class AppointmentOfferController extends BaseApiController
         parent::__construct();
     }
 
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): AppointmentOfferCollection
     {
-        return AppointmentOfferResource::collection($this->appointmentOfferRepository->all($request))
+        return AppointmentOfferCollection::make($this->appointmentOfferRepository->all($request))
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
