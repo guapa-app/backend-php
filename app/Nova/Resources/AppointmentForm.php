@@ -26,7 +26,7 @@ class AppointmentForm extends Resource
      */
     public function title()
     {
-        return $this->id.' - '.$this->key.' - '.$this->type->value;
+        return $this->id.' - '.$this->type->value.' - '.$this->key;
     }
 
     /**

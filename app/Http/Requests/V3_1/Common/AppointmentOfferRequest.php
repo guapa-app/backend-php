@@ -50,7 +50,7 @@ class AppointmentOfferRequest extends FailedValidationRequest
                     'required',
                     Rule::exists('appointment_form_values', 'id')
                 ],
-                'appointments.*.key' => ['required', 'string', 'max:255'],
+                'appointments.*.key' => ['nullable', 'string', 'max:255'],
                 'appointments.*.answer' => ['required', 'string', 'max:255'],
             ];
         } else {
