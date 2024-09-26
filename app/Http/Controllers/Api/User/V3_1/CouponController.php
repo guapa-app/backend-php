@@ -11,36 +11,6 @@ use Illuminate\Http\Request;
 
 class CouponController extends ApiCouponController
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        return CouponCollection::make(parent::index($request))
-            ->additional([
-                'success' => true,
-                'message' => __('api.success'),
-            ]);
-    }
-
-    public function store(CouponRequest $request)
-    {
-        $coupon = parent::store($request);
-
-        return CouponResource::make($coupon)
-            ->additional([
-                'success' => true,
-                'message' => __('api.success'),
-            ]);
-    }
-
-    public function destroy($id)
-    {
-        parent::destroy($id);
-
-        return $this->successJsonRes([], __('api.deleted'));
-    }
-
     public function applyCoupon(ApplyCouponRequest $request)
     {
         $result = parent::applyCoupon($request);
