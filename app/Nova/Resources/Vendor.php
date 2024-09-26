@@ -2,14 +2,11 @@
 
 namespace App\Nova\Resources;
 
-use Alexwenzel\DependencyContainer\DependencyContainer;
 use Bissolli\NovaPhoneField\PhoneNumber;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Files;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Inspheric\Fields\Email;
-use Inspheric\Fields\Url;
-use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
@@ -21,7 +18,6 @@ use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Panel;
 
 class Vendor extends Resource
 {
@@ -194,6 +190,8 @@ class Vendor extends Resource
             Boolean::make(__('verified'), 'verified')->default(false),
 
             Boolean::make(__('Accept Appointment'), 'accept_appointment'),
+
+            BelongsToMany::make('Appointment form', 'appointmentForms', AppointmentForm::class),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),

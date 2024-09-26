@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\User\V3_1\AppointmentFormResource;
+use App\Http\Resources\User\V3_1\AppointmentFormCollection;
 use App\Services\V3_1\AppointmentFormService;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AppointmentFormController extends BaseApiController
 {
@@ -15,9 +14,9 @@ class AppointmentFormController extends BaseApiController
         parent::__construct();
     }
 
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): AppointmentFormCollection
     {
-        return AppointmentFormResource::collection($this->appointmentService->get($request))
+        return AppointmentFormCollection::make($this->appointmentService->get($request))
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),

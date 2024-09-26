@@ -401,7 +401,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->belongsTo(self::class, 'parent_id');
     }
 
-    public function appointmentForm(): BelongsToMany
+    public function appointmentForms(): BelongsToMany
     {
         return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
     }
@@ -480,7 +480,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('logo');
+        $query->with('logo', 'specialties');
         $query->withCount('products', 'activeOffers', 'services');
 
         return $query;

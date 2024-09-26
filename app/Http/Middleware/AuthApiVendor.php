@@ -15,7 +15,7 @@ class AuthApiVendor
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth('api')->user()->vendor) {
+        if (auth('api')->user() && !auth('api')->user()->vendor) {
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
         return $next($request);

@@ -2,29 +2,32 @@
 
 namespace App\Nova\Resources;
 
+use App\Enums\AppointmentTypeEnum;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 
-class AppointmentOfferDetails extends Resource
+class AppointmentForm extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\AppointmentOfferDetail::class;
-    public static $displayInNavigation = false;
+    public static $model = \App\Models\AppointmentForm::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'id';
+    public function title()
+    {
+        return $this->id.' - '.$this->type->value.' - '.$this->key;
+    }
 
     /**
      * The columns that should be searched.
@@ -33,6 +36,8 @@ class AppointmentOfferDetails extends Resource
      */
     public static $search = [
         'id',
+        'key',
+        'type'
     ];
 
     /**
@@ -43,27 +48,20 @@ class AppointmentOfferDetails extends Resource
      */
     public function fields(Request $request)
     {
-        $returned_arr = [
+        return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Text::make('status'),
+            Text::make(__('key'), 'key'),
 
-            Number::make('Offer price', 'offer_price'),
+            Select::make('Type')
+                ->options(array_combine(AppointmentTypeEnum::getValues(), AppointmentTypeEnum::getValues()))
+                ->rules('required'),
 
-            Textarea::make(__('Reject reason'), 'reject_reason')->nullable(),
+            HasMany::make('Values', 'values', AppointmentFormValue::class),
 
-            Textarea::make(__('Staff reason'), 'staff_notes')->nullable(),
-
-            Textarea::make(__('Offer reason'), 'offer_notes')->nullable(),
-
-            Textarea::make(__('Terms'), 'terms')->nullable(),
-
-            DateTime::make(__('Starts at'), 'starts_at')->nullable(),
-
-            DateTime::make(__('Expires at'), 'expires_at')->nullable(),
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
-
-        return $returned_arr;
     }
 
     /**

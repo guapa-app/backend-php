@@ -8,6 +8,7 @@ use App\Models\Taxonomy;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
@@ -121,6 +122,8 @@ class Category extends Resource
                     ->step(1)
                     ->min(0),
             ])->dependsOn('is_appointment', true),
+
+            BelongsToMany::make('Appointment form', 'appointmentForms', AppointmentForm::class),
 
             DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->exceptOnForms()->readonly(),

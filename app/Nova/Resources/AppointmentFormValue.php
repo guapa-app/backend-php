@@ -3,20 +3,19 @@
 namespace App\Nova\Resources;
 
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 
-class AppointmentOfferDetails extends Resource
+class AppointmentFormValue extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\AppointmentOfferDetail::class;
+    public static $model = \App\Models\AppointmentFormValue::class;
     public static $displayInNavigation = false;
 
     /**
@@ -33,6 +32,7 @@ class AppointmentOfferDetails extends Resource
      */
     public static $search = [
         'id',
+        'value'
     ];
 
     /**
@@ -43,27 +43,17 @@ class AppointmentOfferDetails extends Resource
      */
     public function fields(Request $request)
     {
-        $returned_arr = [
+        return [
             ID::make(__('ID'), 'id')->sortable(),
 
-            Text::make('status'),
+            Text::make(__('value'), 'value'),
 
-            Number::make('Offer price', 'offer_price'),
+            BelongsTo::make('appointment form', 'appointmentForm', AppointmentForm::class)
+                ->showCreateRelationButton(),
 
-            Textarea::make(__('Reject reason'), 'reject_reason')->nullable(),
-
-            Textarea::make(__('Staff reason'), 'staff_notes')->nullable(),
-
-            Textarea::make(__('Offer reason'), 'offer_notes')->nullable(),
-
-            Textarea::make(__('Terms'), 'terms')->nullable(),
-
-            DateTime::make(__('Starts at'), 'starts_at')->nullable(),
-
-            DateTime::make(__('Expires at'), 'expires_at')->nullable(),
+            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
         ];
-
-        return $returned_arr;
     }
 
     /**
