@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V3_1;
+namespace App\Http\Requests\V3_1\Common;
 
 use App\Enums\AppointmentOfferEnum;
 use App\Http\Requests\FailedValidationRequest;
@@ -54,31 +54,17 @@ class AppointmentOfferRequest extends FailedValidationRequest
                 'appointments.*.answer' => ['required', 'string', 'max:255'],
             ];
         } else {
+            $accepted = AppointmentOfferEnum::Accept->value;
             $rules = [
                 'appointment_offer_id' => ['required', Rule::exists('appointment_offers', 'id')],
                 'status' => ['required', Rule::in(AppointmentOfferEnum::getValues())],
                 'reject_reason' => ['nullable', 'string', 'max:5000'],
-                'staff_notes' => [
-                    'required_if:status,'.AppointmentOfferEnum::Accept->value, 'string', 'max:5000'
-                ],
-                'offer_notes' => [
-                    'required_if:status,'.AppointmentOfferEnum::Accept->value, 'string', 'max:5000'
-                ],
-                'terms' => [
-                    'required_if:status,'.AppointmentOfferEnum::Accept->value, 'string', 'max:5000'
-                ],
-                'offer_price' => [
-                    'required_if:status,'.AppointmentOfferEnum::Accept->value, 'numeric', 'min:1'
-                ],
-                'starts_at' => [
-                    'required_if:status,'.AppointmentOfferEnum::Accept->value, 'date', 'date_format:Y-m-d H:i'
-                ],
-                'expires_at' => [
-                    'required_if:status,'.AppointmentOfferEnum::Accept->value,
-                    'date',
-                    'date_format:Y-m-d H:i',
-                    'after:starts_at'
-                ],
+                'staff_notes' => ['required_if:status,'.$accepted, 'string', 'max:5000'],
+                'offer_notes' => ['required_if:status,'.$accepted, 'string', 'max:5000'],
+                'terms' => ['required_if:status,'.$accepted, 'string', 'max:5000'],
+                'offer_price' => ['required_if:status,'.$accepted, 'numeric', 'min:1'],
+                'starts_at' => ['required_if:status,'.$accepted, 'date_format:Y-m-d H:i'],
+                'expires_at' => ['required_if:status,'.$accepted, 'date_format:Y-m-d H:i', 'after:starts_at'],
             ];
         }
 

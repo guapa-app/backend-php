@@ -20,7 +20,7 @@ use Spatie\Translatable\HasTranslations;
 
 class Page extends Model implements Listable, HasMedia
 {
-    use HasFactory, ListableTrait, InteractsWithMedia,HasTranslations, HasSlug;
+    use HasFactory, ListableTrait, InteractsWithMedia, HasTranslations, HasSlug;
 
     protected $fillable = [
         'title', 'content', 'published',
@@ -42,6 +42,7 @@ class Page extends Model implements Listable, HasMedia
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable = [
@@ -50,6 +51,7 @@ class Page extends Model implements Listable, HasMedia
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -58,11 +60,13 @@ class Page extends Model implements Listable, HasMedia
 
     /**
      * Attributes to be added to each model.
+     *
      * @var array
      */
     protected $appends = [
         'content_text',
     ];
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('pages');
@@ -70,6 +74,7 @@ class Page extends Model implements Listable, HasMedia
 
     /**
      * Register media conversions.
+     *
      * @return void
      */
 //    public function registerMediaConversions(BaseMedia $media = null): void
@@ -91,7 +96,7 @@ class Page extends Model implements Listable, HasMedia
      *
      * @return \Spatie\Sluggable\SlugOptions
      */
-    public function getSlugOptions() : SlugOptions
+    public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
             ->generateSlugsFrom('title')
@@ -102,6 +107,7 @@ class Page extends Model implements Listable, HasMedia
 
     /**
      * Get content without markup.
+     *
      * @return object
      */
     public function getContentTextAttribute()
@@ -111,12 +117,14 @@ class Page extends Model implements Listable, HasMedia
             'ar' => $this->getTranslation('content', 'ar'),
         ];
     }
+
     public function image(): MorphOne
     {
         return $this->morphOne('App\Models\Media', 'model')
             ->where('collection_name', 'pages');
     }
-    public function scopeApplyFilters(Builder $query, Request $request) : Builder
+
+    public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');
         if (is_array($filter)) {
@@ -130,17 +138,17 @@ class Page extends Model implements Listable, HasMedia
         return $query;
     }
 
-    public function scopeWithListRelations(Builder $query, Request $request) : Builder
+    public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
         return $query;
     }
 
-    public function scopeWithListCounts(Builder $query, Request $request) : Builder
+    public function scopeWithListCounts(Builder $query, Request $request): Builder
     {
         return $query;
     }
 
-    public function scopeWithSingleRelations(Builder $query) : Builder
+    public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('image');
         return $query;

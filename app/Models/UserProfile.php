@@ -17,6 +17,7 @@ class UserProfile extends Model implements HasMedia
 
     /**
      * Attributes that are mass assignable.
+     *
      * @var array
      */
     protected $fillable = [
@@ -34,7 +35,7 @@ class UserProfile extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'settings'   => 'array',
+        'settings' => 'array',
         'birth_date' => 'date',
     ];
 
@@ -46,7 +47,8 @@ class UserProfile extends Model implements HasMedia
 
     /**
      * Modify birthdate before save.
-     * @param string $value
+     *
+     * @param  string  $value
      */
     public function setBirthDateAttribute($value): void
     {
@@ -57,6 +59,7 @@ class UserProfile extends Model implements HasMedia
 
     /**
      * Register media collections.
+     *
      * @return void
      */
     public function registerMediaCollections(): void
@@ -66,6 +69,7 @@ class UserProfile extends Model implements HasMedia
 
     /**
      * Register media conversions.
+     *
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -85,20 +89,22 @@ class UserProfile extends Model implements HasMedia
 
     /**
      * Get owner of this profile.
+     *
      * @return BelongsTo
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     /**
      * User profile photo relationship.
+     *
      * @return MorphOne
      */
     public function photo(): MorphOne
     {
-        return $this->morphOne('App\Models\Media', 'model')
+        return $this->morphOne(Media::class, 'model')
             ->where('collection_name', 'avatars');
     }
 }

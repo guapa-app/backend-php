@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coupon extends Model
@@ -24,27 +27,27 @@ class Coupon extends Model
         'expires_at' => 'datetime',
     ];
 
-    public function products()
+    public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'coupon_products');
     }
 
-    public function vendors()
+    public function vendors(): BelongsToMany
     {
         return $this->belongsToMany(Vendor::class, 'coupon_vendors');
     }
 
-    public function categories()
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Taxonomy::class, 'coupon_taxonomies', 'coupon_id', 'taxonomy_id');
     }
 
-    public function usages()
+    public function usages(): HasMany
     {
         return $this->hasMany(CouponUsage::class);
     }
 
-    public function admin()
+    public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
     }
@@ -67,12 +70,12 @@ class Coupon extends Model
         return now()->gt($this->expires_at);
     }
 
-    private function hasReachedMaxUses()
+    private function hasReachedMaxUses(): bool
     {
         return $this->max_uses && $this->usages->sum('usage_count') >= $this->max_uses;
     }
 
-    public function hasReachedMaxUsesForUser(User $user)
+    public function hasReachedMaxUsesForUser(User $user): bool
     {
         return $this->usages->where('user_id', $user->id)->sum('usage_count') >= $this->single_user_usage;
     }
@@ -105,7 +108,7 @@ class Coupon extends Model
             $this->isCouponApplicableToProduct($product);
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
         $query->whereHas('vendors', function ($q) use ($value) {
             $q->where('vendor_id', $value);

@@ -2,13 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\OrderTypeEnum;
 use App\Models\OrderItem;
 use App\Models\Product;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class OrderRequest extends FormRequest
+class OrderRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -16,6 +16,7 @@ class VendorResource extends JsonResource
             'is_deleted' => (bool) $this->deleted_at,
             'status' => $this->resource::STATUSES[$this->status],
             'type' => $this->resource::TYPES[$this->type],
+            'specialties' => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'addresses' => AddressResource::collection($this->whenLoaded('addresses')),
             'logo' => MediaResource::make($this->whenLoaded('logo')),
         ];

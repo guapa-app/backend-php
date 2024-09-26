@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Vendor\V3_1;
+namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Helpers\Common;
-use App\Models\Address;
+use App\Http\Requests\FailedValidationRequest;
 use App\Models\Setting;
 use App\Models\Vendor;
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
@@ -34,7 +33,7 @@ use Illuminate\Validation\Rule;
  * @bodyParam address.lng number Longitude. Example: 62.659898
  * @bodyParam address.type integer required Address type (see address types returned in api data). Example: 3
  */
-class UpdateVendorRequest extends FormRequest
+class UpdateVendorRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

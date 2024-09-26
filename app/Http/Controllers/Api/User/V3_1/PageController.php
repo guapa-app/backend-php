@@ -53,7 +53,7 @@ class PageController extends BaseApiController
      */
     public function show($id)
     {
-        $page = $this->pageRepository->getOneWithRelations($id);
+        $page = $this->pageRepository->getOneWithRelations($id,['published'=>1]);
 
         return PageResource::make($page)
             ->additional([

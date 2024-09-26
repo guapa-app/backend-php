@@ -4,7 +4,7 @@ namespace App\Services\V3_1;
 
 use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderTypeEnum;
-use App\Http\Requests\V3_1\AppointmentOfferRequest;
+use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
 use App\Models\Order;
@@ -17,6 +17,23 @@ use Illuminate\Support\Facades\DB;
 
 class AppointmentOfferService
 {
+    public function index()
+    {
+        $user = auth('api')->user();
+
+        if ($user->vendor) {
+            $vendor = $user->vendor;
+
+            $appointmentOffers = is_null($vendor->parent_id) ?
+                $vendor->appointmentOffers() :
+                $vendor->whereHas('appointmentOfferDetails')->first()?->parent?->appointmentOffers();
+
+            return $appointmentOffers->with('user', 'taxonomy', 'appointmentForms');
+        }
+
+        return $user->appointmentOffers()->with('vendor', 'taxonomy', 'appointmentForms');
+    }
+
     public function create(AppointmentOfferRequest $request): AppointmentOffer
     {
         if (!$request->has('appointment_offer_id')) {

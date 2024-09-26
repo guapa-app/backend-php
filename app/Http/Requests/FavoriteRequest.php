@@ -3,13 +3,12 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @bodyParam type string required Object type (vendor, product or post). Example: product
  * @bodyParam id int required Object id. Example: 4
  */
-class FavoriteRequest extends FormRequest
+class FavoriteRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

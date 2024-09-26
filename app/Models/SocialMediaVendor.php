@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SocialMediaVendor extends Model
 {
@@ -15,18 +16,18 @@ class SocialMediaVendor extends Model
         'social_media_id', 'vendor_id', 'link',
     ];
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function socialMedia()
+    public function socialMedia(): BelongsTo
     {
         return $this->belongsTo(SocialMedia::class);
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->where('vendor_id', $value);
+        $query->where('vendor_id', $value);
     }
 }

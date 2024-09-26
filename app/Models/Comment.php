@@ -7,6 +7,8 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 
 class Comment extends Model implements Listable
@@ -30,12 +32,12 @@ class Comment extends Model implements Listable
         $this->attributes['content'] = strip_tags($value);
     }
 
-    public function user()
+    public function user(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function post()
+    public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }

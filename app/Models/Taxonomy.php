@@ -7,7 +7,10 @@ use App\Traits\Listable as ListableTrait;
 use Hamedov\Taxonomies\Taxonomy as BaseTaxonomy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
 use Spatie\Sluggable\SlugOptions;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
@@ -57,18 +60,18 @@ class Taxonomy extends BaseTaxonomy implements Listable
             ->doNotGenerateSlugsOnUpdate();
     }
 
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo('App\Models\Taxonomy', 'parent_id');
     }
 
-    public function icon()
+    public function icon(): MorphOne
     {
         return $this->morphOne('App\Models\Media', 'model')
             ->where('collection_name', config('taxonomies.icon_collection_name'));
     }
 
-    public function attributes()
+    public function attributes(): HasMany
     {
         return $this->hasMany('App\Models\Attribute', 'category_id');
     }

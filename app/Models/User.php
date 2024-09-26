@@ -14,6 +14,8 @@ use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
@@ -112,7 +114,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
      */
     protected $guard_name = 'api';
 
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return false;
     }
@@ -134,7 +136,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
      */
     public function receivesBroadcastNotificationsOn()
     {
-        return 'user.' . $this->id;
+        return 'user.'.$this->id;
     }
 
     public function getRoleAttribute()
@@ -144,38 +146,38 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return isset($relations['roles']) ? $relations['roles']->pluck('name') : [];
     }
 
-    public function profile()
+    public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
     }
 
-    public function photo()
+    public function photo(): HasOneThrough
     {
         return $this->hasOneThrough(Media::class, UserProfile::class, 'user_id', 'model_id')
             ->where('model_type', 'profile');
     }
 
-    public function histories()
+    public function histories(): HasMany
     {
         return $this->hasMany(History::class);
     }
 
-    public function support_messages()
+    public function support_messages(): HasMany
     {
         return $this->hasMany(SupportMessage::class);
     }
 
-    public function userVendor()
+    public function userVendor(): HasOne
     {
         return $this->hasOne(UserVendor::class);
     }
 
-    public function vendor()
+    public function vendor(): HasOneThrough
     {
         return $this->hasOneThrough(Vendor::class, UserVendor::class, 'user_id', 'id', 'id', 'vendor_id');
     }
 
-    public function userVendors()
+    public function userVendors(): HasMany
     {
         return $this->hasMany(UserVendor::class);
     }
@@ -185,14 +187,14 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->userVendors()->pluck('vendor_id')->toArray();
     }
 
-    public function hasVendor(int $vendorId)
+    public function hasVendor(int $vendorId): bool
     {
         return (bool) $this->userVendors()->where([
             'vendor_id' => $vendorId,
         ])->exists();
     }
 
-    public function managerVendorId()
+    public function managerVendorId(): int|null
     {
         return $this->userVendors()
             ->where('role', 'manager')
@@ -204,34 +206,34 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->userVendors()->whereIn('vendor_id', $vendorIds)->count() > 0;
     }
 
-    public function orders()
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->whereRelation('userVendors', 'vendor_id', '=', $value);
+        $query->whereRelation('userVendors', 'vendor_id', '=', $value);
     }
 
-    public function scopeActive($query)
+    public function scopeActive($query): void
     {
-        return $query->where('status', self::STATUS_ACTIVE);
+        $query->where('status', self::STATUS_ACTIVE);
     }
 
-    public function scopeClosed($query)
+    public function scopeClosed($query): void
     {
-        return $query->where('status', self::STATUS_CLOSED);
+        $query->where('status', self::STATUS_CLOSED);
     }
 
-    public function loadRoles()
+    public function loadRoles(): void
     {
         // Load user role names directly before sending response to client
         $roles = $this->roles;
         $this->setRelation('roles', $roles->pluck('name'));
     }
 
-    public function loadProfileFields()
+    public function loadProfileFields(): void
     {
         $this->load('profile', 'profile.photo', 'roles');
 
@@ -309,7 +311,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
      *
      * @return MorphMany
      */
-    public function notifications()
+    public function notifications(): MorphMany
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
     }

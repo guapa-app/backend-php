@@ -22,7 +22,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Offer extends Model implements Listable, HasMedia
 {
-    use HasFactory, ListableTrait, InteractsWithMedia ,Likable;
+    use HasFactory, ListableTrait, InteractsWithMedia, Likable;
 
     protected $fillable = [
         'product_id', 'discount', 'title', 'description',
@@ -49,6 +49,7 @@ class Offer extends Model implements Listable, HasMedia
 
     /**
      * Register media collections.
+     *
      * @return void
      */
     public function registerMediaCollections(): void
@@ -58,7 +59,8 @@ class Offer extends Model implements Listable, HasMedia
 
     /**
      * Register media conversions.
-     * @param BaseMedia|null $media
+     *
+     * @param  BaseMedia|null  $media
      * @return void
      * @throws InvalidManipulation
      */
@@ -117,22 +119,22 @@ class Offer extends Model implements Listable, HasMedia
         $this->attributes['description'] = strip_tags($value);
     }
 
-    public function getDiscountStringAttribute()
+    public function getDiscountStringAttribute(): string
     {
-        return $this->discount . '%';
+        return $this->discount.'%';
     }
 
-    public function getStatusAttribute()
+    public function getStatusAttribute(): string
     {
-        if ($this->starts_at == null) {
-            return 'Active';
-        } elseif (now()->lt($this->starts_at)) {
+        if (now()->lt($this->starts_at)) {
             return 'Incoming';
-        } elseif (now()->gt($this->expires_at)) {
-            return 'Expired';
-        } else {
-            return 'Active';
         }
+
+        if (now()->gt($this->expires_at)) {
+            return 'Expired';
+        }
+
+        return 'Active';
     }
 
     public function product(): BelongsTo
@@ -142,6 +144,7 @@ class Offer extends Model implements Listable, HasMedia
 
     /**
      * Offer image relationship.
+     *
      * @return MorphOne
      */
     public function image(): MorphOne
@@ -149,10 +152,12 @@ class Offer extends Model implements Listable, HasMedia
         return $this->morphOne('App\Models\Media', 'model')
             ->where('collection_name', 'offer_images');
     }
+
     public function marketingCampaigns(): MorphMany
     {
         return $this->morphMany(MarketingCampaign::class, 'campaignable');
     }
+
     public function scopeActive($query): Builder
     {
         return $query->whereNull('starts_at')
@@ -219,8 +224,8 @@ class Offer extends Model implements Listable, HasMedia
         return $query;
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->whereRelation('product', 'vendor_id', '=', $value);
+        $query->whereRelation('product', 'vendor_id', '=', $value);
     }
 }

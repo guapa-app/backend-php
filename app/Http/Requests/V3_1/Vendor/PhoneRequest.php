@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\V3_1;
+namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Http\Requests\FailedValidationRequest;
 
-class LoginRequest extends FailedValidationRequest
+class PhoneRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,7 @@ class LoginRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'phone' => 'required|string|numeric',
-            'password' => 'required|string',
+            'phone' => 'required|string|numeric|exists:users,phone',
         ];
     }
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Requests\Vendor\V3_1;
+namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Helpers\Common;
+use App\Http\Requests\FailedValidationRequest;
 use App\Models\Address;
 use App\Models\Setting;
 use App\Models\Vendor;
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 
-class CreateVendorRequest extends FormRequest
+class CreateVendorRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

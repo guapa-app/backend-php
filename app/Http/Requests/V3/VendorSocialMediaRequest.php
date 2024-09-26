@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\V3;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\FailedValidationRequest;
 
-class VendorSocialMediaRequest extends FormRequest
+class VendorSocialMediaRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -12,6 +12,10 @@ class AppointmentFormResource extends JsonResource
             'id' => $this->id,
             'key' => $this->key,
             'type' => $this->type,
+            $this->mergeWhen($this->pivot, [
+                'key' => $this->pivot->key,
+                'answer' => $this->pivot->answer,
+            ]),
             'values' => AppointmentFormValuesResource::collection($this->whenLoaded('values')),
         ];
     }

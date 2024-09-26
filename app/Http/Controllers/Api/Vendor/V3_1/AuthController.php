@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\Vendor\V3_1\RegisterRequest;
+use App\Http\Requests\V3_1\Vendor\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Http\Resources\Vendor\V3_1\LoginResource;
 use App\Http\Resources\Vendor\V3_1\VendorProfileResource;
