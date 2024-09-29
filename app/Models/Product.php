@@ -176,7 +176,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function shareLink()
     {
-        return $this->morphone(ShareLink::class, 'shareable');
+        return $this->morphone(ShareLink::class, 'shareable')->withDefault();
     }
 
     public function vendor(): BelongsTo
@@ -213,6 +213,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     {
         return $this->morphOne(Media::class, 'model')
             ->where('collection_name', 'products');
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'product_id');
     }
 
     public function scopeCurrentVendor($query, $value)

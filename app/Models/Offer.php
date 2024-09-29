@@ -139,6 +139,11 @@ class Offer extends Model implements Listable, HasMedia
             ->where('collection_name', 'offer_images');
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'offer_id');
+    }
+
     public function scopeActive($query): Builder
     {
         return $query->whereNull('starts_at')
