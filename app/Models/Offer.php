@@ -88,16 +88,6 @@ class Offer extends Model implements Listable, HasMedia
         return __('api.the_offer_expires_in', ['countdown' => $daysString]);
     }
 
-    public function getStartsAtAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
-
-    public function getExpiresAtAttribute($value)
-    {
-        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s') : null;
-    }
-
     public function getPriceAttribute(): float
     {
         return round($this->product->price * (1 - ($this->discount / 100)), 1);
