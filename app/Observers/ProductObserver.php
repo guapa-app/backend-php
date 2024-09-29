@@ -2,9 +2,11 @@
 
 namespace App\Observers;
 
+use App\Enums\ProductStatus;
 use App\Events\ProductCreated;
 use App\Helpers\Common;
 use App\Models\Product;
+use Exception;
 use Illuminate\Support\Str;
 
 class ProductObserver
@@ -39,5 +41,16 @@ class ProductObserver
         ]);
 
         event(new ProductCreated($product));
+    }
+
+    public function deleting(Product $product)
+    {
+        if ($product->orderItems->count()) {
+            $product->status = ProductStatus::Draft;
+            $product->save();
+            throw new Exception("Cannot delete this product. We draft it instead.");
+        }
+
+        return true;
     }
 }

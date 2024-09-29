@@ -143,6 +143,11 @@ class Offer extends Model implements Listable, HasMedia
             ->where('collection_name', 'offer_images');
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'offer_id');
+    }
+
     public function marketingCampaigns(): MorphMany
     {
         return $this->morphMany(MarketingCampaign::class, 'campaignable');
