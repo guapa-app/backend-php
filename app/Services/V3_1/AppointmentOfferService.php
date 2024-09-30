@@ -10,10 +10,14 @@ use App\Models\AppointmentOfferDetail;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Taxonomy;
+use App\Models\User;
+use App\Models\UserVendor;
+use App\Notifications\AppointmentOfferNotification;
 use App\Services\MediaService;
 use App\Services\PaymentService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class AppointmentOfferService
 {
@@ -187,5 +191,33 @@ class AppointmentOfferService
         $appointmentOffer->load('media');
 
         return $appointmentOffer;
+    }
+
+    /**
+     * change payment status
+     *
+     * @param  array $data
+     *
+     */
+    public function changePaymentStatus(array $data) : void
+    {
+        $appointmentOffer = AppointmentOffer::findOrfail($data['id']);
+        if ($data['status'] == 'paid') {
+            $appointmentOffer->status =  AppointmentOfferEnum::Paid_Application_Fees->value;
+            $appointmentOffer->payment_id = $data['payment_id'];
+            $appointmentOffer->payment_gateway = $data['payment_gateway'];
+            $appointmentOffer->save();
+
+            // Send email notifications
+            $userVendors = UserVendor::query()
+                ->whereIn('vendor_id', $appointmentOffer->details->pluck('vendor_id'))
+                ->pluck('user_id');
+            $users = User::whereIn('id', $userVendors)->get();
+            Notification::send($users, new AppointmentOfferNotification($appointmentOffer));
+        }else {
+            $appointmentOffer->status = $data['status'];
+            $appointmentOffer->save();
+        }
+
     }
 }

@@ -71,4 +71,8 @@ return [
     ],
     'view_details'             => 'view details',
     'server_error'             => 'Our servers are under maintenance. We\'ll be back shortly with a better experience!',
+
+    'invalid_type' => 'Invalid type',
+    'payment_status_changed' => 'Payment status changed successfully',
+    'error_payment_status' => 'An error occurred while changing the payment status',
 ];

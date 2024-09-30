@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\User\V3_1\DeviceController;
 use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
+use App\Http\Controllers\Api\User\V3_1\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("user/v3.1")->group(function () {
@@ -37,4 +38,5 @@ Route::prefix("user/v3.1")->group(function () {
     Route::get('vendor_types', [DataController::class, 'vendor_types']);
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
+    Route::post('payment/change-status', [PaymentController::class, 'changePaymentStatus']);
 });

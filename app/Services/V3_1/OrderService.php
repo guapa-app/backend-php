@@ -4,6 +4,7 @@ namespace App\Services\V3_1;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\OrderStatus;
+use App\Models\Admin;
 use App\Models\Appointment;
 use App\Models\Coupon;
 use App\Models\Order;
@@ -12,9 +13,11 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\UserVendor;
 use App\Notifications\AddVendorClientNotification;
+use App\Notifications\OrderNotification;
 use App\Notifications\OrderUpdatedNotification;
 use App\Services\CouponService;
 use App\Services\PaymentService;
+use App\Services\PDFService;
 use App\Services\QrCodeService;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -207,6 +210,40 @@ class OrderService
         }
     }
 
+    //changeOrderStatus
+    public function changeOrderStatus(array $data): void
+    {
+        $order = Order::findOrFail($data['id']);
+        if ($data['status'] == 'paid') {
+            $order->status = 'Accepted';
+            $order->payment_id = $data['payment_id'];
+            $order->payment_gateway = $data['payment_gateway'];
+
+            if (!str_contains($order->invoice_url, '.s3.')) {
+                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+            }
+            $order->save();
+
+            // Send email notifications
+            $this->sendOrderNotifications($order);
+        }else {
+            $order->status = $data['status'];
+            $order->save();
+        }
+    }
+    protected function sendOrderNotifications(Order $order)
+    {
+        // Send email to admin
+        $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+        Notification::route('mail', $adminEmails)
+            ->notify(new OrderNotification($order));
+
+        // Send email to vendor staff
+        Notification::send($order->vendor->staff, new OrderNotification($order));
+
+        // Send email to customer
+        $order->user->notify(new OrderNotification($order));
+    }
     private function checkUserAuthorization($order, $user): ?string
     {
         return ($order->user_id !== $user->id)

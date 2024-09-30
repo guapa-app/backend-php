@@ -116,6 +116,7 @@ class MarketingCampaignService
         return $campaign;
     }
 
+    // TODO - will be deprecated on v3.1 release
     public function changeStatus(Request $request)
     {
         $invoice = Invoice::query()
@@ -143,6 +144,23 @@ class MarketingCampaignService
         );
 
         return true;
+    }
+
+    public function changePaymentStatus(array $data) : void
+    {
+        $campaign = MarketingCampaign::findOrfail($data['id']);
+        if ($data['status'] == 'paid') {
+            $campaign->status =  MarketingCampaignStatus::COMPLETED;
+            $campaign->payment_id = $data['payment_id'];
+            $campaign->payment_gateway = $data['payment_gateway'];
+            $campaign->save();
+
+            // Send Campaign Messages
+            $this->sendCampaignMessages($campaign);
+        } else {
+            $campaign->status = MarketingCampaignStatus::FAILED;
+            $campaign->save();
+        }
     }
 
     protected function sendCampaignMessages(MarketingCampaign $campaign)
