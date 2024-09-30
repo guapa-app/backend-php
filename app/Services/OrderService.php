@@ -49,7 +49,6 @@ class OrderService
             $orders = new Collection;
             $now = now();
             $orderItems = [];
-            $userIds = [];
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
@@ -57,6 +56,8 @@ class OrderService
                 $productsTitles = $vendorProducts->pluck('title')->implode(' - ');
 
                 $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $now, $vendorId, &$orderItems, &$userIds) {
+                    $userIds = [];
+
                     $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
 
                     if (isset($inputItem['appointment'])) {
@@ -138,6 +139,7 @@ class OrderService
 
                     $orderItem = OrderItem::create($item);
 
+                    $this->qrCodeData[$item['product_id']]['order_id'] = $order->id;
                     $qrCodeImage = (new QrCodeService())->generate($this->qrCodeData[$item['product_id']]);
 
                     $orderItem->addMediaFromString($qrCodeImage)->toMediaCollection('order_items');
