@@ -40,7 +40,7 @@ class AppointmentOfferRequest extends FailedValidationRequest
                 ],
                 'notes' => ['required', 'string', 'max:5000'],
                 'media' => ['nullable', 'array', 'min:1'],
-                'media.*' => ['nullable', 'image', 'max:10240'],
+                'media.*' => ['nullable', 'string'],
                 'appointments.*' => ['required', 'array'],
                 'appointments.*.appointment_form_id' => [
                     'required',
