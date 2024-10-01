@@ -2,6 +2,9 @@
 
 namespace App\Nova\Resources;
 
+use App\Nova\Actions\ClearSort;
+use App\Nova\Actions\RandomizeMissingSortOrder;
+use App\Nova\Actions\RandomizeSort;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
@@ -58,6 +61,10 @@ class Product extends Resource
                 ->rules('required'), // validation rules
 
             ID::make(__('ID'), 'id')->sortable(),
+
+            Number::make('Sort Order')
+                ->sortable()
+                ->rules('nullable', 'integer'),
 
             Text::make(__('title'), 'title')->required()->rules('required'),
 
@@ -183,7 +190,11 @@ class Product extends Resource
      */
     public function actions(Request $request)
     {
-        return [];
+        return [
+            ClearSort::make()->standalone(),
+            RandomizeSort::make()->standalone(),
+            RandomizeMissingSortOrder::make()->standalone(),
+        ];
     }
 
     public static function softDeletes()
