@@ -51,7 +51,7 @@ class AppointmentOffer extends Model implements HasMedia
 
     public function details(): HasMany
     {
-        return $this->hasMany(AppointmentOfferDetail::class);
+        return $this->hasMany(AppointmentOfferDetail::class)->with('vendor');
     }
 
     public function user(): BelongsTo

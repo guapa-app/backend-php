@@ -27,16 +27,11 @@ class AppointmentOfferRequest extends FailedValidationRequest
     {
         if (!$this->has('appointment_offer_id')) {
             $rules = [
-                'vendor_id' => [
-                    'required',
-                    Rule::exists('vendors', 'id')->whereNull('parent_id')
-                ],
                 'taxonomy_id' => ['required', Rule::exists('taxonomies', 'id')],
-                'sub_vendor_ids' => ['required', 'array'],
-                'sub_vendor_ids.*' => [
+                'vendor_ids' => ['required', 'array'],
+                'vendor_ids.*' => [
                     'required',
                     Rule::exists('vendors', 'id')
-                        ->where('parent_id', request()->get('vendor_id'))
                 ],
                 'notes' => ['required', 'string', 'max:5000'],
                 'media' => ['nullable', 'array', 'min:1'],

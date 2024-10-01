@@ -13,13 +13,7 @@ class AppointmentFormService
 {
     public function get(?Request $request = null): Collection
     {
-        $appointments = Vendor::findOrfail($request->vendor_id)->appointmentForms->load('values');
-
-        if ($appointments->isEmpty()) {
-            return Taxonomy::findOrfail($request->taxonomy_id)->appointmentForms->load('values');
-        }
-
-        return $appointments;
+        return Taxonomy::findOrfail($request->taxonomy_id)->appointmentForms->load('values');
     }
 
     public function create(Model $model, array $data, array $additionalParameters): void

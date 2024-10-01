@@ -35,7 +35,7 @@ class AppointmentOfferService
             return $appointmentOffers->with('user', 'taxonomy', 'appointmentForms');
         }
 
-        return $user->appointmentOffers()->with('vendor', 'taxonomy', 'appointmentForms');
+        return $user->appointmentOffers()->with('vendors', 'taxonomy', 'appointmentForms');
     }
 
     public function create(AppointmentOfferRequest $request): AppointmentOffer
@@ -44,7 +44,6 @@ class AppointmentOfferService
             return DB::transaction(function () use ($request) {
                 $appointmentOffer = AppointmentOffer::create([
                     'user_id' => auth('api')->user()->id,
-                    'vendor_id' => $request->vendor_id,
                     'taxonomy_id' => $request->taxonomy_id,
                     'notes' => $request->notes,
                     'status' => AppointmentOfferEnum::Pending->value
@@ -52,7 +51,7 @@ class AppointmentOfferService
 
                 $transformedArray = array_map(function ($value) {
                     return ['vendor_id' => $value, 'status' => AppointmentOfferEnum::Pending->value];
-                }, $request->sub_vendor_ids);
+                }, $request->vendor_ids);
                 $appointmentOffer->details()->createMany($transformedArray);
 
                 (new AppointmentFormService())->create(
@@ -173,7 +172,7 @@ class AppointmentOfferService
      */
     public function loadAppointmentOffer(AppointmentOffer $appointmentOffer): AppointmentOffer
     {
-        return $appointmentOffer->load('vendor', 'taxonomy', 'appointmentForms', 'media');
+        return $appointmentOffer->load('details','taxonomy', 'appointmentForms', 'media');
     }
 
     /**

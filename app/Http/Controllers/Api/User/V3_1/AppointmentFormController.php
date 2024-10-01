@@ -16,6 +16,9 @@ class AppointmentFormController extends BaseApiController
 
     public function index(Request $request): AppointmentFormCollection
     {
+        $request->validate([
+            'taxonomy_id' => 'required|integer|exists:taxonomies,id',
+        ]);
         return AppointmentFormCollection::make($this->appointmentService->get($request))
             ->additional([
                 'success' => true,
