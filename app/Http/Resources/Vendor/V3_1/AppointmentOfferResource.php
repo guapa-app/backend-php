@@ -11,7 +11,6 @@ class AppointmentOfferResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'vendor' => VendorResource::make($this->whenLoaded('vendor')),
             'taxonomy' => TaxonomyResource::make($this->whenLoaded('taxonomy')),
             'status' => $this->status,
             'notes' => $this->notes,
