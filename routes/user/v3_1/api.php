@@ -38,5 +38,5 @@ Route::prefix("user/v3.1")->group(function () {
     Route::get('vendor_types', [DataController::class, 'vendor_types']);
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
-    Route::post('payment/change-status', [PaymentController::class, 'changePaymentStatus']);
+    Route::post('payment/change-status', [PaymentController::class, 'changePaymentStatus'])->middleware('auth:api');
 });
