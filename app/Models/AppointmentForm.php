@@ -12,7 +12,8 @@ class AppointmentForm extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'type' => AppointmentTypeEnum::class
+        'type' => AppointmentTypeEnum::class,
+        'options' => 'json'
     ];
 
     /**
