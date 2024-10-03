@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\User\V3_1\TransactionController;
 use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
 use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
+use App\Http\Controllers\Api\User\V3_1\PaymentController;
 
 Route::prefix("user/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index']);
@@ -45,6 +46,9 @@ Route::prefix("user/v3.1")->group(function () {
 
 
     Route::middleware('auth:api')->group(function () {
+        
+        Route::post('payment/change-status', [PaymentController::class, 'changePaymentStatus']);
+
         // Wallet Charging Packages
         Route::get('wallet-charging-packages', [WalletChargingPackageController::class, 'index']);
 

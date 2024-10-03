@@ -5,7 +5,6 @@ namespace App\Services\V3;
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Models\Appointment;
 use App\Models\Coupon;
-use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Services\CouponService;
@@ -153,8 +152,9 @@ class OrderService extends BaseOrderService
 
             $this->qrCodeData[$product->id] = [
                 'hash_id'                   => $product->hash_id,
-                'client_name'               => $order->name,
-                'client_phone'              => $product->phone,
+                'order_id'                  => $order->id,
+                'client_name'               => auth()->user()?->name,
+                'client_phone'              => auth()->user()?->phone,
                 'vendor_name'               => $product->vendor?->name,
                 'paid_amount'               => $itemAmountToPay,
                 'remain_amount'             => ($product->price - $itemAmountToPay),

@@ -14,4 +14,6 @@ enum AppointmentOfferEnum: string
     case Accept = 'accept';
     case Reject = 'reject';
     case Canceled = 'canceled';
+    case Refunded = 'refunded';
+    case Completed = 'completed';
 }

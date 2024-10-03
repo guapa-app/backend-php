@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use App\Models\Order;
 use App\Models\User;
 use Benwilkins\FCM\FcmMessage;
@@ -47,7 +48,7 @@ class OrderNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database', 'mail'];
+        return [FirebaseChannel::class, 'database', 'mail'];
     }
 
     /**
@@ -144,6 +145,14 @@ class OrderNotification extends Notification implements ShouldQueue
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title' => 'New order',
+            'body' => 'New order from ' . $this->user->name . ' #' . $this->order->id,
+        ];
     }
 
     public function getSummary(): string

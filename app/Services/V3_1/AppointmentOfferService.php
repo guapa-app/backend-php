@@ -10,10 +10,14 @@ use App\Models\AppointmentOfferDetail;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Taxonomy;
+use App\Models\User;
+use App\Models\UserVendor;
+use App\Notifications\AppointmentOfferNotification;
 use App\Services\MediaService;
 use App\Services\PaymentService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class AppointmentOfferService
 {
@@ -24,14 +28,15 @@ class AppointmentOfferService
         if ($user->vendor) {
             $vendor = $user->vendor;
 
-            $appointmentOffers = is_null($vendor->parent_id) ?
-                $vendor->appointmentOffers() :
-                $vendor->whereHas('appointmentOfferDetails')->first()?->parent?->appointmentOffers();
+          $appointmentOffers = AppointmentOffer::query()
+                ->whereHas('details', function ($query) use ($vendor) {
+                    $query->where('vendor_id', $vendor->id);
+                });
 
             return $appointmentOffers->with('user', 'taxonomy', 'appointmentForms');
         }
 
-        return $user->appointmentOffers()->with('vendor', 'taxonomy', 'appointmentForms');
+        return $user->appointmentOffers()->with('vendors', 'taxonomy', 'appointmentForms');
     }
 
     public function create(AppointmentOfferRequest $request): AppointmentOffer
@@ -40,7 +45,6 @@ class AppointmentOfferService
             return DB::transaction(function () use ($request) {
                 $appointmentOffer = AppointmentOffer::create([
                     'user_id' => auth('api')->user()->id,
-                    'vendor_id' => $request->vendor_id,
                     'taxonomy_id' => $request->taxonomy_id,
                     'notes' => $request->notes,
                     'status' => AppointmentOfferEnum::Pending->value
@@ -48,7 +52,7 @@ class AppointmentOfferService
 
                 $transformedArray = array_map(function ($value) {
                     return ['vendor_id' => $value, 'status' => AppointmentOfferEnum::Pending->value];
-                }, $request->sub_vendor_ids);
+                }, $request->vendor_ids);
                 $appointmentOffer->details()->createMany($transformedArray);
 
                 (new AppointmentFormService())->create(
@@ -70,11 +74,10 @@ class AppointmentOfferService
                 return $this->loadAppointmentOffer($appointmentOffer);
             });
         }
-
         $appointmentOffer = AppointmentOffer::find($request->appointment_offer_id);
         $appointmentOfferDetails = $appointmentOffer
             ->details()
-            ->where('vendor_id', $request->sub_vendor_id)
+            ->where('vendor_id', auth('api')->user()->vendor->id)
             ->firstOrFail();
 
         switch ($request->status) {
@@ -169,7 +172,7 @@ class AppointmentOfferService
      */
     public function loadAppointmentOffer(AppointmentOffer $appointmentOffer): AppointmentOffer
     {
-        return $appointmentOffer->load('vendor', 'taxonomy', 'appointmentForms', 'media');
+        return $appointmentOffer->load('details','taxonomy', 'appointmentForms', 'media');
     }
 
     /**
@@ -187,5 +190,33 @@ class AppointmentOfferService
         $appointmentOffer->load('media');
 
         return $appointmentOffer;
+    }
+
+    /**
+     * change payment status
+     *
+     * @param  array $data
+     *
+     */
+    public function changePaymentStatus(array $data) : void
+    {
+        $appointmentOffer = AppointmentOffer::findOrfail($data['id']);
+        if ($data['status'] == 'paid') {
+            $appointmentOffer->status =  AppointmentOfferEnum::Paid_Application_Fees->value;
+            $appointmentOffer->payment_id = $data['payment_id'];
+            $appointmentOffer->payment_gateway = $data['payment_gateway'];
+            $appointmentOffer->save();
+
+            // Send email notifications
+            $userVendors = UserVendor::query()
+                ->whereIn('vendor_id', $appointmentOffer->details->pluck('vendor_id'))
+                ->pluck('user_id');
+            $users = User::whereIn('id', $userVendors)->get();
+            Notification::send($users, new AppointmentOfferNotification($appointmentOffer));
+        }else {
+            $appointmentOffer->status = $data['status'];
+            $appointmentOffer->save();
+        }
+
     }
 }

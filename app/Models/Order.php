@@ -23,7 +23,7 @@ class Order extends Model implements Listable
     protected $fillable = [
         'hash_id', 'user_id', 'vendor_id', 'address_id', 'total', 'status',
         'note', 'name', 'phone', 'invoice_url', 'cancellation_reason', 'coupon_id', 'coupon_discount',
-        "type", "staff_id"
+        'type', 'staff_id', 'payment_gateway', 'payment_id'
     ];
 
     /**

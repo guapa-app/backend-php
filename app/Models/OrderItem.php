@@ -73,7 +73,7 @@ class OrderItem extends Model implements HasMedia
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->withDefault();
     }
 
     public function user()
@@ -83,7 +83,7 @@ class OrderItem extends Model implements HasMedia
 
     public function offer(): BelongsTo
     {
-        return $this->belongsTo(Offer::class);
+        return $this->belongsTo(Offer::class)->withDefault();
     }
 
     // =========== Scopes Section ===========

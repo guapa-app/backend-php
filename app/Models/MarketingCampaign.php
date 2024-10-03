@@ -24,7 +24,7 @@ class MarketingCampaign extends Model implements Listable
     protected $fillable = [
         'vendor_id', 'channel', 'audience_type', 'audience_count',
         'message_cost', 'taxes', 'total_cost', 'status',
-        'invoice_url', 'campaignable_id', 'campaignable_type',
+        'invoice_url', 'campaignable_id', 'campaignable_type', 'payment_gateway', 'payment_id'
     ];
 
     protected $casts = [

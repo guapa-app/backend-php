@@ -27,30 +27,21 @@ class AppointmentOfferRequest extends FailedValidationRequest
     {
         if (!$this->has('appointment_offer_id')) {
             $rules = [
-                'vendor_id' => [
-                    'required',
-                    Rule::exists('vendors', 'id')->whereNull('parent_id')
-                ],
                 'taxonomy_id' => ['required', Rule::exists('taxonomies', 'id')],
-                'sub_vendor_ids' => ['required', 'array'],
-                'sub_vendor_ids.*' => [
+                'vendor_ids' => ['required', 'array'],
+                'vendor_ids.*' => [
                     'required',
                     Rule::exists('vendors', 'id')
-                        ->where('parent_id', request()->get('vendor_id'))
                 ],
                 'notes' => ['required', 'string', 'max:5000'],
                 'media' => ['nullable', 'array', 'min:1'],
-                'media.*' => ['nullable', 'image', 'max:10240'],
+                'media.*' => ['nullable', 'string'],
                 'appointments.*' => ['required', 'array'],
                 'appointments.*.appointment_form_id' => [
                     'required',
                     Rule::exists('appointment_forms', 'id')
                 ],
-                'appointments.*.appointment_form_value_id' => [
-                    'required',
-                    Rule::exists('appointment_form_values', 'id')
-                ],
-                'appointments.*.key' => ['nullable', 'string', 'max:255'],
+                'appointments.*.key' => ['required', 'string', 'max:255'],
                 'appointments.*.answer' => ['required', 'string', 'max:255'],
             ];
         } else {

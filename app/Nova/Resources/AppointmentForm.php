@@ -5,10 +5,12 @@ namespace App\Nova\Resources;
 use App\Enums\AppointmentTypeEnum;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\FormData;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class AppointmentForm extends Resource
 {
@@ -49,22 +51,35 @@ class AppointmentForm extends Resource
     public function fields(Request $request)
     {
         return [
-            ID::make(__('ID'), 'id')->sortable(),
 
-            Text::make(__('key'), 'key'),
+            ID::make()->sortable(),
+            Text::make('Key')->rules('required', 'max:255'),
 
             Select::make('Type')
-                ->options(array_combine(AppointmentTypeEnum::getValues(), AppointmentTypeEnum::getValues()))
+                ->options(array_combine(AppointmentTypeEnum::getValues(), AppointmentTypeEnum::options()))
+                ->displayUsingLabels()
                 ->rules('required'),
 
-            HasMany::make('Values', 'values', AppointmentFormValue::class),
+            Textarea::make('Options')
+                ->help('Options template based on the selected Type. You can modify this as needed.')
+                ->dependsOn('type', function (Textarea $field, NovaRequest $request, FormData $formData) {
+                    $field->default(function ($request) use ($formData) {
+                        $selectedType = $formData->get('type');
+                        $template = AppointmentTypeEnum::templates()[$selectedType] ?? '';
+                        return $template;
+                    });
+                })
+                ->rules(['nullable','json']),
 
-            DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
-            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+            DateTime::make(__('created at'), 'created_at')
+                ->onlyOnDetail()
+                ->readonly(),
+
+            DateTime::make(__('updated at'), 'updated_at')
+                ->onlyOnDetail()
+                ->readonly(),
         ];
-    }
-
-    /**
+    }    /**
      * Get the cards available for the request.
      *
      * @param  Request  $request

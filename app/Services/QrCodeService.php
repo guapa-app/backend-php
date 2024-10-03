@@ -10,6 +10,7 @@ class QrCodeService
     {
         $qrCodeString = 'https://guapa?'
             . "hash_id={$data['hash_id']}"
+            . "&order_id={$data['order_id']}"
             . "&client_name={$data['client_name']}"
             . "&client_phone={$data['client_phone']}"
             . "&vendor_name={$data['vendor_name']}"
