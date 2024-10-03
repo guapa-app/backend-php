@@ -74,11 +74,10 @@ class AppointmentOfferService
                 return $this->loadAppointmentOffer($appointmentOffer);
             });
         }
-
         $appointmentOffer = AppointmentOffer::find($request->appointment_offer_id);
         $appointmentOfferDetails = $appointmentOffer
             ->details()
-            ->where('vendor_id', $request->sub_vendor_id)
+            ->where('vendor_id', auth('api')->user()->vendor->id)
             ->firstOrFail();
 
         switch ($request->status) {

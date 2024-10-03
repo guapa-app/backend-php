@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
+use App\Enums\AppointmentOfferEnum;
 use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
@@ -31,9 +32,11 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
             ->withListCounts($request)
             ->withSingleRelations($request)
             ->when($vendor, function ($query) use ($vendor) {
-                $query->whereHas('details', function ($query) use ($vendor) {
+                $query->where('status', '!=' , AppointmentOfferEnum::Accept->value)->whereHas('details', function ($query) use ($vendor) {
                     $query->where('vendor_id', $vendor->id);
-                });
+                })->with(['details' => function ($query) use ($vendor) {
+                    $query->where('vendor_id', $vendor->id);
+                }]);
             })
             ->when(!$vendor, function ($query) use ($user) {
                     $query->where('user_id', $user->id);
