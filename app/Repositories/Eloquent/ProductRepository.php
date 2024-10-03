@@ -45,11 +45,15 @@ class ProductRepository extends EloquentRepository implements ProductRepositoryI
 
         $query = $this->model->applyFilters($request);
 
-        $sortColumn = Schema::hasColumn('products', 'sort_order')
-            ? ($request->get('sort') ?? 'sort_order')
-            : $request->get('sort');
+        $order = $request->get('order');
+        if (Schema::hasColumn('products', 'sort_order')) {
+            $sortColumn = ($request->get('sort') ?? 'sort_order');
+            $order = 'asc';
+        } else {
+            $sortColumn = $request->get('sort');
+        }
 
-        $query->applyOrderBy($sortColumn, $request->get('order'));
+        $query->applyOrderBy($sortColumn, $order);
 
         $query->withListRelations($request)
             ->withListCounts($request)
