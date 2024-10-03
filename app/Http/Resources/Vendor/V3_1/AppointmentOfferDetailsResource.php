@@ -11,7 +11,6 @@ class AppointmentOfferDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'appointmentOffer' => AppointmentOfferResource::make($this->whenLoaded('appointmentOffer')),
-            'vendor' => VendorResource::make($this->whenLoaded('vendor')),
             'status' => $this->status,
             'offer_price' => (float) $this->offer_price,
             'reject_reason' => $this->reject_reason,

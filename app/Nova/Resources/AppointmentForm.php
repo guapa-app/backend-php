@@ -69,7 +69,7 @@ class AppointmentForm extends Resource
                         return $template;
                     });
                 })
-                ->rules('json'),
+                ->rules(['nullable','json']),
 
             DateTime::make(__('created at'), 'created_at')
                 ->onlyOnDetail()
