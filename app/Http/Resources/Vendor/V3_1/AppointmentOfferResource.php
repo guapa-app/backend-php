@@ -14,7 +14,8 @@ class AppointmentOfferResource extends JsonResource
             'taxonomy' => TaxonomyResource::make($this->whenLoaded('taxonomy')),
             'status' => $this->status,
             'notes' => $this->notes,
-            'details' => AppointmentOfferDetailsResource::collection($this->whenLoaded('details')),
+            'created_date' => $this->created_at->format('Y-m-d'),
+            'details' => AppointmentOfferDetailsResource::make($this->whenLoaded('details')->first()),
             'appointment_form' => AppointmentFormResource::collection($this->whenLoaded('appointmentForms')),
             'images' => MediaResource::collection($this->whenLoaded('media')),
         ];

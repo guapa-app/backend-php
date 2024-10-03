@@ -15,8 +15,9 @@ class AppointmentFormResource extends JsonResource
             $this->mergeWhen($this->pivot, [
                 'key' => $this->pivot->key,
                 'answer' => $this->pivot->answer,
+                'answer_array'=> explode(',',$this->pivot->answer),
             ]),
-            'key' => $this->key
+            'key' => $this->key,
         ];
     }
 }
