@@ -2,12 +2,10 @@
 
 namespace App\Providers;
 
-use App\Channels\WhatsAppChannel;
 use App\Contracts\WhatsAppServiceInterface;
 use App\Services\ConnectlyWhatsAppService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -21,7 +19,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(WhatsAppServiceInterface::class, ConnectlyWhatsAppService::class);
-
     }
 
     /**
@@ -50,10 +47,5 @@ class AppServiceProvider extends ServiceProvider
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(365));
 
         $this->app['request']->server->set('HTTPS', $this->app->environment() != 'local');
-
-
-        Notification::extend('whatsapp', function ($app) {
-            return new WhatsAppChannel($app->make(WhatsAppServiceInterface::class));
-        });
     }
 }
