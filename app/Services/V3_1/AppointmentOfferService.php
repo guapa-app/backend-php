@@ -28,9 +28,10 @@ class AppointmentOfferService
         if ($user->vendor) {
             $vendor = $user->vendor;
 
-            $appointmentOffers = is_null($vendor->parent_id) ?
-                $vendor->appointmentOffers() :
-                $vendor->whereHas('appointmentOfferDetails')->first()?->parent?->appointmentOffers();
+          $appointmentOffers = AppointmentOffer::query()
+                ->whereHas('details', function ($query) use ($vendor) {
+                    $query->where('vendor_id', $vendor->id);
+                });
 
             return $appointmentOffers->with('user', 'taxonomy', 'appointmentForms');
         }

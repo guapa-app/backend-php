@@ -21,18 +21,36 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
 
     public function all(Request $request): object
     {
-        $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
+        $user = auth('api')->user();
+        $vendor = $user->vendor ?? null;
 
-        if ($perPage > 50) {
-            $perPage = 50;
-        }
+        $query = AppointmentOffer::query()
+            ->applyFilters($request)
+            ->applyOrderBy($request->get('sort'), $request->get('order'))
+            ->withListRelations($request)
+            ->withListCounts($request)
+            ->withSingleRelations($request)
+            ->when($vendor, function ($query) use ($vendor) {
+                $query->whereHas('details', function ($query) use ($vendor) {
+                    $query->where('vendor_id', $vendor->id);
+                });
+            })
+            ->when(!$vendor, function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+            });
 
-        $query = $this->appointmentOfferService->index()->latest('id');
 
         if ($request->has('perPage')) {
+            $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
+
+            if ($perPage > 50) {
+                $perPage = 50;
+            }
+
             return $query->paginate($perPage);
         }
         return $query->get();
+
     }
 
     public function store(AppointmentOfferRequest $request): AppointmentOffer
