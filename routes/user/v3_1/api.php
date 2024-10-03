@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\User\V3_1\DeviceController;
 use App\Http\Controllers\Api\User\V3_1\WalletController;
 use App\Http\Controllers\Api\User\V3_1\TransactionController;
 use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
+use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
 use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
 
 Route::prefix("user/v3.1")->group(function () {
@@ -42,9 +43,15 @@ Route::prefix("user/v3.1")->group(function () {
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
 
-    Route::get('wallet-charging-packages', [WalletChargingPackageController::class, 'index']);
 
     Route::middleware('auth:api')->group(function () {
+        // Wallet Charging Packages
+        Route::get('wallet-charging-packages', [WalletChargingPackageController::class, 'index']);
+
+        // Wheel Of Fortune
+        Route::get('wheel-of-fortune', [WheelOfFortuneController::class, 'index']);
+        Route::post('wheel-of-fortune/spin', [WheelOfFortuneController::class, 'spinWheel']);
+
         // Wallet
         Route::get('wallet', [WalletController::class, 'show']);
         Route::post('wallet/charge', [WalletController::class, 'charge']);
@@ -56,7 +63,7 @@ Route::prefix("user/v3.1")->group(function () {
         // Loyalty Points
         Route::get('loyalty-points', [LoyaltyPointsController::class, 'totalPoints']);
         Route::get('loyalty-points/history', [LoyaltyPointsController::class, 'pointsHistory']);
-        Route::post('/loyalty-points/convert-points', [LoyaltyPointsController::class, 'convertPoints']);
-        Route::post('/loyalty-points/calc-convert-points', [LoyaltyPointsController::class, 'calcConvertPointsToCash']);
+        Route::post('loyalty-points/convert-points', [LoyaltyPointsController::class, 'convertPoints']);
+        Route::post('loyalty-points/calc-convert-points', [LoyaltyPointsController::class, 'calcConvertPointsToCash']);
     });
 });

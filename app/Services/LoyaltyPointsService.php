@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
-use App\Enums\LoyaltyPointAction;
+use App\Models\User;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Enums\TransactionType;
+use App\Enums\LoyaltyPointAction;
 use App\Models\LoyaltyPointHistory;
 use App\Http\Resources\TransactionResource;
 
@@ -27,6 +28,11 @@ class LoyaltyPointsService
      */
     public function addPoints(int $userId, int $points, string $action)
     {
+        $user = User::findOrFail($userId);
+        $wallet = $user->myWallet();
+        $wallet->points += $points;
+        $wallet->save();
+
         LoyaltyPointHistory::create([
             'user_id' => $userId,
             'points' => abs($points), // Store points as positive
@@ -44,6 +50,11 @@ class LoyaltyPointsService
      */
     public function subtractPoints(int $userId, int $points, string $action)
     {
+        $user = User::findOrFail($userId);
+        $wallet = $user->myWallet();
+        $wallet->points -= $points;
+        $wallet->save();
+
         LoyaltyPointHistory::create([
             'user_id' => $userId,
             'points' => -abs($points), // Store points as negative
@@ -85,9 +96,7 @@ class LoyaltyPointsService
             // Call the service to create the transaction
             $transaction = $this->transactionService->createTransaction($userId, $amount, $transactionType);
 
-            $wallet->points -= $pointsToConvert;
             $wallet->balance += $cashAmount;
-
             $wallet->save();
 
             $this->subtractPoints($userId, $points, LoyaltyPointAction::CONVERSION->value);
@@ -118,7 +127,7 @@ class LoyaltyPointsService
      */
     public function getPointsHistory(int $userId)
     {
-        return LoyaltyPointHistory::where('user_id', $userId)->get();
+        return LoyaltyPointHistory::where('user_id', $userId)->orderBy('id', 'DESC')->get();
     }
 
     /**

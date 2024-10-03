@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\LoyaltyPointsService;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\User\V3_1\LoyaltyPointHistoryCollection;
 
 class LoyaltyPointsController extends BaseApiController
 {
@@ -30,7 +31,11 @@ class LoyaltyPointsController extends BaseApiController
         $userId = $request->user()->id;
         $history = $this->loyaltyPointsService->getPointsHistory($userId);
 
-        return response()->json($history);
+        return LoyaltyPointHistoryCollection::make($history)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
     public function calcConvertPointsToCash(Request $request)

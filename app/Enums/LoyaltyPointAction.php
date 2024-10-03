@@ -8,4 +8,5 @@ enum LoyaltyPointAction: string
     case REFERRAL = 'referral';
     case CONVERSION = 'conversion';
     case WALLET_CHARGING = 'wallet_charging';
+    case SPIN_WHEEL = 'spin_wheel';
 }

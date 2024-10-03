@@ -49,7 +49,6 @@ class WalletController extends BaseApiController
         $transaction = $this->transactionService->createTransaction($userId, $amount, $transactionType);
 
         $wallet->balance += $package->amount;
-        $wallet->points += $package->points;
         $wallet->save();
 
         $this->loyaltyPointsService->addPoints($userId, $package->points, LoyaltyPointAction::WALLET_CHARGING->value);
