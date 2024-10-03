@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Events\OfferCreated;
 use App\Models\Offer;
+use Exception;
 
 class OfferObserver
 {
@@ -29,6 +30,16 @@ class OfferObserver
         //
     }
 
+    public function deleting(Offer $offer)
+    {
+        if ($offer->orderItems->count()) {
+            $offer->expires_at = $offer->expires_at > now() ? now() : $offer->expires_at;
+            $offer->save();
+            throw new Exception("Cannot delete this offer. We Expired it instead.");
+        }
+
+        return true;
+    }
     /**
      * Handle the Offer "deleted" event.
      *

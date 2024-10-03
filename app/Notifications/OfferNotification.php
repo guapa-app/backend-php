@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use App\Channels\WhatsAppChannel;
 use App\Models\Offer;
 use Benwilkins\FCM\FcmMessage;
@@ -35,7 +36,7 @@ class OfferNotification extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return [
-            'database', 'fcm', WhatsAppChannel::class,
+            'database', FirebaseChannel::class, WhatsAppChannel::class,
         ];
     }
 
@@ -78,6 +79,14 @@ class OfferNotification extends Notification implements ShouldQueue
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title' => 'خصم ' . $this->offer->discount_string . ' على ' . $this->offer->product->title,
+            'body' => $this->getSummary(),
+        ];
     }
 
     public function toWhatsapp($notifiable)
