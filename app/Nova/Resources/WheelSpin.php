@@ -4,27 +4,30 @@ namespace App\Nova\Resources;
 
 use Laravel\Nova\Resource;
 use Laravel\Nova\Fields\ID;
+use App\Nova\Resources\User;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Number;
-use Spatie\NovaTranslatable\Translatable;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\BelongsTo;
+use App\Nova\Resources\WheelOfFortune;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class WheelOfFortune extends Resource
+class WheelSpin extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\WheelOfFortune>
+     * @var class-string<\App\Models\WheelSpin>
      */
-    public static $model = \App\Models\WheelOfFortune::class;
+    public static $model = \App\Models\WheelSpin::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'rarity_title';
+    public static $title = 'id';
 
     /**
      * The columns that should be searched.
@@ -33,9 +36,31 @@ class WheelOfFortune extends Resource
      */
     public static $search = [
         'id',
-        'rarity_title'
+        'user_id',
+        'wheel_id',
+        'points_awarded',
     ];
 
+    public static function authorizedToCreate(Request $request)
+    {
+        return false;
+    }
+
+    public function authorizedToUpdate(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToReplicate(Request $request): bool
+    {
+        return false;
+    }
+    
     /**
      * Get the fields displayed by the resource.
      *
@@ -46,20 +71,22 @@ class WheelOfFortune extends Resource
     {
         return [
             ID::make()->sortable(),
-            Translatable::make([
-                Text::make(__('Rarity Title'), 'rarity_title')
-                    ->sortable()
-                    ->rules('required', 'max:255'),
-            ]),
-            Number::make('Probability (%)', 'probability')
-                ->min(0)
-                ->max(100)
-                ->rules('required', 'integer')
-                ->help('Make sure the total probability does not exceed 100%'),
-            Number::make('Points', 'points')
-                ->min(0)
-                ->rules('required', 'integer')
-                ->help('Number of points.'),
+
+            // BelongsTo::make(__('user'), 'user', User::class),
+
+            BelongsTo::make('User', 'user', User::class)
+                ->sortable()
+                ->searchable(),
+
+            BelongsTo::make('Wheel', 'wheel', WheelOfFortune::class)
+                ->sortable()
+                ->searchable(),
+
+            Number::make('Points Awarded', 'points_awarded')
+                ->sortable(),
+
+            DateTime::make('Spin Date', 'spin_date')
+                ->sortable(),
         ];
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\WheelOfFortune;
 use App\Enums\LoyaltyPointAction;
 use App\Services\LoyaltyPointsService;
+use App\Services\WheelOfFortuneService;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Contracts\Repositories\WheelOfFortuneInterface;
 use App\Http\Resources\User\V3_1\WheelOfFortuneCollection;
@@ -17,12 +18,14 @@ class WheelOfFortuneController extends BaseApiController
 
     private $wheelOfFortuneRepository;
     protected $loyaltyPointsService;
+    protected $wheelOfFortuneService;
 
-    public function __construct(WheelOfFortuneInterface $wheelOfFortuneRepository, LoyaltyPointsService $loyaltyPointsService)
+    public function __construct(WheelOfFortuneInterface $wheelOfFortuneRepository, LoyaltyPointsService $loyaltyPointsService, WheelOfFortuneService $wheelOfFortuneService)
     {
         parent::__construct();
         $this->wheelOfFortuneRepository = $wheelOfFortuneRepository;
         $this->loyaltyPointsService = $loyaltyPointsService;
+        $this->wheelOfFortuneService = $wheelOfFortuneService;
     }
 
     /**
@@ -62,21 +65,17 @@ class WheelOfFortuneController extends BaseApiController
             }
         }
 
-        // Get the wheel settings by ID
-        $wheelItems = WheelOfFortune::findOrFail($wheelId);
+        $wheel = WheelOfFortune::findOrFail($wheelId);
 
         // Award the points to the customer
-        $this->loyaltyPointsService->addPoints($userId, $wheelItems->points, LoyaltyPointAction::SPIN_WHEEL->value);
+        $this->loyaltyPointsService->addPoints($userId, $wheel->points, LoyaltyPointAction::SPIN_WHEEL->value);
 
-        WheelSpin::create([
-            'user_id' => $userId,
-            'wheel_id' => $wheelId,
-            'spin_date' => Carbon::now(),
-        ]);
+        // Log user wheel spin
+        $this->wheelOfFortuneService->wheelSpin($userId, $wheelId, $wheel->points);
 
         return response()->json([
-            'message' => __('You have been awarded ' . $wheelItems->points . ' points!'),
-            'points' => $wheelItems->points
+            'message' => __('You have been awarded ' . $wheel->points . ' points!'),
+            'points' => $wheel->points
         ]);
     }
 }

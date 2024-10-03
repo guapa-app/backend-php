@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class WheelSpin extends Model
 {
@@ -13,6 +13,11 @@ class WheelSpin extends Model
         'user_id',
         'wheel_id',
         'spin_date',
+        'points_awarded',
+    ];
+
+    protected $casts = [
+        'spin_date' => 'datetime',
     ];
 
     public function user()
