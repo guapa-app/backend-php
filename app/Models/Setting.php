@@ -29,7 +29,7 @@ class Setting extends Model
             's_value'           => 15.00,
             's_unit'            => 'float',
             's_validation_type' => 'number',
-            's_validation'      => ['min'=> 0, 'max'=> 100],
+            's_validation'      => ['min' => 0, 'max' => 100],
             'instructions'      => 'Taxes are a percentage of the service (example: 10% of 150 riyals = 15 riyals)',
         ]);
 
@@ -42,19 +42,33 @@ class Setting extends Model
             's_value'           => 0.00,
             's_unit'            => 'float',
             's_validation_type' => 'number',
-            's_validation'      => ['min'=> 0, 'max'=> 100],
+            's_validation'      => ['min' => 0, 'max' => 100],
             'instructions'      => 'Fees are a percentage of the product (example: 10% of 150 riyals = 15 riyals)',
         ]);
 
         return $record->s_value;
     }
+
+    public static function pointsConversionRate()
+    {
+        $record = static::firstOrCreate(['s_key' => 'points_conversion_rate'], [
+            's_value'           => 100,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Points to cash conversion rate (example: 100 points = 1 riyal)',
+        ]);
+
+        return $record->s_value;
+    }
+
     public static function getMessageCost()
     {
         $record = static::firstOrCreate(['s_key' => 'message_cost'], [
             's_value'           => 1.00,
             's_unit'            => 'float',
             's_validation_type' => 'number',
-            's_validation'      => ['min'=> 0, 'max'=> 1000],
+            's_validation'      => ['min' => 0, 'max' => 1000],
             'instructions'      => 'The cost of sending a message to the customer',
         ]);
 
@@ -71,7 +85,6 @@ class Setting extends Model
         ]);
 
         return explode(',', $record->s_value);
-
     }
 
     public static function checkTestingMode()
@@ -119,7 +132,7 @@ class Setting extends Model
             's_value'           => 60,
             's_unit'            => 'integer',
             's_validation_type' => 'number',
-            's_validation'      => ['min'=> 0, 'max'=> 365],
+            's_validation'      => ['min' => 0, 'max' => 365],
             'instructions'      => 'Orders that have services (procedures) should expired after (numer) of days. if user does not use it before',
         ]);
 

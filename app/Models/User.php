@@ -206,6 +206,16 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->userVendors()->whereIn('vendor_id', $vendorIds)->count() > 0;
     }
 
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function loyaltyPointHistory()
+    {
+        return $this->hasMany(LoyaltyPointHistory::class);
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
@@ -319,5 +329,27 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function appointmentOffers(): HasMany
     {
         return $this->hasMany(AppointmentOffer::class);
+    }
+
+    /**
+     * My Wallet
+     * Get user wallet data.
+     *
+     * @return Wallet
+     */
+    public function myWallet(): Wallet
+    {
+        // Check if the user has a wallet
+        if (!$this->wallet) {
+            // Create a new wallet if it doesn't exist
+            $wallet = $this->wallet()->create([
+                'balance' => 0,
+                'points' => 0,
+            ]);
+        } else {
+            $wallet = $this->wallet;
+        }
+
+        return $wallet;
     }
 }
