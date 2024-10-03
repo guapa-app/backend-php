@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\User\V3_1\TransactionCollection;
 
 class TransactionController extends BaseApiController
 {
@@ -21,7 +22,11 @@ class TransactionController extends BaseApiController
     {
         $transactions = $this->transactionService->getUserTransactionHistory(auth()->user()->id);
 
-        return TransactionResource::collection($transactions);
+        return TransactionCollection::make($transactions)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
     public function show(Transaction $transaction)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Contracts\Repositories\WalletChargingPackageInterface;
+use App\Http\Resources\User\V3_1\WalletChargingPackageCollection;
 
 class WalletChargingPackageController extends BaseApiController
 {
@@ -23,6 +24,10 @@ class WalletChargingPackageController extends BaseApiController
     {
         $walletChargingPackages = $this->walletChargingPackageRepository->all($request);
 
-        return $walletChargingPackages;
+        return WalletChargingPackageCollection::make($walletChargingPackages)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 }
