@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Contracts\WhatsAppServiceInterface;
-use App\Services\ConnectlyWhatsAppService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -18,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(WhatsAppServiceInterface::class, ConnectlyWhatsAppService::class);
+        //
     }
 
     /**
