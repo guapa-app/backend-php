@@ -1,11 +1,15 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Controllers\Api\User\V3_1\DeviceController;
-use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\User\V3_1\OrderController;
+use App\Http\Controllers\Api\User\V3_1\DeviceController;
+use App\Http\Controllers\Api\User\V3_1\WalletController;
+use App\Http\Controllers\Api\User\V3_1\TransactionController;
+use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
+use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
 
 Route::prefix("user/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index']);
@@ -37,4 +41,22 @@ Route::prefix("user/v3.1")->group(function () {
     Route::get('vendor_types', [DataController::class, 'vendor_types']);
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
+
+    Route::get('wallet-charging-packages', [WalletChargingPackageController::class, 'index']);
+
+    Route::middleware('auth:api')->group(function () {
+        // Wallet
+        Route::get('wallet', [WalletController::class, 'show']);
+        Route::post('wallet/charge', [WalletController::class, 'charge']);
+
+        // Transaction
+        Route::get('transactions', [TransactionController::class, 'index']);
+        Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
+
+        // Loyalty Points
+        Route::get('loyalty-points', [LoyaltyPointsController::class, 'totalPoints']);
+        Route::get('loyalty-points/history', [LoyaltyPointsController::class, 'pointsHistory']);
+        Route::post('/loyalty-points/convert-points', [LoyaltyPointsController::class, 'convertPoints']);
+        Route::post('/loyalty-points/calc-convert-points', [LoyaltyPointsController::class, 'calcConvertPointsToCash']);
+    });
 });

@@ -37,5 +37,7 @@
     "Unauthorized",
     "Verify Email Address",
     "Whoops!",
-    "You are receiving this email because we received a password reset request for your account."
+    "You are receiving this email because we received a password reset request for your account.",
+    "Not enough points to convert"
+
 ]
