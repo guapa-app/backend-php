@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -36,7 +37,11 @@ class ChatMessage extends Notification
      */
     public function via($notifiable)
     {
-        $channels = ['fcm', 'broadcast'];
+        $channels = [
+            FirebaseChannel::class,
+            'broadcast'
+        ];
+
         if ($this->message->type === 'offer') {
             $channels[] = 'database';
         }
@@ -69,6 +74,14 @@ class ChatMessage extends Notification
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title' => $this->getSenderName(),
+            'body' => $this->getMessageBody()
+        ];
     }
 
     /**
