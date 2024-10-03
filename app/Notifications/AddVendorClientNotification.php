@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,8 +26,19 @@ class AddVendorClientNotification extends Notification implements ShouldQueue
         if ($this->isNewClient) {
             return ['whatsapp'];
         } else {
-            return ['database', 'fcm'];
+            return [
+                'database',
+                FirebaseChannel::class,
+            ];
         }
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title'        => 'تمت إضافتك كعميل',
+            'body'         => $this->getSummary(),
+        ];
     }
 
     public function toFcm($notifiable): FcmMessage

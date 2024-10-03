@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use App\Enums\ProductType;
 use App\Models\Product;
 use Benwilkins\FCM\FcmMessage;
@@ -37,7 +38,7 @@ class ProductNotification extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         return [
-            'database', 'fcm',
+            'database', FirebaseChannel::class,
         ];
     }
 
@@ -79,6 +80,14 @@ class ProductNotification extends Notification implements ShouldQueue
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title' => $this->product->title,
+            'body' => $this->getSummary(),
+        ];
     }
 
     public function getSummary()

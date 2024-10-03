@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use Benwilkins\FCM\FcmMessage;
+use App\Channels\FirebaseChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -34,7 +34,10 @@ class PushNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database'];
+        return [
+            FirebaseChannel::class,
+            'database',
+        ];
     }
 
     /**
@@ -56,24 +59,13 @@ class PushNotification extends Notification
      *
      * @param mixed $notifiable
      *
-     * @return FcmMessage
+     * @return array
      */
-    public function toFcm($notifiable): FcmMessage
+    public function toFirebase()
     {
-        $message = new FcmMessage();
-        $message->content([
+        return [
             'title' => $this->title,
             'body' => $this->summary,
-            'image' => $this->image,
-            'sound' => 'default',
-            'icon' => '',
-            'click_action' => '',
-        ])->data([
-            'title' => $this->title,
-            'summary' => $this->summary,
-            'image' => $this->image,
-        ])->priority(FcmMessage::PRIORITY_HIGH);
-
-        return $message;
+        ];
     }
 }

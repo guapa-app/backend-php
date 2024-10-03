@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\Channels\WhatsappChannel;
@@ -46,7 +47,7 @@ class OrderUpdatedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database', WhatsappChannel::class];
+        return [FirebaseChannel::class, 'database', WhatsappChannel::class];
     }
 
     /**
@@ -110,6 +111,14 @@ class OrderUpdatedNotification extends Notification
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title' => 'Update order',
+            'body' => $this->getSummary(),
+        ];
     }
 
     public function getSummary(): string
