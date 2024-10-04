@@ -66,4 +66,15 @@ class PaymentService
     {
         $this->paymentService->refund($order);
     }
+
+    /**
+     * Check if the payment paid successfully.
+     *
+     * @param  mixed $payment_id
+     * @return bool
+     */
+    public function isPaymentPaidSuccessfully($payment_id)
+    {
+        return $this->paymentService->isPaymentPaidSuccessfully($payment_id);
+    }
 }

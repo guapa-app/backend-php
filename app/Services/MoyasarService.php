@@ -70,4 +70,18 @@ class MoyasarService
             'amount_format' => $invoiceService->amountFormat,
         ]);
     }
+
+    /**
+     * Check if the payment paid successfully.
+     *
+     * @param  mixed $payment_id
+     * @return bool
+     */
+    public function isPaymentPaidSuccessfully($payment_id)
+    {
+        $paymentService = new MoyasarPaymentService();
+        $paymentService = $paymentService->fetch($payment_id);
+        if ($paymentService->status == 'paid') return true;
+        return false;
+    }
 }
