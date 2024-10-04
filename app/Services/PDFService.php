@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
+use misterspelik\LaravelPdf\Facades\Pdf as PDF;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Models\Transaction;
 use Elibyy\TCPDF\Facades\TCPDF;
-use Illuminate\Support\Facades\Storage;
 use Prgayman\Zatca\Facades\Zatca;
-use PDF;
+use Illuminate\Support\Facades\Storage;
 
 class PDFService
 {
@@ -51,7 +52,31 @@ class PDFService
         return $url;
     }
 
+    /**
+     * Generate transaction pdf file and save it in s3.
+     *
+     * @param  Transaction $transaction
+     * @return string
+     */
+    public function addTransactionPDF(Transaction $transaction)
+    {
+        $data = [
+            'invoice' => $transaction,
+            'cus_name' => $transaction->user->name,
+        ];
+        $pdf = PDF::loadView('invoice-transaction-pdf', $data);
+        $pdfContent = $pdf->output();
+        // Define a unique file name for the PDF
+        $fileName = 'mpdf/invoices/invoice_' . time() . '.pdf';
 
+        // Upload the PDF to S3
+        Storage::disk('s3')->put($fileName, $pdfContent, 'public');
+
+        // Get the URL of the uploaded PDF
+        $url = Storage::disk('s3')->url($fileName);
+
+        return $url;
+    }
 
     public function generatePDF($order)
     {
