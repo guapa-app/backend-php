@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionService
 {
+    protected $pdfService;
+
+    public function __construct(PDFService $pdfService)
+    {
+        $this->pdfService = $pdfService;
+    }
+
     /**
      * Create a new transaction.
      *
@@ -36,6 +43,10 @@ class TransactionService
                 'transaction_date' => now(),
                 'invoice_link' => $invoiceLink,
             ]);
+
+            $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
+            $transaction->invoice_link = $invoiceLink;
+            $transaction->save();
 
             DB::commit();
 
