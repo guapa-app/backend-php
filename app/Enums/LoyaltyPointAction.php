@@ -5,6 +5,7 @@ namespace App\Enums;
 enum LoyaltyPointAction: string
 {
     case PURCHASE = 'purchase';
+    case RETURN_PURCHASE = 'return_purchase';
     case REFERRAL = 'referral';
     case CONVERSION = 'conversion';
     case WALLET_CHARGING = 'wallet_charging';

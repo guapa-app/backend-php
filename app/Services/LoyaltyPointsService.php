@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Enums\TransactionType;
 use App\Enums\LoyaltyPointAction;
 use App\Models\LoyaltyPointHistory;
 use App\Http\Resources\TransactionResource;
+use App\Models\WalletChargingPackage;
+use App\Models\WheelOfFortune;
 
 class LoyaltyPointsService
 {
@@ -127,7 +130,20 @@ class LoyaltyPointsService
      */
     public function getPointsHistory(int $userId)
     {
-        return LoyaltyPointHistory::where('user_id', $userId)->orderBy('id', 'DESC')->get();
+        $histories =  LoyaltyPointHistory::with(['sourceable'])->where('user_id', $userId)->orderBy('id', 'DESC')->get();
+
+        // Iterate through each history to customize the sourceable data
+        $histories->each(function ($history) {
+            if ($history->sourceable_type == 'product') {
+                $history->setRelation('sourceable', $history->sourceable()->select('id', 'title')->first());
+            } elseif ($history->sourceable_type === \App\Models\WheelOfFortune::class) {
+                $history->setRelation('sourceable', $history->sourceable()->select('id', 'rarity_title')->first());
+            } elseif ($history->sourceable_type === \App\Models\WalletChargingPackage::class) {
+                $history->setRelation('sourceable', $history->sourceable()->select('id', 'name')->first());
+            }
+        });
+
+        return $histories;
     }
 
     /**
@@ -141,5 +157,94 @@ class LoyaltyPointsService
         $conversionRate = Setting::pointsConversionRate();
 
         return $points % $conversionRate === 0;
+    }
+
+    /**
+     * Add Wallet Charging Points
+     *
+     * @param  mixed $order
+     * @return void
+     */
+    public function addWalletChargingPoints($userId, WalletChargingPackage $package)
+    {
+        $package->loyaltyPointHistories()->create([
+            'user_id' => $userId,
+            'points' => $package->points,
+            'action' => LoyaltyPointAction::WALLET_CHARGING->value,
+            'type' => 'added',
+        ]);
+    }
+
+    /**
+     * Add Spin Wheel Points
+     *
+     * @param  mixed $order
+     * @return void
+     */
+    public function addSpinWheelPoints($userId, WheelOfFortune $wheel)
+    {
+        $wheel->loyaltyPointHistories()->create([
+            'user_id' => $userId,
+            'points' => $wheel->points,
+            'action' => LoyaltyPointAction::SPIN_WHEEL->value,
+            'type' => 'added',
+        ]);
+    }
+
+    /**
+     * Add Purchase Points
+     *
+     * @param  mixed $order
+     * @return void
+     */
+    public function addPurchasePoints(Order $order)
+    {
+        $conversionRate = Setting::purchasePointsConversionRate();
+        $paidAmount = $order->paid_amount_with_taxes;
+        $points = (int) ($paidAmount * $conversionRate);
+
+        $items = $order->items;
+        foreach ($items as $item) {
+            $product = $item->product;
+            if ($product->earned_points) {
+                $product->loyaltyPointHistories()->create([
+                    'user_id' => $order->user_id,
+                    'points' => $product->earned_points,
+                    'action' => LoyaltyPointAction::PURCHASE->value,
+                    'type' => 'added',
+                ]);
+            } else {
+                $product->loyaltyPointHistories()->create([
+                    'user_id' => $order->user_id,
+                    'points' => $points,
+                    'action' => LoyaltyPointAction::PURCHASE->value,
+                    'type' => 'added',
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Return Purchase Points
+     *
+     * @param  mixed $order
+     * @return void
+     */
+    public function returnPurchasePoints(Order $order)
+    {
+        $items = $order->items;
+        foreach ($items as $item) {
+            $product = $item->product;
+            $loyaltyHistories = $product->loyaltyPointHistories()->where('type', 'added')
+            ->orderBy('id', 'desc')->get();
+            foreach ($loyaltyHistories as $history) {
+                $product->loyaltyPointHistories()->create([
+                    'user_id' => $order->user_id,
+                    'points' => -abs($history->points),
+                    'action' => LoyaltyPointAction::RETURN_PURCHASE->value,
+                    'type' => 'subtracted',
+                ]);
+            }
+        }
     }
 }

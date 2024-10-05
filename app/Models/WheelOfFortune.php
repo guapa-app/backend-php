@@ -51,6 +51,11 @@ class WheelOfFortune extends Model implements Listable
     }
 
 
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');

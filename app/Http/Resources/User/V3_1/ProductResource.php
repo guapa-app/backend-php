@@ -20,7 +20,7 @@ class ProductResource extends JsonResource
             'terms'                                 => (string) $this->terms,
             'is_liked'                              => (bool) $this->is_liked,
             'payment_details'                       => $this->payment_details,
-
+            'points'                                => $this->calcProductPoints(),
             'offer'                                 => OfferResource::make($this->whenLoaded('offer')),
             'vendor'                                =>  [
                                                             'id'  => $this->vendor->id,

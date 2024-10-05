@@ -712,5 +712,6 @@
     "Not enough points to convert": "لا يوجد لديك نقاط كافية للاستبدال",
     "The points count must be a multiple of the conversion rate (:paypal).": "يجب أن يكون عدد النقاط مضاعفًا لمعدل التحويل (:paypal).",
     "You can only spin the wheel once every 24 hours.": "يمكنك تدوير العجلة مرة واحدة فقط كل 24 ساعة.",
-    "Payment details are incorrect. Please check your payment again.": "بيانات الدفع غير صحيح. يرجى التاكد من عملية الدفع مرة اخرى"
+    "Payment details are incorrect. Please check your payment again.": "بيانات الدفع غير صحيح. يرجى التاكد من عملية الدفع مرة اخرى",
+    "Buy Product :product":"شراء product: منتج"
 }

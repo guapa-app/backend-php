@@ -54,11 +54,11 @@ class WheelOfFortune extends Resource
             Number::make('Probability (%)', 'probability')
                 ->min(0)
                 ->max(100)
-                ->rules('required', 'integer')
+                ->rules('required', 'integer', 'min:1')
                 ->help('Make sure the total probability does not exceed 100%'),
             Number::make('Points', 'points')
                 ->min(0)
-                ->rules('required', 'integer')
+                ->rules('required', 'integer', 'min:1')
                 ->help('Number of points.'),
         ];
     }

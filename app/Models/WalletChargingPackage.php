@@ -34,6 +34,11 @@ class WalletChargingPackage extends Model implements Listable
         'points'
     ];
 
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
+    }
+    
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Services\LoyaltyPointsService;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Resources\User\V3_1\LoyaltyPointHistoryCollection;
@@ -21,9 +20,16 @@ class LoyaltyPointsController extends BaseApiController
     public function totalPoints(Request $request)
     {
         $userId = $request->user()->id;
+
         $totalPoints = $this->loyaltyPointsService->getTotalPoints($userId);
 
-        return response()->json(['total_points' => $totalPoints]);
+        return response()->json([
+            'data' => [
+                'points' => (int) $totalPoints,
+            ],
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
     }
 
     public function pointsHistory(Request $request)

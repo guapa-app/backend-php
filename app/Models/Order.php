@@ -99,6 +99,11 @@ class Order extends Model implements Listable
         return $this->morphOne(Invoice::class, 'invoiceable');
     }
 
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
+    }
+    
     public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
