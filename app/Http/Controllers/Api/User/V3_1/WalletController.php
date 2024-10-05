@@ -32,7 +32,12 @@ class WalletController extends BaseApiController
     public function show(Request $request)
     {
         $wallet = $request->user()->myWallet();
-        return new WalletResource($wallet);
+
+        return WalletResource::make($wallet)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
     public function charge(Request $request)
@@ -57,7 +62,7 @@ class WalletController extends BaseApiController
             $wallet->balance += $package->amount;
             $wallet->save();
 
-            $this->loyaltyPointsService->addPoints($userId, $package->points, LoyaltyPointAction::WALLET_CHARGING->value);
+            $this->loyaltyPointsService->addWalletChargingPoints($userId, $package);
 
             return new TransactionResource($transaction);
         } else {

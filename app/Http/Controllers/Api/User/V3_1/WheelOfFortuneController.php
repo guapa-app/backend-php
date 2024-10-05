@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use App\Models\WheelSpin;
 use Illuminate\Http\Request;
 use App\Models\WheelOfFortune;
-use App\Enums\LoyaltyPointAction;
 use App\Services\LoyaltyPointsService;
 use App\Services\WheelOfFortuneService;
 use App\Http\Controllers\Api\BaseApiController;
@@ -61,21 +60,26 @@ class WheelOfFortuneController extends BaseApiController
             $spinDate = Carbon::parse($lastSpin->spin_date);
             // Check if 24 hours have passed since the last spin
             if ($spinDate->diffInHours(Carbon::now()) < 24) {
-                return response()->json(['message' => 'You can only spin the wheel once every 24 hours.'], 403);
+                return $this->errorJsonRes(message: __('You can only spin the wheel once every 24 hours.'));
             }
         }
 
         $wheel = WheelOfFortune::findOrFail($wheelId);
 
         // Award the points to the customer
-        $this->loyaltyPointsService->addPoints($userId, $wheel->points, LoyaltyPointAction::SPIN_WHEEL->value);
+        $this->loyaltyPointsService->addSpinWheelPoints($userId, $wheel);
 
         // Log user wheel spin
         $this->wheelOfFortuneService->wheelSpin($userId, $wheelId, $wheel->points);
 
         return response()->json([
-            'message' => __('You have been awarded ' . $wheel->points . ' points!'),
-            'points' => $wheel->points
+            'data' => [
+                'message' => __('You have been awarded :points points!',[
+                    'points'=> $wheel->points
+                ]),
+            ],
+            'success' => true,
+            'message' => __('api.success'),
         ]);
     }
 }

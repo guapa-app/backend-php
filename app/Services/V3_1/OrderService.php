@@ -2,29 +2,30 @@
 
 namespace App\Services\V3_1;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
-use App\Enums\OrderStatus;
+use Carbon\Carbon;
 use App\Models\Admin;
-use App\Models\Appointment;
-use App\Models\Coupon;
 use App\Models\Order;
-use App\Models\OrderItem;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\OrderItem;
+use App\Enums\OrderStatus;
 use App\Models\UserVendor;
-use App\Notifications\AddVendorClientNotification;
-use App\Notifications\OrderNotification;
-use App\Notifications\OrderUpdatedNotification;
-use App\Services\CouponService;
-use App\Services\PaymentService;
-use App\Services\PDFService;
-use App\Services\QrCodeService;
-use Carbon\Carbon;
+use App\Models\Appointment;
 use Illuminate\Support\Arr;
+use App\Services\PDFService;
+use App\Services\CouponService;
+use App\Services\QrCodeService;
+use App\Services\PaymentService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use App\Services\LoyaltyPointsService;
+use App\Notifications\OrderNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
+use App\Notifications\OrderUpdatedNotification;
+use App\Notifications\AddVendorClientNotification;
+use App\Contracts\Repositories\OrderRepositoryInterface;
 
 class OrderService
 {
@@ -34,11 +35,15 @@ class OrderService
     protected $taxesPercentage;
     protected $couponService;
     protected $qrCodeData;
+    protected $fees;
+    protected $taxes;
+    protected $loyaltyPointsService;
 
     public function __construct(
         OrderRepositoryInterface $repository,
         PaymentService $payment_service,
-        CouponService $coupon_service
+        CouponService $coupon_service,
+        LoyaltyPointsService $loyaltyPointsService
     ) {
         $this->repository = $repository;
         $this->paymentService = $payment_service;
@@ -47,6 +52,7 @@ class OrderService
         $this->taxesPercentage = Setting::getTaxes();
         $this->fees = 0;
         $this->taxes = 0;
+        $this->loyaltyPointsService= $loyaltyPointsService;
     }
 
     public function create(array $data): Collection
@@ -140,6 +146,7 @@ class OrderService
         }
         if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
             $this->paymentService->refund($order);
+            $this->loyaltyPointsService->returnPurchasePoints($order);
         }
 
         Notification::send($user, new OrderUpdatedNotification($order));
@@ -226,6 +233,7 @@ class OrderService
 
             // Send email notifications
             $this->sendOrderNotifications($order);
+            $this->loyaltyPointsService->addPurchasePoints($order);
         }else {
             $order->status = $data['status'];
             $order->save();

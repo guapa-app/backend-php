@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\LoyaltyPointAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoyaltyPointHistory extends Model
 {
@@ -14,6 +15,13 @@ class LoyaltyPointHistory extends Model
         'points',
         'action',
         'type',
+        'sourceable_id',
+        'sourceable_type'
+    ];
+
+    protected $appends = [
+        'title',
+        'points_change'
     ];
 
     /**
@@ -24,6 +32,11 @@ class LoyaltyPointHistory extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function sourceable()
+    {
+        return $this->morphTo();
+    }
+
     /**
      * Get a human-readable representation of the point change.
      *
@@ -31,7 +44,7 @@ class LoyaltyPointHistory extends Model
      */
     public function getPointsChangeAttribute()
     {
-        return $this->points > 0 ? '+' . $this->points : $this->points;
+        return $this->points > 0 ? '+' . $this->points : '-' . $this->points;
     }
 
     /**
@@ -42,5 +55,33 @@ class LoyaltyPointHistory extends Model
     public function getFormattedDateAttribute()
     {
         return $this->created_at->format('d M Y'); // Format: 10 Oct 2024
+    }
+
+    /**
+     * Title Attribute
+     *
+     * @return void
+     */
+    public function getTitleAttribute()
+    {
+        if ($this->action == LoyaltyPointAction::PURCHASE->value) {
+            return __('Buy Product :product', [
+                'product' => $this->sourceable->title,
+            ]);
+        } else if ($this->action == LoyaltyPointAction::RETURN_PURCHASE->value) {
+            return __('Return Product :product', [
+                'product' => $this->sourceable->title,
+            ]);
+        } elseif ($this->action == LoyaltyPointAction::SPIN_WHEEL->value) {
+            return __('Spin Wheel - :wheel', [
+                'wheel' => $this->sourceable->rarity_title,
+            ]);
+        } elseif ($this->action == LoyaltyPointAction::WALLET_CHARGING->value) {
+            return __('Recharge balance - :package', [
+                'package' => $this->sourceable->name,
+            ]);
+        }
+
+        return $this->action;
     }
 }

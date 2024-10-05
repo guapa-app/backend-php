@@ -52,10 +52,10 @@ class WalletChargingPackage extends Resource
             ]),
             Number::make('Amount', 'amount')
                 ->sortable()
-                ->rules('required', 'min:0'),
+                ->rules('required', 'min:1'),
             Number::make('Points', 'points')
                 ->sortable()
-                ->rules('required', 'min:0'),
+                ->rules('required', 'min:1'),
         ];
     }
 

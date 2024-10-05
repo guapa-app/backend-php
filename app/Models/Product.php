@@ -40,7 +40,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         SoftDeletes;
 
     protected $fillable = [
-        'hash_id', 'vendor_id', 'title', 'description', 'price',
+        'hash_id', 'vendor_id', 'title', 'description', 'price', 'earned_points',
         'status', 'review', 'type', 'terms', 'url',
     ];
 
@@ -244,6 +244,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->morphMany(MarketingCampaign::class, 'campaignable');
     }
 
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
+    }
+
     public function scopeCurrentVendor($query, $value): void
     {
         $query->where('vendor_id', $value);
@@ -444,5 +449,18 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         } else {
             return $productCategory?->fixed_price ?? 0;
         }
+    }
+
+    /**
+     * Calc Product Points
+     *
+     * @return int
+     */
+    function calcProductPoints() {
+        if($this->earned_points) return $this->earned_points;
+        $conversionRate = Setting::purchasePointsConversionRate();
+        $paidAmount = $this->payment_details['fees_with_taxes'];
+        $points = (int) ($paidAmount * $conversionRate);
+        return $points;
     }
 }
