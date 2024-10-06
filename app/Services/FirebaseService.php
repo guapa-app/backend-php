@@ -14,7 +14,7 @@ class FirebaseService
     {
         // Initialize Firebase SDK with service account JSON
         $firebase = (new Factory)
-            ->withServiceAccount(config('services.firebase.credentials'));
+            ->withServiceAccount(base_path('firebase.json'));
 
         // Get Firebase Messaging
         $this->messaging = $firebase->createMessaging();
