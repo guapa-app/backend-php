@@ -52,13 +52,13 @@ class LoyaltyPointsController extends BaseApiController
 
         $conversionRate = Setting::pointsConversionRate();
 
-        $wallet = $request->user()->myWallet();
+        $totalPoints = $this->loyaltyPointsService->getTotalPoints($request->user()->id);
 
-        if ($request->points > $wallet->points) {
+        if ($request->points > $totalPoints) {
             return response()->json(['message' => __('Not enough points to convert')], 400);
         }
 
-        $pointsToConvert = min($request->points, $wallet->points);
+        $pointsToConvert = min($request->points, $totalPoints);
         $cashAmount = $pointsToConvert / $conversionRate;
 
         if ($pointsToConvert > 0) {

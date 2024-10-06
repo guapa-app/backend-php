@@ -211,6 +211,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->hasOne(Wallet::class);
     }
 
+    public function pointsWallet()
+    {
+        return $this->hasOne(PointsWallet::class);
+    }
+
     public function loyaltyPointHistory()
     {
         return $this->hasMany(LoyaltyPointHistory::class);
@@ -332,7 +337,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     }
 
     /**
-     * My Wallet
+     * User Wallet
      * Get user wallet data.
      *
      * @return Wallet
@@ -351,5 +356,27 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         }
 
         return $wallet;
+    }
+
+    /**
+     * User Points Wallet
+     * Get user wallet data.
+     *
+     * @return PointsWallet
+     */
+    public function myPointsWallet(): PointsWallet
+    {
+        // Check if the user has a points wallet
+
+        if (!$this->pointsWallet) {
+            // Create a new points wallet if it doesn't exist
+            $pointsWallet = $this->pointsWallet()->create([
+                'points' => 0,
+            ]);
+        } else {
+            $pointsWallet = $this->pointsWallet;
+        }
+
+        return $pointsWallet;
     }
 }

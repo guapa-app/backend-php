@@ -18,18 +18,7 @@ class WalletChargingPackageRepository extends EloquentRepository implements Wall
     {
         parent::__construct($model);
     }
-
-    public function all(Request $request): object
-    {
-        $query = WalletChargingPackage::query();
-
-        if ($request->has('perPage')) {
-            return $query->paginate($request->perPage);
-        } else {
-            return $query->get();
-        }
-    }
-
+    
     public function findByCode(string $code): ?WalletChargingPackage
     {
         return WalletChargingPackage::where('code', $code)->first();
