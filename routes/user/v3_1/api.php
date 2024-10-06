@@ -46,7 +46,7 @@ Route::prefix("user/v3.1")->group(function () {
 
 
     Route::middleware('auth:api')->group(function () {
-        
+
         Route::post('payment/change-status', [PaymentController::class, 'changePaymentStatus']);
 
         // Wallet Charging Packages
@@ -55,6 +55,7 @@ Route::prefix("user/v3.1")->group(function () {
         // Wheel Of Fortune
         Route::get('wheel-of-fortune', [WheelOfFortuneController::class, 'index']);
         Route::post('wheel-of-fortune/spin', [WheelOfFortuneController::class, 'spinWheel']);
+        Route::get('wheel-of-fortune/last-spin-date', [WheelOfFortuneController::class, 'lastSpinWheelDate']);
 
         // Wallet
         Route::get('wallet', [WalletController::class, 'show']);

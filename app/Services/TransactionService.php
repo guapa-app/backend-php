@@ -44,9 +44,9 @@ class TransactionService
                 'invoice_link' => $invoiceLink,
             ]);
 
-            $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
-            $transaction->invoice_link = $invoiceLink;
-            $transaction->save();
+            // $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
+            // $transaction->invoice_link = $invoiceLink;
+            // $transaction->save();
 
             DB::commit();
 

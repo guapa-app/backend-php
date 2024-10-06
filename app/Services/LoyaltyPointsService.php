@@ -31,11 +31,6 @@ class LoyaltyPointsService
      */
     public function addPoints(int $userId, int $points, string $action)
     {
-        $user = User::findOrFail($userId);
-        $wallet = $user->myWallet();
-        $wallet->points += $points;
-        $wallet->save();
-
         LoyaltyPointHistory::create([
             'user_id' => $userId,
             'points' => abs($points), // Store points as positive
@@ -51,14 +46,9 @@ class LoyaltyPointsService
      * @param int $points
      * @param string $action
      */
-    public function subtractPoints(int $userId, int $points, string $action)
+    public function subtractPoints($sourceable, int $userId, int $points, string $action)
     {
-        $user = User::findOrFail($userId);
-        $wallet = $user->myWallet();
-        $wallet->points -= $points;
-        $wallet->save();
-
-        LoyaltyPointHistory::create([
+        $sourceable->loyaltyPointHistories()->create([
             'user_id' => $userId,
             'points' => -abs($points), // Store points as negative
             'action' => $action,
@@ -77,13 +67,13 @@ class LoyaltyPointsService
     {
         $conversionRate = Setting::pointsConversionRate();
 
-        $wallet = auth()->user()->myWallet();
+        $totalPoints = $this->getTotalPoints($userId);
 
-        if ($points > $wallet->points) {
+        if ($points > $totalPoints) {
             return response()->json(['message' => __('Not enough points to convert')], 400);
         }
 
-        $pointsToConvert = min($points, $wallet->points);
+        $pointsToConvert = min($points, $totalPoints);
         $cashAmount = $pointsToConvert / $conversionRate;
 
         if ($pointsToConvert > 0) {
@@ -99,10 +89,9 @@ class LoyaltyPointsService
             // Call the service to create the transaction
             $transaction = $this->transactionService->createTransaction($userId, $amount, $transactionType);
 
-            $wallet->balance += $cashAmount;
-            $wallet->save();
+            $user = User::find($userId)->first();
 
-            $this->subtractPoints($userId, $points, LoyaltyPointAction::CONVERSION->value);
+            $this->subtractPoints($user->myPointsWallet(), $userId, $points, LoyaltyPointAction::CONVERSION->value);
 
             return new TransactionResource($transaction);
         }
@@ -236,7 +225,7 @@ class LoyaltyPointsService
         foreach ($items as $item) {
             $product = $item->product;
             $loyaltyHistories = $product->loyaltyPointHistories()->where('type', 'added')
-            ->orderBy('id', 'desc')->get();
+                ->orderBy('id', 'desc')->get();
             foreach ($loyaltyHistories as $history) {
                 $product->loyaltyPointHistories()->create([
                     'user_id' => $order->user_id,

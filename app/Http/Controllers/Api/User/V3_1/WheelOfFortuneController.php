@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\WheelOfFortune;
 use App\Services\LoyaltyPointsService;
 use App\Services\WheelOfFortuneService;
+use App\Http\Resources\WheelOfFortuneResource;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Contracts\Repositories\WheelOfFortuneInterface;
-use App\Http\Resources\User\V3_1\WheelOfFortuneCollection;
 
 class WheelOfFortuneController extends BaseApiController
 {
@@ -34,7 +34,7 @@ class WheelOfFortuneController extends BaseApiController
     {
         $wheelOfFortunes = $this->wheelOfFortuneRepository->all($request);
 
-        return WheelOfFortuneCollection::make($wheelOfFortunes)
+        return WheelOfFortuneResource::collection($wheelOfFortunes)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -74,9 +74,37 @@ class WheelOfFortuneController extends BaseApiController
 
         return response()->json([
             'data' => [
-                'message' => __('You have been awarded :points points!',[
-                    'points'=> $wheel->points
+                'message' => __('You have been awarded :points points!', [
+                    'points' => $wheel->points
                 ]),
+            ],
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
+    }
+
+    public function lastSpinWheelDate(Request $request)
+    {
+        $userId = $request->user()->id();
+
+        // Check if the customer has already spun today
+        $lastSpin = WheelSpin::where('user_id', $userId)
+            ->orderBy('spin_date', 'desc')
+            ->first();
+
+        if ($lastSpin) {
+            return response()->json([
+                'data' => [
+                    'date' => $lastSpin->spin_date->format('Y-m-d H:i:s'),
+                ],
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+        }
+
+        return response()->json([
+            'data' => [
+                'date' => "",
             ],
             'success' => true,
             'message' => __('api.success'),

@@ -38,7 +38,7 @@ class WalletChargingPackage extends Model implements Listable
     {
         return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
     }
-    
+
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');
@@ -64,6 +64,11 @@ class WalletChargingPackage extends Model implements Listable
     }
 
     public function scopeWithSingleRelations(Builder $query): Builder
+    {
+        return $query;
+    }
+
+    public function scopewithApiListRelations(Builder $query, Request $request): Builder
     {
         return $query;
     }
