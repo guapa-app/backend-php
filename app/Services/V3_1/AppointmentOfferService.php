@@ -67,9 +67,15 @@ class AppointmentOfferService
 
                 /* Create new invoice for the appointment offer */
                 $appointmentPrice = Taxonomy::find($request->taxonomy_id)?->appointment_price;
+                $taxes = (Setting::getTaxes() / 100) * $appointmentPrice;
                 $invoice = (new PaymentService())->generateInvoice($appointmentOffer, "Appointment app fees",
-                    $appointmentPrice, 0);
-                $appointmentOffer->update(['invoice_url' => $invoice->url]);
+                    $appointmentPrice, $taxes);
+                $application_fees  = $appointmentPrice + $taxes;
+
+                $appointmentOffer->update([
+                    'invoice_url' => $invoice->url,
+                    'application_fees' => $application_fees
+                ]);
 
                 return $this->loadAppointmentOffer($appointmentOffer);
             });
@@ -118,7 +124,6 @@ class AppointmentOfferService
             $order->save();
 
             $appointmentOffer->update([
-                'status' => AppointmentOfferEnum::Paid_Application_Fees->value,
                 'total' => $total
             ]);
 
