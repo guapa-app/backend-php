@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\Vendor\V3_1\DataController;
+use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
 use App\Http\Controllers\Api\Vendor\V3_1\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix("vendor/v3.1")->group(function () {
+Route::prefix('vendor/v3.1')->group(function () {
     Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
 
     Route::prefix('auth')->group(base_path('routes/vendor/v3_1/api/auth.php'));
@@ -27,6 +27,7 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::prefix('taxonomies')->group(base_path('routes/vendor/v3_1/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/vendor/v3_1/api/notifications.php'));
     Route::prefix('')->group(base_path('routes/vendor/v3_1/api/support.php'));
+    Route::prefix('')->group(base_path('routes/vendor/v3_1/api/doctors.php')); //sub-vendors
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);

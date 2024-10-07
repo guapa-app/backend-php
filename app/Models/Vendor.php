@@ -84,7 +84,7 @@ class Vendor extends Model implements HasMedia, HasReviews
      * @var array
      */
     protected $filterable = [
-        'status', 'verified',
+        'status', 'verified', 'parent_id',
     ];
 
     /**
