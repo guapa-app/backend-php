@@ -107,7 +107,7 @@ class AppointmentOfferService
 
             $order = $appointmentOfferDetail->order()->create([
                 'user_id' => $appointmentOffer->user_id,
-                'vendor_id' => $appointmentOffer->vendor_id,
+                'vendor_id' => $appointmentOfferDetail->vendor_id,
                 'type' => OrderTypeEnum::Appointment->value,
                 'total' => $total
             ]);
