@@ -175,8 +175,12 @@ class VendorService
 
     public function updateLogo(Vendor $vendor, array $data): Vendor
     {
-        if (isset($data['logo']) && $data['logo'] instanceof UploadedFile) {
-            $vendor->addMedia($data['logo'])->toMediaCollection('logos');
+        if (isset($data['logo'])) {
+            if ($data['logo'] instanceof UploadedFile) {
+                $vendor->addMedia($data['logo'])->toMediaCollection('logos');
+            } elseif (is_string($data['logo']) && str_contains($data['logo'], ';base64')) {
+                $vendor->addMediaFromBase64($data['logo'])->toMediaCollection('logos');
+            }
         } elseif ($this->vendorRepository->isAdmin() && !isset($data['logo']) || isset($data['remove_logo']) && $data['remove_logo'] === true) {
             // Delete all vendor media
             // As there is only one collection - logos

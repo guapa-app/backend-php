@@ -139,8 +139,12 @@ class UserService
 
     public function updatePhoto(UserProfile $profile, array $data): UserProfile
     {
-        if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
-            $profile->addMedia($data['photo'])->toMediaCollection('avatars');
+        if (isset($data['photo'])) {
+            if ($data['photo'] instanceof UploadedFile) {
+                $profile->addMedia($data['photo'])->toMediaCollection('avatars');
+            } elseif (is_string($data['photo']) && str_contains($data['photo'], ';base64')) {
+                $profile->addMediaFromBase64($data['photo'])->toMediaCollection('avatars');
+            }
         } elseif ($this->userRepository->isAdmin() && !isset($data['photo']) || isset($data['remove_photo']) && $data['remove_photo'] === true ) {
             // Delete all profile media
             // As there is only one collection - avatars

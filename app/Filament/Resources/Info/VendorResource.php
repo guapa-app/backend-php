@@ -72,7 +72,8 @@ class VendorResource extends Resource
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
                 Tables\Columns\SelectColumn::make('status')
-                    ->options(Vendor::STATUSES),
+                    ->options(Vendor::STATUSES)
+                    ->rules(['required']),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
