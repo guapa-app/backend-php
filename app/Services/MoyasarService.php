@@ -79,9 +79,22 @@ class MoyasarService
      */
     public function isPaymentPaidSuccessfully($payment_id)
     {
-        $paymentService = new MoyasarPaymentService();
-        $paymentService = $paymentService->fetch($payment_id);
-        if ($paymentService->status == 'paid') return true;
-        return false;
+        try {
+            $paymentService = new MoyasarPaymentService();
+            $payment = $paymentService->fetch($payment_id);
+
+            if ($payment->status == 'paid') {
+                return true;
+            }
+            return false;
+
+        } catch (\Exception $e) {
+            // Log the error message if needed
+            \Log::error('Payment fetch failed: ' . $e->getMessage());
+
+            // Return false or throw a custom error message
+            return false;
+        }
     }
+
 }
