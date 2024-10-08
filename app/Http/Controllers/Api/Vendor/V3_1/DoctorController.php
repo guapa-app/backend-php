@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Http\Controllers\Api\VendorController as ApiVendorController;
 use App\Http\Requests\Vendor\V3_1\DoctorRequest;
+use App\Http\Requests\Vendor\V3_1\UpdateDoctorRequest;
 use App\Http\Resources\Vendor\V3_1\DoctorCollection;
 use App\Http\Resources\Vendor\V3_1\DoctorResource;
 use App\Services\V3\UserService;
@@ -53,6 +54,34 @@ class DoctorController extends ApiVendorController
         DB::commit();
 
         return DoctorResource::make($record)
+            ->additional([
+                'success' => true,
+                'message' => 'Doctor Added Successfully',
+            ]);
+    }
+
+    public function edit(UpdateDoctorRequest $request, $vendorId, $doctorId)
+    {
+        $vendor = $this->vendorRepository->getOneOrFail($doctorId);
+
+        abort_unless(($vendorId == $vendor->parent_id), 403, message: 'Invalid Doctor Id');
+
+        DB::beginTransaction();
+        // handle user data
+        $data = $this->userService->handleUserData($request->validated());
+        // update vendor data
+        $vendor = $this->vendorService->editDoctor($request->validated() + ['parent_id' => $this->authVendor()->id], $vendor);
+
+        // update user data
+        $user = $vendor->staff->first();
+        $this->userService->update($user, $data);
+
+        // update email for user vendor relation
+        $user->pivot->update(['email' => $data['email']]);
+
+        DB::commit();
+
+        return DoctorResource::make($vendor)
             ->additional([
                 'success' => true,
                 'message' => 'Doctor Added Successfully',
