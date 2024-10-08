@@ -32,24 +32,54 @@ class UserService extends BaseUserService
         return $user;
     }
 
+    public function update($id, array $data): User
+    {
+        // Create user
+        $user = $this->userRepository->update($id, $data);
+
+        // Update profile
+        if (isset($data['profile'])) {
+            $this->updateProfile($user, (array)$data['profile']);
+        }
+
+        return $user;
+    }
+
     public function handleUserData(mixed $data): array
     {
-        // Split the string by spaces
-        $nameParts = explode(' ', $data['name']);
-        // Assign the first and last name
-        $firstName = $nameParts[0];
-        $lastName = $nameParts[1] ?? '';
+        $result = [];
 
-        return [
-            'name'          => $data['name'],
-            'email'         => $data['email'] ?? null,
-            'phone'         => $data['phone'],
-            'profile'       => [
+        if (isset($data['name'])) {
+            // Split the string by spaces
+            $nameParts = explode(' ', $data['name']);
+            // Assign the first and last name
+            $firstName = $nameParts[0];
+            $lastName = $nameParts[1] ?? '';
+
+            $result['name'] = $data['name'];
+            $result['profile'] = [
                 'firstname'     => $firstName,
                 'lastname'      => $lastName,
-                'gender'        => $data['gender'] ?? null,
-            ],
-        ];
+            ];
+        }
+
+        if (isset($data['gender'])) {
+            $result['profile']['gender'] = $data['gender'];
+        }
+
+        if ($photo = $data['photo'] ?? $data['logo'] ?? null) {
+            $result['profile']['photo'] = $photo;
+        }
+
+        if (isset($data['email'])) {
+            $result['email'] = $data['email'];
+        }
+
+        if (isset($data['phone'])) {
+            $result['phone'] = $data['phone'];
+        }
+
+        return $result;
     }
 
     public function checkUserCredentials($token)

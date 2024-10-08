@@ -46,6 +46,52 @@ class VendorService extends BaseVendorService
         });
     }
 
+    public function addDoctor(array $data, $user): Vendor
+    {
+        $data['status'] = array_flip(Vendor::STATUSES)['active'];
+
+        $vendor = $this->vendorRepository->create($data);
+
+        if (isset($data['logo'])) {
+            $this->updateLogo($vendor, ['logo' => $data['logo']]);
+        }
+
+        if (isset($data['specialty_ids'])) {
+            $this->updateSpecialties($vendor, $data['specialty_ids']);
+        }
+
+        $vendor->users()->create([
+            'user_id' => $user->id,
+            'role' => 'doctor',
+            'email' => $user->email,
+        ]);
+
+        $vendor->loadMissing('logo');
+
+        return $vendor;
+    }
+
+    public function editDoctor(array $data, $id): Vendor
+    {
+        if (isset($data['status'])) {
+            $data['status'] = array_flip(Vendor::STATUSES)[$data['status']];
+        }
+
+        $vendor = $this->vendorRepository->update($id, $data);
+
+        if (isset($data['logo'])) {
+            $this->updateLogo($vendor, ['logo' => $data['logo']]);
+        }
+
+        if (isset($data['specialty_ids'])) {
+            $this->updateSpecialties($vendor, $data['specialty_ids']);
+        }
+
+        $vendor->loadMissing('logo');
+
+        return $vendor;
+    }
+
     public function addStaff(Vendor $vendor, $data): User
     {
         $data = $this->normalizeStaffData($vendor, $data);

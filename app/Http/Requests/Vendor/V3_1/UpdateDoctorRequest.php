@@ -7,7 +7,7 @@ use App\Http\Requests\FailedValidationRequest;
 use App\Models\Setting;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class DoctorRequest extends FailedValidationRequest
+class UpdateDoctorRequest extends FailedValidationRequest
 {
     public function authorize()
     {
@@ -33,10 +33,11 @@ class DoctorRequest extends FailedValidationRequest
         $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation();
 
         $rules = [
-            'name' => 'required|string|min:5|max:150',
-            'email' => 'required|email|unique:vendors,email,unique:users,email',
-            'phone' => 'required|unique:vendors,phone,unique:users,phone' . $phoneNumbersRule,
+            'name' => 'nullable|string|min:5|max:150',
+            'email' => 'nullable|email|unique:vendors,email,' . $this->doctor,
+            'phone' => 'nullable|unique:vendors,phone,' . $this->doctor . 'phone' . $phoneNumbersRule,
             'about' => 'nullable|string|min:10|max:1024',
+            'status' => 'nullable|string|in:active,closed',
 
             'specialty_ids' => 'sometimes|array|min:1',
             'specialty_ids.*' => 'integer|exists:taxonomies,id',
