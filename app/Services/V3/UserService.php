@@ -45,6 +45,7 @@ class UserService extends BaseUserService
                 'firstname'     => $firstName,
                 'lastname'      => $lastName,
                 'gender'        => $data['gender'] ?? null,
+                'photo'         => $data['photo'] ?? $data['logo'] ?? null,
             ],
         ];
     }

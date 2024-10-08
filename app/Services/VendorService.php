@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Redis;
  */
 class VendorService
 {
-    private $vendorRepository;
-    private $userRepository;
+    protected $vendorRepository;
+    protected $userRepository;
 
     public function __construct(VendorRepositoryInterface $vendorRepository, UserRepositoryInterface $userRepository)
     {

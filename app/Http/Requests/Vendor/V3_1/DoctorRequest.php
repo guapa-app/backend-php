@@ -3,11 +3,16 @@
 namespace App\Http\Requests\Vendor\V3_1;
 
 use App\Helpers\Common;
+use App\Http\Requests\FailedValidationRequest;
 use App\Models\Setting;
-use Illuminate\Foundation\Http\FormRequest;
 
-class DoctorRequest extends FormRequest
+class DoctorRequest extends FailedValidationRequest
 {
+    public function authorize()
+    {
+        return $this->user()->vendor->id == request()->vendor;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
