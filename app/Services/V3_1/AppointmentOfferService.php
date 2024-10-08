@@ -4,8 +4,7 @@ namespace App\Services\V3_1;
 
 use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderTypeEnum;
-use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
-use App\Http\Requests\V3_1\Vendor\AcceptAppointmentRequest;
+use App\Http\Requests\V3_1\User\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
 use App\Models\Order;
@@ -92,9 +91,10 @@ class AppointmentOfferService
 
         return $appointmentOfferDetails;
     }
-    public function accept(AppointmentOfferDetail $appointmentOfferDetail): Order
+    public function accept($OfferDetailID): Order
     {
-        return DB::transaction(function () use ($appointmentOfferDetail) {
+        return DB::transaction(function () use ($OfferDetailID) {
+            $appointmentOfferDetail = AppointmentOfferDetail::findOrfail($OfferDetailID);
             $appointmentOffer = $appointmentOfferDetail->appointmentOffer;
 
             $description = "Order invoice";
@@ -122,8 +122,9 @@ class AppointmentOfferService
         });
     }
 
-    public function reject(AppointmentOfferDetail $appointmentOfferDetail): void
+    public function reject($OfferDetailID): void
     {
+        $appointmentOfferDetail = AppointmentOfferDetail::findOrfail($OfferDetailID);
         $appointmentOfferDetail->update(['status' => AppointmentOfferEnum::Reject->value]);
     }
 

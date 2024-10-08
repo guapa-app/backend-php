@@ -74,22 +74,4 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
             ->firstOrFail();
     }
 
-    public function store(AppointmentOfferRequest $request): AppointmentOffer
-    {
-        return $this->appointmentOfferService->create($request);
-    }
-
-    public function accept(Request $request): Order
-    {
-        return $this->appointmentOfferService->accept(
-            AppointmentOfferDetail::findOrfail($request->appointment_offer_detail_id)
-        );
-    }
-
-    public function reject(Request $request): void
-    {
-        $this->appointmentOfferService->reject(
-            AppointmentOfferDetail::findOrfail($request->appointment_offer_detail_id)
-        );
-    }
 }
