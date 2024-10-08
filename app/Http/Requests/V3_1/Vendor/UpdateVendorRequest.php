@@ -111,8 +111,9 @@ class UpdateVendorRequest extends FailedValidationRequest
             'work_days.*'           => 'required|integer|min:0|max:6',
 
             // Appointments array validation (optional)
-            'appointments'          => 'sometimes|required|array|min:1',
-            'appointments.*'        => 'required|array|min:2',
+            'accept_appointment'       => 'sometimes|boolean',
+            'appointments'             => 'sometimes|required|array|min:1',
+            'appointments.*'           => 'required|array|min:2',
             'appointments.*.from_time' => 'required|date_format:H:i:s',
             'appointments.*.to_time'   => 'required|date_format:H:i:s',
         ];
