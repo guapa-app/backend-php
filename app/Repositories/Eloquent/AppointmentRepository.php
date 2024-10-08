@@ -9,6 +9,7 @@ use App\Models\AppointmentOffer;
 use App\Models\AppointmentOfferDetail;
 use App\Models\Order;
 use App\Services\V3_1\AppointmentOfferService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class AppointmentRepository extends EloquentRepository implements AppointmentOfferRepositoryInterface
@@ -54,6 +55,23 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
         }
         return $query->get();
 
+    }
+
+    public function getOneWithRelations(int $id, $where = []): ?AppointmentOffer
+    {
+        if ($id > 0) {
+            $where['id'] = $id;
+        }
+        $user = auth('api')->user();
+        $vendor = $user->vendor ?? null;
+        return $this->model->where($where)
+            ->withSingleRelations()
+            ->when($vendor, function ($query) use ($vendor) {
+                $query->with(['details' => function ($query) use ($vendor) {
+                    $query->where('vendor_id', $vendor->id);
+                }]);
+            })
+            ->firstOrFail();
     }
 
     public function store(AppointmentOfferRequest $request): AppointmentOffer
