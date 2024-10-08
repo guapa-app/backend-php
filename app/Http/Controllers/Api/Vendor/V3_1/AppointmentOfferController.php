@@ -4,16 +4,25 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
+use App\Http\Requests\V3_1\Vendor\AcceptAppointmentRequest;
 use App\Http\Resources\Vendor\V3_1\AppointmentOfferCollection;
+use App\Http\Resources\Vendor\V3_1\AppointmentOfferDetailsResource;
 use App\Http\Resources\Vendor\V3_1\AppointmentOfferResource;
+use App\Services\V3_1\AppointmentOfferService;
 use Illuminate\Http\Request;
 
 class AppointmentOfferController extends BaseApiController
 {
-    public function __construct(public AppointmentOfferRepositoryInterface $appointmentOfferRepository)
+    protected $appointmentOfferRepository;
+    protected $appointmentOfferService;
+    public function __construct(
+        AppointmentOfferRepositoryInterface $appointmentOfferRepository,
+        AppointmentOfferService $appointmentOfferService
+    )
     {
         parent::__construct();
+        $this->appointmentOfferRepository = $appointmentOfferRepository;
+        $this->appointmentOfferService = $appointmentOfferService;
     }
 
     public function index(Request $request): AppointmentOfferCollection
@@ -34,9 +43,10 @@ class AppointmentOfferController extends BaseApiController
             ]);
     }
 
-    public function store(AppointmentOfferRequest $request): AppointmentOfferResource
+    public function approveAppointmentOffer(AcceptAppointmentRequest $request): AppointmentOfferDetailsResource
     {
-        return AppointmentOfferResource::make($this->appointmentOfferRepository->store($request))
+        $data = $request->validated();
+        return AppointmentOfferDetailsResource::make($this->appointmentOfferService->approveAppointmentOffer($data))
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),

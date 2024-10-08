@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
+use App\Http\Requests\V3_1\User\AppointmentOfferRequest;
 use App\Http\Resources\User\V3_1\AppointmentOfferCollection;
 use App\Http\Resources\User\V3_1\AppointmentOfferResource;
 use App\Http\Resources\User\V3_1\OrderResource;

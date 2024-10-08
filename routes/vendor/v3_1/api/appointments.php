@@ -7,5 +7,5 @@ Route::prefix('offers')->controller(AppointmentOfferController::class)
     ->middleware('auth:api')->group(function () {
         Route::get('/', 'index');
         Route::get('/{id}', 'show');
-        Route::post('/', 'store');
+        Route::post('/', 'approveAppointmentOffer');
     });
