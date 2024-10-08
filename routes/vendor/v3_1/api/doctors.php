@@ -7,5 +7,5 @@ Route::group(['middleware' => 'auth:api', 'prefix' => '{vendor}/doctors', 'as' =
     Route::get('/', [DoctorController::class, 'list'])->name('list');
     Route::get('/{doctor}', [DoctorController::class, 'show'])->name('show');
     Route::post('/', [DoctorController::class, 'add'])->name('create');
-//    Route::match(['put', 'patch', 'post'], '/{doctor}', [DoctorController::class, 'update'])->name('update');
+    Route::match(['put', 'patch', 'post'], '/{doctor}', [DoctorController::class, 'edit'])->name('edit');
 });
