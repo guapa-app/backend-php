@@ -27,7 +27,7 @@ class VendorProfileResource extends JsonResource
             'health_declaration'                        => (string) $this->health_declaration,
 
             'shared_link'                               => (string) $this->shared_link,
-
+            'accept_appointment'                       => (bool) $this->accept_appointment,
             'work_days'                                 => WorkDayResource::collection($this->whenLoaded('workDays')),
             'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),
             'logo'                                      => MediaResource::make($this->whenLoaded('logo')),
