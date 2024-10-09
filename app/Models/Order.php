@@ -33,7 +33,7 @@ class Order extends Model implements Listable
      * @var array
      */
     protected $filterable = [
-        'status', 'user_id', 'vendor_id',
+        'status', 'user_id', 'vendor_id','type'
     ];
 
     /**
@@ -103,7 +103,7 @@ class Order extends Model implements Listable
     {
         return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
     }
-    
+
     public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
@@ -121,9 +121,9 @@ class Order extends Model implements Listable
             $request = new Request($filter);
         }
 
-        if ($request->has('user_id')) {
-            $query->forUserWithFilteredItems();
-        }
+//        if ($request->has('user_id')) {
+//            $query->forUserWithFilteredItems();
+//        }
 
         $query->dateRange($request->get('startDate'), $request->get('endDate'));
 
@@ -150,7 +150,7 @@ class Order extends Model implements Listable
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies',
-            'items.product.media', 'appointmentForms.values', 'staff');
+            'items.product.media', 'appointmentOfferDetails', 'staff');
 
         return $query;
     }
@@ -163,7 +163,7 @@ class Order extends Model implements Listable
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user',
-            'appointmentForms.values', 'staff');
+            'appointmentOfferDetails', 'staff');
 
         return $query;
     }
@@ -207,15 +207,9 @@ class Order extends Model implements Listable
         return $this->belongsTo(User::class, 'staff_id');
     }
 
-    public function appointmentForm(): BelongsTo
+    public function appointmentOfferDetails(): BelongsTo
     {
-        return $this->belongsTo(AppointmentOffer::class);
+        return $this->belongsTo(AppointmentOfferDetail::class, 'appointment_offer_detail_id', 'id');
     }
 
-    public function appointmentForms(): BelongsToMany
-    {
-        return $this->belongsToMany(AppointmentForm::class, 'order_appointments')
-            ->withPivot('key', 'answer', 'appointment_form_value_id')
-            ->withTimestamps();
-    }
 }
