@@ -27,7 +27,6 @@ class OrderResource extends JsonResource
             'address' => AddressResource::make($this->whenLoaded('address')),
             'vendor' => VendorResource::make($this->whenLoaded('vendor')),
             'staff' => UserResource::make($this->whenLoaded('staff')),
-
             'appointment' => AppointmentOfferDetailsResource::make($this->whenLoaded('appointmentOfferDetails')),
         ];
     }
