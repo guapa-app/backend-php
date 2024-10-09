@@ -85,7 +85,7 @@ class WheelOfFortuneController extends BaseApiController
 
     public function lastSpinWheelDate(Request $request)
     {
-        $userId = $request->user()->id();
+        $userId = $request->user()->id;
 
         // Check if the customer has already spun today
         $lastSpin = WheelSpin::where('user_id', $userId)
@@ -93,13 +93,16 @@ class WheelOfFortuneController extends BaseApiController
             ->first();
 
         if ($lastSpin) {
-            return response()->json([
-                'data' => [
-                    'date' => $lastSpin->spin_date->format('Y-m-d H:i:s'),
-                ],
-                'success' => true,
-                'message' => __('api.success'),
-            ]);
+            $spinDate = Carbon::parse($lastSpin->spin_date);
+            if ($spinDate->diffInHours(Carbon::now()) < 24) {
+                return response()->json([
+                    'data' => [
+                        'date' => $lastSpin->spin_date->format('Y-m-d H:i:s'),
+                    ],
+                    'success' => true,
+                    'message' => __('api.success'),
+                ]);
+            }
         }
 
         return response()->json([
