@@ -72,12 +72,12 @@ class Post extends Model implements Listable, HasMedia
 
     public function admin()
     {
-        return $this->belongsTo(Admin::class);
+        return $this->belongsTo(Admin::class)->withDefault();
     }
 
     public function category()
     {
-        return $this->belongsTo(Taxonomy::class, 'category_id');
+        return $this->belongsTo(Taxonomy::class, 'category_id')->withDefault();
     }
 
     public function socialMedia(): BelongsToMany
