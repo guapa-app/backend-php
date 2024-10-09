@@ -13,6 +13,7 @@ class VendorResource extends JsonResource
             'staff_id'                                  => $this->staff_id,
             'name'                                      => (string) $this->name,
             'verified'                                  => (bool) $this->verified,
+            'is_child'                                  => (bool) $this->parent_id,
             'is_deleted'                                => (bool) $this->deleted_at,
             'status'                                    => $this->resource::STATUSES[$this->status],
             'type'                                      => $this->resource::TYPES[$this->type],
