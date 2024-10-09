@@ -93,13 +93,16 @@ class WheelOfFortuneController extends BaseApiController
             ->first();
 
         if ($lastSpin) {
-            return response()->json([
-                'data' => [
-                    'date' => $lastSpin->spin_date->format('Y-m-d H:i:s'),
-                ],
-                'success' => true,
-                'message' => __('api.success'),
-            ]);
+            $spinDate = Carbon::parse($lastSpin->spin_date);
+            if ($spinDate->diffInHours(Carbon::now()) < 24) {
+                return response()->json([
+                    'data' => [
+                        'date' => $lastSpin->spin_date->format('Y-m-d H:i:s'),
+                    ],
+                    'success' => true,
+                    'message' => __('api.success'),
+                ]);
+            }
         }
 
         return response()->json([
