@@ -13,6 +13,7 @@ class AppointmentOfferDetailsResource extends JsonResource
             'appointmentOffer' => AppointmentOfferResource::make($this->whenLoaded('appointmentOffer')),
             'vendor' => VendorResource::make($this->whenLoaded('vendor')),
             'status' => $this->status,
+            'qr_code_link' => $this->qrCode?->url,
             'offer_price' => (float) $this->offer_price,
             'reject_reason' => $this->reject_reason,
             'staff_notes' => $this->staff_notes,

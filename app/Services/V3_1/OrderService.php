@@ -2,6 +2,8 @@
 
 namespace App\Services\V3_1;
 
+use App\Enums\AppointmentOfferEnum;
+use App\Enums\OrderTypeEnum;
 use Carbon\Carbon;
 use App\Models\Admin;
 use App\Models\Order;
@@ -61,6 +63,8 @@ class OrderService
             $productIds = array_column($data['products'], 'id');
             $products = Product::whereIn('id', $productIds)->get();
 
+            // get order type from product type
+            $data['type'] = $products->first()->type;
             // Apply coupon if provided
             $couponResult = null;
             if (isset($data['coupon_code'])) {
@@ -230,6 +234,15 @@ class OrderService
                 $order->invoice_url = (new PDFService)->addInvoicePDF($order);
             }
             $order->save();
+
+            if ($order->type == OrderTypeEnum::Appointment->value) {
+                $order->appointmentOfferDetails->update([
+                    'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value,
+                ]);
+                $order->appointmentOfferDetails->appointmentOffer->update([
+                    'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value,
+                ]);
+            }
 
             // Send email notifications
             $this->sendOrderNotifications($order);

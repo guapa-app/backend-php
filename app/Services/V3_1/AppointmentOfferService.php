@@ -15,6 +15,7 @@ use App\Models\UserVendor;
 use App\Notifications\AppointmentOfferNotification;
 use App\Services\MediaService;
 use App\Services\PaymentService;
+use App\Services\QrCodeService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -113,6 +114,23 @@ class AppointmentOfferService
             $invoice = (new PaymentService())->generateInvoice($order, $description, $fees, $taxes);
             $order->invoice_url = $invoice->url;
             $order->save();
+
+            $qrCodeData = [
+                'hash_id'                   => $order->hash_id,
+                'order_id'                  => $order->id,
+                'client_name'               => auth()->user()?->name,
+                'client_phone'              => auth()->user()?->phone,
+                'vendor_name'               => $order->vendor?->name,
+                'paid_amount'               => $order->paid_amount,
+                'remain_amount'             => $order->remaining_amount,
+                'title'                     => $appointmentOffer->taxonomy->title,
+                'item_price'                => $appointmentOfferDetail->offer_price,
+                'item_price_after_discount' => null,
+                'item_image'                => null
+            ];
+            $qrCodeImage = (new QrCodeService())->generate($qrCodeData);
+
+            $appointmentOfferDetail->addMediaFromString($qrCodeImage)->toMediaCollection('appointment_details');
 
             $appointmentOffer->update([
                 'total' => $total

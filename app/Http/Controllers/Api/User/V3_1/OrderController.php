@@ -49,6 +49,7 @@ class OrderController extends BaseApiController
     public function index(GetOrdersRequest $request)
     {
         $request->merge(['user_id' => $this->user->id]);
+
         $orders = $this->orderRepository->all($request);
 
         return OrderCollection::make($orders)

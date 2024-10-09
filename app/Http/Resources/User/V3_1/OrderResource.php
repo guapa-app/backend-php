@@ -11,6 +11,7 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
             'hash_id' => (string) $this->hash_id,
             'total' => (float) $this->total,
             'paid_amount_with_taxes' => (float) $this->paid_amount_with_taxes,
@@ -26,7 +27,8 @@ class OrderResource extends JsonResource
             'address' => AddressResource::make($this->whenLoaded('address')),
             'vendor' => VendorResource::make($this->whenLoaded('vendor')),
             'staff' => UserResource::make($this->whenLoaded('staff')),
-            'appointments' => AppointmentFormResource::collection($this->whenLoaded('appointments')),
+
+            'appointment' => AppointmentOfferDetailsResource::make($this->whenLoaded('appointmentOfferDetails')),
         ];
     }
 }
