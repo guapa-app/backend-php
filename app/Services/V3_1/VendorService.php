@@ -42,7 +42,7 @@ class VendorService extends BaseVendorService
     public function editDoctor(array $data, $id): Vendor
     {
         if (isset($data['status'])) {
-            $data['status'] = array_flip(Vendor::STATUSES)[$data['status']];
+            $data['status'] = (string)array_flip(Vendor::STATUSES)[$data['status']];
         }
 
         $vendor = $this->vendorRepository->update($id, $data);

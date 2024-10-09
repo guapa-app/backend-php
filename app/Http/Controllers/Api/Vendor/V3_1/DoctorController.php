@@ -77,7 +77,9 @@ class DoctorController extends ApiVendorController
         $this->userService->update($user, $data);
 
         // update email for user vendor relation
-        $user->pivot->update(['email' => $data['email']]);
+        if (isset($data['email'])) {
+            $user->pivot->update(['email' => $data['email']]);
+        }
 
         DB::commit();
 
