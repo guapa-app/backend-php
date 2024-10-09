@@ -85,7 +85,7 @@ class WheelOfFortuneController extends BaseApiController
 
     public function lastSpinWheelDate(Request $request)
     {
-        $userId = $request->user()->id();
+        $userId = $request->user()->id;
 
         // Check if the customer has already spun today
         $lastSpin = WheelSpin::where('user_id', $userId)
