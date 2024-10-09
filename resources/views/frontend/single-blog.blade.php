@@ -71,7 +71,7 @@
 
                     <div class="flex-data">
                         <span class="badge" style="width: auto;">
-                            {{ $post->category->title }}
+                            {{ $post->category?->title }}
                         </span>
 
                         <div class="date">
