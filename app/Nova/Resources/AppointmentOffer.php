@@ -16,7 +16,7 @@ class AppointmentOffer extends Resource
      * @var string
      */
     public static $model = \App\Models\AppointmentOffer::class;
-    public static $displayInNavigation = false;
+    public static $displayInNavigation = true;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
