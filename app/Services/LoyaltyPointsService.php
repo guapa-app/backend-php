@@ -236,4 +236,32 @@ class LoyaltyPointsService
             }
         }
     }
+
+
+    /**
+     * Add Friend Registrations Points
+     *
+     * @param  User $inviter
+     * @param  User $invitee
+     * @return void
+     */
+    public function addFriendRegistrationsPoints(User $inviter, User $invitee)
+    {
+        $inviterPoints = Setting::inviterEarndPoints();
+        $inviteePoints = Setting::inviteeEarndPoints();
+
+        $inviter->loyaltyPointHistories()->create([
+            'user_id' => $invitee->id,
+            'points' => abs($inviteePoints),
+            'action' => LoyaltyPointAction::FRIENDS_REGISTRATIONS->value,
+            'type' => 'added',
+        ]);
+
+        $invitee->loyaltyPointHistories()->create([
+            'user_id' => $inviter->id,
+            'points' => abs($inviterPoints),
+            'action' => LoyaltyPointAction::FRIENDS_REGISTRATIONS->value,
+            'type' => 'added',
+        ]);
+    }
 }

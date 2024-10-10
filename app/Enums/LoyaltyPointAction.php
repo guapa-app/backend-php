@@ -10,4 +10,5 @@ enum LoyaltyPointAction: string
     case CONVERSION = 'conversion';
     case WALLET_CHARGING = 'wallet_charging';
     case SPIN_WHEEL = 'spin_wheel';
+    case FRIENDS_REGISTRATIONS = 'friends_registrations';
 }

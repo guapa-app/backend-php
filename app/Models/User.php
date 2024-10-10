@@ -226,6 +226,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->hasMany(Order::class);
     }
 
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
+    }
+
     public function scopeCurrentVendor($query, $value): void
     {
         $query->whereRelation('userVendors', 'vendor_id', '=', $value);

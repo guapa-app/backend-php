@@ -13,6 +13,7 @@ use App\Models\UserProfile;
  * @bodyParam email     string Email address. Example: user@example.com
  * @bodyParam password string required Password. Example: 445566332255
  * @bodyParam password_confirmation string required Password confirmation. Example 445566332255
+ * @bodyParam referral_code string inviter referral code
  */
 class RegisterRequest extends FailedValidationRequest
 {
@@ -47,6 +48,7 @@ class RegisterRequest extends FailedValidationRequest
             'email' => 'sometimes|required|email|unique:users,email',
             'phone' => 'required|unique:users,phone|'.(Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
             'gender' => 'nullable|string|in:'.implode(',', UserProfile::GENDER),
+            'referral_code' => 'nullable|exists:user_profiles,referral_code',
         ];
     }
 }

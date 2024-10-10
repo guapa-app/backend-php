@@ -54,4 +54,16 @@ class UserController extends ApiUserController
             ], __('api.contact_support'), 422);
         }
     }
+
+    public function getReferralCode(Request $request)
+    {
+        $referralCode = $request->user()->profile->getReferralCode();
+        return response()->json([
+            'data' => [
+                'referral_code' => $referralCode
+            ],
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
+    }
 }

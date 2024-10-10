@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Contracts\Repositories\UserRepositoryInterface;
-use App\Exceptions\ApiException;
-use App\Exceptions\PhoneNotVerifiedException;
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\PhoneRequest;
-use App\Http\Requests\V3_1\User\LoginRequest;
-use App\Http\Requests\V3_1\User\RegisterRequest;
-use App\Http\Requests\VerifyPhoneRequest;
-use App\Http\Resources\User\V3_1\UserResource;
-use App\Models\Setting;
 use App\Models\User;
-use App\Services\AuthService;
+use App\Models\Setting;
 use App\Services\SMSService;
-use App\Services\V3\UserService;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Services\AuthService;
+use App\Exceptions\ApiException;
+use App\Services\V3\UserService;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\PhoneRequest;
+use Illuminate\Auth\Events\Registered;
+use App\Http\Requests\VerifyPhoneRequest;
+use App\Services\V3_1\ReferralCodeService;
+use App\Exceptions\PhoneNotVerifiedException;
+use App\Http\Requests\V3_1\User\LoginRequest;
+use App\Http\Resources\User\V3_1\UserResource;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\V3_1\User\RegisterRequest;
+use App\Contracts\Repositories\UserRepositoryInterface;
 
 class AuthController extends BaseApiController
 {
@@ -26,7 +27,8 @@ class AuthController extends BaseApiController
         public UserRepositoryInterface $userRepository,
         public AuthService $authService,
         public UserService $userService,
-        public SMSService $smsService
+        public SMSService $smsService,
+        public ReferralCodeService $referralCodeService,
     ) {
         parent::__construct();
     }
@@ -50,11 +52,15 @@ class AuthController extends BaseApiController
         $data = $this->userService->handleUserData($data);
 
         // create user
-        $this->userService->create($data);
+        $user = $this->userService->create($data);
 
         // send otp to the user to verify account.
         if (!Setting::checkTestingMode()) {
             $this->smsService->sendOtp($data['phone']);
+        }
+
+        if ($request->filled('referral_code')) {
+            $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
         }
 
         return $this->successJsonRes([
