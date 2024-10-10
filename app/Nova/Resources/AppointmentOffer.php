@@ -2,14 +2,22 @@
 
 namespace App\Nova\Resources;
 
+use App\Enums\AppointmentOfferEnum;
+use App\Traits\NovaReadOnly;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\BelongsToMany;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\MorphOne;
+use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Status;
 use Laravel\Nova\Fields\Textarea;
 use Michielfb\Time\Time;
 
 class AppointmentOffer extends Resource
 {
+    use NovaReadOnly;
     /**
      * The model the resource corresponds to.
      *
@@ -45,11 +53,22 @@ class AppointmentOffer extends Resource
         $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
 
-            BelongsTo::make(__('user'), 'user', User::class),
+            BelongsTo::make(__('User'), 'user', User::class),
 
-            BelongsTo::make(__('taxonomy'), 'taxonomy', Category::class),
+            BelongsTo::make(__('Taxonomy'), 'taxonomy', Category::class),
+            Status::make('Status')
+                ->loadingWhen(['pending'])
+                ->failedWhen(['refund']),
+//                ->field(function () {
+//                    return Select::make('Status')
+//                        ->options(AppointmentOfferEnum::class)
+//                        ->displayUsingLabels();
+//                }),
 
+            HasMany::make('Details', 'details', AppointmentOfferDetails::class),
+            MorphOne::make('Invoice', 'invoices', Invoice::class),
             Textarea::make(__('notes'), 'notes')->nullable(),
+
         ];
 
         return $returned_arr;

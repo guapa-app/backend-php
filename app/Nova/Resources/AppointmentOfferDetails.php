@@ -2,7 +2,9 @@
 
 namespace App\Nova\Resources;
 
+use App\Traits\NovaReadOnly;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
@@ -11,6 +13,7 @@ use Laravel\Nova\Fields\Textarea;
 
 class AppointmentOfferDetails extends Resource
 {
+    use NovaReadOnly;
     /**
      * The model the resource corresponds to.
      *
@@ -45,6 +48,8 @@ class AppointmentOfferDetails extends Resource
     {
         $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
+
+            BelongsTo::make(__('Vendor'), 'vendor', Vendor::class),
 
             Text::make('status'),
 
