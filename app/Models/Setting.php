@@ -75,6 +75,32 @@ class Setting extends Model
         return $record->s_value;
     }
 
+    public static function inviterEarndPoints()
+    {
+        $record = static::firstOrCreate(['s_key' => 'inviter_earnd_points'], [
+            's_value'           => 100,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 10000],
+            'instructions'      => 'Points earned for the inviter',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function inviteeEarndPoints()
+    {
+        $record = static::firstOrCreate(['s_key' => 'invitee_earnd_points'], [
+            's_value'           => 100,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 10000],
+            'instructions'      => 'Points earned for the invitee',
+        ]);
+
+        return $record->s_value;
+    }
+
     public static function getMessageCost()
     {
         $record = static::firstOrCreate(['s_key' => 'message_cost'], [

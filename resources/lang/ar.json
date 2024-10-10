@@ -818,5 +818,7 @@
     "Return Product :product":"إسترجاع منتج :product",
     "Spin Wheel - :wheel": "لف عجلة - :wheel",
     "You have been awarded :points points!":"لقد حصلت على :points نقطة!",
-    "Recharge balance - :package":"شحن رصيد باقة - :package"
+    "Recharge balance - :package":"شحن رصيد باقة - :package",
+    "Friends Registrations":"دعوة الاضدقاء",
+    "Points conversion":"تحويل نقاط"
 }

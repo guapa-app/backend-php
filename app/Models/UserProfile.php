@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Str;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class UserProfile extends Model implements HasMedia
@@ -22,7 +23,7 @@ class UserProfile extends Model implements HasMedia
      */
     protected $fillable = [
         'user_id', 'firstname', 'lastname', 'gender',
-        'birth_date', 'about', 'settings',
+        'birth_date', 'about', 'referral_code' ,'settings',
     ];
 
     /**
@@ -44,6 +45,32 @@ class UserProfile extends Model implements HasMedia
         'Female',
         'Other',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($profile) {
+            if (!$profile->referral_code) {
+                $profile->referral_code = self::generateUniqueReferralCode();
+                $profile->save();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique referral code
+     *
+     * @return string
+     */
+    public static function generateUniqueReferralCode()
+    {
+        do {
+            $code = strtoupper(Str::random(8)); // 8-character referral code
+        } while (self::where('referral_code', $code)->exists());
+
+        return $code;
+    }
 
     /**
      * Modify birthdate before save.
@@ -106,5 +133,20 @@ class UserProfile extends Model implements HasMedia
     {
         return $this->morphOne(Media::class, 'model')
             ->where('collection_name', 'avatars');
+    }
+
+    /**
+     * Referral Code
+     *
+     * @return void
+     */
+    public function getReferralCode()
+    {
+        if (!$this->referral_code) {
+            $this->referral_code = self::generateUniqueReferralCode();
+            $this->save();
+        }
+
+        return $this->referral_code;
     }
 }

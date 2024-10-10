@@ -163,6 +163,10 @@ class User extends Resource
                     'Female' => '👩 Female',
                     'Other' => '- Other',
                 ])->displayUsingLabels(),
+                
+            Text::make('Referral Code', function () {
+                    return $this->profile->getReferralCode() ?? 'N/A';
+                })->readonly(),
         ];
     }
 
