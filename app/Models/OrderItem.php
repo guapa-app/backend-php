@@ -73,7 +73,7 @@ class OrderItem extends Model implements HasMedia
 
     public function product()
     {
-        return $this->belongsTo(Product::class)->withDefault();
+        return $this->belongsTo(Product::class)->withTrashed()->withDefault();
     }
 
     public function user()

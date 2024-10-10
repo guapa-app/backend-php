@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Enums\OrderStatus;
+use App\Enums\OrderTypeEnum;
 use App\Enums\ProductType;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
