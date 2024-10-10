@@ -44,7 +44,7 @@ class LoyaltyPointHistory extends Model
      */
     public function getPointsChangeAttribute()
     {
-        return $this->points > 0 ? '+' . $this->points : '-' . $this->points;
+        return $this->points > 0 ? '+' . $this->points : (string) $this->points;
     }
 
     /**
@@ -80,7 +80,12 @@ class LoyaltyPointHistory extends Model
             return __('Recharge balance - :package', [
                 'package' => $this->sourceable->name,
             ]);
+        } elseif ($this->action == LoyaltyPointAction::FRIENDS_REGISTRATIONS->value) {
+            return __('Friends Registrations');
+        } elseif ($this->action == LoyaltyPointAction::CONVERSION->value) {
+            return __('Points conversion');
         }
+
 
         return $this->action;
     }
