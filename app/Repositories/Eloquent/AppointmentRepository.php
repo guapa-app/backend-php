@@ -32,12 +32,19 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
             ->withListRelations($request)
             ->withListCounts($request)
             ->withSingleRelations($request)
-            ->when($vendor, function ($query) use ($vendor) {
-                $query->where('status', '!=' , AppointmentOfferEnum::Pending->value)->whereHas('details', function ($query) use ($vendor) {
-                    $query->where('vendor_id', $vendor->id);
-                })->with(['details' => function ($query) use ($vendor) {
-                    $query->where('vendor_id', $vendor->id);
-                }]);
+            ->when($vendor, function ($query) use ($vendor, $request) {
+                $query->where('status', '!=', AppointmentOfferEnum::Pending->value)
+                    ->whereHas('details', function ($detailsQuery) use ($vendor, $request) {
+                        $detailsQuery->where('vendor_id', $vendor->id);
+
+                        // Handle vendor_status filter
+                        if ($request->filled('vendor_status')) {
+                            $detailsQuery->where('status', $request->get('vendor_status'));
+                        }
+                    })
+                    ->with(['details' => function ($detailsQuery) use ($vendor, $request) {
+                        $detailsQuery->where('vendor_id', $vendor->id);
+                    }]);
             })
             ->when(!$vendor, function ($query) use ($user) {
                     $query->where('user_id', $user->id);
