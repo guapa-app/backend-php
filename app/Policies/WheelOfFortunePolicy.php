@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\WalletChargingPackage;
+use App\Models\WheelOfFortune;
 use Illuminate\Database\Eloquent\Model;
 
 class WheelOfFortunePolicy
@@ -22,7 +22,7 @@ class WheelOfFortunePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(Model $user, WalletChargingPackage $walletChargingPackage): bool
+    public function view(Model $user, WheelOfFortune $wheelOfFortune): bool
     {
         try {
             return $user->hasPermissionTo('view_wheel_of_fortunes');
@@ -46,7 +46,7 @@ class WheelOfFortunePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(Model $user, WalletChargingPackage $walletChargingPackage): bool
+    public function update(Model $user, WheelOfFortune $wheelOfFortune): bool
     {
         try {
             return $user->hasPermissionTo('update_wheel_of_fortunes');
@@ -58,7 +58,7 @@ class WheelOfFortunePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(Model $user, WalletChargingPackage $walletChargingPackage): bool
+    public function delete(Model $user, WheelOfFortune $wheelOfFortune): bool
     {
         try {
             return $user->hasPermissionTo('delete_wheel_of_fortunes');
