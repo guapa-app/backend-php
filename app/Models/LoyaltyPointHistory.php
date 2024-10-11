@@ -84,6 +84,10 @@ class LoyaltyPointHistory extends Model
             return __('Friends Registrations');
         } elseif ($this->action == LoyaltyPointAction::CONVERSION->value) {
             return __('Points conversion');
+        }elseif ($this->action == LoyaltyPointAction::SYSTEM_ADDITION->value) {
+            return __('System Addition');
+        }elseif ($this->action == LoyaltyPointAction::SYSTEM_DEDUCTION->value) {
+            return __('System Deduction');
         }
 
 

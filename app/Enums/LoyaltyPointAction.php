@@ -11,4 +11,6 @@ enum LoyaltyPointAction: string
     case WALLET_CHARGING = 'wallet_charging';
     case SPIN_WHEEL = 'spin_wheel';
     case FRIENDS_REGISTRATIONS = 'friends_registrations';
+    case SYSTEM_ADDITION = 'system_addition';
+    case SYSTEM_DEDUCTION = 'system_deduction';
 }
