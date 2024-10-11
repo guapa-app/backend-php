@@ -167,7 +167,7 @@ class User extends Resource
                 ])->displayUsingLabels(),
 
             Text::make('Referral Code', function () {
-                    return $this->profile->getReferralCode() ?? 'N/A';
+                    return $this->profile?->getReferralCode() ?? 'N/A';
                 })->readonly(),
         ];
     }
