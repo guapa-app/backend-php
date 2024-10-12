@@ -68,7 +68,7 @@ class AppointmentForm extends Resource
                         $template = AppointmentTypeEnum::templates()[$selectedType] ?? '';
                         return $template;
                     });
-                })
+                })->rows(10)
                 ->rules(['nullable','json']),
 
             DateTime::make(__('created at'), 'created_at')

@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\AppointmentForm;
-use App\Models\AppointmentFormValue;
 use App\Models\AppointmentOffer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,7 +17,7 @@ return new class extends Migration {
             $table->foreignIdFor(AppointmentOffer::class)->constrained();
             $table->foreignIdFor(AppointmentForm::class)->constrained();
             $table->string('key')->nullable();
-            $table->string('answer')->nullable();
+            $table->longText('answer')->nullable();
             $table->timestamps();
         });
     }
