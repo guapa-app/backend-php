@@ -17,14 +17,6 @@ class AppointmentForm extends Model
     ];
 
     /**
-     * @return HasMany
-     */
-    public function values(): HasMany
-    {
-        return $this->hasMany(AppointmentFormValue::class);
-    }
-
-    /**
      * @return BelongsToMany
      */
     public function taxonomies(): BelongsToMany
@@ -38,15 +30,5 @@ class AppointmentForm extends Model
     public function vendors(): BelongsToMany
     {
         return $this->belongsToMany(Vendor::class)->withTimestamps();
-    }
-
-    /**
-     * @return BelongsToMany
-     */
-    public function orders(): BelongsToMany
-    {
-        return $this->belongsToMany(Order::class, 'order_appointments')
-            ->withPivot('key', 'answer', 'appointment_form_value_id')
-            ->withTimestamps();
     }
 }

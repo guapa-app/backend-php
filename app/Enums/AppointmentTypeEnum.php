@@ -15,6 +15,8 @@ enum AppointmentTypeEnum: string
     case SingleCheckChoices = 'single_check_choices';
     case SingleCheckWithText = 'single_check_with_text';
     case DoubleSmallText = 'double_small_text';
+    case Number = 'number';
+    case DoubleSmallNumber = 'double_small_number';
 
     // Method to return the human-readable label for each field type
     public function label(): string
@@ -27,6 +29,8 @@ enum AppointmentTypeEnum: string
             self::SingleCheckChoices => 'Single Check with Choices (Yes/No)',
             self::SingleCheckWithText => 'Single Check with Text Input',
             self::DoubleSmallText => 'Double Small Text Inputs (Two Inputs)',
+            self::Number => 'Number Input',
+            self::DoubleSmallNumber => 'Double Small Number Inputs (Two Inputs)',
         };
     }
 
@@ -40,26 +44,116 @@ enum AppointmentTypeEnum: string
     public function defaultOptionsTemplate(): array
     {
         return match ($this) {
-            self::SmallText, self::LargeText => [
-                'key' => 'Enter a Question...',
+            self::SmallText => [
+                'type' => 'string',
+                'rules' => [
+                    'required' => true,
+                    'max' => 255,
+                    'min' => 3
+                ]
+            ],
+             self::LargeText => [
+                'type' => 'textarea',
+                'rules' => [
+                    'required' => true,
+                    'max' => 400,
+                    'min' => 5
+                ]
             ],
             self::SingleCheck => [
-                'options' => ['Option 1', 'Option 2', 'Option 3'],
+                'options' => [
+                    ['label' => 'Yes', 'value' => true],
+                    ['label' => 'No', 'value' => false]
+                ],
+                'rules' => [
+                    'required' => true,
+                ]
             ],
             self::MultipleCheck => [
                 'options' => ['Option A', 'Option B', 'Option C'],
+                'type' => 'checkboxes',
+                'rules' => [
+                    'required' => true,
+                    'min' => 1
+                ]
             ],
             self::SingleCheckChoices => [
-                'options' => ['Yes', 'No'],
+                'options' => [
+                    ['label' => 'Yes', 'value' => true],
+                    ['label' => 'No', 'value' => false]
+                ],
+                'options_rules' => [
+                    'required' => true,
+                ],
                 'choices' => ['Choice 1', 'Choice 2'],
+                'choices_rules' => [
+                    'required' => true,
+                    'min' => 1
+                ]
             ],
             self::SingleCheckWithText => [
-                'options' => ['Yes', 'No'],
+                'type' => 'checkbox_with_text',
+                'options' => [
+                    ['label' => 'Yes', 'value' => true], // true option ,
+                    ['label' => 'No', 'value' => false]
+                ],
+                'options_rules' => [
+                    'required' => true,
+                ],
                 'key' => 'Enter additional text...',
+                'text_rules'=> [
+                    'required' => true,
+                    'max' => 200,
+                    'min' => 5
+                ]
             ],
             self::DoubleSmallText => [
-                'first_key' => 'First small input...',
-                'second_key' => 'Second small input...',
+                'first' => [
+                    'label' => 'First small input',
+                    'type' => 'text',
+                    'rules' => [
+                        'required' => true,
+                        'max' => 100,
+                        'min' => 2
+                    ]
+                ],
+                'second' => [
+                    'label' => 'Second small input...',
+                    'type' => 'text',
+                    'rules' => [
+                        'required' => true,
+                        'max' => 100,
+                        'min' => 2
+                    ]
+                ]
+            ],
+            self::Number => [
+                'type' => 'number',
+                'rules' => [
+                    'required' => true,
+                    'max' => 10000,
+                    'min' => 0
+                ]
+            ],
+            self::DoubleSmallNumber => [
+                'first' => [
+                    'label' => 'First small input',
+                    'type' => 'number',
+                    'rules' => [
+                        'required' => true,
+                        'max' => 10000,
+                        'min' => 0
+                    ]
+                ],
+                'second' => [
+                    'label' => 'Second small input...',
+                    'type' => 'number',
+                    'rules' => [
+                        'required' => true,
+                        'max' => 10000,
+                        'min' => 2
+                    ]
+                ]
             ],
         };
     }
