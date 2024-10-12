@@ -125,6 +125,8 @@ class LoyaltyPointsService
         $histories->each(function ($history) {
             if ($history->sourceable_type == 'product') {
                 $history->setRelation('sourceable', $history->sourceable()->select('id', 'title')->first());
+            } elseif ($history->sourceable_type == 'user') {
+                $history->setRelation('sourceable', $history->sourceable()->select('id', 'name')->first());
             } elseif ($history->sourceable_type === \App\Models\WheelOfFortune::class) {
                 $history->setRelation('sourceable', $history->sourceable()->select('id', 'rarity_title')->first());
             } elseif ($history->sourceable_type === \App\Models\WalletChargingPackage::class) {
@@ -262,6 +264,38 @@ class LoyaltyPointsService
             'points' => abs($inviterPoints),
             'action' => LoyaltyPointAction::FRIENDS_REGISTRATIONS->value,
             'type' => 'added',
+        ]);
+    }
+
+    /**
+     * Add Admin User Points
+     *
+     * @param  mixed $order
+     * @return void
+     */
+    public function addAdminUserPoints(User $user, $points)
+    {
+        $user->loyaltyPointHistories()->create([
+            'user_id' => $user->id,
+            'points' => $points,
+            'action' => LoyaltyPointAction::SYSTEM_ADDITION->value,
+            'type' => 'added',
+        ]);
+    }
+
+    /**
+     * Deduct Admin User Points
+     *
+     * @param  mixed $order
+     * @return void
+     */
+    public function deductAdminUserPoints(User $user, $points)
+    {
+        $user->loyaltyPointHistories()->create([
+            'user_id' => $user->id,
+            'points' => -abs($points),
+            'action' => LoyaltyPointAction::SYSTEM_DEDUCTION->value,
+            'type' => 'subtracted',
         ]);
     }
 }

@@ -820,5 +820,7 @@
     "You have been awarded :points points!":"لقد حصلت على :points نقطة!",
     "Recharge balance - :package":"شحن رصيد باقة - :package",
     "Friends Registrations":"دعوة الاضدقاء",
-    "Points conversion":"تحويل نقاط"
+    "Points conversion":"تحويل نقاط",
+    "System Addition":"إضافة من النظام",
+    "System Deduction":"خصم من النظام"
 }
