@@ -13,4 +13,5 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('logout', [AuthController::class, 'logout'])->name('auth.logout');
     Route::get('user', [AuthController::class, 'user']);
     Route::delete('delete', [AuthController::class, 'deleteAccount'])->name('auth.delete');
+    Route::post('/change-phone', [AuthController::class, 'updatePhone'])->name('users.update_phone');
 });
