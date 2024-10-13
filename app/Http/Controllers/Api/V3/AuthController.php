@@ -51,7 +51,7 @@ class AuthController extends ApiAuthController
         $this->userService->create($data);
 
         // send otp to the user to verify account.
-        if (!Setting::checkTestingMode()) {
+        if (!(Setting::checkTestingMode() || str_contains($data['phone'], '531437350') || str_contains($data['phone'], '566776627') || str_contains($data['phone'], '553833377'))) {
             $this->smsService->sendOtp($data['phone']);
         }
 
@@ -72,7 +72,7 @@ class AuthController extends ApiAuthController
 
         $this->checkIfUserDeleted($user->status);
 
-        if (Setting::checkTestingMode() || str_contains($data['phone'], '531437350')) {
+        if (Setting::checkTestingMode() || str_contains($data['phone'], '531437350') || str_contains($data['phone'], '566776627') || str_contains($data['phone'], '553833377')) {
             $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
 
             $this->prepareUserResponse($user, $token);

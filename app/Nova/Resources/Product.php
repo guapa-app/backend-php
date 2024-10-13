@@ -2,6 +2,7 @@
 
 namespace App\Nova\Resources;
 
+use App\Models\Taxonomy;
 use App\Nova\Actions\ClearSort;
 use App\Nova\Actions\RandomizeMissingSortOrder;
 use App\Nova\Actions\RandomizeSort;
@@ -73,6 +74,7 @@ class Product extends Resource
                     'product' => 'Products',
                     'service' => 'Procedures',
                 ])
+                ->default('product')
                 ->filterable()
                 ->displayUsingLabels()
                 ->rules('required'),
@@ -86,21 +88,20 @@ class Product extends Resource
                 ->required()
                 ->help('Only first category \'ll be stored')
                 ->label(function ($state) {
-                    return $state->title . ' - (' . $state->type . ')';
+                    return $state->title . ' - - - (' . ($state->type == 'category' ? 'Product' : 'Procedure') . ')';
+                })->optionsQuery(function ($query) {
+                    $query->where('taxonomies.type', '!=', 'blog_category')->orderBy('taxonomies.type');
                 })
-                ->dependsOn(
-                    ['type'],
-                    function (SelectPlus $field, NovaRequest $request, FormData $formData) {
-                        $type = $formData->type != null ? ($formData->type == 'service' ? 'specialty' : 'category') : '';
-
-                        $field->optionsQuery(function ($query) use ($type) {
-                            $query->where('type', '=', $type);
-                        });
-                    }
-                )
                 ->rules('required', function ($attribute, $value, $fail) use ($request) {
                     if (preg_match('/^\[({.*?})/', $request->taxonomies, $matches)) {
                         $firstObject = $matches[1];
+
+                        if ((Taxonomy::find(json_decode($firstObject)?->id)?->type == 'specialty') && ($request->get('type') != 'service')) {
+                            return $fail('You have to select one category that match product type.');
+                        }
+                        if ((Taxonomy::find(json_decode($firstObject)?->id)?->type == 'category') && ($request->get('type') != 'product')) {
+                            return $fail('You have to select one category that match product type.');
+                        }
 
                         $request->merge(['taxonomies' => '[' . $firstObject . ']']);
                     } else {
