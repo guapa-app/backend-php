@@ -2,17 +2,26 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Controllers\Api\ProductController as ApiProductController;
+use App\Contracts\Repositories\ProductRepositoryInterface;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\ProductListRequest;
+use App\Http\Resources\User\V3_1\ProductCollection;
 use App\Http\Resources\User\V3_1\ProductResource;
 
-class ProductController extends ApiProductController
+class ProductController extends BaseApiController
 {
+    protected $productRepository;
+    public function __construct(ProductRepositoryInterface $productRepository)
+    {
+        parent::__construct();
+
+        $this->productRepository = $productRepository;
+    }
     public function index(ProductListRequest $request)
     {
-        $index = parent::index($request);
+        $products = $this->productRepository->all($request);
 
-        return ProductResource::collection($index)
+        return ProductCollection::make($products)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -21,9 +30,11 @@ class ProductController extends ApiProductController
 
     public function single($id)
     {
-        $single = parent::single($id);
+        $product = $this->productRepository->getOneWithRelations((int) $id);
 
-        return ProductResource::make($single)
+        $product->description = strip_tags($product->description);
+
+        return ProductResource::make($product)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
