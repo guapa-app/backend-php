@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Common;
+use App\Models\Setting;
+
 class ChangePhoneRequest extends FailedValidationRequest
 {
     /**
@@ -20,7 +23,7 @@ class ChangePhoneRequest extends FailedValidationRequest
     public function rules(): array
     {
         return [
-            'phone' => 'required|string|max:30|unique:users,phone',
+            'phone'     => 'required|unique:users,phone|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
         ];
     }
 }

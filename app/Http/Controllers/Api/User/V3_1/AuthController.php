@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Http\Requests\ChangePhoneRequest;
 use App\Models\User;
 use App\Models\Setting;
 use App\Services\SMSService;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use App\Exceptions\ApiException;
@@ -20,6 +22,7 @@ use App\Http\Resources\User\V3_1\UserResource;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\RegisterRequest;
 use App\Contracts\Repositories\UserRepositoryInterface;
+use Throwable;
 
 class AuthController extends BaseApiController
 {
@@ -250,6 +253,39 @@ class AuthController extends BaseApiController
         return $this->logout();
     }
 
+    public function updatePhone(ChangePhoneRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $user = $request->user();
+
+            if ($user->phone !== $data['phone']) {
+                $this->userService->updatePhoneNumber($user, $data['phone']);
+            } else {
+                return $this->errorJsonRes(['phone' => 'you use the same phone number'], __('api.error'), 400);
+            }
+
+            return $this->successJsonRes(['is_otp_sent' => true], __('api.otp_sent'), 200);
+        } catch (Throwable $th) {
+
+            if ($th instanceof ClientException) {
+                if ($th->getCode() == 402) {
+                    // 402 Not enough credit.
+                } elseif ($th->getCode() == 400) {
+                    // 400 Invalid phone number.
+                    return $this->errorJsonRes([
+                        'phone' => [__('api.invalid_phone')],
+                    ], __('api.otp_not_sent'), 422);
+                }
+            }
+            $this->logReq(json_decode($th));
+
+            return $this->errorJsonRes([
+                'is_otp_sent' => false,
+            ], __('api.contact_support'), 422);
+        }
+    }
+
     private function prepareUserResponse($user, $token)
     {
         $user->update(['phone_verified_at' => now()->toDateTimeString()]);
@@ -283,4 +319,5 @@ class AuthController extends BaseApiController
             throw new ApiException(__('api.account_deleted'), 401);
         }
     }
+
 }
