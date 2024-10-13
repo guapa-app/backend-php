@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\User\V3_1\VendorCollection;
 use App\Http\Resources\User\V3_1\VendorResource;
-use App\Http\Resources\VendorCollection;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
 
