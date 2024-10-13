@@ -70,7 +70,7 @@ enum AppointmentTypeEnum: string
                 ]
             ],
             self::MultipleCheck => [
-                'checkbox_options' => ['Option A', 'Option B', 'Option C'],
+                'choices' => ['Option A', 'Option B', 'Option C'],
                 'type' => 'checkboxes',
                 'rules' => [
                     'required' => true,
