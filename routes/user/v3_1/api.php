@@ -23,6 +23,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::prefix('pages')->group(base_path('routes/user/v3_1/api/pages.php'));
     Route::prefix('offers')->group(base_path('routes/user/v3_1/api/offers.php'));
     Route::prefix('orders')->group(base_path('routes/user/v3_1/api/orders.php'));
+    Route::prefix('coupons')->group(base_path('routes/user/v3_1/api/coupons.php'));
     Route::prefix('vendors')->group(base_path('routes/user/v3_1/api/vendors.php'));
     Route::prefix('history')->group(base_path('routes/user/v3_1/api/history.php'));
     Route::prefix('reviews')->group(base_path('routes/user/v3_1/api/reviews.php'));
