@@ -31,6 +31,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::prefix('favorites')->group(base_path('routes/user/v3_1/api/favorites.php'));
     Route::prefix('social-media')->group(base_path('routes/user/v3_1/api/social_media.php'));
     Route::prefix('addresses')->group(base_path('routes/user/v3_1/api/addresses.php'));
+    Route::prefix('cities')->group(base_path('routes/user/v3_1/api/cities.php'));
     Route::prefix('messaging')->group(base_path('routes/user/v3_1/api/messaging.php'));
     Route::prefix('taxonomies')->group(base_path('routes/user/v3_1/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/user/v3_1/api/notifications.php'));
