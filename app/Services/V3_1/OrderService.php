@@ -2,9 +2,8 @@
 
 namespace App\Services\V3_1;
 
-use App\Enums\AppointmentOfferEnum;
-use App\Enums\OrderTypeEnum;
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Coupon;
@@ -15,12 +14,16 @@ use App\Enums\OrderStatus;
 use App\Models\UserVendor;
 use App\Models\Appointment;
 use Illuminate\Support\Arr;
+use App\Enums\OrderTypeEnum;
 use App\Services\PDFService;
 use App\Services\CouponService;
 use App\Services\QrCodeService;
+use App\Services\WalletService;
 use App\Services\PaymentService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use App\Enums\AppointmentOfferEnum;
+use Illuminate\Support\Facades\Log;
 use App\Services\LoyaltyPointsService;
 use App\Notifications\OrderNotification;
 use Illuminate\Support\Facades\Notification;
@@ -40,12 +43,14 @@ class OrderService
     protected $fees;
     protected $taxes;
     protected $loyaltyPointsService;
+    protected $walletService;
 
     public function __construct(
         OrderRepositoryInterface $repository,
         PaymentService $payment_service,
         CouponService $coupon_service,
-        LoyaltyPointsService $loyaltyPointsService
+        LoyaltyPointsService $loyaltyPointsService,
+        WalletService $walletService
     ) {
         $this->repository = $repository;
         $this->paymentService = $payment_service;
@@ -54,7 +59,8 @@ class OrderService
         $this->taxesPercentage = Setting::getTaxes();
         $this->fees = 0;
         $this->taxes = 0;
-        $this->loyaltyPointsService= $loyaltyPointsService;
+        $this->loyaltyPointsService = $loyaltyPointsService;
+        $this->walletService = $walletService;
     }
 
     public function create(array $data): Collection
@@ -400,5 +406,33 @@ class OrderService
             ['user_id' => $userId],
             ['usage_count' => DB::raw('usage_count + 1')]
         );
+    }
+
+    /**
+     * Pay Via Wallet
+     *
+     * @param  mixed $data
+     * @return void
+     */
+    public function payViaWallet(User $user, array $data): void
+    {
+        $order = Order::findOrFail($data['id']);
+        if ($order->status->value != 'Accepted') {
+            $wallet = $user->myWallet();
+            $orderPrice = $order->paid_amount_with_taxes;
+            if ($wallet->balance >= $orderPrice) {
+                try {
+                    DB::beginTransaction();
+                    $transaction = $this->walletService->debit($user, $orderPrice);
+                    $data['payment_id'] = $transaction->transaction_number;
+                    $this->changeOrderStatus($data);
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    Log::error('Transaction failed: ' . $e->getMessage());
+                    throw $e;
+                }
+            }
+        }
     }
 }

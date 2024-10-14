@@ -76,4 +76,6 @@ return [
     'invalid_type' => 'نوع غير صالح',
     'payment_status_changed' => 'تم تغيير حالة الدفع بنجاح',
     'error_payment_status' => 'حدث خطأ أثناء تغيير حالة الدفع',
+    'paid_successfully' => 'تم الدفع بنجاح',
+
 ];

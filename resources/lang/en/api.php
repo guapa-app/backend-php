@@ -75,4 +75,5 @@ return [
     'invalid_type' => 'Invalid type',
     'payment_status_changed' => 'Payment status changed successfully',
     'error_payment_status' => 'An error occurred while changing the payment status',
+    'paid_successfully' => 'Paid Successfully',
 ];

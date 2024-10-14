@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Models\Transaction;
-use App\Enums\TransactionType;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
+use App\Enums\TransactionType;
 use Illuminate\Support\Facades\DB;
+use App\Enums\TransactionOperation;
+use Illuminate\Support\Facades\Log;
 
 class TransactionService
 {
@@ -26,7 +27,7 @@ class TransactionService
      * @param string|null $invoiceLink
      * @return Transaction
      */
-    public function createTransaction(int $userId, float $amount, TransactionType $transactionType, ?string $invoiceLink = null): Transaction
+    public function createTransaction(int $userId, float $amount, TransactionType $transactionType, TransactionOperation $transactionOperation = TransactionOperation::DEPOSIT): Transaction
     {
         try {
             DB::beginTransaction();
@@ -39,9 +40,9 @@ class TransactionService
                 'user_id' => $userId,
                 'transaction_number' => $transactionNumber,
                 'amount' => $amount,
+                'operation' => $transactionOperation,
                 'transaction_type' => $transactionType,
                 'transaction_date' => now(),
-                'invoice_link' => $invoiceLink,
             ]);
 
             // $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
@@ -54,7 +55,7 @@ class TransactionService
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Transaction creation failed: ' . $e->getMessage());
-            throw $e; // Re-throw the exception to be handled elsewhere
+            throw $e;
         }
     }
 

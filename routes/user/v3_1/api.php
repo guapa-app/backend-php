@@ -48,6 +48,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::middleware('auth:api')->group(function () {
 
         Route::post('payment/change-status', [PaymentController::class, 'changePaymentStatus']);
+        Route::post('payment/pay-via-wallet', [PaymentController::class, 'payViaWallet']);
 
         // Wallet Charging Packages
         Route::get('wallet-charging-packages', [WalletChargingPackageController::class, 'index']);

@@ -2,31 +2,35 @@
 
 namespace App\Services;
 
-use App\Enums\MarketingCampaignAudienceType;
-use App\Enums\MarketingCampaignStatus;
-use App\Models\Invoice;
-use App\Models\MarketingCampaign;
+use App\Models\User;
 use App\Models\Offer;
+use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Models\User;
-use App\Notifications\CampaignNotification;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use App\Models\MarketingCampaign;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Enums\MarketingCampaignStatus;
+use Illuminate\Database\Eloquent\Model;
+use App\Notifications\CampaignNotification;
+use App\Enums\MarketingCampaignAudienceType;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class MarketingCampaignService
 {
     protected $messageCost;
     protected $taxesPercentage;
     protected $paymentService;
+    protected $walletService;
 
-    public function __construct(PaymentService $paymentService)
+    public function __construct(PaymentService $paymentService, WalletService $walletService)
     {
         $this->paymentService = $paymentService;
         $this->messageCost = Setting::getMessageCost();
         $this->taxesPercentage = Setting::getTaxes();
+        $this->walletService = $walletService;
     }
 
     public function calculatePricingDetails(array $data)
@@ -160,6 +164,34 @@ class MarketingCampaignService
         } else {
             $campaign->status = MarketingCampaignStatus::FAILED;
             $campaign->save();
+        }
+    }
+
+    /**
+     * Pay Via Wallet
+     *
+     * @param  mixed $data
+     * @return void
+     */
+    public function payViaWallet(User $user, array $data): void
+    {
+        $campaign = MarketingCampaign::findOrFail($data['id']);
+        if ($campaign->status->value != MarketingCampaignStatus::COMPLETED->value) {
+            $wallet = $user->myWallet();
+            $campaignPrice = $campaign->total_cost;
+            if ($wallet->balance >= $campaignPrice) {
+                try {
+                    DB::beginTransaction();
+                    $transaction = $this->walletService->debit($user, $campaignPrice);
+                    $data['payment_id'] = $transaction->transaction_number;
+                    $this->changePaymentStatus($data);
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    Log::error('Transaction failed: ' . $e->getMessage());
+                    throw $e;
+                }
+            }
         }
     }
 
