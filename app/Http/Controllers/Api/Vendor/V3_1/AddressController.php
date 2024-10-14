@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Controllers\Api\AddressController as ApiAddressController;
-use App\Http\Requests\AddressListRequest;
-use App\Http\Requests\AddressRequest;
+use App\Contracts\Repositories\AddressRepositoryInterface;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\V3_1\Vendor\AddressListRequest;
+use App\Http\Requests\V3_1\Vendor\AddressRequest;
 use App\Http\Resources\Vendor\V3_1\AddressCollection;
 use App\Http\Resources\Vendor\V3_1\AddressResource;
 use Illuminate\Http\Request;
@@ -12,14 +13,21 @@ use Illuminate\Http\Request;
 /**
  * @group Addresses
  */
-class AddressController extends ApiAddressController
+class AddressController extends BaseApiController
 {
+    private $addressRepository;
+
+    public function __construct(AddressRepositoryInterface $addressRepository )
+    {
+        parent::__construct();
+
+        $this->addressRepository = $addressRepository;
+    }
     public function index(AddressListRequest $request)
     {
-        $index = parent::index($request);
-        $data = $request->validated();
+        $vendorId = $this->user->vendor->id;
+        $request->merge(['addressable_id' => $vendorId, 'addressable_type' => 'vendor']);
 
-        $this->checkAddressable($data['addressable_type'], $data['addressable_id']);
         $addresses =$this->addressRepository->all($request);
 
         return AddressCollection::make($addresses)
@@ -31,9 +39,9 @@ class AddressController extends ApiAddressController
 
     public function single(Request $request)
     {
-        $single = parent::single($request);
+        $address = $this->addressRepository->getOneOrFail($request->id);
 
-        return AddressResource::make($single)
+        return AddressResource::make($address)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -42,7 +50,9 @@ class AddressController extends ApiAddressController
 
     public function create(AddressRequest $request)
     {
-        $item = parent::create($request);
+        $data = $this->prepareAddressData($request->validated());
+
+        $item = $this->addressRepository->create($data);
 
         return AddressResource::make($item)
             ->additional([
@@ -53,8 +63,14 @@ class AddressController extends ApiAddressController
 
     public function update(AddressRequest $request, $id = 0)
     {
-        $item = parent::update($request, $id);
+        $data = $this->prepareAddressData($request->validated());
+        $address = $this->addressRepository->getOneOrFail($id);
 
+        if ($address->addressable_id !== $data['addressable_id']) {
+            return $this->errorJsonRes([], __('api.not_allowed'), 403);
+        }
+
+        $item =  $this->addressRepository->update($id, $data);
         return AddressResource::make($item)
             ->additional([
                 'success' => true,
@@ -64,24 +80,28 @@ class AddressController extends ApiAddressController
 
     public function delete(int $id = 0)
     {
-        parent::delete($id);
+        $address = $this->addressRepository->getOneOrFail($id);
+
+        if ($address->addressable_id !== $this->user->vendor->id) {
+            return $this->errorJsonRes([], __('api.not_allowed'), 403);
+        }
+
+        $this->addressRepository->delete($id);
 
         return $this->successJsonRes([], __('api.deleted'));
     }
 
-    private function checkAddressable(string $addressable_type, int $addressable_id, int $requestAddressableId = null): void
+    /**
+     * Prepare address data for creation or update
+     *
+     * @param array $data
+     * @return array
+     */
+    private function prepareAddressData(array $data): array
     {
-        if ($addressable_type === 'user' && $addressable_id !== auth()->id()) {
-            abort(403, 'Cannot create address for provided user');
-        } elseif ($addressable_type === 'vendor') {
-            $vendor = $this->vendorRepository->getOneOrFail($addressable_id);
-            if (!$vendor->hasUser(auth()->user())) {
-                abort(403, 'You cannot create address for provided vendor');
-            }
-            // this check for update only.
-            if (isset($requestAddressableId) && ($requestAddressableId !== $addressable_id)) {
-                abort(403, __('api.not_allowed'));
-            }
-        }
+        return array_merge($data, [
+            'addressable_type' => 'vendor',
+            'addressable_id' => $this->user->vendor->id,
+        ]);
     }
 }

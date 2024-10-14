@@ -2,20 +2,30 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Controllers\Api\InfluencerController as ApiInfluencerController;
-use App\Http\Requests\V3\InfluencerRequest;
+use App\Contracts\Repositories\InfluencerRepositoryInterface;
+use App\Enums\InfluencerStatus;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\V3_1\Vendor\InfluencerRequest;
 use App\Http\Resources\Vendor\V3_1\InfluencerCollection;
 use App\Http\Resources\Vendor\V3_1\InfluencerResource;
-use App\Models\Vendor;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class InfluencerController extends ApiInfluencerController
+class InfluencerController extends BaseApiController
 {
-    public function index(Request $request, Vendor $vendor)
+    private $InfluencerRepository;
+
+    public function __construct(InfluencerRepositoryInterface $InfluencerRepository)
     {
-        $records = parent::indexCommon($request, $vendor);
+        parent::__construct();
+
+        $this->InfluencerRepository = $InfluencerRepository;
+    }
+    public function index(Request $request)
+    {
+        $request->merge(['vendor_id' => $this->user->managerVendorId()]);
+        $records = $this->InfluencerRepository->all($request);
 
         return InfluencerCollection::make($records)
             ->additional([
@@ -24,11 +34,17 @@ class InfluencerController extends ApiInfluencerController
             ]);
     }
 
-    public function store(InfluencerRequest $request, Vendor $vendor)
+    public function store(InfluencerRequest $request)
     {
         try {
-            return DB::transaction(function () use ($request, $vendor) {
-                $record = parent::createCommon($request, $vendor);
+            return DB::transaction(function () use ($request) {
+                $data = $request->validated();
+                $vendor = $this->user->vendor;
+                $data['vendor_id'] = $vendor->id;
+                $data['status'] = InfluencerStatus::Pending;
+                $data['phone'] ??= $vendor?->phone ?? $this->user->phone;
+                // create influencer
+                $record = $this->InfluencerRepository->create($data);
 
                 return InfluencerResource::make($record)
                     ->additional([
