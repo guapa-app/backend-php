@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\V3_1\Vendor;
+
+use App\Http\Requests\FailedValidationRequest;
 
 class AddressListRequest extends FailedValidationRequest
 {

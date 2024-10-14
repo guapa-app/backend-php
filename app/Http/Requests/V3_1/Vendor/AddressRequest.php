@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Requests\V3_1\User;
+namespace App\Http\Requests\V3_1\Vendor;
 
 use App\Http\Requests\FailedValidationRequest;
 use App\Models\Address;
-use Illuminate\Support\Facades\Auth;
 
 class AddressRequest extends FailedValidationRequest
 {
@@ -38,13 +37,5 @@ class AddressRequest extends FailedValidationRequest
             'type'              => 'required|integer|in:' . $types,
             'phone'             => 'nullable|string|min:4|max:30',
         ];
-    }
-
-    public function prepareForValidation()
-    {
-        $this->merge([
-            'addressable_type' => 'user',
-            'addressable_id' => Auth::id(),
-        ]);
     }
 }
