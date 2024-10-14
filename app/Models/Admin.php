@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Traits\Listable as ListableTrait;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +15,7 @@ use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
-class Admin extends Authenticatable implements Listable
+class Admin extends Authenticatable implements Listable, FilamentUser
 {
     use HasFactory, Notifiable, HasApiTokens, HasRoles, HasPermissions, ListableTrait;
 
@@ -114,5 +116,10 @@ class Admin extends Authenticatable implements Listable
         $query->with('roles');
 
         return $query;
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 }
