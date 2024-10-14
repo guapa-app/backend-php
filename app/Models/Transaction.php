@@ -14,6 +14,7 @@ class Transaction extends Model
         'user_id',
         'transaction_number',
         'amount',
+        'operation',
         'transaction_type',
         'transaction_date',
         'invoice_link'

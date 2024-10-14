@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\V3_1\Common\PaymentStatusRequest;
-use App\Services\MarketingCampaignService;
 use App\Services\PaymentService;
-use App\Services\V3_1\AppointmentOfferService;
 use App\Services\V3_1\OrderService;
 use Illuminate\Support\Facades\Log;
+use App\Services\MarketingCampaignService;
+use App\Services\V3_1\AppointmentOfferService;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\V3_1\Common\PayByWalletRequest;
+use App\Http\Requests\V3_1\Common\PaymentStatusRequest;
 
 class PaymentController extends BaseApiController
 {
@@ -22,8 +23,7 @@ class PaymentController extends BaseApiController
         MarketingCampaignService $marketingCampaignService,
         AppointmentOfferService $appointmentOfferService,
         PaymentService $paymentService
-    )
-    {
+    ) {
         parent::__construct();
         $this->orderService = $orderService;
         $this->marketingCampaignService = $marketingCampaignService;
@@ -44,7 +44,7 @@ class PaymentController extends BaseApiController
     {
         $data = $request->validated();
         $payment_id = $request->payment_id;
-//        dd($payment_id);
+        //        dd($payment_id);
         if ($this->paymentService->isPaymentPaidSuccessfully($payment_id)) {
             $type = $request->type;
             try {
@@ -69,6 +69,42 @@ class PaymentController extends BaseApiController
             }
         } else {
             return $this->errorJsonRes([], __('Payment details are incorrect. Please check your payment again.'));
+        }
+    }
+
+    /**
+     * Pay Via Wallet
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function payViaWallet(PayByWalletRequest $request)
+    {
+        $data = $request->validated();
+        $data['payment_gateway'] = 'wallet';
+        $data['status'] = 'paid';
+        try {
+            $user = $request->user();
+            $type = $request->type;
+
+            switch ($type) {
+                case 'order':
+                    $this->orderService->payViaWallet($user, $data);
+                    break;
+                case 'campaign':
+                    $this->marketingCampaignService->payViaWallet($user, $data);
+                    break;
+                case 'appointment':
+                    $this->appointmentOfferService->payViaWallet($user, $data);
+                    break;
+                default:
+                    return $this->errorJsonRes([], __('api.invalid_type'));
+            }
+
+            return $this->successJsonRes([], __('api.paid_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Error changing payment status: ' . $e->getMessage());
+            return $this->errorJsonRes([], __('api.error_payment_status'));
         }
     }
 }
