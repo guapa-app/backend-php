@@ -2,26 +2,35 @@
 
 namespace App\Services\V3_1;
 
-use App\Enums\AppointmentOfferEnum;
-use App\Enums\OrderTypeEnum;
-use App\Http\Requests\V3_1\User\AppointmentOfferRequest;
-use App\Models\AppointmentOffer;
-use App\Models\AppointmentOfferDetail;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Taxonomy;
-use App\Models\User;
 use App\Models\UserVendor;
-use App\Notifications\AppointmentOfferNotification;
+use App\Enums\OrderTypeEnum;
 use App\Services\MediaService;
-use App\Services\PaymentService;
 use App\Services\QrCodeService;
-use Illuminate\Database\Eloquent\Model;
+use App\Services\WalletService;
+use App\Models\AppointmentOffer;
+use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
+use App\Enums\AppointmentOfferEnum;
+use Illuminate\Support\Facades\Log;
+use App\Models\AppointmentOfferDetail;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
+use App\Notifications\AppointmentOfferNotification;
+use App\Http\Requests\V3_1\User\AppointmentOfferRequest;
 
 class AppointmentOfferService
 {
+    protected $walletService;
+
+    public function __construct(WalletService $walletService)
+    {
+        $this->walletService = $walletService;
+    }
+
     public function index()
     {
         $user = auth('api')->user();
@@ -212,5 +221,33 @@ class AppointmentOfferService
             $appointmentOffer->save();
         }
 
+    }
+
+    /**
+     * Pay Via Wallet
+     *
+     * @param  mixed $data
+     * @return void
+     */
+    public function payViaWallet(User $user, array $data): void
+    {
+        $appointmentOffer = AppointmentOffer::findOrFail($data['id']);
+        if ($appointmentOffer->status->value != AppointmentOfferEnum::Paid_Application_Fees->value) {
+            $wallet = $user->myWallet();
+            $appointmentOfferPrice = $appointmentOffer->total;
+            if ($wallet->balance >= $appointmentOfferPrice) {
+                try {
+                    DB::beginTransaction();
+                    $transaction = $this->walletService->debit($user, $appointmentOfferPrice);
+                    $data['payment_id'] = $transaction->transaction_number;
+                    $this->changePaymentStatus($data);
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    Log::error('Transaction failed: ' . $e->getMessage());
+                    throw $e;
+                }
+            }
+        }
     }
 }

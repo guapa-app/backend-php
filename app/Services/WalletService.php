@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Setting;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
 use App\Enums\TransactionType;
 use Illuminate\Support\Facades\DB;
+use App\Enums\TransactionOperation;
 use App\Models\WalletChargingPackage;
-use Illuminate\Http\Request;
 
 class WalletService
 {
@@ -43,6 +46,28 @@ class WalletService
         $wallet->save();
 
         return $wallet;
+    }
+
+    /**
+     * debit the user's wallet with a specific amount.
+     *
+     * @param User $user
+     * @param float $amount
+     * @return Transaction
+     */
+    public function debit(User $user, float $amount)
+    {
+        $wallet = $user->myWallet();
+
+        $transactionType = TransactionType::DEBIT_FROM_WALLET;
+        $transactionOperation = TransactionOperation::WITHDRAWAL;
+        // Call the service to create the transaction
+        $transaction = $this->transactionService->createTransaction($user->id, -$amount, $transactionType, $transactionOperation);
+
+        $wallet->balance -= $amount;
+        $wallet->save();
+
+        return $transaction;
     }
 
     /**
