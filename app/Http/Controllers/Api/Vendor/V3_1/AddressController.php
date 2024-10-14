@@ -17,8 +17,12 @@ class AddressController extends ApiAddressController
     public function index(AddressListRequest $request)
     {
         $index = parent::index($request);
+        $data = $request->validated();
 
-        return AddressCollection::make($index)
+        $this->checkAddressable($data['addressable_type'], $data['addressable_id']);
+        $addresses =$this->addressRepository->all($request);
+
+        return AddressCollection::make($addresses)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -63,5 +67,21 @@ class AddressController extends ApiAddressController
         parent::delete($id);
 
         return $this->successJsonRes([], __('api.deleted'));
+    }
+
+    private function checkAddressable(string $addressable_type, int $addressable_id, int $requestAddressableId = null): void
+    {
+        if ($addressable_type === 'user' && $addressable_id !== auth()->id()) {
+            abort(403, 'Cannot create address for provided user');
+        } elseif ($addressable_type === 'vendor') {
+            $vendor = $this->vendorRepository->getOneOrFail($addressable_id);
+            if (!$vendor->hasUser(auth()->user())) {
+                abort(403, 'You cannot create address for provided vendor');
+            }
+            // this check for update only.
+            if (isset($requestAddressableId) && ($requestAddressableId !== $addressable_id)) {
+                abort(403, __('api.not_allowed'));
+            }
+        }
     }
 }
