@@ -30,7 +30,9 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->id('admin')
-            ->path('admin-filament')
+            ->path('admin-cms')
+            ->authGuard('admin-filament')
+            ->login()
             ->colors([
                 'primary' => Color::Sky,
             ])

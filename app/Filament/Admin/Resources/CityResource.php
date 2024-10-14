@@ -3,21 +3,18 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\CityResource\Pages;
-use App\Filament\Admin\Resources\CityResource\RelationManagers;
 use App\Models\City;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CityResource extends Resource
 {
     protected static ?string $model = City::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-asia-australia';
 
     public static function form(Form $form): Form
     {

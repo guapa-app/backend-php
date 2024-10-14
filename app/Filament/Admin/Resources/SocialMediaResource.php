@@ -3,21 +3,18 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\SocialMediaResource\Pages;
-use App\Filament\Admin\Resources\SocialMediaResource\RelationManagers;
 use App\Models\SocialMedia;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SocialMediaResource extends Resource
 {
     protected static ?string $model = SocialMedia::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-at-symbol';
 
     public static function form(Form $form): Form
     {
