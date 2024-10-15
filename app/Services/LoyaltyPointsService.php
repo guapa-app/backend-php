@@ -7,11 +7,12 @@ use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Enums\TransactionType;
+use App\Models\WheelOfFortune;
 use App\Enums\LoyaltyPointAction;
 use App\Models\LoyaltyPointHistory;
-use App\Http\Resources\TransactionResource;
 use App\Models\WalletChargingPackage;
-use App\Models\WheelOfFortune;
+use App\Http\Resources\TransactionResource;
+use App\Http\Resources\LoyaltyPointHistoryResource;
 
 class LoyaltyPointsService
 {
@@ -134,7 +135,7 @@ class LoyaltyPointsService
             }
         });
 
-        return $histories;
+        return LoyaltyPointHistoryResource::collection($histories);
     }
 
     /**

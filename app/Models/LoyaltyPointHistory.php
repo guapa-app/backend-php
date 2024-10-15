@@ -66,31 +66,30 @@ class LoyaltyPointHistory extends Model
     {
         if ($this->action == LoyaltyPointAction::PURCHASE->value) {
             return __('Buy Product :product', [
-                'product' => $this->sourceable->title,
+                'product' => $this->sourceable?->title,
             ]);
         } else if ($this->action == LoyaltyPointAction::RETURN_PURCHASE->value) {
             return __('Return Product :product', [
-                'product' => $this->sourceable->title,
+                'product' => $this->sourceable?->title,
             ]);
         } elseif ($this->action == LoyaltyPointAction::SPIN_WHEEL->value) {
             return __('Spin Wheel - :wheel', [
-                'wheel' => $this->sourceable->rarity_title,
+                'wheel' => $this->sourceable?->rarity_title,
             ]);
         } elseif ($this->action == LoyaltyPointAction::WALLET_CHARGING->value) {
             return __('Recharge balance - :package', [
-                'package' => $this->sourceable->name,
+                'package' => $this->sourceable?->name,
             ]);
         } elseif ($this->action == LoyaltyPointAction::FRIENDS_REGISTRATIONS->value) {
             return __('Friends Registrations');
         } elseif ($this->action == LoyaltyPointAction::CONVERSION->value) {
             return __('Points conversion');
-        }elseif ($this->action == LoyaltyPointAction::SYSTEM_ADDITION->value) {
+        } elseif ($this->action == LoyaltyPointAction::SYSTEM_ADDITION->value) {
             return __('System Addition');
-        }elseif ($this->action == LoyaltyPointAction::SYSTEM_DEDUCTION->value) {
+        } elseif ($this->action == LoyaltyPointAction::SYSTEM_DEDUCTION->value) {
             return __('System Deduction');
         }
-
-
+        
         return $this->action;
     }
 }
