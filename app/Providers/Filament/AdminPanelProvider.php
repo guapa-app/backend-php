@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -37,9 +38,18 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Sky,
             ])
             ->navigationGroups([
-                'Shop',
-                'Info',
-                'Blog',
+                NavigationGroup::make()
+                    ->label('Admin Setting')
+                    ->collapsed(),
+                NavigationGroup::make()
+                    ->label('Shop')
+                    ->collapsed(),
+                NavigationGroup::make()
+                    ->label('Info')
+                    ->collapsed(),
+                NavigationGroup::make()
+                    ->label('Blog')
+                    ->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')

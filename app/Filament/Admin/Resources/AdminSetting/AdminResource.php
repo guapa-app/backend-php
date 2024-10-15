@@ -1,37 +1,37 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Admin\Resources\AdminSetting;
 
-use App\Filament\Admin\Resources\SettingResource\Pages;
-use App\Models\Setting;
+use App\Filament\Admin\Resources\AdminSetting\AdminResource\Pages;
+use App\Models\Admin;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class SettingResource extends Resource
+class AdminResource extends Resource
 {
-    protected static ?string $model = Setting::class;
+    protected static ?string $model = Admin::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static ?string $navigationIcon = 'heroicon-o-user';
+
+    protected static ?string $navigationGroup = 'Admin Setting';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('s_key')
+                Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(50),
-                Forms\Components\Textarea::make('s_value')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('email')
+                    ->email()
                     ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('s_unit')
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('s_validation_type')
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('s_validation'),
-                Forms\Components\TextInput::make('instructions')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('password')
+                    ->password()
+                    ->required()
                     ->maxLength(255),
             ]);
     }
@@ -40,13 +40,9 @@ class SettingResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('s_key')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('s_unit')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('s_validation_type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('instructions')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -80,9 +76,9 @@ class SettingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSettings::route('/'),
-            'create' => Pages\CreateSetting::route('/create'),
-            'edit' => Pages\EditSetting::route('/{record}/edit'),
+            'index' => Pages\ListAdmins::route('/'),
+            'create' => Pages\CreateAdmin::route('/create'),
+            'edit' => Pages\EditAdmin::route('/{record}/edit'),
         ];
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Admin\Resources\SettingResource\Pages;
+namespace App\Filament\Admin\Resources\AdminSetting\SettingResource\Pages;
 
-use App\Filament\Admin\Resources\SettingResource;
+use App\Filament\Admin\Resources\AdminSetting\SettingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
