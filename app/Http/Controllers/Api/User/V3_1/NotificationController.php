@@ -2,15 +2,26 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Controllers\Api\NotificationController as ApiNotificationController;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Resources\User\V3_1\NotificationCollection;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class NotificationController extends ApiNotificationController
+class NotificationController extends BaseApiController
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function index(Request $request)
     {
-        return NotificationCollection::make(parent::index($request))
+        $perPage = $request->get('perPage');
+        $notifications = $this->user->notifications()->filter($request->type)->paginate($perPage ?: 15);
+
+        $this->transformNotifications($notifications);
+
+        return NotificationCollection::make($notifications)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -19,7 +30,12 @@ class NotificationController extends ApiNotificationController
 
     public function unread(Request $request)
     {
-        return NotificationCollection::make(parent::unread($request))
+        $perPage = $request->get('perPage');
+        $notifications = $this->user->unreadNotifications()->paginate($perPage ?: 15);
+
+        $this->transformNotifications($notifications);
+
+        return NotificationCollection::make($notifications)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -28,22 +44,35 @@ class NotificationController extends ApiNotificationController
 
     public function unread_count()
     {
-        return $this->successJsonRes(['count' => parent::unread_count()], __('api.success'));
+        return $this->successJsonRes(['count' => $this->user->unreadNotifications()->count()], __('api.success'));
     }
 
     public function markAllAsRead()
     {
-        parent::markAllAsRead();
+        $this->user->unreadNotifications()
+            ->update(['read_at' => Carbon::now()]);
 
         return $this->successJsonRes([], __('api.success'));
     }
 
     public function markRead(string $notification_id = '')
     {
-        parent::markRead($notification_id);
+        $this->user->unreadNotifications()
+            ->where('id', $notification_id)
+            ->update([
+                'read_at' => Carbon::now(),
+            ]);
 
         return $this->successJsonRes([
             'is_read' => true,
         ], __('api.success'));
+    }
+
+    public function delete($id)
+    {
+        $notification = $this->user->notifications()->findOrFail($id);
+        $notification->delete();
+
+        return $this->successJsonRes([], __('api.success'));
     }
 }

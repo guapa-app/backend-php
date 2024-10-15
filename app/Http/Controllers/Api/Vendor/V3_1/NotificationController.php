@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class NotificationController extends BaseApiController
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
     public function index(Request $request)
     {
         $perPage = $request->get('perPage');

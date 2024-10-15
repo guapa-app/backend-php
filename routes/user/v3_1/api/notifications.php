@@ -9,4 +9,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/unread_count', [NotificationController::class, 'unread_count']);
     Route::patch('/mark_all_read', [NotificationController::class, 'markAllAsRead']);
     Route::put('/{id}/mark_read', [NotificationController::class, 'markRead']);
+    Route::delete('/{id}', [NotificationController::class, 'delete']);
+
 });
