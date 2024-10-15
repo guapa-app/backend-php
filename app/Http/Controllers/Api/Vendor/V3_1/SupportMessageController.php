@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Controllers\Api\SupportMessageController as ApiSupportMessageController;
+use App\Contracts\Repositories\SupportMessageRepositoryInterface;
+use App\Enums\SupportMessageSenderType;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3\SupportMessageRequest;
 use App\Http\Resources\Vendor\V3_1\SupportMessageCollection;
 use App\Http\Resources\Vendor\V3_1\SupportMessageResource;
@@ -10,8 +12,16 @@ use App\Http\Resources\Vendor\V3_1\SupportMessageTypeCollection;
 use App\Models\SupportMessageType;
 use Illuminate\Http\Request;
 
-class SupportMessageController extends ApiSupportMessageController
+class SupportMessageController extends BaseApiController
 {
+    private $supportMessageRepository;
+
+    public function __construct(SupportMessageRepositoryInterface $supportMessageRepository)
+    {
+        parent::__construct();
+
+        $this->supportMessageRepository = $supportMessageRepository;
+    }
     /**
      * Contact support.
      *
@@ -29,7 +39,7 @@ class SupportMessageController extends ApiSupportMessageController
             'user_id' => $this->user->id,
         ]);
 
-        $records = parent::indexCommon($request);
+        $records = $this->supportMessageRepository->all($request);
 
         return SupportMessageCollection::make($records)
             ->additional([
@@ -51,7 +61,13 @@ class SupportMessageController extends ApiSupportMessageController
      */
     public function create(SupportMessageRequest $request)
     {
-        $record = parent::createCommon($request);
+        $data = $request->validated();
+        $isAdmin = $this->isAdmin();
+        $data['user_id'] = $this->user?->id;
+        $data['phone'] ??= $this->user?->phone;
+        $data['sender_type'] = $isAdmin ? SupportMessageSenderType::Admin : SupportMessageSenderType::User;
+
+        $record = $this->supportMessageRepository->create($data);
 
         $record->load('supportMessageType');
 
@@ -64,7 +80,7 @@ class SupportMessageController extends ApiSupportMessageController
 
     public function single($id)
     {
-        $record = parent::singleCommon($id);
+        $record = $this->supportMessageRepository->getOneWithRelations($id);
 
         return SupportMessageResource::make($record)
             ->additional([

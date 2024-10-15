@@ -2,16 +2,34 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Controllers\Api\StaffController as ApiStaffController;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\StaffRequest;
 use App\Http\Resources\Vendor\V3_1\UserResource;
+use App\Services\VendorService;
 use Illuminate\Http\Request;
 
-class StaffController extends ApiStaffController
+class StaffController extends BaseApiController
 {
+    private $userRepository;
+
+    private $vendorService;
+
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        VendorService $vendorService
+    ) {
+        parent::__construct();
+        $this->userRepository = $userRepository;
+        $this->vendorService = $vendorService;
+    }
     public function index(Request $request)
     {
-        return UserResource::collection(parent::index($request))
+        $vendor  = $this->user->vendor;
+
+        $this->validateVendorManager($vendor);
+
+        return UserResource::collection($vendor->staff()->get())
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -20,7 +38,14 @@ class StaffController extends ApiStaffController
 
     public function create(StaffRequest $request)
     {
-        return UserResource::make(parent::create($request))
+        $data = $request->validated();
+
+        $vendor  = $this->user->vendor;
+
+        $this->validateVendorManager($vendor);
+
+        $user = $this->vendorService->addStaff($vendor, $data);
+        return UserResource::make($user)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -30,7 +55,16 @@ class StaffController extends ApiStaffController
     public function update(StaffRequest $request, $userId)
     {
         try {
-            return UserResource::make(parent::update($request, $userId))
+            $data = $request->validated();
+            $vendor  = $this->user->vendor;
+            $userToUpdate = $this->userRepository->getOneOrFail($userId);
+
+            $this->validateVendorManager($vendor);
+            $this->validateUserBelongsToVendor($vendor, $userToUpdate);
+
+            $user = $this->vendorService->updateSingleStaff($vendor, $userToUpdate, $data);
+
+            return UserResource::make($user)
                 ->additional([
                     'success' => true,
                     'message' => __('api.success'),
@@ -43,10 +77,28 @@ class StaffController extends ApiStaffController
         }
     }
 
-    public function delete($userId, $vendorId)
+    public function delete($userId)
     {
-        parent::delete($userId, $vendorId);
+        $vendor  = $this->user->vendor;
+        $this->validateVendorManager($vendor);
+
+        $this->vendorService->deleteStaff((int) $userId, $vendor);
 
         return $this->successJsonRes([], __('api.staff_deleted'));
+    }
+
+    private function validateVendorManager($vendor): void
+    {
+        $user = auth()->user();
+
+        if (!$vendor->hasManager($user)) {
+            abort(403, 'You must be a manager to manage staff of this vendor');
+        }
+    }
+    private function validateUserBelongsToVendor($vendor, $user): void
+    {
+        if (!$vendor->hasUser($user)) {
+            abort(403, 'This user does not belong to this manager');
+        }
     }
 }

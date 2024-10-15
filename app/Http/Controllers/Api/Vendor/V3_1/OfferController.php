@@ -2,14 +2,30 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Controllers\Api\OfferController as ApiOfferController;
+use App\Contracts\Repositories\OfferRepositoryInterface;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\OfferRequest;
 use App\Http\Resources\Vendor\V3_1\OfferResource;
 use App\Http\Resources\Vendor\V3_1\ProductResource;
+use App\Services\OfferService;
 use Illuminate\Http\Request;
 
-class OfferController extends ApiOfferController
+class OfferController extends BaseApiController
 {
+    private $offerRepository;
+
+    private $offerService;
+
+    public function __construct(
+        OfferService $offerService,
+        OfferRepositoryInterface $repository
+    ) {
+        parent::__construct();
+
+        $this->offerService = $offerService;
+        $this->offerRepository = $repository;
+    }
+
     /**
      * This API for vendors ONLY.
      * To display all products that has offer
@@ -21,9 +37,8 @@ class OfferController extends ApiOfferController
     public function index(Request $request)
     {
         $request->merge(['vendor_id' => $this->user->managerVendorId()]);
-        $index = parent::index($request);
-
-        return ProductResource::collection($index)
+        $offers = $this->offerRepository->all($request);
+        return ProductResource::collection($offers)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -32,7 +47,8 @@ class OfferController extends ApiOfferController
 
     public function create(OfferRequest $request)
     {
-        return OfferResource::make(parent::create($request))
+        $offer = $this->offerService->create($request->validated());
+        return OfferResource::make($offer)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -41,7 +57,8 @@ class OfferController extends ApiOfferController
 
     public function update(OfferRequest $request, $id)
     {
-        return OfferResource::make(parent::update($request, $id))
+        $offer = $this->offerService->update($id, $request->validated());
+        return OfferResource::make($offer)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -50,8 +67,7 @@ class OfferController extends ApiOfferController
 
     public function delete($id)
     {
-        parent::delete($id);
-
+        $this->offerService->delete($id);
         return $this->successJsonRes([], __('api.success'));
     }
 }

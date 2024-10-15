@@ -25,7 +25,7 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
     {
         $user = auth('api')->user();
         $vendor = $user->vendor ?? null;
-
+        dd($vendor);
         $query = AppointmentOffer::query()
             ->applyFilters($request)
             ->applyOrderBy($request->get('sort'), $request->get('order'))
