@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources\SupportMessageTypeResource\Pages;
 
 use App\Filament\Admin\Resources\SupportMessageTypeResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSupportMessageType extends CreateRecord

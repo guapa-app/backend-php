@@ -1,31 +1,39 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Admin\Resources\Info;
 
-use App\Filament\Admin\Resources\SocialMediaVendorResource\Pages;
-use App\Models\SocialMediaVendor;
+use App\Filament\Admin\Resources\Info\ShareLinkResource\Pages;
+use App\Models\ShareLink;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class SocialMediaVendorResource extends Resource
+class ShareLinkResource extends Resource
 {
-    protected static ?string $model = SocialMediaVendor::class;
+    protected static ?string $model = ShareLink::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-link';
+
+    protected static ?string $navigationGroup = 'Info';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('social_media_id')
+                Forms\Components\TextInput::make('shareable_type')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('shareable_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\Textarea::make('link')
+                Forms\Components\TextInput::make('identifier')
                     ->required()
-                    ->columnSpanFull(),
+                    ->maxLength(36),
+                Forms\Components\TextInput::make('link')
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 
@@ -33,12 +41,15 @@ class SocialMediaVendorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('social_media_id')
+                Tables\Columns\TextColumn::make('shareable_type')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('shareable_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('vendor_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('identifier')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('link')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -71,9 +82,9 @@ class SocialMediaVendorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSocialMediaVendors::route('/'),
-            'create' => Pages\CreateSocialMediaVendor::route('/create'),
-            'edit' => Pages\EditSocialMediaVendor::route('/{record}/edit'),
+            'index' => Pages\ListShareLinks::route('/'),
+            'create' => Pages\CreateShareLink::route('/create'),
+            'edit' => Pages\EditShareLink::route('/{record}/edit'),
         ];
     }
 }

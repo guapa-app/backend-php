@@ -1,29 +1,35 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Admin\Resources\Info;
 
-use App\Filament\Admin\Resources\SocialMediaVendorResource\Pages;
-use App\Models\SocialMediaVendor;
+use App\Filament\Admin\Resources\Info\CommentResource\Pages;
+use App\Models\Comment;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class SocialMediaVendorResource extends Resource
+class CommentResource extends Resource
 {
-    protected static ?string $model = SocialMediaVendor::class;
+    protected static ?string $model = Comment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('social_media_id')
+                Forms\Components\TextInput::make('post_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\Textarea::make('link')
+                Forms\Components\TextInput::make('user_type')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('user_id')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
             ]);
@@ -33,10 +39,12 @@ class SocialMediaVendorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('social_media_id')
+                Tables\Columns\TextColumn::make('post_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('vendor_id')
+                Tables\Columns\TextColumn::make('user_type')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -71,9 +79,9 @@ class SocialMediaVendorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSocialMediaVendors::route('/'),
-            'create' => Pages\CreateSocialMediaVendor::route('/create'),
-            'edit' => Pages\EditSocialMediaVendor::route('/{record}/edit'),
+            'index' => Pages\ListComments::route('/'),
+            'create' => Pages\CreateComment::route('/create'),
+            'edit' => Pages\EditComment::route('/{record}/edit'),
         ];
     }
 }

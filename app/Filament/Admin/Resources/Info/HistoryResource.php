@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Admin\Resources\Info;
 
-use App\Filament\Admin\Resources\PostSocialMediaResource\Pages;
-use App\Models\PostSocialMedia;
+use App\Filament\Admin\Resources\Info\HistoryResource\Pages;
+use App\Models\History;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class PostSocialMediaResource extends Resource
+class HistoryResource extends Resource
 {
-    protected static ?string $model = PostSocialMedia::class;
+    protected static ?string $model = History::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -20,12 +20,13 @@ class PostSocialMediaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('social_media_id')
+                Forms\Components\TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\Textarea::make('link')
+                Forms\Components\Textarea::make('details')
                     ->required()
                     ->columnSpanFull(),
+                Forms\Components\DateTimePicker::make('record_date'),
             ]);
     }
 
@@ -33,12 +34,20 @@ class PostSocialMediaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('post_id')
+                Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('social_media_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('record_date')
+                    ->dateTime()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -63,9 +72,9 @@ class PostSocialMediaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPostSocialMedia::route('/'),
-            'create' => Pages\CreatePostSocialMedia::route('/create'),
-            'edit' => Pages\EditPostSocialMedia::route('/{record}/edit'),
+            'index' => Pages\ListHistories::route('/'),
+            'create' => Pages\CreateHistory::route('/create'),
+            'edit' => Pages\EditHistory::route('/{record}/edit'),
         ];
     }
 }

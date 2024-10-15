@@ -1,31 +1,27 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Admin\Resources\Info;
 
-use App\Filament\Admin\Resources\SocialMediaVendorResource\Pages;
-use App\Models\SocialMediaVendor;
+use App\Filament\Admin\Resources\Info\CityResource\Pages;
+use App\Models\City;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class SocialMediaVendorResource extends Resource
+class CityResource extends Resource
 {
-    protected static ?string $model = SocialMediaVendor::class;
+    protected static ?string $model = City::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-asia-australia';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('social_media_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\Textarea::make('link')
-                    ->required()
-                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('name')
+                    ->required(),
             ]);
     }
 
@@ -33,12 +29,6 @@ class SocialMediaVendorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('social_media_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('vendor_id')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -71,9 +61,9 @@ class SocialMediaVendorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSocialMediaVendors::route('/'),
-            'create' => Pages\CreateSocialMediaVendor::route('/create'),
-            'edit' => Pages\EditSocialMediaVendor::route('/{record}/edit'),
+            'index' => Pages\ListCities::route('/'),
+            'create' => Pages\CreateCity::route('/create'),
+            'edit' => Pages\EditCity::route('/{record}/edit'),
         ];
     }
 }

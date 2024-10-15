@@ -1,31 +1,34 @@
 <?php
 
-namespace App\Filament\Admin\Resources;
+namespace App\Filament\Admin\Resources\Info;
 
-use App\Filament\Admin\Resources\PostSocialMediaResource\Pages;
-use App\Models\PostSocialMedia;
+use App\Filament\Admin\Resources\Info\AppointmentResource\Pages;
+use App\Models\Appointment;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class PostSocialMediaResource extends Resource
+class AppointmentResource extends Resource
 {
-    protected static ?string $model = PostSocialMedia::class;
+    protected static ?string $model = Appointment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-bookmark';
+
+    protected static ?string $navigationGroup = 'Info';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('social_media_id')
+                Forms\Components\TextInput::make('vendor_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\Textarea::make('link')
-                    ->required()
-                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('from_time')
+                    ->required(),
+                Forms\Components\TextInput::make('to_time')
+                    ->required(),
             ]);
     }
 
@@ -33,12 +36,11 @@ class PostSocialMediaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('post_id')
+                Tables\Columns\TextColumn::make('vendor_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('social_media_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('from_time'),
+                Tables\Columns\TextColumn::make('to_time'),
             ])
             ->filters([
                 //
@@ -63,9 +65,9 @@ class PostSocialMediaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPostSocialMedia::route('/'),
-            'create' => Pages\CreatePostSocialMedia::route('/create'),
-            'edit' => Pages\EditPostSocialMedia::route('/{record}/edit'),
+            'index' => Pages\ListAppointments::route('/'),
+            'create' => Pages\CreateAppointment::route('/create'),
+            'edit' => Pages\EditAppointment::route('/{record}/edit'),
         ];
     }
 }
