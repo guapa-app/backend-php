@@ -10,11 +10,11 @@ class LoyaltyPointHistoryResource extends JsonResource
     {
         return [
             'id'                   => $this->id,
+            'title'                => (string) $this->title,
+            'points_change'        => (string) $this->points_change,
             'points'               => (int) $this->points,
             'action'               => (string) $this->action,
             'type'                 => (string) $this->type,
-            'title'                => (string) $this->title,
-            'points_change'        => (string) $this->points_change,
         ];
     }
 }
