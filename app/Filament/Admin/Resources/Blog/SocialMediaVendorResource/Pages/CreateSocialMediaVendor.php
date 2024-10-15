@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Filament\Admin\Resources\Blog\SocialMediaVendorResource\Pages;
+
+use App\Filament\Admin\Resources\Blog\SocialMediaVendorResource;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreateSocialMediaVendor extends CreateRecord
+{
+    protected static string $resource = SocialMediaVendorResource::class;
+}
