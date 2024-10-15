@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Controllers\Api\ProductController as ApiProductController;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\ProductListRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\Vendor\V3_1\ProductResource;
 
-class ProductController extends ApiProductController
+class ProductController extends BaseApiController
 {
     public function index(ProductListRequest $request)
     {
-        $request['vendor_id'] = $this->user->userVendor?->vendor_id;
-        $index = parent::index($request);
+        $request->merge(['vendor_id' => $this->user->managerVendorId()]);
 
-        return ProductResource::collection($index)
+        $products = $this->productRepository->all($request);
+
+        return ProductResource::collection($products)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -23,9 +24,10 @@ class ProductController extends ApiProductController
 
     public function single($id)
     {
-        $single = parent::single($id);
+        $product = $this->productRepository->getOneWithRelations((int) $id);
+        $product->description = strip_tags($product->description);
 
-        return ProductResource::make($single)
+        return ProductResource::make($product)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -34,7 +36,10 @@ class ProductController extends ApiProductController
 
     public function create(ProductRequest $request)
     {
-        $item = parent::create($request);
+        $data = $request->validated();
+        $data['vendor_id'] = $this->user->managerVendorId();
+
+        $item = $this->productService->create($data);
 
         return ProductResource::make($item)
             ->additional([
@@ -45,7 +50,7 @@ class ProductController extends ApiProductController
 
     public function update($id, ProductRequest $request)
     {
-        $item = parent::update($id, $request);
+        $item = $this->productService->update($id, $request->validated());
 
         return ProductResource::make($item)
             ->additional([
@@ -56,7 +61,7 @@ class ProductController extends ApiProductController
 
     public function delete($id)
     {
-        parent::delete($id);
+        $this->productService->delete($id);
 
         return $this->successJsonRes([], __('api.deleted'));
     }

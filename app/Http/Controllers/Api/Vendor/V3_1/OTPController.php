@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\Vendor\V3_1\PhoneRequest;
+use App\Http\Requests\V3_1\Vendor\PhoneRequest;
 use App\Models\Setting;
 use App\Services\SMSService;
 

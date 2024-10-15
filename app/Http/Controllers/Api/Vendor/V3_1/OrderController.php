@@ -3,26 +3,28 @@
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Resources\Vendor\V3_1\OrderCollection;
 use App\Http\Resources\Vendor\V3_1\OrderResource;
-use App\Services\V3\OrderService;
+use App\Models\Order;
+use App\Models\Setting;
 
 class OrderController extends ApiOrderController
 {
-    protected $orderService;
-
-    public function __construct(OrderRepositoryInterface $orderRepository, OrderService $orderService)
+    protected $orderRepository;
+    public function __construct(OrderRepositoryInterface $orderRepository)
     {
-        parent::__construct($orderRepository, $orderService);
-        $this->orderService = $orderService;
+        parent::__construct();
+
+        $this->orderRepository = $orderRepository;
     }
 
     public function index(GetOrdersRequest $request)
     {
-        $request->merge(['vendor_id' => $this->user->userVendor?->vendor_id]);
-        $orders = parent::index($request);
+        $request->merge(['vendor_id' => $this->user->managerVendorId()]);
+        $orders = $this->orderRepository->all($request);
 
         return OrderCollection::make($orders)
             ->additional([
@@ -33,7 +35,7 @@ class OrderController extends ApiOrderController
 
     public function single($id)
     {
-        $item = parent::single($id);
+        $item = $this->orderService->getOrderDetails((int) $id);
 
         return OrderResource::make($item)
             ->additional([
@@ -42,15 +44,32 @@ class OrderController extends ApiOrderController
             ]);
     }
 
-    public function printPDF($id)
-    {
-        $url = parent::printPDF($id);
-
-        return $this->successJsonRes(['url' => $url], __('api.success'));
-    }
-
     public function showInvoice($id)
     {
-        return parent::showInvoice($id);
+        $order = Order::query()
+            ->where('hash_id', $id)
+            ->firstOrFail();
+
+        $cus_name = $order->user->name;
+
+        $invoice = $order->invoice;
+
+        if (in_array($order->status->value, OrderStatus::notAvailableShowInvoice()) || $invoice == null) {
+            return response('Not Available', 405);
+        }
+
+        $vat = Setting::getTaxes();
+
+        $order_items = $order->items->map(function ($item) use ($vat) {
+            $arr['name'] = $item->title;
+            $arr['price'] = $item->amount_to_pay;
+            $arr['vat'] = $arr['price'] * $item->taxes / 100;
+            $arr['qty'] = $item->quantity;
+            $arr['subtotal_with_vat'] = ($arr['price'] + $arr['vat']) * $arr['qty'];
+
+            return $arr;
+        });
+
+        return view('invoice', compact('invoice', 'cus_name', 'order_items', 'vat'));
     }
 }
