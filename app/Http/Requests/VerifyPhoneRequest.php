@@ -24,6 +24,7 @@ class VerifyPhoneRequest extends FailedValidationRequest
         return [
             'phone' => 'required|string|numeric',
             'otp'   => 'required|string|max:10',
+            'referral_code' => 'nullable|exists:user_profiles,referral_code',
         ];
     }
 }
