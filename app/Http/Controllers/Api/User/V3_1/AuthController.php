@@ -62,10 +62,6 @@ class AuthController extends BaseApiController
             $this->smsService->sendOtp($data['phone']);
         }
 
-        if ($request->filled('referral_code')) {
-            $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
-        }
-
         return $this->successJsonRes([
             'is_otp_sent' => true,
         ], __('api.otp_sent'));
@@ -125,12 +121,17 @@ class AuthController extends BaseApiController
         if (Setting::checkTestingMode()) {
             $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
 
+            if ($request->filled('referral_code')) {
+                $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
+            }
+            
             $this->prepareUserResponse($user, $token);
 
             return UserResource::make($user)
                 ->additional([
                     'success' => true,
                     'message' => __('api.success'),
+                    'points'  => (int) $user->myPointsWallet()->points,
                 ]);
         }
 
@@ -146,10 +147,15 @@ class AuthController extends BaseApiController
         if ($token) {
             $user = $this->prepareUserResponse($user, $token);
 
+            if ($request->filled('referral_code')) {
+                $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
+            }
+
             return UserResource::make($user)
                 ->additional([
                     'success' => true,
                     'message' => __('api.success'),
+                    'points'  => (int) $user->myPointsWallet()->points,
                 ]);
         } else {
             return $this->errorJsonRes([

@@ -260,6 +260,14 @@ class LoyaltyPointsService
             'type' => 'added',
         ]);
 
+        $inviteePointsWallet = $invitee->myPointsWallet();
+        $inviteePointsWallet->points += $inviteePoints;
+        $inviteePointsWallet->save();
+
+        $inviterPointsWallet = $inviter->myPointsWallet();
+        $inviterPointsWallet->points += $inviterPoints;
+        $inviterPointsWallet->save();
+
         $invitee->loyaltyPointHistories()->create([
             'user_id' => $inviter->id,
             'points' => abs($inviterPoints),
