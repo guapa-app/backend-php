@@ -159,6 +159,8 @@ class MarketingCampaignService
             $campaign->payment_gateway = $data['payment_gateway'];
             $campaign->save();
 
+            // Update invoice status
+            $campaign->invoice->update(['status' => 'paid']);
             // Send Campaign Messages
             $this->sendCampaignMessages($campaign);
         } else {

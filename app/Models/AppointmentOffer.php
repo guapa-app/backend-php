@@ -79,7 +79,7 @@ class AppointmentOffer extends Model implements Listable, HasMedia
             ->withTimestamps();
     }
 
-    public function invoices(): MorphOne
+    public function invoice(): MorphOne
     {
         return $this->morphOne(Invoice::class, 'invoiceable');
     }

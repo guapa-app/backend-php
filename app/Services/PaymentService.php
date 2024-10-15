@@ -62,9 +62,19 @@ class PaymentService
         return Invoice::query()->create($invoiceData);
     }
 
-    public function refund($order)
+    public function refund($model)
     {
-        $this->paymentService->refund($order);
+        // if the model has payment id and the payment is paid successfully
+        // check the payment_getway if it wallet return it to the user wallet else refund it to the payment_getway
+        if (!empty($model->payment_id)) {
+            if ($model->payment_gateway == 'wallet') {
+                $model->user->wallet += $model->total;
+                $model->user->save();
+            } else {
+                $this->paymentService->refund($model);
+            }
+        }
+
     }
 
     /**
