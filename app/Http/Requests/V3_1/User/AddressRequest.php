@@ -29,8 +29,6 @@ class AddressRequest extends FailedValidationRequest
 
         return [
             'title'             => 'nullable|string|max:150',
-            'addressable_type'  => 'required|string|in:vendor,user',
-            'addressable_id'    => 'required|integer',
             'city_id'           => 'sometimes|required|integer|exists:cities,id',
             'address_1'         => 'required|string|max:250',
             'address_2'         => 'nullable|string|max:250',

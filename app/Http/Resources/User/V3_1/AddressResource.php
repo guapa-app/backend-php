@@ -11,7 +11,7 @@ class AddressResource extends JsonResource
         return [
             'id'                   => $this->id,
             'title'                => (string) $this->title,
-            'city'              => (string) $this->city?->name,
+            'city'                 => CityResource::make($this->whenLoaded('city')),
             'address_1'            => (string) $this->address_1,
             'address_2'            => (string) $this->address_2,
             'lat'                  => (float) $this->lat,

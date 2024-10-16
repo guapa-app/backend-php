@@ -6,6 +6,7 @@ use App\Contracts\FcmNotifiable;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Models\Device;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserVendor;
@@ -201,19 +202,18 @@ class UserService
         return $user;
     }
 
-    public function updatePhoneNumber(User $user, $phone): User
+    public function updatePhoneNumber(User $user, $phone): bool
     {
-        if ($user->phone !== $phone) {
-            $user->phone_verified_at = null;
-            $user->phone = $phone;
-            $user->save();
+        $user->phone_verified_at = null;
+        $user->phone = $phone;
+        $user->save();
 
-            // Send OTP to the new phone number
+        if (!Setting::checkTestingMode()) {
             $smsService = new SMSService();
             $smsService->sendOtp($phone);
         }
 
-        return $user;
+        return true;
     }
     public function setPassword(User $user, $password): User
     {

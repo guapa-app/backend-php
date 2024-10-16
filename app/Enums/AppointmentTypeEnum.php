@@ -61,7 +61,7 @@ enum AppointmentTypeEnum: string
                 ]
             ],
             self::SingleCheck => [
-                'options' => [
+                'checkbox_options' => [
                     ['label' => 'Yes', 'value' => true],
                     ['label' => 'No', 'value' => false]
                 ],
@@ -70,7 +70,7 @@ enum AppointmentTypeEnum: string
                 ]
             ],
             self::MultipleCheck => [
-                'options' => ['Option A', 'Option B', 'Option C'],
+                'choices' => ['Option A', 'Option B', 'Option C'],
                 'type' => 'checkboxes',
                 'rules' => [
                     'required' => true,
@@ -78,7 +78,7 @@ enum AppointmentTypeEnum: string
                 ]
             ],
             self::SingleCheckChoices => [
-                'options' => [
+                'checkbox_options' => [
                     ['label' => 'Yes', 'value' => true],
                     ['label' => 'No', 'value' => false]
                 ],
@@ -93,8 +93,8 @@ enum AppointmentTypeEnum: string
             ],
             self::SingleCheckWithText => [
                 'type' => 'checkbox_with_text',
-                'options' => [
-                    ['label' => 'Yes', 'value' => true], // true option ,
+                'checkbox_options' => [
+                    ['label' => 'Yes', 'value' => true],
                     ['label' => 'No', 'value' => false]
                 ],
                 'options_rules' => [

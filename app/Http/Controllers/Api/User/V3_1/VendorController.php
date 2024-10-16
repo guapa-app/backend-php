@@ -2,17 +2,29 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Controllers\Api\VendorController as ApiVendorController;
+use App\Contracts\Repositories\VendorRepositoryInterface;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\User\V3_1\VendorCollection;
 use App\Http\Resources\User\V3_1\VendorResource;
+use App\Services\VendorService;
 use Illuminate\Http\Request;
 
-class VendorController extends ApiVendorController
+class VendorController extends BaseApiController
 {
+    protected $vendorRepository;
+    protected $vendorService;
+
+    public function __construct(VendorRepositoryInterface $vendorRepository, VendorService $vendorService)
+    {
+        parent::__construct();
+
+        $this->vendorRepository = $vendorRepository;
+        $this->vendorService = $vendorService;
+    }
     public function index(Request $request)
     {
-        $index = parent::index($request);
-
-        return VendorResource::collection($index)
+        $vendors  = $this->vendorRepository->all($request);
+        return VendorCollection::make($vendors)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -21,9 +33,13 @@ class VendorController extends ApiVendorController
 
     public function single(Request $request, $id)
     {
-        $item = parent::single($request, $id);
+        $vendor = $this->vendorRepository->getOneWithRelations($id);
 
-        return VendorResource::make($item)
+        $this->vendorService->view($id);
+
+        $vendor->about = strip_tags($vendor->about);
+
+        return VendorResource::make($vendor)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),

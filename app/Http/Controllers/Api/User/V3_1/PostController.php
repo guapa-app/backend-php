@@ -2,18 +2,26 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Controllers\Api\PostController as ApiPostController;
+use App\Contracts\Repositories\PostRepositoryInterface;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Resources\User\V3_1\PostCollection;
 use App\Http\Resources\User\V3_1\PostResource;
 use Illuminate\Http\Request;
 
-class PostController extends ApiPostController
+class PostController extends BaseApiController
 {
+    protected $postRepository;
+
+    public function __construct(PostRepositoryInterface $postRepository)
+    {
+        parent::__construct();
+
+        $this->postRepository = $postRepository;
+    }
     public function index(Request $request)
     {
-        $index = parent::index($request);
-
-        return PostCollection::make($index)
+        $posts =  $this->postRepository->all($request);
+        return PostCollection::make($posts)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
@@ -22,7 +30,11 @@ class PostController extends ApiPostController
 
     public function single($id)
     {
-        return PostResource::make(parent::single($id))
+        $post = $this->postRepository->getOneWithRelations((int) $id);
+
+        $post->content = strip_tags($post->content);
+
+        return PostResource::make($post)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),

@@ -23,6 +23,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::prefix('pages')->group(base_path('routes/user/v3_1/api/pages.php'));
     Route::prefix('offers')->group(base_path('routes/user/v3_1/api/offers.php'));
     Route::prefix('orders')->group(base_path('routes/user/v3_1/api/orders.php'));
+    Route::prefix('coupons')->group(base_path('routes/user/v3_1/api/coupons.php'));
     Route::prefix('vendors')->group(base_path('routes/user/v3_1/api/vendors.php'));
     Route::prefix('history')->group(base_path('routes/user/v3_1/api/history.php'));
     Route::prefix('reviews')->group(base_path('routes/user/v3_1/api/reviews.php'));
@@ -31,6 +32,7 @@ Route::prefix("user/v3.1")->group(function () {
     Route::prefix('favorites')->group(base_path('routes/user/v3_1/api/favorites.php'));
     Route::prefix('social-media')->group(base_path('routes/user/v3_1/api/social_media.php'));
     Route::prefix('addresses')->group(base_path('routes/user/v3_1/api/addresses.php'));
+    Route::prefix('cities')->group(base_path('routes/user/v3_1/api/cities.php'));
     Route::prefix('messaging')->group(base_path('routes/user/v3_1/api/messaging.php'));
     Route::prefix('taxonomies')->group(base_path('routes/user/v3_1/api/taxonomies.php'));
     Route::prefix('notifications')->group(base_path('routes/user/v3_1/api/notifications.php'));

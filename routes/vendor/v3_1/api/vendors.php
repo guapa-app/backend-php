@@ -12,7 +12,7 @@ Route::group(['middleware' => 'auth:api', 'as' => 'vendors.'], function () {
     Route::apiResource('{vendor}/social-media', VendorSocialMediaController::class)->only([
         'store', 'update', 'destroy'
     ]);
-    Route::apiResource('{vendor}/influencers', InfluencerController::class)->only([
+    Route::apiResource('influencers', InfluencerController::class)->only([
         'index', 'store', 'update', 'destroy'
     ]);
 });
