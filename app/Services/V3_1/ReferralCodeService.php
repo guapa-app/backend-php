@@ -27,13 +27,15 @@ class ReferralCodeService
             $inviter = UserProfile::where('referral_code', $referral_code)->first();
 
             // Log the invitation in referral_code_usages
-            ReferralCodeUsage::create([
+            $referralCodeUsage = ReferralCodeUsage::firstOrCreate([
                 'user_id' => $inviter->user_id, // The inviter's profile
                 'invitee_id' => $invitee->id, // The new user (invitee)
             ]);
 
-            // Allocate points to both the inviter and invitee
-            $this->loyaltyPointsService->addFriendRegistrationsPoints($inviter->user, $invitee);
+            if ($referralCodeUsage->wasRecentlyCreated) {
+                // Allocate points to both the inviter and invitee
+                $this->loyaltyPointsService->addFriendRegistrationsPoints($inviter->user, $invitee);
+            }
         }
     }
 }

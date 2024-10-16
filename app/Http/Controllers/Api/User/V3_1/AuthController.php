@@ -20,6 +20,7 @@ use App\Http\Resources\User\V3_1\UserResource;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\RegisterRequest;
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Http\Resources\User\V3_1\UserWithPointsResource;
 
 class AuthController extends BaseApiController
 {
@@ -121,14 +122,13 @@ class AuthController extends BaseApiController
             if ($request->filled('referral_code')) {
                 $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
             }
-            
+
             $this->prepareUserResponse($user, $token);
 
-            return UserResource::make($user)
+            return UserWithPointsResource::make($user)
                 ->additional([
                     'success' => true,
                     'message' => __('api.success'),
-                    'points'  => (int) $user->myPointsWallet()->points,
                 ]);
         }
 
@@ -148,11 +148,10 @@ class AuthController extends BaseApiController
                 $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
             }
 
-            return UserResource::make($user)
+            return UserWithPointsResource::make($user)
                 ->additional([
                     'success' => true,
                     'message' => __('api.success'),
-                    'points'  => (int) $user->myPointsWallet()->points,
                 ]);
         } else {
             return $this->errorJsonRes([
