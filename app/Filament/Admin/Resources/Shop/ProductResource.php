@@ -2,13 +2,19 @@
 
 namespace App\Filament\Admin\Resources\Shop;
 
+use App\Enums\ProductReview;
+use App\Enums\ProductStatus;
 use App\Filament\Admin\Resources\Shop\ProductResource\Pages;
+use App\Filament\Admin\Resources\Shop\ProductResource\RelationManagers;
+use App\Helpers\Common;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductResource extends Resource
 {
@@ -22,35 +28,52 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('hash_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('vendor_id')
-                    ->relationship('vendor', 'name')
-                    ->required(),
+                Forms\Components\Hidden::make('hash_id')
+                    ->label('Number')
+                    ->default(Common::generateUniqueHashForModel(self::$model, 16)),
+                Forms\Components\TextInput::make('sort_order')
+                    ->numeric(),
+                Forms\Components\Hidden::make('type')
+                    ->default(request('type')),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
+                Forms\Components\Select::make('taxonomies')
+                    ->label(__('Categories'))
+                    ->relationship(
+                        name: 'taxonomies',
+                        modifyQueryUsing: fn (Builder $query, $record) => ($record->type?->value ?? request('type')) == 'service' ?
+                            $query->where('type', 'specialty') :
+                            $query->where('type', 'category')
+                    )
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->required(),
+                Forms\Components\Select::make('vendor_id')
+                    ->label(__('Vendor'))
+                    ->native(false)
+                    ->relationship(name: 'vendor')
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name}")
+                    ->required(),
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
                     ->prefix('$'),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
+                    ->native(false)
+                    ->options(ProductStatus::class)
                     ->required(),
-                Forms\Components\TextInput::make('review')
+                Forms\Components\Select::make('review')
+                    ->native(false)
+                    ->options(ProductReview::class)
                     ->required(),
-                Forms\Components\TextInput::make('type')
-                    ->required()
-                    ->maxLength(30)
-                    ->default('product'),
                 Forms\Components\TextInput::make('url')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('terms')
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(65535)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('sort_order')
-                    ->numeric(),
+                Forms\Components\Textarea::make('terms')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -58,29 +81,23 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('hash_id')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('vendor.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(20),
                 Tables\Columns\TextColumn::make('price')
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('review'),
-                Tables\Columns\TextColumn::make('type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('url')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('sort_order')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -90,23 +107,19 @@ class ProductResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\OfferRelationManager::class,
         ];
     }
 

@@ -38,13 +38,13 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price',
-        'status', 'review', 'type', 'terms', 'url',
+        'status', 'review', 'type', 'terms', 'url', 'sort_order',
     ];
 
     protected $appends = [
         'likes_count', 'is_liked',
         'taxonomy_name', 'address',
-        'shared_link'
+        'shared_link',
     ];
 
     /**
@@ -151,6 +151,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $price -= ($price * ($this->offer->discount / 100));
             $price = round($price, 2);
         }
+
         return $price;
     }
 
@@ -414,6 +415,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         if ($productCategory?->fees) {
             $productFees = $productCategory->fees;
+
             return ($productFees / 100) * $finalPrice;
         } else {
             return $productCategory?->fixed_price ?? 0;

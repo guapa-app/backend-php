@@ -14,7 +14,7 @@ class WorkDayResource extends Resource
 {
     protected static ?string $model = WorkDay::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar-date-range';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     protected static ?string $navigationGroup = 'Info';
 

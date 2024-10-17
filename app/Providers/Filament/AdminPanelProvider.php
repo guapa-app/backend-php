@@ -37,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Sky,
             ])
+            ->topNavigation()
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Shop')
