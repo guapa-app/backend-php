@@ -10,7 +10,7 @@ enum MarketingCampaignStatus: string implements HasLabel
     case COMPLETED = 'completed';
     case EXPIRED = 'expired';
     case FAILED = 'failed';
-
+    case Refunded = 'refunded';
     public function getLabel(): string
     {
         return match ($this) {
@@ -18,6 +18,7 @@ enum MarketingCampaignStatus: string implements HasLabel
             self::COMPLETED => 'Completed',
             self::EXPIRED => 'Expired',
             self::FAILED => 'Failed',
+            self::Refunded => 'Refunded',
         };
     }
 }

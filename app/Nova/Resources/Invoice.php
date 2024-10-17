@@ -2,6 +2,7 @@
 
 namespace App\Nova\Resources;
 
+use App\Nova\Actions\RefundInvoice;
 use Illuminate\Http\Request;
 use Laravel\Nova\Actions\ExportAsCsv;
 use Laravel\Nova\Fields\Badge;
@@ -54,6 +55,7 @@ class Invoice extends Resource
                 ->types([
                     Order::class,
                     MarketingCampaign::class,
+                    AppointmentOffer::class
                 ])
                 ->searchable(),
             Text::make(__('invoice id'), 'invoice_id')->required(),
@@ -141,6 +143,11 @@ class Invoice extends Resource
                 }),
 
             (new \App\Nova\Actions\DownloadInvoice)->onlyInline(),
+
+            (new RefundInvoice)
+                ->canRun(function ($request, $invoice) {
+                    return $invoice->status === 'paid';
+                }),
         ];
     }
 
