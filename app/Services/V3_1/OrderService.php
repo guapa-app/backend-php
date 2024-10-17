@@ -240,6 +240,8 @@ class OrderService
                 $order->invoice_url = (new PDFService)->addInvoicePDF($order);
             }
             $order->save();
+            // Update invoice status
+            $order->invoice->update(['status' => 'paid']);
 
             if ($order->type == OrderTypeEnum::Appointment->value) {
                 $order->appointmentOfferDetails->update([

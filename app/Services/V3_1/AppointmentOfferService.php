@@ -210,6 +210,7 @@ class AppointmentOfferService
             $appointmentOffer->payment_gateway = $data['payment_gateway'];
             $appointmentOffer->save();
 
+            $appointmentOffer->invoice->update(['status' => 'paid']);
             // Send email notifications
             $userVendors = UserVendor::query()
                 ->whereIn('vendor_id', $appointmentOffer->details->pluck('vendor_id'))
@@ -234,7 +235,7 @@ class AppointmentOfferService
         $appointmentOffer = AppointmentOffer::findOrFail($data['id']);
         if ($appointmentOffer->status->value != AppointmentOfferEnum::Paid_Application_Fees->value) {
             $wallet = $user->myWallet();
-            $appointmentOfferPrice = $appointmentOffer->total;
+            $appointmentOfferPrice = $appointmentOffer->application_fees;
             if ($wallet->balance >= $appointmentOfferPrice) {
                 try {
                     DB::beginTransaction();

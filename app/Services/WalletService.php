@@ -71,6 +71,36 @@ class WalletService
     }
 
     /**
+     * refund transaction by id.
+     * @param int $transactionId
+     * @return bool
+     */
+    public function refund(int $transactionId)
+    {
+        $transaction = Transaction::find($transactionId);
+
+        if (!$transaction) {
+            return false;
+        }
+
+        $wallet = Wallet::where('user_id', $transaction->user_id)->first();
+
+        if (!$wallet) {
+            return false;
+        }
+
+        $transactionType = TransactionType::RECHARGE;
+        // Call the service to create the transaction
+        $this->transactionService->createTransaction($transaction->user_id, $transaction->amount, $transactionType);
+
+        $wallet->balance += $transaction->amount;
+        $wallet->save();
+
+        return true;
+    }
+
+
+    /**
      * Check if the points count can be converted.
      *
      * @param int $points
