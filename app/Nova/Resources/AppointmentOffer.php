@@ -66,7 +66,7 @@ class AppointmentOffer extends Resource
 //                }),
 
             HasMany::make('Details', 'details', AppointmentOfferDetails::class),
-            MorphOne::make('Invoice', 'invoices', Invoice::class),
+            MorphOne::make('Invoice', 'invoice', Invoice::class),
             Textarea::make(__('notes'), 'notes')->nullable(),
 
         ];
