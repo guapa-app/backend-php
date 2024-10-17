@@ -41,14 +41,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     protected $fillable = [
         'hash_id', 'vendor_id', 'title', 'description', 'price', 'earned_points',
-        'status', 'review', 'type', 'terms', 'url',
+        'status', 'review', 'type', 'terms', 'url', 'sort_order',
     ];
 
     protected $appends = [
         'likes_count', 'is_liked',
         'taxonomy_name', 'taxonomy_id',
         'taxonomy_type', 'address',
-        'shared_link'
+        'shared_link',
     ];
 
     /**
