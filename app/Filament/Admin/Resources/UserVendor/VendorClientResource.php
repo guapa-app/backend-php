@@ -1,41 +1,33 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Info;
+namespace App\Filament\Admin\Resources\UserVendor;
 
-use App\Filament\Admin\Resources\Info\DeviceResource\Pages;
-use App\Models\Device;
+use App\Filament\Admin\Resources\UserVendor\VendorClientResource\Pages;
+use App\Models\VendorClient;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class DeviceResource extends Resource
+class VendorClientResource extends Resource
 {
-    protected static ?string $model = Device::class;
+    protected static ?string $model = VendorClient::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-device-tablet';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Info';
+    protected static ?string $navigationGroup = 'User & Vendor';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_type')
+                Forms\Components\TextInput::make('vendor_id')
                     ->required()
-                    ->maxLength(255),
+                    ->numeric(),
                 Forms\Components\TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('guid')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('fcmtoken')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('type')
-                    ->required()
-                    ->maxLength(50),
             ]);
     }
 
@@ -43,17 +35,12 @@ class DeviceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_type')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('vendor_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('guid')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('fcmtoken')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -86,9 +73,9 @@ class DeviceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDevices::route('/'),
-            'create' => Pages\CreateDevice::route('/create'),
-            'edit' => Pages\EditDevice::route('/{record}/edit'),
+            'index' => Pages\ListVendorClients::route('/'),
+            'create' => Pages\CreateVendorClient::route('/create'),
+            'edit' => Pages\EditVendorClient::route('/{record}/edit'),
         ];
     }
 }

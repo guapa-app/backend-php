@@ -39,9 +39,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('Admin Setting')
-                    ->collapsed(),
-                NavigationGroup::make()
                     ->label('Shop')
                     ->collapsed(),
                 NavigationGroup::make()
@@ -49,6 +46,12 @@ class AdminPanelProvider extends PanelProvider
                     ->collapsed(),
                 NavigationGroup::make()
                     ->label('Blog')
+                    ->collapsed(),
+                NavigationGroup::make()
+                    ->label('User & Vendor')
+                    ->collapsed(),
+                NavigationGroup::make()
+                    ->label('Admin Setting')
                     ->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')

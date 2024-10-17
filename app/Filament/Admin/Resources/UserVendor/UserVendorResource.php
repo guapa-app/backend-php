@@ -1,41 +1,36 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Info;
+namespace App\Filament\Admin\Resources\UserVendor;
 
-use App\Filament\Admin\Resources\Info\DeviceResource\Pages;
-use App\Models\Device;
+use App\Filament\Admin\Resources\UserVendor\UserVendorResource\Pages;
+use App\Models\UserVendor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class DeviceResource extends Resource
+class UserVendorResource extends Resource
 {
-    protected static ?string $model = Device::class;
+    protected static ?string $model = UserVendor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-device-tablet';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Info';
+    protected static ?string $navigationGroup = 'User & Vendor';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_type')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('user_id')
+                Forms\Components\TextInput::make('vendor_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('guid')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('fcmtoken')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('type')
+                Forms\Components\TextInput::make('role')
                     ->required()
                     ->maxLength(50),
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->maxLength(255),
             ]);
     }
 
@@ -43,16 +38,15 @@ class DeviceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_type')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('guid')
+                Tables\Columns\TextColumn::make('vendor_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('role')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('fcmtoken')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('type')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -86,9 +80,9 @@ class DeviceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDevices::route('/'),
-            'create' => Pages\CreateDevice::route('/create'),
-            'edit' => Pages\EditDevice::route('/{record}/edit'),
+            'index' => Pages\ListUserVendors::route('/'),
+            'create' => Pages\CreateUserVendor::route('/create'),
+            'edit' => Pages\EditUserVendor::route('/{record}/edit'),
         ];
     }
 }

@@ -2,19 +2,19 @@
 
 namespace App\Filament\Admin\Resources\Info;
 
-use App\Filament\Admin\Resources\Info\DeviceResource\Pages;
-use App\Models\Device;
+use App\Filament\Admin\Resources\Info\DatabaseNotificationResource\Pages;
+use App\Models\DatabaseNotification;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class DeviceResource extends Resource
+class DatabaseNotificationResource extends Resource
 {
-    protected static ?string $model = Device::class;
+    protected static ?string $model = DatabaseNotification::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-device-tablet';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-oval-left-ellipsis';
 
     protected static ?string $navigationGroup = 'Info';
 
@@ -22,20 +22,19 @@ class DeviceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_type')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('guid')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('fcmtoken')
-                    ->maxLength(255),
                 Forms\Components\TextInput::make('type')
                     ->required()
-                    ->maxLength(50),
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('notifiable_type')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('notifiable_id')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\Textarea::make('data')
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\DateTimePicker::make('read_at'),
             ]);
     }
 
@@ -43,17 +42,19 @@ class DeviceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('guid')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('fcmtoken')
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('notifiable_type')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('notifiable_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('read_at')
+                    ->dateTime()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -86,9 +87,9 @@ class DeviceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDevices::route('/'),
-            'create' => Pages\CreateDevice::route('/create'),
-            'edit' => Pages\EditDevice::route('/{record}/edit'),
+            'index' => Pages\ListDatabaseNotifications::route('/'),
+            'create' => Pages\CreateDatabaseNotification::route('/create'),
+            'edit' => Pages\EditDatabaseNotification::route('/{record}/edit'),
         ];
     }
 }

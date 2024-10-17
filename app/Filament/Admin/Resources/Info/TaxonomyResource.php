@@ -2,19 +2,19 @@
 
 namespace App\Filament\Admin\Resources\Info;
 
-use App\Filament\Admin\Resources\Info\DeviceResource\Pages;
-use App\Models\Device;
+use App\Filament\Admin\Resources\Info\TaxonomyResource\Pages;
+use App\Models\Taxonomy;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class DeviceResource extends Resource
+class TaxonomyResource extends Resource
 {
-    protected static ?string $model = Device::class;
+    protected static ?string $model = Taxonomy::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-device-tablet';
+    protected static ?string $navigationIcon = 'heroicon-o-queue-list';
 
     protected static ?string $navigationGroup = 'Info';
 
@@ -22,20 +22,22 @@ class DeviceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_type')
+                Forms\Components\TextInput::make('title')
+                    ->required(),
+                Forms\Components\TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
+                Forms\Components\TextInput::make('fees')
                     ->numeric(),
-                Forms\Components\TextInput::make('guid')
-                    ->required()
+                Forms\Components\TextInput::make('fixed_price')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('fcmtoken')
-                    ->maxLength(255),
+                Forms\Components\TextInput::make('description'),
+                Forms\Components\TextInput::make('font_icon')
+                    ->maxLength(100),
                 Forms\Components\TextInput::make('type')
-                    ->required()
-                    ->maxLength(50),
+                    ->maxLength(100),
+                Forms\Components\TextInput::make('parent_id')
+                    ->numeric(),
             ]);
     }
 
@@ -43,17 +45,20 @@ class DeviceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_type')
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('fees')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('guid')
+                Tables\Columns\TextColumn::make('fixed_price')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('fcmtoken')
+                Tables\Columns\TextColumn::make('font_icon')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('parent_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -86,9 +91,9 @@ class DeviceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDevices::route('/'),
-            'create' => Pages\CreateDevice::route('/create'),
-            'edit' => Pages\EditDevice::route('/{record}/edit'),
+            'index' => Pages\ListTaxonomies::route('/'),
+            'create' => Pages\CreateTaxonomy::route('/create'),
+            'edit' => Pages\EditTaxonomy::route('/{record}/edit'),
         ];
     }
 }

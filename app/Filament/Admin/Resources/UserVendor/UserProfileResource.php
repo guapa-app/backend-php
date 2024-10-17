@@ -1,34 +1,39 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Info;
+namespace App\Filament\Admin\Resources\UserVendor;
 
-use App\Filament\Admin\Resources\Info\HistoryResource\Pages;
-use App\Models\History;
+use App\Filament\Admin\Resources\UserVendor\UserProfileResource\Pages;
+use App\Models\UserProfile;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class HistoryResource extends Resource
+class UserProfileResource extends Resource
 {
-    protected static ?string $model = History::class;
+    protected static ?string $model = UserProfile::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Info';
+    protected static ?string $navigationGroup = 'User & Vendor';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\Textarea::make('details')
-                    ->required()
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->required(),
+                Forms\Components\TextInput::make('firstname')
+                    ->maxLength(50),
+                Forms\Components\TextInput::make('lastname')
+                    ->maxLength(50),
+                Forms\Components\TextInput::make('gender'),
+                Forms\Components\DatePicker::make('birth_date'),
+                Forms\Components\Textarea::make('about')
                     ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('record_date'),
+                Forms\Components\TextInput::make('settings'),
             ]);
     }
 
@@ -36,11 +41,16 @@ class HistoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('record_date')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('firstname')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('lastname')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('gender'),
+                Tables\Columns\TextColumn::make('birth_date')
+                    ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -74,9 +84,9 @@ class HistoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListHistories::route('/'),
-            'create' => Pages\CreateHistory::route('/create'),
-            'edit' => Pages\EditHistory::route('/{record}/edit'),
+            'index' => Pages\ListUserProfiles::route('/'),
+            'create' => Pages\CreateUserProfile::route('/create'),
+            'edit' => Pages\EditUserProfile::route('/{record}/edit'),
         ];
     }
 }

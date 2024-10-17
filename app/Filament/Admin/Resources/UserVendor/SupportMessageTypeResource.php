@@ -1,33 +1,30 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Shop;
+namespace App\Filament\Admin\Resources\UserVendor;
 
-use App\Filament\Admin\Resources\Shop\CouponVendorResource\Pages;
-use App\Models\CouponVendor;
+use App\Filament\Admin\Resources\UserVendor\SupportMessageTypeResource\Pages;
+use App\Models\SupportMessageType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class CouponVendorResource extends Resource
+class SupportMessageTypeResource extends Resource
 {
-    protected static ?string $model = CouponVendor::class;
+    protected static ?string $model = SupportMessageType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'User & Vendor';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('coupon_id')
+                Forms\Components\TextInput::make('name')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('vendor_id')
-                    ->required()
-                    ->numeric(),
+                    ->maxLength(255),
             ]);
     }
 
@@ -35,12 +32,8 @@ class CouponVendorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('coupon_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('vendor_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -73,9 +66,9 @@ class CouponVendorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCouponVendors::route('/'),
-            'create' => Pages\CreateCouponVendor::route('/create'),
-            'edit' => Pages\EditCouponVendor::route('/{record}/edit'),
+            'index' => Pages\ListSupportMessageTypes::route('/'),
+            'create' => Pages\CreateSupportMessageType::route('/create'),
+            'edit' => Pages\EditSupportMessageType::route('/{record}/edit'),
         ];
     }
 }
