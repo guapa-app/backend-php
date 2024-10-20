@@ -23,8 +23,9 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
 
     public function all(Request $request): object
     {
+        $route = $request->route();
+        $isVendorRoute = strpos($route->getPrefix(), 'vendor') !== false;
         $user = auth('api')->user();
-        $vendor = $user->vendor ?? null;
 
         $query = AppointmentOffer::query()
             ->applyFilters($request)
@@ -32,7 +33,8 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
             ->withListRelations($request)
             ->withListCounts($request)
             ->withSingleRelations($request)
-            ->when($vendor, function ($query) use ($vendor, $request) {
+            ->when($isVendorRoute, function ($query) use ($user, $request) {
+                $vendor = $user->vendor;
                 $query->where('status', '!=', AppointmentOfferEnum::Pending->value)
                     ->whereHas('details', function ($detailsQuery) use ($vendor, $request) {
                         $detailsQuery->where('vendor_id', $vendor->id);
@@ -46,7 +48,7 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
                         $detailsQuery->where('vendor_id', $vendor->id);
                     }]);
             })
-            ->when(!$vendor, function ($query) use ($user) {
+            ->when(!$isVendorRoute, function ($query) use ($user) {
                     $query->where('user_id', $user->id);
             });
 
