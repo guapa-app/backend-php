@@ -4,12 +4,8 @@ namespace App\Repositories\Eloquent;
 
 use App\Contracts\Repositories\AppointmentOfferRepositoryInterface;
 use App\Enums\AppointmentOfferEnum;
-use App\Http\Requests\V3_1\Common\AppointmentOfferRequest;
 use App\Models\AppointmentOffer;
-use App\Models\AppointmentOfferDetail;
-use App\Models\Order;
 use App\Services\V3_1\AppointmentOfferService;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class AppointmentRepository extends EloquentRepository implements AppointmentOfferRepositoryInterface
@@ -23,15 +19,18 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
 
     public function all(Request $request): object
     {
+        $route = $request->route();
+        $isVendorRoute = strpos($route->getPrefix(), 'vendor') !== false;
         $user = auth('api')->user();
-        $vendor = $user->vendor ?? null;
+
         $query = AppointmentOffer::query()
             ->applyFilters($request)
             ->applyOrderBy($request->get('sort'), $request->get('order'))
             ->withListRelations($request)
             ->withListCounts($request)
             ->withSingleRelations($request)
-            ->when($vendor, function ($query) use ($vendor, $request) {
+            ->when($isVendorRoute, function ($query) use ($user, $request) {
+                $vendor = $user->vendor;
                 $query->where('status', '!=', AppointmentOfferEnum::Pending->value)
                     ->whereHas('details', function ($detailsQuery) use ($vendor, $request) {
                         $detailsQuery->where('vendor_id', $vendor->id);
@@ -45,7 +44,7 @@ class AppointmentRepository extends EloquentRepository implements AppointmentOff
                         $detailsQuery->where('vendor_id', $vendor->id);
                     }]);
             })
-            ->when(!$vendor, function ($query) use ($user) {
+            ->when(!$isVendorRoute, function ($query) use ($user) {
                     $query->where('user_id', $user->id);
             });
 
