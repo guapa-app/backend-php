@@ -75,4 +75,15 @@ class NotificationController extends BaseApiController
 
         return $this->successJsonRes([], __('api.success'));
     }
+
+    private function transformNotifications($notifications)
+    {
+        return $notifications->getCollection()->transform(function ($notification) {
+            $data = $notification->data;
+
+            $notification->summary = $data['summary'] ?? '';
+
+            return $notification;
+        });
+    }
 }

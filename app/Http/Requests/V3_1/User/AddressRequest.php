@@ -28,6 +28,8 @@ class AddressRequest extends FailedValidationRequest
         $types = implode(',', array_keys(Address::TYPES));
 
         return [
+            'addressable_type'  => 'required|string|in:user',
+            'addressable_id'    => 'required|integer',
             'title'             => 'nullable|string|max:150',
             'city_id'           => 'sometimes|required|integer|exists:cities,id',
             'address_1'         => 'required|string|max:250',
