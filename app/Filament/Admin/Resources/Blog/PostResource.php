@@ -9,6 +9,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class PostResource extends Resource
 {
@@ -22,22 +24,28 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('admin_id')
+                Forms\Components\Select::make('admin_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('category_id')
+                    ->native(false)
+                    ->relationship('admin', 'name'),
+                Forms\Components\Select::make('category_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('title')
+                    ->native(false)
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->relationship('category', 'title', function (Builder $query) {
+                        return $query->where('type', 'blog_category');
+                    }),
+                Forms\Components\Textarea::make('title')
                     ->required()
+                    ->columnSpanFull()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
                     ->required()
-                    ->numeric()
-                    ->default(1),
+                    ->options(Post::STATUSES)
+                    ->native(false),
                 Forms\Components\TextInput::make('youtube_url')
                     ->maxLength(255),
             ]);
@@ -47,19 +55,17 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('admin_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('category_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('id')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
+                    ->limit(50)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('youtube_url')
-                    ->searchable(),
+                    ->limit(30),
+                Tables\Columns\SelectColumn::make('status')
+                    ->options(Post::STATUSES)
+                    ->selectablePlaceholder(false)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
