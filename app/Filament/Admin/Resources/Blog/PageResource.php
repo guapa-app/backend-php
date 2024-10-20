@@ -6,12 +6,16 @@ use App\Filament\Admin\Resources\Blog\PageResource\Pages;
 use App\Models\Page;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class PageResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
@@ -23,11 +27,19 @@ class PageResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('title')
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
                     ->required()
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (Forms\Set $set, $state) use ($form) {
+                        if ($form->getOperation() === 'create') {
+                            $set('slug', Str::slug($state));
+                        }
+                    }),
+                Forms\Components\TextInput::make('slug')
+                    ->disabled()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('content')
+                Forms\Components\Textarea::make('content')
+                    ->columnSpanFull()
                     ->required(),
                 Forms\Components\Toggle::make('published')
                     ->required(),
@@ -38,7 +50,7 @@ class PageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('slug')
+                Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('published')
                     ->boolean(),
