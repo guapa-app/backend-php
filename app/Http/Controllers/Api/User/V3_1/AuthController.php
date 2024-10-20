@@ -169,15 +169,43 @@ class AuthController extends BaseApiController
      */
     public function sendOtp(PhoneRequest $request)
     {
-        $data = $request->validated();
+        try {
+            if (Setting::checkTestingMode()) {
+                return $this->successJsonRes([
+                    'is_otp_sent' => true,
+                    'otp' => 1111,
+                ], __('api.otp_sent'), 200);
+            }
 
-        $this->smsService->sendOtp($data['phone']);
+            $data = $request->validated();
 
-        return $this->successJsonRes([
-            'is_otp_sent' => true,
-        ], __('api.otp_sent'), 200);
+            $this->smsService->sendOtp($data['phone']);
+
+            return $this->successJsonRes([
+                'is_otp_sent' => true,
+            ], __('api.otp_sent'), 200);
+        } catch (\Throwable $th) {
+            if ($th instanceof \Illuminate\Validation\ValidationException) {
+                throw $th;
+            }
+            $res = json_decode((string) $th->getResponse()?->getBody());
+            if ($th instanceof \GuzzleHttp\Exception\ClientException) {
+                if ($th->getCode() == 402) {
+                    // 402 Not enough credit.
+                } elseif ($th->getCode() == 400) {
+                    // 400 Invalid phone number.
+                    return $this->errorJsonRes([
+                        'phone' => [__('api.invalid_phone')],
+                    ], __('api.otp_not_sent'), 422);
+                }
+            }
+            $this->logReq($res?->message);
+
+            return $this->successJsonRes([
+                'is_otp_sent' => false,
+            ], __('api.contact_support'), 422);
+        }
     }
-
     /**
      * Get logged in user.
      *
