@@ -4,11 +4,10 @@ namespace App\Filament\Admin\Resources\AdminSetting;
 
 use App\Filament\Admin\Resources\AdminSetting\SettingResource\Pages;
 use App\Models\Setting;
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class SettingResource extends Resource
 {
@@ -18,36 +17,16 @@ class SettingResource extends Resource
 
     protected static ?string $navigationGroup = 'Admin Setting';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('s_key')
-                    ->required()
-                    ->maxLength(50),
-                Forms\Components\Textarea::make('s_value')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('s_unit')
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('s_validation_type')
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('s_validation'),
-                Forms\Components\TextInput::make('instructions')
-                    ->maxLength(255),
-            ]);
-    }
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('s_key')
+                    ->label('Name')
+                    ->formatStateUsing(fn (string $state): string => str_replace('_', ' ', $state))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('s_unit')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('s_validation_type')
-                    ->searchable(),
+                Tables\Columns\TextInputColumn::make('s_value')
+                    ->label('Value'),
                 Tables\Columns\TextColumn::make('instructions')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -63,12 +42,6 @@ class SettingResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
@@ -83,8 +56,16 @@ class SettingResource extends Resource
     {
         return [
             'index' => Pages\ListSettings::route('/'),
-            'create' => Pages\CreateSetting::route('/create'),
-            'edit' => Pages\EditSetting::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
     }
 }
