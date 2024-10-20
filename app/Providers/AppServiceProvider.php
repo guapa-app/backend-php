@@ -44,6 +44,6 @@ class AppServiceProvider extends ServiceProvider
 
         Passport::refreshTokensExpireIn(Carbon::now()->addDays(365));
 
-        $this->app['request']->server->set('HTTPS', $this->app->environment() != 'local');
+        // $this->app['request']->server->set('HTTPS', $this->app->environment() != 'local');
     }
 }
