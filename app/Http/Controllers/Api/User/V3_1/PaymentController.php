@@ -104,7 +104,7 @@ class PaymentController extends BaseApiController
             return $this->successJsonRes([], __('api.paid_successfully'));
         } catch (\Exception $e) {
             Log::error('Error changing payment status: ' . $e->getMessage());
-            return $this->errorJsonRes([], __('api.error_payment_status'));
+            return $this->errorJsonRes([], $e->getMessage()?: __('api.error_payment_status'));
         }
     }
 }

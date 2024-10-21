@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Notifications\CampaignNotification;
 use App\Enums\MarketingCampaignAudienceType;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class MarketingCampaignService
@@ -191,6 +192,10 @@ class MarketingCampaignService
                     Log::error('Transaction failed: ' . $e->getMessage());
                     throw $e;
                 }
+            }else{
+                throw ValidationException::withMessages([
+                    'message' => __('There is no sufficient balance'),
+                ]);
             }
         }
     }

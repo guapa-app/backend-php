@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\AppointmentOfferDetail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 use App\Notifications\AppointmentOfferNotification;
 use App\Http\Requests\V3_1\User\AppointmentOfferRequest;
 
@@ -247,6 +248,10 @@ class AppointmentOfferService
                     Log::error('Transaction failed: ' . $e->getMessage());
                     throw $e;
                 }
+            }else{
+                throw ValidationException::withMessages([
+                    'message' => __('There is no sufficient balance'),
+                ]);
             }
         }
     }
