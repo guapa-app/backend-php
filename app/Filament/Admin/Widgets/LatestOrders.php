@@ -18,6 +18,7 @@ class LatestOrders extends BaseWidget
         return $table
             ->query(OrderResource::getEloquentQuery())
             ->defaultPaginationPageOption(5)
+            ->paginated([5])
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
@@ -35,7 +36,7 @@ class LatestOrders extends BaseWidget
             ])
             ->actions([
                 Tables\Actions\Action::make('open')
-                    ->url(fn(Order $record): string => OrderResource::getUrl('edit', ['record' => $record])),
+                    ->url(fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record])),
             ]);
     }
 }
