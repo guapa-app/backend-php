@@ -126,7 +126,7 @@ class Offer extends Model implements Listable, HasMedia
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class)->withDefault();
+        return $this->belongsTo(Product::class)->withTrashed()->withDefault();
     }
 
     /**

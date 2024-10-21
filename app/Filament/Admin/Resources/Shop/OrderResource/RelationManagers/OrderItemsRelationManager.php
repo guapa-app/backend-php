@@ -8,7 +8,9 @@ use Filament\Tables\Table;
 
 class OrderItemsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'Order Items';
+    protected static string $relationship = 'items';
+
+    protected static ?string $label = 'Order Items';
 
     protected static ?string $recordTitleAttribute = 'title';
 
