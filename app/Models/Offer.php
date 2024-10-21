@@ -111,7 +111,7 @@ class Offer extends Model implements Listable, HasMedia
 
     public function getDiscountStringAttribute(): string
     {
-        return $this->discount.'%';
+        return $this->discount . '%';
     }
 
     public function getStatusAttribute(): string
@@ -129,7 +129,7 @@ class Offer extends Model implements Listable, HasMedia
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class)->withTrashed();
+        return $this->belongsTo(Product::class)->withTrashed()->withDefault();
     }
 
     /**
