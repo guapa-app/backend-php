@@ -16,8 +16,10 @@ class Taxonomy extends BaseTaxonomy implements Listable
     use ListableTrait, HasRecursiveRelationships, HasFactory;
 
     protected $fillable = [
-      'fees', 'fixed_price',
+        'fees', 'fixed_price',
+        'title', 'description', 'font_icon', 'type', 'parent_id',
     ];
+
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
