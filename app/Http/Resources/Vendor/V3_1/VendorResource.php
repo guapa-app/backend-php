@@ -18,6 +18,14 @@ class VendorResource extends JsonResource
             'status'                                    => $this->resource::STATUSES[$this->status],
             'type'                                      => $this->resource::TYPES[$this->type],
             'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),
+            $this->mergeWhen($this->parent_id, [
+                'parent_id'                                 => $this->parent_id,
+                'parent_name'                               => $this->parent?->name,
+                'parent_photo'                              => MediaResource::make($this->parent?->logo),
+            ]),
+
+            'specialties'                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
+
         ];
 
         return $returned_arr;
