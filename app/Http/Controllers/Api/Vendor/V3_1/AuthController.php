@@ -92,7 +92,7 @@ class AuthController extends BaseApiController
 
         $this->userService->checkIfUserDeleted($user->status);
 
-        $user->loadMissing('vendor');
+        $user->loadMissing('vendor',);
 
         if (Setting::checkTestingMode()) {
             $token = $user->createToken('Temp Personal Token', ['*'])->accessToken;
@@ -141,13 +141,14 @@ class AuthController extends BaseApiController
 
     private function prepareUserResponse($user, $token)
     {
-        $user->update(['phone_verified_at' => now()->toDateTimeString()]);
+        if ($user->phone_verified_at == null) {
+            $user->update(['phone_verified_at' => now()->toDateTimeString()]);
+            event(new Registered($user));
+        }
 
         $user->loadProfileFields();
         $user->append('user_vendors_ids');
         $user->access_token = $token;
-
-        event(new Registered($user));
 
         return $user;
     }
