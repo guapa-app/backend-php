@@ -2,13 +2,6 @@
 
 namespace App\Http\Resources\User\V3_1;
 
-use App\Http\Resources\AddressResource;
-use App\Http\Resources\AppointmentResource;
-use App\Http\Resources\MediaResource;
-use App\Http\Resources\ProductResource;
-use App\Http\Resources\StaffResource;
-use App\Http\Resources\TaxonomyResource;
-use App\Http\Resources\V3\SocialMediaResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VendorDetailsResource extends JsonResource
@@ -77,7 +70,6 @@ class VendorDetailsResource extends JsonResource
             'products'                                => ProductResource::collection($this->whenLoaded('products')),
             'services'                                => ProductResource::collection($this->whenLoaded('services')),
             'offers'                                  => ProductResource::collection($this->whenLoaded('productsHasOffers')),
-
         ];
 
         return $returned_arr;
