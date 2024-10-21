@@ -3,9 +3,10 @@
 namespace App\Filament\Admin\Resources\Shop;
 
 use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
+use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
 use App\Models\Order;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Infolists\Components;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,44 +19,21 @@ class OrderResource extends Resource
 
     protected static ?string $navigationGroup = 'Shop';
 
-    public static function form(Form $form): Form
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $form
+        return $infolist
             ->schema([
-                Forms\Components\TextInput::make('hash_id')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('vendor_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('address_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('total')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(25),
-                Forms\Components\TextInput::make('invoice_url')
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('note')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('cancellation_reason')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('coupon_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('discount_amount')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
+                Components\TextEntry::make('id'),
+                Components\TextEntry::make('vendor.name'),
+                Components\TextEntry::make('address.title'),
+                Components\TextEntry::make('name'),
+                Components\TextEntry::make('phone'),
+                Components\TextEntry::make('total'),
+                Components\TextEntry::make('status'),
+                Components\TextEntry::make('note'),
+                Components\TextEntry::make('cancellation_reason'),
+                Components\TextEntry::make('coupon_id'),
+                Components\TextEntry::make('discount_amount'),
             ]);
     }
 
@@ -63,15 +41,11 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('hash_id')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('vendor_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('address_id')
+                Tables\Columns\TextColumn::make('vendor.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
@@ -83,8 +57,6 @@ class OrderResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('invoice_url')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -93,22 +65,17 @@ class OrderResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('coupon_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('discount_amount')
-                    ->numeric()
-                    ->sortable(),
             ])
+            ->defaultPaginationPageOption(10)
+            ->paginated([10])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -116,7 +83,7 @@ class OrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\OrderItemsRelationManager::class,
         ];
     }
 
@@ -124,8 +91,7 @@ class OrderResource extends Resource
     {
         return [
             'index' => Pages\ListOrders::route('/'),
-            'create' => Pages\CreateOrder::route('/create'),
-            'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view' => Pages\ViewOrder::route('/{record}'),
         ];
     }
 }

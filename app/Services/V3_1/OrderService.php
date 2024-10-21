@@ -434,6 +434,10 @@ class OrderService
                     Log::error('Transaction failed: ' . $e->getMessage());
                     throw $e;
                 }
+            }else{
+                throw ValidationException::withMessages([
+                    'message' => __('There is no sufficient balance'),
+                ]);
             }
         }
     }
