@@ -14,9 +14,6 @@ class LoginResource extends JsonResource
             'email'                 => (string) $this->email,
             'phone'                 => (string) $this->phone,
             'status'                => (string) $this->status,
-            'email_verified_at'     => (bool) $this->email_verified_at,
-            'phone_verified_at'     => (bool) $this->phone_verified_at,
-            'role'                  => $this->role,
             'user_vendors_ids'      => $this->user_vendors_ids,
 
             $this->mergeWhen(!$this->relationLoaded('profile'), [

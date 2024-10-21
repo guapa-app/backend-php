@@ -95,13 +95,7 @@ class AuthController extends BaseApiController
         $user->loadMissing('vendor');
 
         if (Setting::checkTestingMode()) {
-            $token = $user->createToken('Temp Personal Token', ['*']);
-            $tokenData = [
-                'token_type' => 'Bearer',
-                'expires_in' => $token->token->expires_at->diffInSeconds(now()),
-                'access_token' => $token->accessToken,
-                'refresh_token' => null, // In testing mode, we don't have a refresh token
-            ];
+            $token = $user->createToken('Temp Personal Token', ['*'])->accessToken;
         } else {
             $requestPayload = [
                 'grant_type' => 'otp_verify',
@@ -110,16 +104,16 @@ class AuthController extends BaseApiController
                 'scope' => '*',
             ];
 
-            $tokenData = $this->authService->authenticate($requestPayload);
+            $token = $this->authService->authenticate($requestPayload);
 
-            if (!$tokenData) {
+            if (!$token) {
                 return $this->errorJsonRes([
                     'otp' => [__('api.incorrect_otp')],
                 ], __('api.incorrect_otp'), 406);
             }
         }
 
-        $user = $this->prepareUserResponse($user, $tokenData);
+        $user = $this->prepareUserResponse($user, $token);
 
         return LoginResource::make($user)
             ->additional([
@@ -193,14 +187,16 @@ class AuthController extends BaseApiController
     {
         $this->authService->logout($this->user);
 
-        return true;
+        return $this->successJsonRes([], __('api.success'));
     }
 
     public function deleteAccount(Request $request)
     {
         $this->userService->deleteAccount($this->user->getKey());
 
-        return $this->logout($request);
+        $this->authService->logout($this->user);
+
+        return $this->successJsonRes([], __('api.account_deleted'));
     }
 
     public function checkIfPhoneExist(Request $request)
@@ -209,7 +205,16 @@ class AuthController extends BaseApiController
             'phone' => 'required|string|max:40',
         ]);
 
-        return $this->userService->checkIfPhoneExist($data['phone']);
+        $user = $this->userRepository->getByPhone($data['phone']);
+        if ($user == null) {
+            return $this->successJsonRes([
+                'is_phone_exists' => false,
+            ], __('api.phone_doesnt_exist'), 200);
+        } else {
+            return $this->successJsonRes([
+                'is_phone_exists' => true,
+            ], __('api.phone_exist'), 200);
+        }
     }
 
 }
