@@ -38,7 +38,7 @@ class OrderExpire extends Command
             ->whereNotIn('status', OrderStatus::notAvailableForExpire())
             ->chunkMap(function ($order) use ($num_of_days) {
                 foreach ($order->items as $item) {
-                    if ($item->product?->type == ProductType::Service && $order->created_at->addDays($num_of_days) <= today()) {
+                    if ($order->created_at->addDays($num_of_days) <= today()) {
                         // Update order status to "expired"
                         $order->status = OrderStatus::Expired;
                         $order->save();

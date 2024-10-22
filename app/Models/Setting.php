@@ -101,6 +101,19 @@ class Setting extends Model
         return (int) $record->s_value;
     }
 
+    public static function getOrderReminderAfter()
+    {
+        $record = static::firstOrCreate(['s_key' => 'order_reminder_after'], [
+            's_value'           => 12,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min'=> 1, 'max'=> 10000],
+            'instructions'      => 'send reminder to user for bending orders after (number) of hours from order created',
+        ]);
+
+        return (int) $record->s_value;
+    }
+
     public static function isAllMobileNumsAccepted()
     {
         $record = static::firstOrCreate(['s_key' => 'is_all_mob_nums_accepted'], [
