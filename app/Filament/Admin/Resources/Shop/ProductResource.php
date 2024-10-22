@@ -28,6 +28,15 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                            ->collection('products')
+                            ->multiple()
+                            ->maxFiles(5)
+                            ->hiddenLabel(),
+                    ])
+                    ->collapsible(),
                 Forms\Components\Hidden::make('hash_id')
                     ->label('Number')
                     ->default(Common::generateUniqueHashForModel(self::$model, 16)),
@@ -81,6 +90,9 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
+                    ->label('Image')
+                    ->collection('products'),
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
                     ->sortable(),
