@@ -24,7 +24,7 @@ class PhoneRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'phone' => 'required|string|numeric|exists:users,phone',
+            'phone' => 'required|string|numeric',
         ];
     }
 }
