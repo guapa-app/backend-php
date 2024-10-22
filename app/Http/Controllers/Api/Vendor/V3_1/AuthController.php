@@ -89,7 +89,7 @@ class AuthController extends BaseApiController
 
         $user->loadMissing('vendor');
 
-        if (Setting::checkTestingMode() && !str_contains($data['phone'], '966123456789')) {
+        if (Setting::checkTestingMode()) {
             $token = $user->createToken('Temp Personal Token', ['*']);
             $tokenData = [
                 'access_token' => $token->accessToken,
