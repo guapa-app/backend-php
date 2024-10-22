@@ -40,7 +40,6 @@ class RegisterRequest extends FailedValidationRequest
             'name'      => 'required|string|min:3|max:64',
             'email'     => 'required|email|unique:users,email',
             'phone'     => 'required|unique:users,phone|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
-            'type'      => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
             'gender'    => 'nullable|string|in:' . implode(',', UserProfile::GENDER),
         ];
     }
