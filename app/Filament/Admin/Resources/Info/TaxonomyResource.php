@@ -65,6 +65,8 @@ class TaxonomyResource extends Resource
                     ->native(false)
                     ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
                     ->relationship('parent', 'title'),
+                Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                    ->collection('taxonomy_icons'),
             ]);
     }
 
@@ -72,6 +74,9 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
+                    ->label('Icon')
+                    ->collection('taxonomy_icons'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('fees')

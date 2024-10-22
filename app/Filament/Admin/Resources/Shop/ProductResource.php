@@ -28,6 +28,15 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                            ->collection('products')
+                            ->multiple()
+                            ->maxFiles(5)
+                            ->hiddenLabel(),
+                    ])
+                    ->collapsible(),
                 Forms\Components\Hidden::make('hash_id')
                     ->label('Number')
                     ->default(Common::generateUniqueHashForModel(self::$model, 16)),
@@ -81,6 +90,9 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
+                    ->label('Image')
+                    ->collection('products'),
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
                     ->sortable(),
@@ -119,7 +131,8 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\OfferRelationManager::class,
+            RelationManagers\OffersRelationManager::class,
+            RelationManagers\ReviewsRelationManager::class,
         ];
     }
 
