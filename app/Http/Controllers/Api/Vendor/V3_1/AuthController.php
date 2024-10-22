@@ -89,7 +89,7 @@ class AuthController extends BaseApiController
 
         $user->loadMissing('vendor');
 
-        if (Setting::checkTestingMode() || !str_contains($data['phone'], '123456789')) {
+        if (Setting::checkTestingMode() || !str_contains($data['phone'], '966123456789')) {
             $token = $user->createToken('Temp Personal Token', ['*']);
             $tokenData = [
                 'access_token' => $token->accessToken,
@@ -125,7 +125,7 @@ class AuthController extends BaseApiController
     {
         $vendor = $this->user->vendor;
 
-        $vendor->loadMissing('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia', 'socialMedia.icon');;
+        $vendor->loadMissing('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia', 'socialMedia.icon');
 
         $this->userService->checkIfUserDeleted($this->user->status);
 
