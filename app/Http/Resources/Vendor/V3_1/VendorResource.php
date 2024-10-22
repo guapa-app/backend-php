@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Vendor\V3_1;
 
+use App\Http\Resources\MediaResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VendorResource extends JsonResource
@@ -17,14 +18,15 @@ class VendorResource extends JsonResource
             'is_deleted'                                => (bool) $this->deleted_at,
             'status'                                    => $this->resource::STATUSES[$this->status],
             'type'                                      => $this->resource::TYPES[$this->type],
+            'logo'                                      => MediaResource::make($this->whenLoaded('logo')),
             'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),
+            'specialties'                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
+
             $this->mergeWhen($this->parent_id, [
                 'parent_id'                                 => $this->parent_id,
                 'parent_name'                               => $this->parent?->name,
                 'parent_photo'                              => MediaResource::make($this->parent?->logo),
             ]),
-
-            'specialties'                               => TaxonomyResource::collection($this->whenLoaded('specialties')),
 
         ];
 
