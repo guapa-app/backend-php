@@ -44,7 +44,7 @@ class TaxonomyResource extends Resource
                 Forms\Components\TextInput::make('description'),
                 Forms\Components\TextInput::make('fees')
                     ->reactive()
-                    ->afterStateUpdated(fn($state, callable $set) => $set('fixed_price', null))
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('fixed_price', null))
                     ->requiredWithout('fixed_price')
                     ->numeric(),
                 Forms\Components\Select::make('type')
@@ -57,7 +57,7 @@ class TaxonomyResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('fixed_price')
                     ->reactive()
-                    ->afterStateUpdated(fn($state, callable $set) => $set('fees', null))
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('fees', null))
                     ->requiredWithout('fees')
                     ->numeric(),
                 Forms\Components\Select::make('parent_id')
@@ -65,6 +65,8 @@ class TaxonomyResource extends Resource
                     ->native(false)
                     ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
                     ->relationship('parent', 'title'),
+                Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                    ->collection('taxonomy_icons'),
             ]);
     }
 
@@ -72,6 +74,9 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
+                    ->label('Icon')
+                    ->collection('taxonomy_icons'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('fees')
