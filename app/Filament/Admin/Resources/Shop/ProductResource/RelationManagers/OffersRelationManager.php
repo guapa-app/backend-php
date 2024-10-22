@@ -11,7 +11,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class OfferRelationManager extends RelationManager
+class OffersRelationManager extends RelationManager
 {
     protected static string $relationship = 'offer';
 
