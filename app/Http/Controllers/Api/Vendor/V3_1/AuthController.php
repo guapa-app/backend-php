@@ -89,8 +89,12 @@ class AuthController extends BaseApiController
 
         $user->loadMissing('vendor');
 
-        if (Setting::checkTestingMode() || str_contains($data['phone'], '123456789')) {
-            $token = $user->createToken('Temp Personal Token', ['*'])->accessToken;
+        if (Setting::checkTestingMode() || !str_contains($data['phone'], '123456789')) {
+            $token = $user->createToken('Temp Personal Token', ['*']);
+            $tokenData = [
+                'access_token' => $token->accessToken,
+                'refresh_token' => null, // In testing mode, we don't have a refresh token
+            ];
         } else {
             $requestPayload = [
                 'grant_type' => 'otp_verify',
@@ -99,16 +103,16 @@ class AuthController extends BaseApiController
                 'scope' => '*',
             ];
 
-            $token = $this->authService->authenticate($requestPayload);
+            $tokenData = $this->authService->authenticate($requestPayload);
 
-            if (!$token) {
+            if (!$tokenData) {
                 return $this->errorJsonRes([
                     'otp' => [__('api.incorrect_otp')],
                 ], __('api.incorrect_otp'), 406);
             }
         }
 
-        $user = $this->prepareUserResponse($user, $token);
+        $user = $this->prepareUserResponse($user, $tokenData);
 
         return LoginResource::make($user)
             ->additional([
