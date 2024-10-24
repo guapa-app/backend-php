@@ -21,9 +21,9 @@ class UserController extends BaseApiController
         $this->userRepository = $userRepository;
         $this->userService = $userService;
     }
-    public function single($id)
+    public function single()
     {
-        $user = $this->userRepository->getOneOrFail($id);
+        $user = $this->user;
         $user->loadProfileFields();
         return UserResource::make($user)
             ->additional([
@@ -32,7 +32,7 @@ class UserController extends BaseApiController
             ]);
     }
 
-    public function update(UserRequest $request, $id = 0)
+    public function update(UserRequest $request)
     {
         $user = $this->userService->update($this->user, $request->validated());
         $user->loadProfileFields();
