@@ -2,20 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class PostSocialMedia extends Model
+class PostSocialMedia extends Pivot
 {
     public $timestamps = false;
-
-    public $incrementing = false;
-
-    protected $primaryKey = 'post_id';
 
     protected $table = 'post_social_media';
 
     protected $fillable = [
-        'social_media_id', 'post_id', 'link'
+        'social_media_id', 'post_id', 'link',
     ];
 
     public function post()
