@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\UserVendor;
 
+use App\Enums\SupportMessageSenderType;
+use App\Enums\SupportMessageStatus;
+use App\Filament\Admin\Resources\UserVendor\SupportMessageResource\Actions\ReplyToTicketAction;
 use App\Filament\Admin\Resources\UserVendor\SupportMessageResource\Pages;
 use App\Models\SupportMessage;
 use Filament\Forms;
@@ -9,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SupportMessageResource extends Resource
 {
@@ -22,53 +26,58 @@ class SupportMessageResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('parent_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('user_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('sender_type')
-                    ->maxLength(12),
-                Forms\Components\TextInput::make('support_message_type_id')
-                    ->numeric(),
+                Forms\Components\Select::make('parent_id')
+                    ->native(false)
+                    ->relationship('parent', 'subject'),
+                Forms\Components\Select::make('sender_type')
+                    ->options(SupportMessageSenderType::toSelect())
+                    ->native(false),
+                Forms\Components\Select::make('support_message_type_id')
+                    ->native(false)
+                    ->relationship('supportMessageType', 'name'),
+                Forms\Components\Select::make('user_id')
+                    ->native(false)
+                    ->relationship('user', 'name'),
                 Forms\Components\TextInput::make('subject')
                     ->required()
                     ->maxLength(100),
-                Forms\Components\TextInput::make('status')
-                    ->maxLength(12),
+                Forms\Components\Select::make('status')
+                    ->options(SupportMessageStatus::toSelect())
+                    ->default(SupportMessageStatus::Pending)
+                    ->native(false),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
                     ->maxLength(30),
+                Forms\Components\DateTimePicker::make('read_at'),
                 Forms\Components\Textarea::make('body')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('read_at'),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->whereNull('parent_id');
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('parent_id')
+                Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('sender_type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('support_message_type_id')
+                Tables\Columns\TextColumn::make('support_message_type.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('subject')
+                    ->limit(30)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('read_at')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -83,6 +92,7 @@ class SupportMessageResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                ReplyToTicketAction::make('Reply'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

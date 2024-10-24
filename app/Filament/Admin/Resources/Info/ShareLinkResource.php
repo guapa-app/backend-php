@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ShareLinkResource extends Resource
 {
@@ -42,12 +43,7 @@ class ShareLinkResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('shareable_type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('shareable_id')
-                    ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('identifier')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('link')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -63,13 +59,22 @@ class ShareLinkResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 
     public static function getRelations(): array

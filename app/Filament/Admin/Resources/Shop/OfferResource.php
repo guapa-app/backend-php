@@ -22,6 +22,13 @@ class OfferResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                            ->collection('offer_images')
+                            ->hiddenLabel(),
+                    ])
+                    ->collapsible(),
                 Forms\Components\Select::make('product_id')
                     ->relationship('product', 'title')
                     ->required(),
@@ -30,9 +37,9 @@ class OfferResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('title')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Forms\Components\TextInput::make('description')
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('terms')
+                Forms\Components\TextInput::make('terms')
                     ->columnSpanFull(),
                 Forms\Components\DateTimePicker::make('starts_at'),
                 Forms\Components\DateTimePicker::make('expires_at'),
@@ -43,14 +50,23 @@ class OfferResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
+                    ->label('Image')
+                    ->collection('offer_images'),
                 Tables\Columns\TextColumn::make('product.title')
-                    ->numeric()
+                    ->limit(30)
+                    ->url(fn($record) => route(
+                        'filament.admin.resources.shop.products.edit',
+                        ['record' => $record->product->id]
+                    ))
+                    ->openUrlInNewTab(false)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('title')
+                    ->limit(30)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('discount')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->dateTime()
                     ->sortable(),
