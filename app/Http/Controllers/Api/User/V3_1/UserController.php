@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\V3_1\User\UpdateUserRequest;
 use App\Http\Resources\User\V3_1\UserResource;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -32,7 +32,7 @@ class UserController extends BaseApiController
             ]);
     }
 
-    public function update(UserRequest $request)
+    public function update(UpdateUserRequest $request)
     {
         $user = $this->userService->update($this->user, $request->validated());
         $user->loadProfileFields();
