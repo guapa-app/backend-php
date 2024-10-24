@@ -35,11 +35,11 @@ class PostResource extends Resource
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
-                Forms\Components\Textarea::make('title')
+                Forms\Components\TextInput::make('title')
                     ->required()
                     ->columnSpanFull()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('content')
+                Forms\Components\RichEditor::make('content')
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')
@@ -80,6 +80,7 @@ class PostResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -77,11 +77,9 @@ class ProductResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('url')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->maxLength(65535)
+                Forms\Components\TextInput::make('description')
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('terms')
-                    ->maxLength(65535)
+                Forms\Components\TextInput::make('terms')
                     ->columnSpanFull(),
             ]);
     }
