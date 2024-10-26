@@ -36,6 +36,13 @@ class OffersRelationManager extends RelationManager
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                            ->collection('offer_images')
+                            ->hiddenLabel(),
+                    ])
+                    ->collapsible(),
                 Forms\Components\TextInput::make('product_id')
                     ->hidden()
                     ->default($this->ownerRecord->id),
@@ -47,10 +54,9 @@ class OffersRelationManager extends RelationManager
                     ->minValue(1)
                     ->maxValue(100)
                     ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->maxLength(65535)
+                Forms\Components\TextInput::make('description')
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('terms')
+                Forms\Components\TextInput::make('terms')
                     ->columnSpanFull(),
                 Forms\Components\DatePicker::make('starts_at')
                     ->required(),
@@ -63,11 +69,14 @@ class OffersRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
+                    ->label('Image')
+                    ->collection('offer_images'),
+                Tables\Columns\TextColumn::make('title')->limit(30),
                 Tables\Columns\TextColumn::make('price')
                     ->numeric(),
                 Tables\Columns\TextColumn::make('discount')
                     ->formatStateUsing(fn ($state): string => $state . '%'),
-                Tables\Columns\TextColumn::make('title'),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->date(),
                 Tables\Columns\TextColumn::make('expires_at')

@@ -89,6 +89,12 @@ class Post extends Model implements Listable, HasMedia
             ->withPivot('link');
     }
 
+    // this relation created for admin panel.
+    public function postSocialMedia(): HasMany
+    {
+        return $this->hasMany(PostSocialMedia::class);
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);

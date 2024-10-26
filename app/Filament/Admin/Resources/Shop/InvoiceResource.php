@@ -45,13 +45,6 @@ class InvoiceResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('invoice_id')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('amount_format')
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('expired_at'),
-                Forms\Components\TextInput::make('logo_url')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('url')
-                    ->maxLength(255),
             ]);
     }
 
@@ -59,34 +52,28 @@ class InvoiceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('order_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('taxes')
+                Tables\Columns\TextColumn::make('id')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('currency')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('callback_url')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'initiated' => 'gray',
+                        'pending' => 'warning',
+                        'paid' => 'success',
+                        'refunded' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('invoice_id')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('amount_format')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('expired_at')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('order_id')
+                    ->numeric()
+                    ->url(fn($record) => route(
+                        'filament.admin.resources.shop.orders.view',
+                        ['record' => $record->order_id]
+                    ))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('logo_url')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('url')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -100,7 +87,7 @@ class InvoiceResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -120,8 +107,11 @@ class InvoiceResource extends Resource
     {
         return [
             'index' => Pages\ListInvoices::route('/'),
-            'create' => Pages\CreateInvoice::route('/create'),
-            'edit' => Pages\EditInvoice::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

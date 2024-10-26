@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use App\Models\SupportMessage;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
@@ -26,7 +27,7 @@ class ReplySupportMessageNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['fcm', 'database'];
+        return ['database', FirebaseChannel::class];
     }
 
     /**
@@ -41,6 +42,14 @@ class ReplySupportMessageNotification extends Notification
             'type'       => $this->getType(),
             'image'      => '',
             'support_message_id' => $this->supportMessage->parent_id,
+        ];
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title' => $this->getTitle(),
+            'body' => $this->getSummary(),
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Blog;
 
 use App\Filament\Admin\Resources\Blog\PostResource\Pages;
+use App\Filament\Admin\Resources\Blog\PostResource\RelationManagers;
 use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -35,11 +36,11 @@ class PostResource extends Resource
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
-                Forms\Components\Textarea::make('title')
+                Forms\Components\TextInput::make('title')
                     ->required()
                     ->columnSpanFull()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('content')
+                Forms\Components\RichEditor::make('content')
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')
@@ -48,6 +49,20 @@ class PostResource extends Resource
                     ->native(false),
                 Forms\Components\TextInput::make('youtube_url')
                     ->maxLength(255),
+
+                Forms\Components\Repeater::make('postSocialMedia')
+                    ->relationship()
+                    ->schema([
+                        Forms\Components\Select::make('social_media_id')
+                            ->relationship('socialMedia', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('link')
+                            ->label('Link')
+                            ->required(),
+                    ])
+                    ->columnSpanFull()
+                    ->columns()
+                    ->itemLabel(fn(array $state): ?string => $state['link']),
             ]);
     }
 
@@ -80,6 +95,7 @@ class PostResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -91,7 +107,7 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CommentsRelationManager::class,
         ];
     }
 
