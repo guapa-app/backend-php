@@ -20,6 +20,9 @@ class ProductResource extends JsonResource
             'type'                         => $this->type,
             'terms'                        => (string) $this->terms,
             'is_liked'                     => (bool) $this->is_liked,
+            'likes_count'                  => (int) $this->likes_count,
+            'shared_link'                  => $this->shared_link,
+
             'payment_details'              => $this->payment_details,
             'points'                       => $this->calcProductPoints(),
             'offer'                        => OfferResource::make($this->whenLoaded('offer')),
