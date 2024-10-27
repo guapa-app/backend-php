@@ -20,7 +20,7 @@ class VendorResource extends JsonResource
             'type'                                      => $this->resource::TYPES[$this->type],
             'logo'                                      => MediaResource::make($this->whenLoaded('logo')),
             'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),
-            'specialty'                                 => $this->specialties?->name,
+            'specialty'                                 => $this->specialties()->first()?->title,
 
             $this->mergeWhen($this->parent_id, [
                 'parent_id'                                 => (int) $this->parent_id,

@@ -123,9 +123,7 @@ class AuthController extends BaseApiController
 
     public function userVendor()
     {
-        $vendor = $this->user->vendor;
-
-        $vendor->loadMissing('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia', 'socialMedia.icon');
+        $vendor = $this->user->vendor()->withSingleRelations()->first();
 
         $this->userService->checkIfUserDeleted($this->user->status);
 
