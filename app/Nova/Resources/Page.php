@@ -2,6 +2,7 @@
 
 namespace App\Nova\Resources;
 
+use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
@@ -45,6 +46,10 @@ class Page extends Resource
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
+
+            Images::make(__('image'), 'pages') // second parameter is the media collection name
+            ->temporary(now()->addMinutes(5))
+                ->rules('nullable'), // validation rules
 
             Translatable::make([
                 Text::make(__('title'), 'title')->required(),
@@ -100,5 +105,10 @@ class Page extends Resource
     public function actions(Request $request)
     {
         return [];
+    }
+
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
     }
 }

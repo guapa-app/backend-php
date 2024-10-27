@@ -7,7 +7,6 @@ use App\Models\Address;
 use App\Models\Setting;
 use App\Models\Vendor;
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
@@ -34,7 +33,7 @@ use Illuminate\Validation\Rule;
  * @bodyParam address.lng number Longitude. Example: 62.659898
  * @bodyParam address.type integer required Address type (see address types returned in api data). Example: 3
  */
-class VendorRequest extends FormRequest
+class VendorRequest extends FailedValidationRequest
 {
     private $id;
 

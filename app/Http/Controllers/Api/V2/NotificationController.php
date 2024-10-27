@@ -46,4 +46,12 @@ class NotificationController extends ApiNotificationController
             'is_read' => true,
         ], __('api.success'));
     }
+
+    // delete notification
+    public function delete($id)
+    {
+        parent::delete($id);
+
+        return $this->successJsonRes([], __('api.deleted'));
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserVendor extends Model
 {
@@ -18,28 +19,28 @@ class UserVendor extends Model
         'user_id', 'vendor_id', 'role', 'email',
     ];
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function isManager()
+    public function isManager(): bool
     {
         return $this->role === 'manager';
     }
 
-    public function scopeRole($query, $role)
+    public function scopeRole($query, $role): void
     {
-        return $query->where('role', $role);
+        $query->where('role', $role);
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->where('vendor_id', $value);
+        $query->where('vendor_id', $value);
     }
 }

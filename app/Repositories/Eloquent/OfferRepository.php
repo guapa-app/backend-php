@@ -38,17 +38,11 @@ class OfferRepository extends EloquentRepository implements OfferRepositoryInter
             ->when(!$this->isAdmin(), function ($query) use ($request) {
                 $query->withApiListRelations($request);
             });
-
-        if ('enduser' === strtolower($request->header('X-App-Type'))) {
-            $query->whereHas('offer');
-        } else {
-            if (empty($request->vendor_id)) {
-                $request->merge([
-                    'vendor_id' => $this->user->managerVendorId(),
-                ]);
-            }
-
+        // get all offers for vendor only
+        if ($request->has('vendor_id')) {
             $query->withAllVendorOffers($request);
+        } else {
+            $query->whereHas('offer');
         }
 
         if ($request->has('perPage')) {

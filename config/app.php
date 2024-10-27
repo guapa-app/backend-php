@@ -180,6 +180,7 @@ return [
          * Package Service Providers...
          */
         App\Providers\NovaServiceProvider::class,
+        misterspelik\LaravelPdf\Providers\PdfServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -189,6 +190,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\Filament\UserPanelProvider::class,
+        App\Providers\Filament\AdminPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\TelescopeServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
@@ -244,6 +246,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'PDF' => misterspelik\LaravelPdf\Facades\Pdf::class,
     ],
 
 ];

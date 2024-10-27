@@ -2,8 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\AppointmentOffer;
 use App\Models\Invoice;
+use App\Models\MarketingCampaign;
+use App\Models\Order;
 use App\Models\Setting;
+use InvalidArgumentException;
 
 class PaymentService
 {
@@ -19,9 +23,9 @@ class PaymentService
         };
     }
 
-    public function generateInvoice($order, $description, $fees, $taxes)
+    public function generateInvoice($invoiceable, $description, $fees, $taxes)
     {
-        $invoice = $this->storeInvoice($order, $description, $fees, $taxes);
+        $invoice = $this->createInvoice($invoiceable, $description, $fees, $taxes);
 
         if (($fees + $taxes) > 0) {
             $paymentInvoice = $this->paymentService->create($invoice);
@@ -31,23 +35,46 @@ class PaymentService
         return $invoice;
     }
 
-    public function storeInvoice($order, $description, $fees = 0, $taxes = 0)
+    private function createInvoice($invoiceable, $description, $fees, $taxes)
     {
-        $invoice = Invoice::query()->create([
-            'order_id'     => $order->id,
-            'status'       => 'initiated',
-            'taxes'        => $taxes,
-            'amount'       => ($fees + $taxes),
-            'description'  => "You will pay the fees and taxes. \n" . $description,
-            'currency'     => config('nova.currency'),
-            'callback_url' => config('app.url') . '/api/v2/invoices/change-status',
-        ]);
+        $invoiceData = [
+            'invoiceable_id'   => $invoiceable->id,
+            'invoiceable_type' => get_class($invoiceable),
+            'status'           => 'initiated',
+            'taxes'            => $taxes,
+            'amount'           => ($fees + $taxes),
+            'description'      => $description,
+            'currency'         => config('nova.currency'),
+        ];
 
-        return $invoice;
+        if ($invoiceable instanceof Order) {
+            $invoiceData['callback_url'] = config('app.url') . '/api/v2/invoices/change-status';
+            $invoiceData['description'] = "Order Invoice: \n" . $description;
+        } elseif ($invoiceable instanceof MarketingCampaign) {
+            $invoiceData['callback_url'] = config('app.url') . '/api/v3/campaigns/change-invoice-status';
+            $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
+        } elseif ($invoiceable instanceof AppointmentOffer) {
+            $invoiceData['callback_url'] = config('app.url').'/api/user/v3.1/invoices/change-status';
+        } else {
+            throw new InvalidArgumentException(__('Unsupported invoice type'));
+        }
+
+        return Invoice::query()->create($invoiceData);
     }
 
     public function refund($order)
     {
         $this->paymentService->refund($order);
+    }
+
+    /**
+     * Check if the payment paid successfully.
+     *
+     * @param  mixed $payment_id
+     * @return bool
+     */
+    public function isPaymentPaidSuccessfully($payment_id)
+    {
+        return $this->paymentService->isPaymentPaidSuccessfully($payment_id);
     }
 }

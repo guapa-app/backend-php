@@ -8,6 +8,7 @@ use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -44,6 +45,7 @@ class Post extends Model implements Listable, HasMedia
 
     /**
      * Register media collections.
+     *
      * @return void
      */
     public function registerMediaCollections(): void
@@ -53,6 +55,7 @@ class Post extends Model implements Listable, HasMedia
 
     /**
      * Register media conversions.
+     *
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -70,12 +73,12 @@ class Post extends Model implements Listable, HasMedia
             ->performOnCollections('posts');
     }
 
-    public function admin()
+    public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class)->withDefault();
     }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class, 'category_id')->withDefault();
     }
@@ -84,6 +87,12 @@ class Post extends Model implements Listable, HasMedia
     {
         return $this->belongsToMany(SocialMedia::class)
             ->withPivot('link');
+    }
+
+    // this relation created for admin panel.
+    public function postSocialMedia(): HasMany
+    {
+        return $this->hasMany(PostSocialMedia::class);
     }
 
     public function comments(): HasMany

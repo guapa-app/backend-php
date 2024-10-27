@@ -2,24 +2,23 @@
 
 namespace App\Services\V3;
 
-use App\Enums\ProductType;
+use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Models\Appointment;
 use App\Models\Coupon;
-use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Services\CouponService;
+use App\Services\OrderService as BaseOrderService;
 use App\Services\PaymentService;
+use App\Services\QrCodeService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use App\Contracts\Repositories\OrderRepositoryInterface;
-
-use \App\Services\OrderService as BaseOrderService;
 
 class OrderService extends BaseOrderService
 {
     protected $couponService;
+    protected $qrCodeData;
 
     public function __construct(
         OrderRepositoryInterface $repository,
@@ -55,6 +54,7 @@ class OrderService extends BaseOrderService
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
+                $data['coupon_id'] = $couponResult ? $couponResult['data']['coupon_id'] : null;
 
                 $orderData = $this->calculateOrderData($vendorProducts, $data, $couponResult);
 
@@ -69,7 +69,13 @@ class OrderService extends BaseOrderService
                     abort(400, 'Invalid staff provided for vendor');
                 }
 
-                OrderItem::insert($items->toArray());
+                $items->map(function ($item) use ($order) {
+                    $orderItem = OrderItem::create($item);
+
+                    $qrCodeImage = (new QrCodeService())->generate($this->qrCodeData[$item['product_id']]);
+
+                    $orderItem->addMediaFromString($qrCodeImage)->toMediaCollection('order_items');
+                });
 
                 $order->load('items', 'address', 'user', 'vendor');
 
@@ -101,7 +107,7 @@ class OrderService extends BaseOrderService
         $couponProductDiscounts = $couponResult ? $couponResult['data']['product_discounts'] : [];
 
         foreach ($vendorProducts as $product) {
-            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+            $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
             $quantity = $inputItem['quantity'];
 
             if (isset($couponProductDiscounts[$product->id])) {
@@ -123,10 +129,11 @@ class OrderService extends BaseOrderService
 
         return $orderData;
     }
+
     private function createOrderItems($vendorProducts, $data, $order, $now, $vendorId, $couponResult)
     {
-        return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId , $couponResult) {
-            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
+        return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId, $couponResult) {
+            $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
 
             if (isset($inputItem['appointment'])) {
                 $appointment = Appointment::find($inputItem['appointment']['id']);
@@ -140,18 +147,35 @@ class OrderService extends BaseOrderService
                 $inputItem['appointment']['to_time'] = $appointment->to_time;
             }
 
+            $itemAmountToPay = $this->productAmountToPay($product, $inputItem['quantity'], $couponResult);
+            $itemPriceAfterDiscount = $this->getDiscountedPrice($product);
+
+            $this->qrCodeData[$product->id] = [
+                'hash_id'                   => $product->hash_id,
+                'order_id'                  => $order->id,
+                'client_name'               => auth()->user()?->name,
+                'client_phone'              => auth()->user()?->phone,
+                'vendor_name'               => $product->vendor?->name,
+                'paid_amount'               => $itemAmountToPay,
+                'remain_amount'             => ($product->price - $itemAmountToPay),
+                'title'                     => $product->title,
+                'item_price'                => $product->price,
+                'item_price_after_discount' => $itemPriceAfterDiscount ?? null,
+                'item_image'                => $product->image?->url,
+            ];
+
             return [
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'offer_id' => optional($product->offer)->id,
-                'amount' => $this->getDiscountedPrice($product),
-                'amount_to_pay' => $this->productAmountToPay($product,$inputItem['quantity'],$couponResult),
+                'order_id'      => $order->id,
+                'product_id'    => $product->id,
+                'offer_id'      => optional($product->offer)->id,
+                'amount'        => $itemPriceAfterDiscount,
+                'amount_to_pay' => $itemAmountToPay,
                 'taxes'         => $this->taxesPercentage,
-                'quantity' => $inputItem['quantity'],
-                'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
-                'user_id' => $inputItem['staff_user_id'] ?? null,
-                'created_at' => $now,
-                'updated_at' => $now,
+                'quantity'      => $inputItem['quantity'],
+                'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
+                'user_id'       => $inputItem['staff_user_id'] ?? null,
+                'created_at'    => $now,
+                'updated_at'    => $now,
             ];
         });
     }
@@ -163,6 +187,7 @@ class OrderService extends BaseOrderService
             $price -= ($price * ($product->offer->discount / 100));
             $price = round($price, 2);
         }
+
         return $price;
     }
 
@@ -172,16 +197,16 @@ class OrderService extends BaseOrderService
 
         if ($productCategory?->fees) {
             $productFees = $productCategory->fees;
+
             return ($productFees / 100) * $finalPrice;
         } else {
             return $productCategory?->fixed_price ?? 0;
         }
     }
 
-    private function productAmountToPay($product,$quantity,$couponResult)
+    private function productAmountToPay($product, $quantity, $couponResult)
     {
-        if ($couponResult && isset($couponResult['data']['product_discounts'][$product->id]))
-        {
+        if ($couponResult && isset($couponResult['data']['product_discounts'][$product->id])) {
             $discountedProduct = $couponResult['data']['product_discounts'][$product->id];
             $productFees = $discountedProduct['fees'];
         } else {
@@ -189,6 +214,7 @@ class OrderService extends BaseOrderService
             $finalPrice = $price * $quantity;
             $productFees = $this->calculateProductFees($product, $finalPrice);
         }
+
         return $productFees;
     }
 

@@ -153,4 +153,15 @@ class OttuService
             'amount_format' => $invoiceService['amount'] . ' ' . $invoiceService['currency_code'],
         ]);
     }
+
+    /**
+     * Check if the payment paid successfully.
+     *
+     * @param  mixed $payment_id
+     * @return bool
+     */
+    public function isPaymentPaidSuccessfully($payment_id)
+    {
+        return false;
+    }
 }

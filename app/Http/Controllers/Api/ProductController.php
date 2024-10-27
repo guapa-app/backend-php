@@ -48,7 +48,7 @@ class ProductController extends BaseApiController
      * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
      *
-     * @param ProductListRequest $request
+     * @param  ProductListRequest  $request
      * @return Collection
      */
     public function index(ProductListRequest $request)
@@ -66,7 +66,7 @@ class ProductController extends BaseApiController
      *
      * @urlParam id required Product id
      *
-     * @param int $id
+     * @param  int  $id
      * @return Model
      */
     public function single($id)
@@ -87,7 +87,7 @@ class ProductController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param ProductRequest $request
+     * @param  ProductRequest  $request
      * @return Product
      */
     public function create(ProductRequest $request)
@@ -95,6 +95,7 @@ class ProductController extends BaseApiController
         $data = $request->validated();
 
         $data['user_id'] = $this->user->id;
+        $data['vendor_id'] = $this->user->userVendor?->vendor_id;
 
         return $this->productService->create($data);
     }
@@ -109,8 +110,8 @@ class ProductController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param int $id
-     * @param ProductRequest $request
+     * @param  int  $id
+     * @param  ProductRequest  $request
      *
      * @return Product
      */
@@ -129,7 +130,7 @@ class ProductController extends BaseApiController
      *
      * @urlParam id required Product id
      *
-     * @param int $id
+     * @param  int  $id
      *
      * @return int
      */

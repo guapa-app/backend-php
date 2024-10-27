@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @bodyParam product_id int required Product id for this offer.
@@ -13,7 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @bodyParam starts_at date The start date of the offer.
  * @bodyParam expires_at date The end date of the offer.
  */
-class OfferRequest extends FormRequest
+class OfferRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

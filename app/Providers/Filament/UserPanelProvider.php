@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\ContractWidget;
+use App\Filament\User\Widgets\ContractWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -38,14 +38,14 @@ class UserPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverResources(in: app_path('Filament/Resources/GuapaPlus'), for: 'App\\Filament\\Resources\\GuapaPlus')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
+            ->discoverResources(in: app_path('Filament/User/Resources/GuapaPlus'), for: 'App\\Filament\\User\\Resources\\GuapaPlus')
+            ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->discoverWidgets(in: app_path('Filament/Widgets/GuapaPlus'), for: 'App\\Filament\\Widgets\\GuapaPlus')
+            ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/User/Widgets/GuapaPlus'), for: 'App\\Filament\\User\\Widgets\\GuapaPlus')
             ->widgets([
                 Widgets\AccountWidget::class,
                 ContractWidget::class,

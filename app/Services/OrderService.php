@@ -21,11 +21,11 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
-
     protected $repository;
     protected $paymentService;
     protected $productFees;
     protected $taxesPercentage;
+    protected $qrCodeData;
 
     public function __construct(OrderRepositoryInterface $repository, PaymentService $payment_service)
     {
@@ -49,7 +49,6 @@ class OrderService
             $orders = new Collection;
             $now = now();
             $orderItems = [];
-            $userIds = [];
 
             foreach ($keyedProducts as $vendorId => $vendorProducts) {
                 $data['vendor_id'] = $vendorId;
@@ -57,6 +56,8 @@ class OrderService
                 $productsTitles = $vendorProducts->pluck('title')->implode(' - ');
 
                 $data['total'] = (float) $vendorProducts->sum(function ($product) use ($data, $now, $vendorId, &$orderItems, &$userIds) {
+                    $userIds = [];
+
                     $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
 
                     if (isset($inputItem['appointment'])) {
@@ -70,9 +71,13 @@ class OrderService
                         $inputItem['appointment']['to_time'] = $appointment->to_time;
                     }
 
+                    $itemPrice = $product->price;
+
                     if ($product->offer) {
                         $product->price -= ($product->price * ($product->offer->discount / 100));
                         $product->price = round($product->price, 2);
+
+                        $itemPriceAfterDiscount = $product->price;
                     }
 
                     $finalPrice = $inputItem['quantity'] * $product->price;
@@ -90,18 +95,31 @@ class OrderService
 
                     $userIds[] = $inputItem['staff_user_id'] ?? null;
 
+                    $this->qrCodeData[$product->id] = [
+                        'hash_id' => $product->hash_id,
+                        'client_name' => auth()->user()?->name,
+                        'client_phone' => auth()->user()?->phone,
+                        'vendor_name' => $product->vendor->name,
+                        'paid_amount' => $itemAmountToPay,
+                        'remain_amount' => ($product->price - $itemAmountToPay),
+                        'title' => $product->title,
+                        'item_price' => $itemPrice,
+                        'item_price_after_discount' => $itemPriceAfterDiscount ?? null,
+                        'item_image' => $product->image?->url,
+                    ];
+
                     $orderItems[] = [
-                        'user_id'       => $inputItem['staff_user_id'] ?? null,
-                        'product_id'    => $product->id,
-                        'offer_id'      => optional($product->offer)->id,
-                        'quantity'      => $inputItem['quantity'],
-                        'amount'        => $product->price,
+                        'user_id' => $inputItem['staff_user_id'] ?? null,
+                        'product_id' => $product->id,
+                        'offer_id' => optional($product->offer)->id,
+                        'quantity' => $inputItem['quantity'],
+                        'amount' => $product->price,
                         'amount_to_pay' => $itemAmountToPay,
-                        'taxes'         => $this->taxesPercentage,
-                        'title'         => $product->title,
-                        'appointment'   => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
-                        'created_at'    => $now,
-                        'updated_at'    => $now,
+                        'taxes' => $this->taxesPercentage,
+                        'title' => $product->title,
+                        'appointment' => isset($inputItem['appointment']) ? json_encode($inputItem['appointment']) : null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
                     ];
 
                     return $finalPrice;
@@ -118,10 +136,16 @@ class OrderService
 
                 $orderItems = array_map(function ($item) use ($order) {
                     $item['order_id'] = $order->id; // Merge the order ID into each item
+
+                    $orderItem = OrderItem::create($item);
+
+                    $this->qrCodeData[$item['product_id']]['order_id'] = $order->id;
+                    $qrCodeImage = (new QrCodeService())->generate($this->qrCodeData[$item['product_id']]);
+
+                    $orderItem->addMediaFromString($qrCodeImage)->toMediaCollection('order_items');
+
                     return $item;
                 }, $orderItems);
-
-                OrderItem::query()->insert($orderItems);
 
                 $order->load('items', 'address', 'user', 'vendor');
 
@@ -157,7 +181,7 @@ class OrderService
         $vendor = $order->vendor;
         // add the client to vendor client list if the order is used
         if ($data['status'] == (OrderStatus::Used)->value) {
-            $vendor->clients()->firstOrCreate(['user_id' =>  $user->id]);
+            $vendor->clients()->firstOrCreate(['user_id' => $user->id]);
             Notification::send($user, new AddVendorClientNotification($vendor, false));
         }
         if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
@@ -202,18 +226,27 @@ class OrderService
             if ($order->created_at->addDays(14)->toDateString() < Carbon::today()->toDateString()) {
                 $error = __('api.cancel_order_error');
             } elseif (in_array($order->status->value, OrderStatus::notAvailableForCancle())) {
-                $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
+                $error = __(
+                    'api.not_available_for_action',
+                    ['status' => __('api.order_statuses.' . $order->status->value)]
+                );
             }
         } elseif ($req_status == (OrderStatus::Return_Request)->value) {
             $error = $this->checkUserAuthorization($order, $user);
 
             if ($order->status != OrderStatus::Delivered) {
-                $error = __('api.not_available_for_action', ['status' => __('api.order_statuses.' . $order->status->value)]);
+                $error = __(
+                    'api.not_available_for_action',
+                    ['status' => __('api.order_statuses.' . $order->status->value)]
+                );
             }
         }
 
         if ($order->status->value === $req_status) {
-            $error = __('api.order_status_req_status_error', ['status' => __('api.order_statuses.' . $order->status->value)]);
+            $error = __(
+                'api.order_status_req_status_error',
+                ['status' => __('api.order_statuses.' . $order->status->value)]
+            );
         }
 
         if (isset($error)) {

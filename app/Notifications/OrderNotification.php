@@ -7,9 +7,11 @@ use App\Models\Order;
 use App\Models\User;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderNotification extends Notification
+class OrderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -41,12 +43,12 @@ class OrderNotification extends Notification
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return array
      */
     public function via($notifiable)
     {
-        return [FirebaseChannel::class, 'database'];
+        return [FirebaseChannel::class, 'database', 'mail'];
     }
 
     /**
@@ -72,26 +74,49 @@ class OrderNotification extends Notification
         ];
     }
 
+    public function toMail($notifiable)
+    {
+        $recipientType = $this->getRecipientType($notifiable);
+        $mailMessage = (new MailMessage)
+            ->from('info@guapa.com.sa', 'Guapa')
+            ->subject('تأكيد استلام الدفع - ' .  $this->order->id)
+            ->view(
+                'emails.order_confirmation',
+                [
+                    'order' => $this->order,
+                    'recipientType' => $recipientType,
+                ]
+            );
+
+        if ($recipientType == 'customer') {
+            $mailMessage->attach($this->order->invoice_url, [
+                'as' => 'invoice.pdf',
+                'mime' => 'application/pdf',
+            ]);
+        }
+        return $mailMessage;
+    }
+
     public function getWhatsappMessage(): string
     {
         $this->order->loadMissing('items.product');
 
-        $message = "------------------------\n" .
-            "فريق قوابا يشعركم بوجود طلب جديد ارجو التحقق من مركز الطلبات في التطبيق\n" .
-            "------------------------\n" .
-            'نوع الطلب: ' . $this->orderType() . "\n" .
-            'الاسم: ' . $this->user->name . "\n" .
-            'الرقم: ' . $this->user->phone . "\n";
+        $message = "------------------------\n".
+            "فريق قوابا يشعركم بوجود طلب جديد ارجو التحقق من مركز الطلبات في التطبيق\n".
+            "------------------------\n".
+            'نوع الطلب: '.$this->orderType()."\n".
+            'الاسم: '.$this->user->name."\n".
+            'الرقم: '.$this->user->phone."\n";
 
         if ($this->orderType() == 'new-order') {
-            $message .= "------------------------\n" .
+            $message .= "------------------------\n".
                 "المنتجات: \n";
             foreach ($this->order->items as $item) {
-                $message .= $item->product->name . ' - ' . $item->quantity . '-' . $item->amount . "\n";
+                $message .= $item->product->name.' - '.$item->quantity.'-'.$item->amount."\n";
             }
         }
 
-        $message .= "------------------------\n" .
+        $message .= "------------------------\n".
             'قوابا';
 
         return $message;
@@ -100,7 +125,7 @@ class OrderNotification extends Notification
     /**
      * Get fcm representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      *
      * @return FcmMessage
      */
@@ -109,14 +134,14 @@ class OrderNotification extends Notification
         $message = new FcmMessage();
         $message->content([
             'title' => 'New order',
-            'body' => 'New order from ' . $this->user->name . ' #' . $this->order->id,
+            'body' => 'New order from '.$this->user->name.' #'.$this->order->id,
             'sound' => 'default',
             'icon' => '',
             'click_action' => '',
         ])->data([
             'type' => $this->orderType(),
             'summary' => $this->getSummary(),
-            'order_id' => $this->order->id,
+            'id' => $this->order->id,
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
 
         return $message;
@@ -132,7 +157,7 @@ class OrderNotification extends Notification
 
     public function getSummary(): string
     {
-        return 'لديك طلب جديد رقم ' . $this->order->id;
+        return 'لديك طلب جديد رقم '.$this->order->id;
     }
 
     private function orderType(): string
@@ -141,10 +166,19 @@ class OrderNotification extends Notification
         $this->order->loadMissing('items');
         foreach ($this->order->items as $item) {
             if ($item->appointment != null) {
-                return $type . 'consultation';
+                return $type.'consultation';
             }
         }
 
-        return $type . 'order';
+        return $type.'order';
+    }
+
+    private function getRecipientType($notifiable): string
+    {
+        if ($notifiable instanceof User && $notifiable->id === $this->order->user_id) {
+            return 'customer';
+        }
+
+        return 'vendor-admin';
     }
 }

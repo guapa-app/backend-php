@@ -2,9 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-
 /**
  * @bodyParam category_id int required Category id for this product.
  * @bodyParam title string required Product title 191 characters max.
@@ -17,7 +14,7 @@ use Illuminate\Validation\Rule;
  * @bodyParam keep_media array required Array of media ids to keep (Update only).
  * @bodyParam keep_media.* int required Media id returned from server.
  */
-class ProductRequest extends FormRequest
+class ProductRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,6 +28,7 @@ class ProductRequest extends FormRequest
 
     /**
      * Handle data to be validated from the request.
+     *
      * @return array
      */
     public function validationData(): array
@@ -65,39 +63,39 @@ class ProductRequest extends FormRequest
         );
 
         $rules = [
-            'vendor_id'         => "{$rule_name}|integer|exists:vendors,id",
-            'title'             => "{$rule_name}|string|max:200",
-            'description'       => 'nullable|string|max:5000',
-            'price'             => "{$rule_name}|numeric|max:100000000",
-            'status'            => "{$rule_name}|string|in:Published,Draft",
-            'category_ids'      => 'sometimes|array|min:1',
-            'category_ids.*'    => 'integer|exists:taxonomies,id',
-            'address_ids'       => 'sometimes|array|min:1',
-            'address_ids.*'     => 'integer|exists:addresses,id',
-            'media'             => ($id ? 'nullable' : 'required_without:keep_media') . '|array|min:1',
-            'media.*'           => "{$rule_name}|image|max:10240",
-            'terms'             => 'nullable|string|max:5000',
-            'type'              => "{$rule_name}|in:product,service",
+//            'vendor_id' => "{$rule_name}|integer|exists:vendors,id",
+            'title' => "{$rule_name}|string|max:200",
+            'description' => 'nullable|string|max:5000',
+            'price' => "{$rule_name}|numeric|max:100000000",
+            'status' => "{$rule_name}|string|in:Published,Draft",
+            'category_ids' => 'sometimes|array|min:1',
+            'category_ids.*' => 'integer|exists:taxonomies,id',
+            'address_ids' => 'sometimes|array|min:1',
+            'address_ids.*' => 'integer|exists:addresses,id',
+            'media' => ($id ? 'nullable' : 'required_without:keep_media').'|array|min:1',
+            'media.*' => "{$rule_name}|image|max:10240",
+            'terms' => 'nullable|string|max:5000',
+            'type' => "{$rule_name}|in:product,service",
             // Admin only attributes
-            'review'            => "{$rule_name}|string|in:Approved,Blocked,Pending",
-            'url'               => 'nullable|string',
+            'review' => "{$rule_name}|string|in:Approved,Blocked,Pending",
+            'url' => 'nullable|string',
         ];
 
         // If the user is not an admin, remove the fields updated
         // only by admin, so they won't be available when using
         // $request->validated()
         $user = $this->user();
-        if ($user && !$user->isAdmin()) {
-            unset($rules['review']);
-            // The user must be member of provided vendor
-            $rules['vendor_id'] = [
-                "{$rule_name}", 'integer',
-                Rule::exists('user_vendor')->where(function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                    $query->where('vendor_id', (int) $this->get('vendor_id'));
-                }),
-            ];
-        }
+//        if ($user && !$user->isAdmin()) {
+//            unset($rules['review']);
+//            // The user must be member of provided vendor
+//            $rules['vendor_id'] = [
+//                "{$rule_name}", 'integer',
+//                Rule::exists('user_vendor')->where(function ($query) use ($user) {
+//                    $query->where('user_id', $user->id);
+//                    $query->where('vendor_id', (int) $this->get('vendor_id'));
+//                }),
+//            ];
+//        }
 
         // If this is an update request, add sometimes
         // rule to required fields to validate if exists only
@@ -112,7 +110,7 @@ class ProductRequest extends FormRequest
             // Validate ad media to keep without deletion
             // If not provided all old media will be removed
             // But new media must be provided
-            $rules['keep_media'] = ($id ? 'nullable' : 'required_without:media') . '|array|min:1';
+            $rules['keep_media'] = ($id ? 'nullable' : 'required_without:media').'|array|min:1';
             $rules['keep_media.*'] = "{$rule_name}|integer|exists:media,id";
         }
 
@@ -123,7 +121,10 @@ class ProductRequest extends FormRequest
     {
         return strtr(
             $string,
-            ['٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9']
+            [
+                '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7',
+                '٨' => '8', '٩' => '9'
+            ]
         );
     }
 }

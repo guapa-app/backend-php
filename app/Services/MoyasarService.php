@@ -12,13 +12,13 @@ class MoyasarService
     {
         $data = $data->attributesToArray();
 
-        /**
+        /*
          * Convert the amount to the smallest currency unit as an integer.
          * For example, 1 Riyal = 100 Halals.
          * Use number_format to avoid floating-point precision issues and convert the result to an integer.
          * Examples: 167.56 becomes 16756, and 9.2 becomes 920.
          */
-        $data['amount'] = (int)number_format($data['amount'] * 100, decimal_separator: '', thousands_separator: '');
+        $data['amount'] = (int) number_format($data['amount'] * 100, decimal_separator: '', thousands_separator: '');
 
         return $data;
     }
@@ -33,31 +33,38 @@ class MoyasarService
         return $invoiceService;
     }
 
-    public function refund($order)
+    public function refund($model)
     {
-        $invoice = $order->invoice;
-        $invoiceService = new InvoiceService();
-        $invoiceService = $invoiceService->fetch($invoice->invoice_id);
-
-        if (!empty($invoiceService->payments)) {
-            if ($invoiceService->payments[0]->status == 'paid') {
-                $paymentService = new MoyasarPaymentService();
-                $paymentService = $paymentService->fetch($invoiceService->payments[0]->id);
-                $paymentService->refund();
-                $invoice->update(['status' => 'refunded']);
-            } else {
-                $invoiceService->cancel();
-                $invoice->update(['status' => 'canceled']);
-            }
-        } else {
-            // Expired invoices has no payments.
-            $invoice->update(['status' => 'canceled']);
+        if (!method_exists($model, 'invoice')) {
+            throw new \InvalidArgumentException("Model must have an 'invoice' relationship");
         }
 
+        $invoice = $model->invoice;
+        if (!$invoice) {
+            throw new \InvalidArgumentException("No invoice found for this model.");
+        }
+
+        if (!$model->payment_id) {
+            throw new \InvalidArgumentException("No payment ID associated with this model.");
+        }
+
+        $paymentService = new MoyasarPaymentService();
+        $payment = $paymentService->fetch($model->payment_id);
+
+        if ($payment->status === 'paid') {
+            $payment->refund();
+            $newStatus = 'refunded';
+        } else {
+            $newStatus = 'canceled';
+        }
+
+        // update status of the model
+        $invoice->update(['status' => $newStatus]);
+
         // delete Invoice pdf
-        if ($order->invoice_url) {
-            (new PDFService)->deletePDF($order->invoice_url);
-            $order->update(['invoice_url' => null]);
+        if (property_exists($model, 'invoice_url') && $model->invoice_url) {
+            (new PDFService)->deletePDF($model->invoice_url);
+            $model->update(['invoice_url' => null]);
         }
     }
 
@@ -70,4 +77,31 @@ class MoyasarService
             'amount_format' => $invoiceService->amountFormat,
         ]);
     }
+
+    /**
+     * Check if the payment paid successfully.
+     *
+     * @param  mixed $payment_id
+     * @return bool
+     */
+    public function isPaymentPaidSuccessfully($payment_id)
+    {
+        try {
+            $paymentService = new MoyasarPaymentService();
+            $payment = $paymentService->fetch($payment_id);
+
+            if ($payment->status == 'paid') {
+                return true;
+            }
+            return false;
+
+        } catch (\Exception $e) {
+            // Log the error message if needed
+            \Log::error('Payment fetch failed: ' . $e->getMessage());
+
+            // Return false or throw a custom error message
+            return false;
+        }
+    }
+
 }

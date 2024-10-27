@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetClientOrdersRequest;
 use App\Http\Requests\VendorClientRequest;
+use App\Models\User;
 use App\Models\Vendor;
 use App\Services\VendorClientService;
 use Illuminate\Http\Request;
@@ -21,13 +22,12 @@ class VendorClientController extends Controller
     public function index(Request $request, Vendor $vendor)
     {
         $request->validate([
-            'name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:255',
+            'search' => 'nullable|string|max:255',
         ]);
-        $filters = $request->only(['name', 'phone']);
+        $filters = $request->only(['search']);
+
         return $this->vendorClientService->listClientsWithOrderCount($vendor, $filters);
     }
-
 
     public function store(VendorClientRequest $request, Vendor $vendor)
     {
@@ -37,9 +37,10 @@ class VendorClientController extends Controller
     public function getClientOrders(GetClientOrdersRequest $request, Vendor $vendor, User $client)
     {
         $productType = $request->input('product_type', null);
-        return $this->vendorClientService->getClientOrders($vendor, $client, $productType);
 
+        return $this->vendorClientService->getClientOrders($vendor, $client, $productType);
     }
+
     public function destroy(Vendor $vendor, $clientId)
     {
         return $this->vendorClientService->deleteClient($vendor, $clientId);

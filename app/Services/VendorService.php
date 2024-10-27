@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Redis;
  */
 class VendorService
 {
-    private $vendorRepository;
-    private $userRepository;
+    protected $vendorRepository;
+    protected $userRepository;
 
     public function __construct(VendorRepositoryInterface $vendorRepository, UserRepositoryInterface $userRepository)
     {
@@ -139,7 +139,11 @@ class VendorService
         $vendor = $this->vendorRepository->update($id, $data);
 
         // Update logo
-        $logoData = Arr::only($data, ['logo']);
+        if (isset($data['remove_logo'])) {
+            $logoData = Arr::only($data, ['logo', 'remove_logo']);
+        }else{
+            $logoData = Arr::only($data, ['logo']);
+        }
         $this->updateLogo($vendor, $logoData);
 
         $this->updateStaff($vendor, $data);
@@ -171,9 +175,13 @@ class VendorService
 
     public function updateLogo(Vendor $vendor, array $data): Vendor
     {
-        if (isset($data['logo']) && $data['logo'] instanceof UploadedFile) {
-            $vendor->addMedia($data['logo'])->toMediaCollection('logos');
-        } elseif ($this->vendorRepository->isAdmin() && !isset($data['logo'])) {
+        if (isset($data['logo'])) {
+            if ($data['logo'] instanceof UploadedFile) {
+                $vendor->addMedia($data['logo'])->toMediaCollection('logos');
+            } elseif (is_string($data['logo']) && str_contains($data['logo'], ';base64')) {
+                $vendor->addMediaFromBase64($data['logo'])->toMediaCollection('logos');
+            }
+        } elseif ($this->vendorRepository->isAdmin() && !isset($data['logo']) || isset($data['remove_logo']) && $data['remove_logo'] === true) {
             // Delete all vendor media
             // As there is only one collection - logos
             $vendor->media()->delete();
@@ -272,34 +280,38 @@ class VendorService
 
     public function share(int $id): int
     {
-        return (int)Redis::hincrby("vendor:{$id}", 'shares_count', 1);
+        return (int) Redis::hincrby("vendor:{$id}", 'shares_count', 1);
     }
 
     public function view(int $id): int
     {
-        return (int)Redis::hincrby("vendor:{$id}", 'views_count', 1);
+        return (int) Redis::hincrby("vendor:{$id}", 'views_count', 1);
     }
 
     public function addSocialMedia(Vendor $vendor, $data)
     {
         return $vendor->socialMedia()
-            ->attach($data['social_media_id'],
-            ['link' => $data['link'],
-        ]);
+            ->attach(
+                $data['social_media_id'],
+                ['link' => $data['link'],
+        ]
+            );
     }
 
     public function updateSocialMedia(Vendor $vendor, $socialMediaId, $data)
     {
         return $vendor->socialMedia()
-            ->updateExistingPivot($socialMediaId,
-            ['link' => $data['link'],
-        ]);
+            ->updateExistingPivot(
+                $socialMediaId,
+                ['link' => $data['link'],
+        ]
+            );
     }
 
     public function deleteSocialMedia(Vendor $vendor, $socialMediaId)
     {
         return $vendor->socialMedia()->detach([
-            $socialMediaId
+            $socialMediaId,
         ]);
     }
 }

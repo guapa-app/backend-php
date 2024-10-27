@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ShareLink extends Model
 {
@@ -16,7 +17,7 @@ class ShareLink extends Model
         'shareable_id', 'shareable_type',
     ];
 
-    public function shareable()
+    public function shareable(): MorphTo
     {
         return $this->morphTo();
     }

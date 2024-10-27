@@ -6,6 +6,7 @@ use App\Contracts\FcmNotifiable;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Models\Device;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserVendor;
@@ -110,7 +111,9 @@ class UserService
         ], $data);
 
         // Update user photo
-        $photoData = Arr::only($data, ['photo']);
+        $photoData = isset($data['remove_photo'])
+            ? Arr::only($data, ['photo', 'remove_photo'])
+            : Arr::only($data, ['photo']);
         $this->updatePhoto($profile, $photoData);
 
         $user->setRelation('profile', $profile);
@@ -137,9 +140,13 @@ class UserService
 
     public function updatePhoto(UserProfile $profile, array $data): UserProfile
     {
-        if (isset($data['photo']) && $data['photo'] instanceof UploadedFile) {
-            $profile->addMedia($data['photo'])->toMediaCollection('avatars');
-        } elseif ($this->userRepository->isAdmin() && !isset($data['photo'])) {
+        if (isset($data['photo'])) {
+            if ($data['photo'] instanceof UploadedFile) {
+                $profile->addMedia($data['photo'])->toMediaCollection('avatars');
+            } elseif (is_string($data['photo']) && str_contains($data['photo'], ';base64')) {
+                $profile->addMediaFromBase64($data['photo'])->toMediaCollection('avatars');
+            }
+        } elseif ($this->userRepository->isAdmin() && !isset($data['photo']) || isset($data['remove_photo']) && $data['remove_photo'] === true ) {
             // Delete all profile media
             // As there is only one collection - avatars
             $profile->media()->delete();
@@ -195,6 +202,19 @@ class UserService
         return $user;
     }
 
+    public function updatePhoneNumber(User $user, $phone): bool
+    {
+        $user->phone_verified_at = null;
+        $user->phone = $phone;
+        $user->save();
+
+        if (!Setting::checkTestingMode()) {
+            $smsService = new SMSService();
+            $smsService->sendOtp($phone);
+        }
+
+        return true;
+    }
     public function setPassword(User $user, $password): User
     {
         // Set user password

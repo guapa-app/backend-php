@@ -22,8 +22,6 @@ class AddressListRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'addressable_id'    => 'required|integer',
-            'addressable_type'  => 'required|string|in:vendor,user',
             'perPage'           => 'nullable|numeric',
             'page'              => 'nullable|numeric',
             'order'             => 'nullable|string|in:asc,desc',

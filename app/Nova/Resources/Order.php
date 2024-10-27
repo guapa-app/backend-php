@@ -4,7 +4,6 @@ namespace App\Nova\Resources;
 
 use App\Nova\Actions\ChangeOrderStatus;
 use App\Nova\Actions\SendWhatsAppReminder;
-use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
@@ -13,7 +12,6 @@ use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Order extends Resource
 {

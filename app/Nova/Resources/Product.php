@@ -83,7 +83,7 @@ class Product extends Resource
             Textarea::make(__('description'), 'description')->required(),
             Textarea::make(__('terms'), 'terms')->required(),
             Number::make(__('price'), 'price')->step(0.01)->required()->rules('required'),
-
+            Number::make(__('points'), 'earned_points')->rules('integer', 'min:0'),
             SelectPlus::make(__('categories'), 'taxonomies', Category::class)
                 ->required()
                 ->help('Only first category \'ll be stored')

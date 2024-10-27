@@ -17,7 +17,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
@@ -37,19 +40,21 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         SoftDeletes;
 
     protected $fillable = [
-        'hash_id', 'vendor_id', 'title', 'description', 'price',
-        'status', 'review', 'type', 'terms', 'url',
+        'hash_id', 'vendor_id', 'title', 'description', 'price', 'earned_points',
+        'status', 'review', 'type', 'terms', 'url', 'sort_order',
     ];
 
     protected $appends = [
         'likes_count', 'is_liked',
-        'taxonomy_name', 'address',
-        'shared_link'
+        'taxonomy_name', 'taxonomy_id',
+        'taxonomy_type', 'address',
+        'shared_link',
     ];
 
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable = [
@@ -58,6 +63,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -65,13 +71,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     ];
 
     protected $casts = [
-        'type'   => ProductType::class,
+        'type' => ProductType::class,
         'status' => ProductStatus::class,
         'review' => ProductReview::class,
     ];
 
     /**
      * Register media collections.
+     *
      * @return void
      */
     public function registerMediaCollections(): void
@@ -81,6 +88,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     /**
      * Register media conversions.
+     *
      * @return void
      */
     public function registerMediaConversions(BaseMedia $media = null): void
@@ -109,12 +117,22 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getSharedLinkAttribute()
     {
-        return $this->shareLink->link;
+        return $this->shareLink?->link;
     }
 
     public function getTaxonomyNameAttribute()
     {
         return $this->getRelations()['taxonomies'][0]->title ?? '';
+    }
+
+    public function getTaxonomyIdAttribute()
+    {
+        return $this->getRelations()['taxonomies'][0]->id ?? '';
+    }
+
+    public function getTaxonomyTypeAttribute()
+    {
+        return $this->getRelations()['taxonomies'][0]->type ?? '';
     }
 
     public function getCategoryIdsAttribute()
@@ -151,14 +169,15 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $price -= ($price * ($this->offer->discount / 100));
             $price = round($price, 2);
         }
+
         return $price;
     }
 
     public function getPaymentDetailsAttribute()
     {
-        $finalPrice = $this->offer_price; // Use the getOfferPriceAttribute method
-        $fees = $this->calculateProductFees($finalPrice);
-        $taxPercentage = Setting::getTaxes(); // Example tax percentage
+        $finalPrice = (float) $this->offer_price; // Use the getOfferPriceAttribute method
+        $fees = (float) $this->calculateProductFees($finalPrice);
+        $taxPercentage = (float) Setting::getTaxes(); // Example tax percentage
         $taxes = ($taxPercentage / 100) * $fees;
         $remaining = $finalPrice - $fees;
         $feesWithTaxes = $fees + $taxes;
@@ -169,12 +188,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             'remaining' => $remaining,
             'fees_with_taxes' => $feesWithTaxes,
             'tax_percentage' => $taxPercentage,
-            'price_after_discount' => $this->offer ? $this->offer_price : $this->price,
-            'discount_percentage' => $this->offer?->discount ?? 0,
+            'price_after_discount' => $this->offer ? $this->offer_price : (float) $this->price,
+            'discount_percentage' => (float) $this->offer?->discount ?? 0.0,
         ];
     }
 
-    public function shareLink()
+    public function shareLink(): MorphOne
     {
         return $this->morphone(ShareLink::class, 'shareable')->withDefault();
     }
@@ -199,17 +218,17 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->taxonomies('specialty');
     }
 
-    public function addresses()
+    public function addresses(): BelongsToMany
     {
         return $this->belongsToMany(Address::class, 'product_addresses');
     }
 
-    public function coupons()
+    public function coupons(): BelongsToMany
     {
         return $this->belongsToMany(Coupon::class, 'coupon_products');
     }
 
-    public function image()
+    public function image(): MorphOne
     {
         return $this->morphOne(Media::class, 'model')
             ->where('collection_name', 'products');
@@ -220,19 +239,29 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         return $this->hasMany(OrderItem::class, 'product_id');
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function marketingCampaigns(): MorphMany
     {
-        return $query->where('vendor_id', $value);
+        return $this->morphMany(MarketingCampaign::class, 'campaignable');
     }
 
-    public function scopeService($query)
+    public function loyaltyPointHistories()
     {
-        return $query->where('type', ProductType::Service);
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
     }
 
-    public function scopeProduct($query)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->where('type', ProductType::Product);
+        $query->where('vendor_id', $value);
+    }
+
+    public function scopeService($query): void
+    {
+        $query->where('type', ProductType::Service);
+    }
+
+    public function scopeProduct($query): void
+    {
+        $query->where('type', ProductType::Product);
     }
 
     public function scopePriceRange($query, $minPrice, $maxPrice)
@@ -320,10 +349,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     /**
      * Scope the query to return only products nearby a specific location by specific distance.
-     * @param Builder $query
-     * @param float $lat
-     * @param float $lng
-     * @param int $dist
+     *
+     * @param  Builder  $query
+     * @param  float  $lat
+     * @param  float  $lng
+     * @param  int  $dist
      * @return Builder
      */
     public function scopeNearBy($query, $lat, $lng, $dist = 50)
@@ -340,7 +370,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         $distance_aggregate = "(6371 * acos(cos(radians($lat)) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians($lng)) + sin(radians($lat)) * sin(radians(addresses.lat))))";
 
-        $query->addSelect(DB::raw($distance_aggregate . ' AS distance'));
+        $query->addSelect(DB::raw($distance_aggregate.' AS distance'));
 
         $query->join('addresses', function ($join) use ($lat, $lng, $dist) {
             $join->on('addresses.id', '=', 'product_addresses.address_id');
@@ -414,9 +444,23 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         if ($productCategory?->fees) {
             $productFees = $productCategory->fees;
+
             return ($productFees / 100) * $finalPrice;
         } else {
             return $productCategory?->fixed_price ?? 0;
         }
+    }
+
+    /**
+     * Calc Product Points
+     *
+     * @return int
+     */
+    function calcProductPoints() {
+        if($this->earned_points) return $this->earned_points;
+        $conversionRate = Setting::purchasePointsConversionRate();
+        $paidAmount = $this->payment_details['fees_with_taxes'];
+        $points = (int) ($paidAmount * $conversionRate);
+        return $points;
     }
 }

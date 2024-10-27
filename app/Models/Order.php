@@ -4,11 +4,17 @@ namespace App\Models;
 
 use App\Contracts\Listable;
 use App\Enums\OrderStatus;
+use App\Enums\OrderTypeEnum;
 use App\Enums\ProductType;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
 
 class Order extends Model implements Listable
@@ -16,22 +22,26 @@ class Order extends Model implements Listable
     use HasFactory, ListableTrait;
 
     protected $fillable = [
-        'hash_id', 'user_id', 'vendor_id', 'address_id', 'total', 'status',
-        'note', 'name', 'phone', 'invoice_url', 'cancellation_reason','coupon_id','coupon_discount',
-        'last_reminder_sent'
+        'hash_id', 'user_id', 'vendor_id', 'address_id',
+        'total', 'status', 'note', 'name', 'phone',
+        'invoice_url', 'cancellation_reason', 'coupon_id',
+        'coupon_discount', 'last_reminder_sent', 'type',
+        'staff_id', 'payment_gateway', 'payment_id',
     ];
 
     /**
      * Attributes that can be filtered directly
      * using values from client without any logic.
+     *
      * @var array
      */
     protected $filterable = [
-        'status', 'user_id', 'vendor_id',
+        'status', 'user_id', 'vendor_id','type'
     ];
 
     /**
      * Attributes to be searched using like operator.
+     *
      * @var array
      */
     protected $search_attributes = [
@@ -53,51 +63,58 @@ class Order extends Model implements Listable
 
     public function getPaidAmountAttribute()
     {
-        return number_format(($this->invoice?->amount - $this->invoice?->taxes), decimal_separator: '', thousands_separator: '');
+        return number_format(($this->invoice?->amount - $this->invoice?->taxes), decimal_separator: '',
+            thousands_separator: '');
     }
 
-    public function getRemainingAmountAttribute()
+    public function getRemainingAmountAttribute(): float
     {
         return $this->total - ($this->paid_amount);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function address()
+    public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }
 
-    public function items()
+    public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function products()
+    public function products(): HasManyThrough
     {
         return $this->hasManyThrough(Product::class, OrderItem::class);
     }
 
-    public function invoice()
+    public function invoice(): MorphOne
     {
-        return $this->hasOne(Invoice::class);
+        return $this->morphOne(Invoice::class, 'invoiceable');
     }
-    public function coupon()
+
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
+    }
+
+    public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function scopeCurrentVendor($query, $value): void
     {
-        return $query->where('vendor_id', $value);
+        $query->where('vendor_id', $value);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
@@ -107,9 +124,9 @@ class Order extends Model implements Listable
             $request = new Request($filter);
         }
 
-        if ($request->has('user_id')) {
-            $query->forUserWithFilteredItems();
-        }
+//        if ($request->has('user_id')) {
+//            $query->forUserWithFilteredItems();
+//        }
 
         $query->dateRange($request->get('startDate'), $request->get('endDate'));
 
@@ -135,7 +152,8 @@ class Order extends Model implements Listable
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies', 'items.product.media');
+        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies',
+            'items.product.media', 'appointmentOfferDetails', 'staff');
 
         return $query;
     }
@@ -147,7 +165,8 @@ class Order extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user');
+        $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user',
+            'appointmentOfferDetails', 'staff');
 
         return $query;
     }
@@ -167,7 +186,8 @@ class Order extends Model implements Listable
     /**
      * Filter user orders to return all product orders
      * And all service orders except pending.
-     * @param Builder $query
+     *
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeForUserWithFilteredItems(Builder $query): Builder
@@ -184,4 +204,15 @@ class Order extends Model implements Listable
                     });
             });
     }
+
+    public function staff(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'staff_id');
+    }
+
+    public function appointmentOfferDetails(): BelongsTo
+    {
+        return $this->belongsTo(AppointmentOfferDetail::class, 'appointment_offer_detail_id', 'id');
+    }
+
 }

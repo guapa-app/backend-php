@@ -4,24 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Invoice extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'order_id',
-        'invoice_id',
-        'status',
-        'amount',
-        'currency',
-        'amount_format',
-        'description',
-        'expired_at',
-        'logo_url',
-        'url',
-        'callback_url',
-        'taxes',
+        'invoiceable_id', 'invoiceable_type', 'invoice_id', 'status',
+        'amount', 'currency', 'amount_format', 'description',
+        'expired_at', 'logo_url', 'url', 'callback_url', 'taxes',
+        'invoiceable_id', 'invoiceable_type'
     ];
 
     protected $appends = [
@@ -30,28 +24,40 @@ class Invoice extends Model
         'amount_without_taxes',
     ];
 
-    public function getVendorNameAttribute()
+    public function invoiceable(): MorphTo
     {
-        return $this->order->vendor->name;
+        return $this->morphTo();
     }
 
-    public function getVendorRegNumAttribute()
+    public function getVendorNameAttribute(): string
     {
-        return $this->order->vendor->reg_number;
+        return $this->invoiceable?->vendor?->name ?? '';
     }
 
-    public function getAmountWithoutTaxesAttribute()
+    public function getVendorRegNumAttribute(): string
+    {
+        return $this->invoiceable?->vendor?->reg_number ?? '';
+    }
+
+    public function getAmountWithoutTaxesAttribute(): float
     {
         return $this->amount - $this->taxes;
     }
 
-    public function order()
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class)->withDefault();
     }
 
-    public function scopeCurrentVendor($query, $value)
+    public function marketing_campaign(): BelongsTo
     {
-        return $query->whereRelation('order', 'vendor_id', '=', $value);
+        return $this->belongsTo(MarketingCampaign::class)->withDefault();
+    }
+
+    public function scopeCurrentVendor($query, $vendorId): void
+    {
+        $query->whereHasMorph('invoiceable', [Order::class, MarketingCampaign::class], function ($q) use ($vendorId) {
+            $q->where('vendor_id', $vendorId);
+        });
     }
 }

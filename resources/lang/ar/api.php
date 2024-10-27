@@ -36,6 +36,7 @@ return [
     'deleted'               => 'تم الحذف.',
     'updated'               => 'تم التحديث.',
     'created'               => 'تم الأضافة.',
+    'something_went_wrong'  => 'حدث خطأ ما.',
 
     'the_offer_expires_in'  => ':countdown',
     'no_days'               => 'انتهي',
@@ -71,4 +72,10 @@ return [
 
     'view_details'             => 'عرض تفاصيل',
     'server_error'             => 'خوادمنا تحت الصيانة. سنعود قريبًا بتجربة أفضل!',
+
+    'invalid_type' => 'نوع غير صالح',
+    'payment_status_changed' => 'تم تغيير حالة الدفع بنجاح',
+    'error_payment_status' => 'حدث خطأ أثناء تغيير حالة الدفع',
+    'paid_successfully' => 'تم الدفع بنجاح',
+
 ];

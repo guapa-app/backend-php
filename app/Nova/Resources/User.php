@@ -3,19 +3,19 @@
 namespace App\Nova\Resources;
 
 use App\Helpers\Common;
-use Bissolli\NovaPhoneField\PhoneNumber;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\HasMany;
-use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\MorphMany;
-use Laravel\Nova\Fields\Password;
-use Laravel\Nova\Fields\Select;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
+use Illuminate\Support\Arr;
+use Laravel\Nova\Fields\ID;
+use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\Password;
+use Laravel\Nova\Fields\MorphMany;
+use App\Nova\Actions\ManageUserPoints;
+use Illuminate\Database\Eloquent\Builder;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class User extends Resource
 {
@@ -121,7 +121,7 @@ class User extends Resource
                     $model->{$attribute} = $string;
                 })
                 ->required()
-                ->rules('required','unique:users,phone')
+                ->creationRules('required', 'unique:users,phone')
                 ->updateRules('unique:users,phone,{{resourceId}}')
                 ->withMeta([
                     'onlyCountries' => Arr::flatten(['SA', 'EG']),
@@ -139,6 +139,7 @@ class User extends Resource
             MorphMany::make(__('Devices'), 'devices', Device::class),
             HasMany::make(__('histories'), 'histories'),
             HasMany::make(__('support messages'), 'support_messages'),
+            HasMany::make(__('Admin Point History'), 'adminUserPointHistory', AdminUserPointHistory::class),
         ];
 
         return $returned_arr;
@@ -164,6 +165,10 @@ class User extends Resource
                     'Female' => '👩 Female',
                     'Other' => '- Other',
                 ])->displayUsingLabels(),
+
+            Text::make('Referral Code', function () {
+                    return $this->profile?->getReferralCode() ?? 'N/A';
+                })->readonly(),
         ];
     }
 
@@ -208,6 +213,8 @@ class User extends Resource
      */
     public function actions(Request $request)
     {
-        return [];
+        return [
+            (new ManageUserPoints())->withConfirmationDialog(),
+        ];
     }
 }

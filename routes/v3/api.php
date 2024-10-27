@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v3')->group(function () {
     Route::prefix('auth')->group(base_path('routes/v3/api/auth.php'));
     Route::prefix('vendors')->group(base_path('routes/v3/api/vendors.php'));
+//    Route::prefix('clients')->group(base_path('routes/v3/api/clients.php'));
     Route::prefix('support-msg')->group(base_path('routes/v3/api/support.php'));
     Route::prefix('coupons')->group(base_path('routes/v3/api/coupons.php'));
     Route::prefix('orders')->group(base_path('routes/v3/api/orders.php'));
@@ -25,4 +26,5 @@ Route::prefix('v3')->group(function () {
     Route::prefix('favorites')->group(base_path('routes/v3/api/favorites.php'));
     Route::prefix('social-media')->group(base_path('routes/v3/api/social_media.php'));
     Route::prefix('posts')->group(base_path('routes/v3/api/posts.php'));
+    Route::prefix('campaigns')->group(base_path('routes/v3/api/campaigns.php'));
 });

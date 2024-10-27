@@ -64,4 +64,18 @@ trait HasAddresses
 
         return $query;
     }
+    /**
+     * Scope the query to return only models that have an address with a specific city ID.
+     * @param Builder $query
+     * @param int $cityId
+     * @return Builder
+     */
+    public function scopeHasCity(Builder $query, int $cityId): Builder
+    {
+        return $query->whereHas('addresses', function ($q) use ($cityId) {
+            $q->where('city_id', $cityId)
+                ->where('addressable_type', $this->getMorphClass());
+        });
+    }
+
 }

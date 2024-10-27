@@ -7,17 +7,17 @@ use Ebess\AdvancedNovaMediaLibrary\Fields\Files;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Inspheric\Fields\Email;
-use Inspheric\Fields\Url;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\HasManyThrough;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Panel;
 
 class Vendor extends Resource
 {
@@ -56,13 +56,15 @@ class Vendor extends Resource
     /**
      * Get the fields displayed by the resource.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function fields(Request $request): array
     {
         $returned_arr = [
             ID::make(__('ID'), 'id')->sortable(),
+
+            BelongsTo::make(__('provider'), 'parent', self::class)->withoutTrashed()->nullable(),
 
             Images::make(__('logo'), 'logos') // second parameter is the media collection name
             ->temporary(now()->addMinutes(5))
@@ -122,13 +124,29 @@ class Vendor extends Resource
 
             Files::make(__('Contract'), 'contract')
                 ->temporary(now()->addMinutes(5))
-                ->rules( 'nullable') // Add appropriate validation rules
+                ->rules('nullable') // Add appropriate validation rules
                 ->help('Upload the vendor contract (PDF, DOC, or DOCX file)'),
-
-            Panel::make(__('social media'), $this->socialMediaFields()),
 
             Text::make(__('working hours'), 'working_hours')
                 ->required(),
+
+            HasMany::make(__('Appointment Offers'), 'appointmentOffers', AppointmentOffer::class)
+                ->canSee(function () use ($request) {
+                    return $this->resource?->isParent();
+                }),
+
+            HasMany::make(__('Appointment Offers'), 'appointmentOfferDetails', AppointmentOfferDetails::class)
+                ->canSee(function () use ($request) {
+                    return !$this->resource?->isParent();
+                }),
+
+//            DependencyContainer::make([
+//                HasMany::make(__('Appointment Offers'), 'appointmentOffers', AppointmentOffer::class)
+//            ])->dependsOn('parent_id', null),
+//
+//            DependencyContainer::make([
+//                HasMany::make(__('Appointment Offers'), 'appointmentOfferDetails', AppointmentOfferDetails::class),
+//            ])->dependsOn('parent_id', !null),
 
             HasMany::make(__('appointments'), 'appointments', Appointment::class),
 
@@ -136,11 +154,13 @@ class Vendor extends Resource
 
             HasMany::make(__('orders'), 'orders', Order::class),
 
+            HasManyThrough::make(__('invoices'), 'invoices', Invoice::class),
+
             BelongsToMany::make(__('staff'), 'staff', User::class)->fields(function () {
                 return [
                     Email::make(__('email (staff)'), 'email')
                         ->sortable()
-                        ->default('vendor-' . time() . '@cosmo.com')
+                        ->default('vendor-'.time().'@cosmo.com')
                         ->alwaysClickable()
                         ->creationRules('unique:user_vendor,email')
                         ->updateRules('unique:user_vendor,email,{{resourceId}}'),
@@ -154,7 +174,24 @@ class Vendor extends Resource
                         ]),
                 ];
             }),
+
+            HasMany::make(__('doctors'), 'children', self::class)->canSee(function () use ($request) {
+                return $request->isResourceDetailRequest() && $this->resource?->isParent();
+            }),
+
+            BelongsToMany::make(__('socialMedia'), 'socialMedia', SocialMedia::class)
+                ->fields(function () {
+                    return [
+                        Text::make('Url', 'link')
+                            ->rules('required'),
+                    ];
+                }),
+
             Boolean::make(__('verified'), 'verified')->default(false),
+
+            Boolean::make(__('Accept Appointment'), 'accept_appointment'),
+
+            BelongsToMany::make('Appointment form', 'appointmentForms', AppointmentForm::class),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),
             DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
@@ -163,31 +200,10 @@ class Vendor extends Resource
         return $returned_arr;
     }
 
-    public function socialMediaFields(): array
-    {
-        return [
-            Url::make(__('twitter'), 'twitter')->showOnIndex(false),
-
-            Url::make(__('instagram'), 'instagram')->showOnIndex(false),
-
-            Url::make(__('snapchat'), 'snapchat')->showOnIndex(false),
-
-            Url::make(__('snapchat'), 'snapchat')->showOnIndex(false),
-
-            Url::make(__('website_url'), 'website_url')
-                ->nullable()
-                ->showOnIndex(false),
-
-            Url::make(__('known_url'), 'known_url')
-                ->nullable()
-                ->showOnIndex(false),
-        ];
-    }
-
     /**
      * Get the cards available for the request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function cards(Request $request)
@@ -198,7 +214,7 @@ class Vendor extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function filters(Request $request)
@@ -209,7 +225,7 @@ class Vendor extends Resource
     /**
      * Get the lenses available for the resource.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function lenses(Request $request)
@@ -220,7 +236,7 @@ class Vendor extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function actions(Request $request)

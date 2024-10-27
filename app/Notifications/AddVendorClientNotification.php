@@ -6,7 +6,6 @@ use App\Channels\FirebaseChannel;
 use Benwilkins\FCM\FcmMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class AddVendorClientNotification extends Notification implements ShouldQueue
@@ -55,9 +54,9 @@ class AddVendorClientNotification extends Notification implements ShouldQueue
 
         return $message;
     }
+
     public function toWhatsApp($notifiable)
     {
-
     }
 
     public function getSummary()

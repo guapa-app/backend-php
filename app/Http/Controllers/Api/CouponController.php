@@ -3,31 +3,33 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\CouponRepositoryInterface;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\ApplyCouponRequest;
 use App\Http\Requests\CouponRequest;
-use App\Models\Coupon;
 use App\Services\CouponService;
 use Illuminate\Http\Request;
 
-class CouponController extends Controller
+class CouponController extends BaseApiController
 {
     private $couponRepository;
     private $couponService;
 
-    public function __construct(CouponRepositoryInterface $couponRepository,CouponService $couponService)
+    public function __construct(CouponRepositoryInterface $couponRepository, CouponService $couponService)
     {
+        parent::__construct();
         $this->couponRepository = $couponRepository;
         $this->couponService = $couponService;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $coupons = $this->couponRepository->all($request);
+
         return $coupons;
     }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -35,8 +37,10 @@ class CouponController extends Controller
     {
         $data = $request->validated();
         $data['vendors'][] = $request->input('vendor_id');
+
         return $this->couponRepository->create($data);
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -44,8 +48,9 @@ class CouponController extends Controller
     {
         return $this->couponService->delete($id);
     }
+
     /**
-     * Apply coupon to products
+     * Apply coupon to products.
      */
     public function applyCoupon(ApplyCouponRequest $request)
     {
@@ -54,6 +59,7 @@ class CouponController extends Controller
             'products' => $request->input('products'),
         ];
         $result = $this->couponService->applyCoupon($couponCode, $requestData);
+
         return $result;
     }
 }

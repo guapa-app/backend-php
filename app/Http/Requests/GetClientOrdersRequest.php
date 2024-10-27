@@ -3,10 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Enums\ProductType;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class GetClientOrdersRequest extends FormRequest
+class GetClientOrdersRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

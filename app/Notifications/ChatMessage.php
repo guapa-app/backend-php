@@ -142,7 +142,7 @@ class ChatMessage extends Notification
     public function getMessageBody()
     {
         if ($this->message->type === 'offer') {
-            return Lang::get('New offer from').' '.$this->getSenderName();
+            return Lang::get('New offer from') . ' ' . $this->getSenderName();
         } else {
             return $this->message->message;
         }

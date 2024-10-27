@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\V3;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\FailedValidationRequest;
 
-class VendorSocialMediaRequest extends FormRequest
+class VendorSocialMediaRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,7 @@ class VendorSocialMediaRequest extends FormRequest
         $social_medium = $this->route('social_medium');
 
         $rules = [
-            'social_media_id' => ($social_medium ? 'nullable' : 'required') .'|integer|exists:social_media,id',
+            'social_media_id' => ($social_medium ? 'nullable' : 'required') . '|integer|exists:social_media,id',
             'link'            => 'required|string',
         ];
 

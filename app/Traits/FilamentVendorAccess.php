@@ -10,6 +10,11 @@ trait FilamentVendorAccess
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->CurrentVendor(Auth::user()->userVendors->first()->vendor_id);
+            ->CurrentVendor(self::authVendorId());
+    }
+
+    public static function authVendorId()
+    {
+        return Auth::user()?->vendor?->id;
     }
 }

@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Rules\ImageOrArray;
-use Illuminate\Foundation\Http\FormRequest;
 
-class TaxonomyRequest extends FormRequest
+class TaxonomyRequest extends FailedValidationRequest
 {
     /**
      * Determine if the user is authorized to make this request.

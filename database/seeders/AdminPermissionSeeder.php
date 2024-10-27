@@ -34,6 +34,7 @@ class AdminPermissionSeeder extends Seeder
             'Taxonomy',
             'City',
             'Comment',
+            'Coupon',
             'Device',
             'History',
             'Invoice',
@@ -49,9 +50,12 @@ class AdminPermissionSeeder extends Seeder
             'Role',
             'Setting',
             'SupportMessage',
+            'ShareLink',
             'User',
             'Vendor',
             'WorkDay',
+            'WalletChargingPackage',
+            'WheelOfFortune',
         ];
 
         $permissions_arr = [
@@ -64,7 +68,7 @@ class AdminPermissionSeeder extends Seeder
         $permissions = [];
         foreach ($modules as $module) {
             foreach ($permissions_arr as $permission) {
-                array_push($permissions, Permission::create([
+                array_push($permissions, Permission::firstOrCreate([
                     'name' => $permission . Str::snake(str_plural($module)),
                     'guard_name' => 'admin',
                 ]));

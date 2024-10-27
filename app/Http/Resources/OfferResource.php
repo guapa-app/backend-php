@@ -14,12 +14,12 @@ class OfferResource extends JsonResource
             'title'                 => $this->title,
             'description'           => $this->description,
             'terms'                 => $this->terms,
-            'price'                 => (int)$this->price,
+            'price'                 => number_format($this->price, 2, '.', ''), // Ensuring one decimal place
             'discount'              => $this->discount,
             'discount_string'       => $this->discount_string,
             'status'                => $this->status,
-            'starts_at'             => $this->starts_at,
-            'expires_at'            => $this->expires_at,
+            'starts_at'             => $this->starts_at->format('Y-m-d H:i:s'),
+            'expires_at'            => $this->expires_at->format('Y-m-d H:i:s'),
             'expires_countdown'     => $this->expires_countdown,
             'image'                 => MediaResource::make($this->whenLoaded('image')),
         ];

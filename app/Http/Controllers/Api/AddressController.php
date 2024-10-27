@@ -102,7 +102,7 @@ class AddressController extends BaseApiController
     {
         $address = $this->addressRepository->getOneOrFail($id);
 
-        $this->checkAddressable($address->addressable_type, $address->addressable_id);
+        $this->checkAddressable($address->addressable_type, $address->addressable_id, $request->addressable_id);
 
         return $this->addressRepository->update($id, $request->validated());
     }
@@ -135,7 +135,7 @@ class AddressController extends BaseApiController
      * @param int $addressable_id
      * @return void
      */
-    private function checkAddressable(string $addressable_type, int $addressable_id): void
+    private function checkAddressable(string $addressable_type, int $addressable_id, int $requestAddressableId = null): void
     {
         if ($addressable_type === 'user' && $addressable_id !== auth()->id()) {
             abort(403, 'Cannot create address for provided user');
@@ -143,6 +143,10 @@ class AddressController extends BaseApiController
             $vendor = $this->vendorRepository->getOneOrFail($addressable_id);
             if (!$vendor->hasUser(auth()->user())) {
                 abort(403, 'You cannot create address for provided vendor');
+            }
+            // this check for update only.
+            if (isset($requestAddressableId) && ($requestAddressableId !== $addressable_id)) {
+                abort(403, __('api.not_allowed'));
             }
         }
     }

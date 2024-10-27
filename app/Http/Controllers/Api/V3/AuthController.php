@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api\V3;
 
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Helpers\Common;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Http\Resources\V3\UserResource;
@@ -13,10 +12,12 @@ use App\Models\Setting;
 use App\Services\AuthService;
 use App\Services\SMSService;
 use App\Services\V3\UserService;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class AuthController extends ApiAuthController
 {
@@ -43,19 +44,19 @@ class AuthController extends ApiAuthController
     {
         $data = $request->validated();
 
-        # handle user date to manage profile.
+        // handle user date to manage profile.
         $data = $this->userService->handleUserData($data);
 
-        # create user
+        // create user
         $this->userService->create($data);
 
-        # send otp to the user to verify account.
+        // send otp to the user to verify account.
         if (!(Setting::checkTestingMode() || str_contains($data['phone'], '531437350') || str_contains($data['phone'], '566776627') || str_contains($data['phone'], '553833377'))) {
             $this->smsService->sendOtp($data['phone']);
         }
 
         return $this->successJsonRes([
-            'is_otp_sent' => true
+            'is_otp_sent' => true,
         ], __('api.otp_sent'));
     }
 
@@ -75,6 +76,7 @@ class AuthController extends ApiAuthController
             $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
 
             $this->prepareUserResponse($user, $token);
+
             return UserResource::make($user)
                 ->additional([
                     'success' => true,
@@ -108,14 +110,61 @@ class AuthController extends ApiAuthController
 
     private function prepareUserResponse($user, $token)
     {
-        $user->update(['phone_verified_at' => now()->toDateTimeString()]);
+        if ($user->phone_verified_at == null) {
+            $user->update(['phone_verified_at' => now()->toDateTimeString()]);
+            event(new Registered($user));
+        }
 
         $user->loadProfileFields();
         $user->append('user_vendors_ids');
         $user->access_token = $token;
 
-        event(new Registered($user));
-
         return $user;
+    }
+
+    public function changePhone(Request $request)
+    {
+        // Validate request
+        $data = $this->validate($request, [
+            'phone'     => 'required|unique:users,phone|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
+        ]);
+
+        try {
+            $user = $request->user();
+
+            if ($user->phone !== $data['phone']) {
+                $user->phone_verified_at = null;
+                $user->phone = $data['phone'];
+                $user->save();
+
+                // send otp to the new phone number to verify account.
+                if (!Setting::checkTestingMode()) {
+                    $this->smsService->sendOtp($data['phone']);
+                }
+            } else {
+                return $this->errorJsonRes(['phone' => 'you use the same phone number'], __('api.error'), 400);
+            }
+
+            return $this->successJsonRes(['is_otp_sent' => true], __('api.otp_sent'), 200);
+        } catch (Throwable $th) {
+            if ($th instanceof ValidationException) {
+                throw $th;
+            }
+            if ($th instanceof ClientException) {
+                if ($th->getCode() == 402) {
+                    // 402 Not enough credit.
+                } elseif ($th->getCode() == 400) {
+                    // 400 Invalid phone number.
+                    return $this->errorJsonRes([
+                        'phone' => [__('api.invalid_phone')],
+                    ], __('api.otp_not_sent'), 422);
+                }
+            }
+            $this->logReq(json_decode($th));
+
+            return $this->successJsonRes([
+                'is_otp_sent' => false,
+            ], __('api.contact_support'), 422);
+        }
     }
 }

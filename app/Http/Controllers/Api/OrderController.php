@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
+use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderStatus;
+use App\Enums\OrderTypeEnum;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Requests\OrderRequest;
+use App\Models\Admin;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Models\User;
+use App\Models\UserVendor;
+use App\Models\Vendor;
+use App\Notifications\AppointmentOfferNotification;
 use App\Notifications\OrderNotification;
 use App\Services\OrderService;
 use App\Services\PDFService;
@@ -41,19 +48,11 @@ class OrderController extends BaseApiController
      * @queryParam page number for pagination Example: 2
      * @queryParam perPage Results to fetch per page Example: 15
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return Collection
      */
     public function index(GetOrdersRequest $request)
     {
-        if (!$request->has('vendor_id')) {
-            $request->merge([
-                'user_id' => $this->user->id,
-            ]);
-        } elseif (!$this->user->hasVendor((int) $request->get('vendor_id'))) {
-            abort(403, 'Forbidden');
-        }
-
         return $this->orderRepository->all($request);
     }
 
@@ -68,7 +67,7 @@ class OrderController extends BaseApiController
      *
      * @urlParam id required Order id
      *
-     * @param int $id
+     * @param  int  $id
      * @return Order
      */
     public function single($id)
@@ -83,7 +82,7 @@ class OrderController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param OrderRequest $request
+     * @param  OrderRequest  $request
      * @return Collection
      */
     public function create(OrderRequest $request)
@@ -105,8 +104,8 @@ class OrderController extends BaseApiController
      * @responseFile 422 scenario="Validation errors" responses/errors/422.json
      * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
      *
-     * @param int $id
-     * @param OrderRequest $request
+     * @param  int  $id
+     * @param  OrderRequest  $request
      *
      * @return Order
      */
@@ -115,7 +114,7 @@ class OrderController extends BaseApiController
         $this->logReq("Update order number - $id");
 
         $data = $this->validate($request, [
-            'status' => 'required|in:' . implode(',', OrderStatus::availableForUpdate()),
+            'status' => 'required|in:'.implode(',', OrderStatus::availableForUpdate()),
             'cancellation_reason' => 'required_if:status,Cancel Request',
         ]);
 
@@ -131,9 +130,21 @@ class OrderController extends BaseApiController
         $invoice->updateOrFail(['status' => $request->state ?? $request->status]);
 
         if ($invoice->status == 'paid') {
-            $order = $invoice->order;
-            $order->updateOrFail(['status' => 'Accepted']);
-            Notification::send($order->vendor->staff, new OrderNotification($order));
+            $order = $invoice->invoiceable;
+            $order->status = 'Accepted';
+            if (!str_contains($order->invoice_url, '.s3.')) {
+                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+            }
+            $order->save();
+
+            if($order->type == OrderTypeEnum::Appointment->value) {
+                $order->appointmentFormDetail->appointmentForm->update([
+                    'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value
+                ]);
+            }
+
+            // Send email notifications
+            $this->sendOrderNotifications($order);
         }
 
         logger(
@@ -191,5 +202,19 @@ class OrderController extends BaseApiController
         });
 
         return view('invoice', compact('invoice', 'cus_name', 'order_items', 'vat'));
+    }
+
+    protected function sendOrderNotifications(Order $order)
+    {
+        // Send email to admin
+        $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+        Notification::route('mail', $adminEmails)
+            ->notify(new OrderNotification($order));
+
+        // Send email to vendor staff
+        Notification::send($order->vendor->staff, new OrderNotification($order));
+
+        // Send email to customer
+        $order->user->notify(new OrderNotification($order));
     }
 }
