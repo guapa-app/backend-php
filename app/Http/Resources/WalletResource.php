@@ -15,7 +15,7 @@ class WalletResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'balance' => (float) round($this->balance,2),
+            'balance' => (float) round($this->balance, 2),
         ];
     }
 }
