@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Shop;
 
 use App\Enums\ProductReview;
 use App\Enums\ProductStatus;
+use App\Filament\Admin\Resources\Shop\ProductResource\Actions;
 use App\Filament\Admin\Resources\Shop\ProductResource\Pages;
 use App\Filament\Admin\Resources\Shop\ProductResource\RelationManagers;
 use App\Helpers\Common;
@@ -116,6 +117,11 @@ class ProductResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->headerActions([
+                Actions\ClearSortAction::make('clear-sort'),
+                Actions\RandomizeSortAction::make('randomize-sort'),
+                Actions\RandomizeMissingSortOrderAction::make('randomize-missing-sort'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
