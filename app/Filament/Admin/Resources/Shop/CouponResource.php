@@ -27,11 +27,14 @@ class CouponResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('code')
                     ->disabled(fn (?Model $record) => $record !== null)
-                    ->rules([
-                        'required',
-                        'max:12',
-                        Rule::unique('coupons', 'code')->ignore(fn ($record) => $record->id),
-                    ]),
+                    ->rules(function (?Model $record) {
+                        return [
+                            'required',
+                            'max:12',
+                            Rule::unique('coupons', 'code')
+                                ->when($record !== null, fn ($query) => $query->ignore($record->id)),
+                        ];
+                    }),
                 Forms\Components\TextInput::make('discount_percentage')
                     ->disabled(fn (?Model $record) => $record !== null)
                     ->rules(['required', 'numeric', 'min:0', 'max:100'])
@@ -56,10 +59,7 @@ class CouponResource extends Resource
                     ->numeric()
                     ->minValue(0)
                     ->default(1),
-                Forms\Components\Select::make('admin_id')
-                    ->relationship('admin', 'name')
-                    ->native(false)
-                    ->hidden()
+                Forms\Components\Hidden::make('admin_id')
                     ->default(auth()->id()),
 
                 Forms\Components\Fieldset::make('Related To')
