@@ -26,17 +26,25 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->email()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->live(),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\DateTimePicker::make('email_verified_at')
+                    ->visible(fn(callable $get) => !empty($get('email')))
+                    ->helperText('If you verify email and user is a vendor he will login from CMS, so make sure the email is valid'),
                 Forms\Components\DateTimePicker::make('phone_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
+                    ->options([
+                        User::STATUS_ACTIVE => '✔️active',
+                        User::STATUS_CLOSED => '❌ disabled',
+                        User::STATUS_DELETED => '🗑️ deleted',
+                    ])
                     ->required(),
             ]);
     }
@@ -51,12 +59,6 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('phone_verified_at')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -78,6 +80,11 @@ class UserResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 
     public static function getRelations(): array
