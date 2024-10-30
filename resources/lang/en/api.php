@@ -70,4 +70,5 @@ return [
     ],
     'view_details'             => 'view details',
     'server_error'             => 'Our servers are under maintenance. We\'ll be back shortly with a better experience!',
+    'app_out_of_date' => 'Your app version is outdated. Please update to continue using the application.',
 ];

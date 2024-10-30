@@ -127,6 +127,19 @@ class Setting extends Model
         return (int) $record->s_value;
     }
 
+    public static function getMinSupportedVersion()
+    {
+        $record = static::firstOrCreate(['s_key' => 'min_supported_version'], [
+            's_value' => 0,
+            's_unit' => 'float',
+            's_validation_type' => 'number',
+            's_validation' => ['min' => 0, 'max' => 30],
+            'instructions' => "0 to prevent version check, Please be careful when changing the app version. Ensure that any changes are aligned with the mobile team's requirements to avoid breaking the app. Forcing app updates can impact user experience, so proceed with caution.",
+        ]);
+
+        return (float)$record->s_value;
+    }
+
     public function scopeByKey(Builder $query, string $key = ''): Builder
     {
         return $query->where('s_key', $key);
