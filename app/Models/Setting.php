@@ -178,6 +178,19 @@ class Setting extends Model
         return (int) $record->s_value;
     }
 
+    public static function getOrderReminderAfter()
+    {
+        $record = static::firstOrCreate(['s_key' => 'order_reminder_after'], [
+            's_value'           => 12,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min'=> 1, 'max'=> 10000],
+            'instructions'      => 'send reminder to user for bending orders after (number) of hours from order created',
+        ]);
+
+        return (int) $record->s_value;
+    }
+
     public static function isAllMobileNumsAccepted()
     {
         $record = static::firstOrCreate(['s_key' => 'is_all_mob_nums_accepted'], [
@@ -189,6 +202,19 @@ class Setting extends Model
         ]);
 
         return (int) $record->s_value;
+    }
+
+    public static function getMinSupportedVersion()
+    {
+        $record = static::firstOrCreate(['s_key' => 'min_supported_version'], [
+            's_value' => 0,
+            's_unit' => 'float',
+            's_validation_type' => 'number',
+            's_validation' => ['min' => 0, 'max' => 30],
+            'instructions' => "0 to prevent version check, Please be careful when changing the app version. Ensure that any changes are aligned with the mobile team's requirements to avoid breaking the app. Forcing app updates can impact user experience, so proceed with caution.",
+        ]);
+
+        return (float)$record->s_value;
     }
 
     public function scopeByKey(Builder $query, string $key = ''): Builder

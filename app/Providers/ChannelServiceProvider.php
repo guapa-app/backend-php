@@ -31,7 +31,7 @@ class ChannelServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Notification::extend('whatsapp', function ($app) {
-            return new WhatsAppChannel($app->make(WhatsAppServiceInterface::class));
+            return $app->make(WhatsAppChannel::class);
         });
     }
 }

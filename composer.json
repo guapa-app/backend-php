@@ -34,6 +34,7 @@
         "laravel/helpers": "^1.6",
         "laravel/nova": "^4.0",
         "laravel/passport": "^11.9",
+        "laravel/telescope": "*",
         "laravel/tinker": "^2.8",
         "lcobucci/jwt": "^5.0",
         "league/flysystem-aws-s3-v3": "^3.15",

@@ -3,6 +3,8 @@
 namespace App\Nova\Resources;
 
 use App\Nova\Actions\ChangeOrderStatus;
+use App\Nova\Actions\SendWhatsAppReminder;
+use Bissolli\NovaPhoneField\PhoneNumber;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\DateTime;
@@ -137,6 +139,17 @@ class Order extends Resource
                 ->canRun(function ($req) {
                     return true;
                 }),
+
+            SendWhatsAppReminder::make()
+                ->canSee(function ($req) {
+                    return true;
+                })
+                ->canRun(function ($req) {
+                    return true;
+                })
+                ->confirmText('Are you sure you want to send WhatsApp reminders?')
+                ->confirmButtonText('Send Reminders')
+                ->cancelButtonText('Cancel'),
         ];
     }
 

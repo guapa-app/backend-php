@@ -192,7 +192,9 @@ return [
         App\Providers\Filament\UserPanelProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\TelescopeServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
+        App\Providers\ChannelServiceProvider::class,
     ],
 
     /*
