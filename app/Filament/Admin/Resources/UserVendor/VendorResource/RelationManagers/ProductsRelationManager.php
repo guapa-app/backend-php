@@ -1,31 +1,24 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Shop;
+namespace App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
 
 use App\Enums\ProductReview;
 use App\Enums\ProductStatus;
-use App\Filament\Admin\Resources\Shop\ProductResource\Actions;
-use App\Filament\Admin\Resources\Shop\ProductResource\Pages;
-use App\Filament\Admin\Resources\Shop\ProductResource\RelationManagers;
 use App\Helpers\Common;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductResource extends Resource
+class ProductsRelationManager extends RelationManager
 {
-    protected static ?string $model = Product::class;
+    protected static string $relationship = 'products';
 
-    protected static ?string $navigationIcon = 'heroicon-s-squares-plus';
-
-    protected static ?string $navigationGroup = 'Shop';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -40,7 +33,7 @@ class ProductResource extends Resource
                     ->collapsible(),
                 Forms\Components\Hidden::make('hash_id')
                     ->label('Number')
-                    ->default(Common::generateUniqueHashForModel(self::$model, 16)),
+                    ->default(Common::generateUniqueHashForModel(Product::class, 16)),
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric(),
                 Forms\Components\Hidden::make('type')
@@ -52,17 +45,17 @@ class ProductResource extends Resource
                     ->label(__('Categories'))
                     ->relationship(
                         name: 'taxonomies',
-                        modifyQueryUsing: fn (Builder $query, $record) => ($record->type?->value ?? request('type')) == 'service' ?
+                        modifyQueryUsing: fn(Builder $query, $record) => ($record->type?->value ?? request('type')) == 'service' ?
                             $query->where('type', 'specialty') :
                             $query->where('type', 'category')
                     )
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->title}")
                     ->required(),
                 Forms\Components\Select::make('vendor_id')
                     ->label(__('Vendor'))
                     ->native(false)
                     ->relationship(name: 'vendor')
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name}")
+                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->name}")
                     ->required(),
                 Forms\Components\TextInput::make('price')
                     ->required()
@@ -85,7 +78,7 @@ class ProductResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -118,11 +111,7 @@ class ProductResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->headerActions([
-                Actions\ClearSortAction::make('clear-sort'),
-                Actions\RandomizeSortAction::make('randomize-sort'),
-                Actions\RandomizeMissingSortOrderAction::make('randomize-missing-sort'),
-            ])
+            ->paginationPageOptions([5])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -130,22 +119,5 @@ class ProductResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            RelationManagers\OffersRelationManager::class,
-            RelationManagers\ReviewsRelationManager::class,
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
-        ];
     }
 }

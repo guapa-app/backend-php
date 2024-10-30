@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Models\Setting;
 use Carbon\Carbon;
 use App\Models\WheelSpin;
 use Illuminate\Http\Request;
@@ -56,7 +57,8 @@ class WheelOfFortuneController extends BaseApiController
             ->orderBy('spin_date', 'desc')
             ->first();
 
-        if ($lastSpin) {
+        // Check if testing mode is enabled
+        if ($lastSpin && !Setting::checkTestingMode()) {
             $spinDate = Carbon::parse($lastSpin->spin_date);
             // Check if 24 hours have passed since the last spin
             if ($spinDate->diffInHours(Carbon::now()) < 24) {

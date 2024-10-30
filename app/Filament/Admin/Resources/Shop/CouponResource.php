@@ -9,6 +9,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
 
 class CouponResource extends Resource
 {
@@ -23,22 +26,63 @@ class CouponResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->maxLength(12),
+                    ->disabled(fn (?Model $record) => $record !== null)
+                    ->rules(function (?Model $record) {
+                        return [
+                            'required',
+                            'max:12',
+                            Rule::unique('coupons', 'code')
+                                ->when($record !== null, fn ($query) => $query->ignore($record->id)),
+                        ];
+                    }),
                 Forms\Components\TextInput::make('discount_percentage')
-                    ->required()
+                    ->disabled(fn (?Model $record) => $record !== null)
+                    ->rules(['required', 'numeric', 'min:0', 'max:100'])
+                    ->minValue(0)
                     ->numeric(),
-                Forms\Components\TextInput::make('discount_source')
+                Forms\Components\Select::make('discount_source')
+                    ->options([
+                        'vendor' => 'Vendor',
+                        'app' => 'Guapa',
+                        'both' => 'Both',
+                    ])->native(false)
                     ->required(),
-                Forms\Components\DateTimePicker::make('expires_at'),
+                Forms\Components\DateTimePicker::make('expires_at')
+                    ->minDate(now())
+                    ->rules('required', 'after:today'),
                 Forms\Components\TextInput::make('max_uses')
-                    ->numeric(),
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(1),
                 Forms\Components\TextInput::make('single_user_usage')
                     ->required()
                     ->numeric()
+                    ->minValue(0)
                     ->default(1),
-                Forms\Components\TextInput::make('admin_id')
-                    ->numeric(),
+                Forms\Components\Hidden::make('admin_id')
+                    ->default(auth()->id()),
+
+                Forms\Components\Fieldset::make('Related To')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Select::make('Products')
+                            ->relationship('Products', 'title')
+                            ->preload()
+                            ->multiple(),
+
+                        Forms\Components\Select::make('Vendors')
+                            ->relationship('Vendors', 'name')
+                            ->preload()
+                            ->multiple(),
+
+                        Forms\Components\Select::make('Categories')
+                            ->relationship('categories', 'title', function (Builder $query) {
+                                return $query->whereIn('type', ['specialty', 'category']);
+                            })
+                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                            ->preload()
+                            ->multiple(),
+                    ]),
             ]);
     }
 
@@ -46,6 +90,8 @@ class CouponResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('discount_percentage')
@@ -58,16 +104,7 @@ class CouponResource extends Resource
                 Tables\Columns\TextColumn::make('max_uses')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('single_user_usage')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('admin_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('admin.name'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
