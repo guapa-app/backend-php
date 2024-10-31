@@ -2,13 +2,26 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
+use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\ProductListRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\Vendor\V3_1\ProductResource;
+use App\Services\ProductService;
 
 class ProductController extends BaseApiController
 {
+    protected $productRepository;
+    protected $productService;
+
+    public function __construct(ProductRepositoryInterface $productRepository, ProductService $productService)
+    {
+        parent::__construct();
+
+        $this->productRepository = $productRepository;
+        $this->productService = $productService;
+    }
+
     public function index(ProductListRequest $request)
     {
         $request->merge(['vendor_id' => $this->user->managerVendorId()]);
