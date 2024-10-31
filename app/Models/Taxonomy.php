@@ -54,6 +54,16 @@ class Taxonomy extends BaseTaxonomy implements Listable
         'slug', 'title', 'description',
     ];
 
+    protected $appends = [
+        'title_en_ar'
+    ];
+
+    public function getTitleEnArAttribute(): string
+    {
+        $title = json_decode($this->attributes['title']);
+        return $title->en . ' - ' . $title->ar;
+    }
+
     /**
      * Get the options for generating the slug.
      */
