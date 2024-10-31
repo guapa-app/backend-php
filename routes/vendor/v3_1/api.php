@@ -34,6 +34,7 @@ Route::prefix("vendor/v3.1")->middleware('api-vendor')->group(function () {
     Route::prefix('campaigns')->group(base_path('routes/vendor/v3_1/api/campaigns.php'));
     Route::prefix('')->group(base_path('routes/vendor/v3_1/api/doctors.php')); //sub-vendors
 
+
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
     Route::get('address_types', [DataController::class, 'address_types']);
