@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\OrderStatus;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\OrderController as ApiOrderController;
 use App\Http\Requests\GetOrdersRequest;
 use App\Http\Resources\Vendor\V3_1\OrderCollection;
@@ -11,7 +12,7 @@ use App\Http\Resources\Vendor\V3_1\OrderResource;
 use App\Models\Order;
 use App\Models\Setting;
 
-class OrderController extends ApiOrderController
+class OrderController extends BaseApiController
 {
     protected $orderRepository;
     public function __construct(OrderRepositoryInterface $orderRepository)
