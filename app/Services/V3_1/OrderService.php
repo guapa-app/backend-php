@@ -236,9 +236,9 @@ class OrderService
             $order->payment_id = $data['payment_id'];
             $order->payment_gateway = $data['payment_gateway'];
 
-            if (!str_contains($order->invoice_url, '.s3.')) {
-                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
-            }
+//            if (!str_contains($order->invoice_url, '.s3.')) {
+//                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+//            }
             $order->save();
             // Update invoice status
             $order->invoice->update(['status' => 'paid']);
