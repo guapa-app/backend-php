@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Shop\AppointmentOfferResource\RelationManagers;
+namespace App\Filament\Admin\Resources\Appointment\AppointmentOfferResource\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class DetailsRelationManager extends RelationManager
 {
