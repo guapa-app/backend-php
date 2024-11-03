@@ -47,6 +47,24 @@ class OrderController extends BaseApiController
             ]);
     }
 
+    public function update($id, Request $request)
+    {
+        $this->logReq("Update order number - $id");
+
+        $data = $this->validate($request, [
+            'status' => 'required|in:'.implode(',', OrderStatus::availableForUpdate()),
+            'cancellation_reason' => 'required_if:status,Cancel Request',
+        ]);
+
+        $item = $this->orderService->update((int) $id, $data);
+
+        return OrderResource::make($item)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
     public function showInvoice($id)
     {
         $order = Order::query()
