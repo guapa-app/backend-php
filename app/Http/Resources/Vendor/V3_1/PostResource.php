@@ -14,13 +14,13 @@ class PostResource extends JsonResource
             'content'       => $this->content,
             'youtube_url'   => $this->youtube_url,
 
+            'likes_count'   => $this->likes_count,
             'is_liked'      => $this->is_liked,
             'created_at'    => $this->created_at,
 
             'admin'         => AdminResource::make($this->whenLoaded('admin'))->only(['id', 'name']),
             'category'      => TaxonomyResource::make($this->whenLoaded('category'))->only(['id', 'title']),
             'images'        => MediaResource::collection($this->whenLoaded('media')),
-            'social_media'  => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
         ];
     }
 }
