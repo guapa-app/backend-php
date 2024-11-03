@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Shop\AppointmentOfferResource\RelationManagers;
+namespace App\Filament\Admin\Resources\Appointment\AppointmentOfferResource\RelationManagers;
 
 use App\Filament\Admin\Resources\Shop\InvoiceResource\Actions\RefundInvoiceAction;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class InvoiceRelationManager extends RelationManager
 {
@@ -24,7 +24,7 @@ class InvoiceRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'initiated' => 'gray',
                         'pending' => 'warning',
                         'paid' => 'success',
@@ -54,5 +54,4 @@ class InvoiceRelationManager extends RelationManager
                 ]),
             ]);
     }
-
 }
