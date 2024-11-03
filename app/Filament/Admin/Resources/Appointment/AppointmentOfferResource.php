@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Shop;
+namespace App\Filament\Admin\Resources\Appointment;
 
-use App\Filament\Admin\Resources\Shop\AppointmentOfferResource\Pages;
-use App\Filament\Admin\Resources\Shop\AppointmentOfferResource\RelationManagers;
+use App\Filament\Admin\Resources\Appointment\AppointmentOfferResource\Pages;
+use App\Filament\Admin\Resources\Appointment\AppointmentOfferResource\RelationManagers;
 use App\Models\AppointmentOffer;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -15,7 +15,9 @@ class AppointmentOfferResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
-    protected static ?string $navigationGroup = 'Shop';
+    protected static ?string $navigationGroup = 'Appointment';
+
+    protected static ?string $navigationLabel = 'Offers';
 
     public static function table(Table $table): Table
     {
