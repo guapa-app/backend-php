@@ -13,6 +13,7 @@ class RandomizeSortAction extends Action
 
         $this->label('Randomize Sort')
             ->icon('heroicon-o-numbered-list')
+            ->color('success')
             ->requiresConfirmation()
             ->action(function () {
                 $uniqueSortOrders = range(1, Product::count());

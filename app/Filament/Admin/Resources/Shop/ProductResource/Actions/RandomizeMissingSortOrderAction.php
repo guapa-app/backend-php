@@ -14,6 +14,7 @@ class RandomizeMissingSortOrderAction extends Action
         $this->label('Randomize Missing Sort Order')
             ->icon('heroicon-o-arrow-path')
             ->requiresConfirmation()
+            ->color('warning')
             ->action(function () {
                 $productCount = Product::count();
 
