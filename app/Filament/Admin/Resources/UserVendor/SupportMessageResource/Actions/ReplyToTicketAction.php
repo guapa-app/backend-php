@@ -39,6 +39,6 @@ class ReplyToTicketAction extends Action
             ->visible(fn(Model $record) => $record->status === SupportMessageStatus::Pending)
             ->icon('heroicon-o-rectangle-stack')
             ->modalHeading('Reply to Ticket')
-            ->modalButton('Send Reply');
+            ->modalSubmitActionLabel('Send Reply');
     }
 }
