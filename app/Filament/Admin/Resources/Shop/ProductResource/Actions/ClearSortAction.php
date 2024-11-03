@@ -13,8 +13,9 @@ class ClearSortAction extends Action
 
         $this->label('Clear Sort')
             ->icon('heroicon-o-x-circle')
+            ->color('danger')
             ->requiresConfirmation()
-            ->action(fn() => Product::query()->update(['sort_order' => null]))
+            ->action(fn () => Product::query()->update(['sort_order' => null]))
             ->modalSubmitActionLabel('Clear Sort');
     }
 }
