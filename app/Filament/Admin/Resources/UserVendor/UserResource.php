@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\UserVendor;
 
+use App\Filament\Admin\Resources\UserVendor\UserResource\Actions;
 use App\Filament\Admin\Resources\UserVendor\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
@@ -74,6 +75,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Actions\ManageUserPointAction::make('manage-points'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

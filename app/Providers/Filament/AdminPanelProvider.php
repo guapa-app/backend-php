@@ -46,6 +46,9 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Info')
                     ->collapsed(),
                 NavigationGroup::make()
+                    ->label(' Appointment')
+                    ->collapsed(),
+                NavigationGroup::make()
                     ->label('Blog')
                     ->collapsed(),
                 NavigationGroup::make()

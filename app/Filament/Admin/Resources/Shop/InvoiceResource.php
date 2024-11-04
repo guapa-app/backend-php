@@ -2,8 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Shop;
 
+use App\Filament\Admin\Resources\Shop\InvoiceResource\Actions\RefundInvoiceAction;
 use App\Filament\Admin\Resources\Shop\InvoiceResource\Pages;
+use App\Models\AppointmentOffer;
 use App\Models\Invoice;
+use App\Models\MarketingCampaign;
+use App\Models\Order;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -67,13 +71,22 @@ class InvoiceResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('invoice_id')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('order_id')
-                    ->numeric()
-                    ->url(fn($record) => route(
-                        'filament.admin.resources.shop.orders.view',
-                        ['record' => $record->order_id]
-                    ))
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('invoiceable')
+                    ->label('Invoiceable')
+                    ->formatStateUsing(fn ($record) => match ($record->invoiceable_type) {
+                        Order::class => 'Order: ' . $record->invoiceable_id,
+                        MarketingCampaign::class => 'Marketing Campaign: ' . $record->invoiceable_id,
+                        AppointmentOffer::class => 'Appointment Offer: ' . $record->invoiceable_id,
+                        default => '-',
+                    })
+                    ->url(fn ($record) => match ($record->invoiceable_type) {
+                        Order::class => route('filament.admin.resources.shop.orders.view', $record->invoiceable_id),
+                        MarketingCampaign::class => route('filament.admin.resources.shop.marketing-campaigns.view', $record->invoiceable_id),
+                        AppointmentOffer::class => route('filament.admin.resources.shop.appointment-offers.view', $record->invoiceable_id),
+                        default => null,
+                    }, shouldOpenInNewTab: true)
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -88,6 +101,7 @@ class InvoiceResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                RefundInvoiceAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -33,6 +33,8 @@ Route::prefix("vendor/v3.1")->middleware('api-vendor')->group(function () {
     Route::prefix('appointments')->group(base_path('routes/vendor/v3_1/api/appointments.php'));
     Route::prefix('campaigns')->group(base_path('routes/vendor/v3_1/api/campaigns.php'));
     Route::prefix('')->group(base_path('routes/vendor/v3_1/api/doctors.php')); //sub-vendors
+    Route::prefix('social-media')->group(base_path('routes/vendor/v3_1/api/social_media.php')); //sub-vendors
+
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
