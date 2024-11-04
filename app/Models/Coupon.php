@@ -27,6 +27,14 @@ class Coupon extends Model
         'expires_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'usage_count',
+    ];
+
+    public function getUsageCountAttribute()
+    {
+        return $this->usages->sum('usage_count');
+    }
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'coupon_products');
@@ -46,6 +54,11 @@ class Coupon extends Model
     {
         return $this->hasMany(CouponUsage::class);
     }
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
 
     public function admin(): BelongsTo
     {
@@ -114,4 +127,5 @@ class Coupon extends Model
             $q->where('vendor_id', $value);
         });
     }
+
 }

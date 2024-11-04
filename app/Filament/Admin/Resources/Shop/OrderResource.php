@@ -32,7 +32,7 @@ class OrderResource extends Resource
                 Components\TextEntry::make('status'),
                 Components\TextEntry::make('note'),
                 Components\TextEntry::make('cancellation_reason'),
-                Components\TextEntry::make('coupon_id'),
+                Components\TextEntry::make('coupon.code'),
                 Components\TextEntry::make('discount_amount'),
             ]);
     }
