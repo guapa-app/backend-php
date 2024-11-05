@@ -6,6 +6,7 @@ use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\ProductListRequest;
 use App\Http\Requests\ProductRequest;
+use App\Http\Resources\Vendor\V3_1\ProductCollection;
 use App\Http\Resources\Vendor\V3_1\ProductResource;
 use App\Services\ProductService;
 
@@ -28,7 +29,7 @@ class ProductController extends BaseApiController
 
         $products = $this->productRepository->all($request);
 
-        return ProductResource::collection($products)
+        return ProductCollection::make($products)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
