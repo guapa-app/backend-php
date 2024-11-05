@@ -2,17 +2,13 @@
 
 namespace App\Services\V3_1;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderTypeEnum;
 use App\Models\Admin;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\OrderNotification;
-use App\Services\CouponService;
 use App\Services\LoyaltyPointsService;
-use App\Services\PaymentService;
 use App\Services\PDFService;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
@@ -59,7 +55,9 @@ class OrderPaymentService
             // Send email notifications
             $this->sendOrderNotifications($order);
 
-            $this->loyaltyPointsService->addPurchasePoints($order);
+//            $this->loyaltyPointsService->addPurchasePoints($order);
+
+            gc_collect_cycles();
         }else {
             $order->status = $data['status'];
             $order->save();
