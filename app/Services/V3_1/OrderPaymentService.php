@@ -18,13 +18,13 @@ use Illuminate\Validation\ValidationException;
 
 class OrderPaymentService
 {
-    protected $loyaltyPointsService;
+//    protected $loyaltyPointsService;
     protected $walletService;
     public function __construct(
-        LoyaltyPointsService $loyaltyPointsService,
+//        LoyaltyPointsService $loyaltyPointsService,
         WalletService $walletService
     ) {
-        $this->loyaltyPointsService = $loyaltyPointsService;
+//        $this->loyaltyPointsService = $loyaltyPointsService;
         $this->walletService = $walletService;
     }
     public function changeOrderStatus(array $data): void
@@ -54,7 +54,7 @@ class OrderPaymentService
             }
 
             // Send email notifications
-            $this->sendOrderNotifications($order);
+//            $this->sendOrderNotifications($order);
 
 //            $this->loyaltyPointsService->addPurchasePoints($order);
 
