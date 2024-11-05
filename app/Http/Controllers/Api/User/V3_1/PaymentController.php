@@ -13,7 +13,7 @@ use App\Http\Requests\V3_1\Common\PaymentStatusRequest;
 
 class PaymentController extends BaseApiController
 {
-    protected $orderService;
+    protected $orderPaymentService;
     protected $marketingCampaignService;
     protected $appointmentOfferService;
     protected $paymentService;
