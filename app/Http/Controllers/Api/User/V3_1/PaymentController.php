@@ -44,7 +44,7 @@ class PaymentController extends BaseApiController
     {
         $data = $request->validated();
         $payment_id = $request->payment_id;
-//        if ($this->paymentService->isPaymentPaidSuccessfully($payment_id)) {
+        if ($this->paymentService->isPaymentPaidSuccessfully($payment_id)) {
             $type = $request->type;
             try {
                 switch ($type) {
@@ -66,9 +66,9 @@ class PaymentController extends BaseApiController
                 Log::error('Error changing payment status: ' . $e->getMessage());
                 return $this->errorJsonRes([], __('api.error_payment_status'));
             }
-//        } else {
-//            return $this->errorJsonRes([], __('Payment details are incorrect. Please check your payment again.'));
-//        }
+        } else {
+            return $this->errorJsonRes([], __('Payment details are incorrect. Please check your payment again.'));
+        }
     }
 
     /**
