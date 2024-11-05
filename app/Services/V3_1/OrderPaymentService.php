@@ -29,6 +29,7 @@ class OrderPaymentService
     }
     public function changeOrderStatus(array $data): void
     {
+        gc_collect_cycles();
         $order = Order::findOrFail($data['id']);
 
         if ($data['status'] == 'paid') {
