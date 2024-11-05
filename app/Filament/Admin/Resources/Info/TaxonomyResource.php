@@ -74,6 +74,22 @@ class TaxonomyResource extends Resource
                     ->searchable(),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('media')
                     ->collection('taxonomy_icons'),
+
+                    Forms\Components\Repeater::make('appointmentForms')
+                        ->label('Appointment Forms')
+                        ->relationship('appointmentFormTaxonomy')
+                        ->schema([
+                            Forms\Components\Select::make('appointment_form_id')
+                                ->label('Select Form')
+                                ->relationship('appointmentForm', 'type')
+                                ->native(false)
+                                ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->type->value} - {$record->key}")
+                                ->required(),
+                        ])
+
+                        ->columnSpanFull()
+                        ->columns(),
             ]);
     }
 

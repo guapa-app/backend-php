@@ -55,6 +55,8 @@ class PostResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('social_media_id')
                             ->relationship('socialMedia', 'name')
+                            ->native(false)
+                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                             ->required(),
                         Forms\Components\TextInput::make('link')
                             ->label('Link')
@@ -62,7 +64,7 @@ class PostResource extends Resource
                     ])
                     ->columnSpanFull()
                     ->columns()
-                    ->itemLabel(fn(array $state): ?string => $state['link']),
+                    ->itemLabel(fn (array $state): ?string => $state['link']),
             ]);
     }
 
