@@ -34,12 +34,15 @@ class OrderPaymentService
             DB::commit();
 
             if ($data['status'] == 'paid') {
-                // Move these operations outside the transaction as they're not critical
-                // and can be processed asynchronously
+                // Send notifications
+                dispatch(function () use ($order) {
                     $this->sendOrderNotifications($order);
+                })->onQueue('notifications');
 
+                dispatch(function () use ($order) {
                     $loyaltyPointsService = app(LoyaltyPointsService::class);
                     $loyaltyPointsService->addPurchasePoints($order);
+                })->onQueue('loyalty-points');
             }
 
         } catch (\Exception $e) {
