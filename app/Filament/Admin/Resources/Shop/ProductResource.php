@@ -68,6 +68,10 @@ class ProductResource extends Resource
                     ->required()
                     ->numeric()
                     ->prefix('$'),
+                Forms\Components\TextInput::make('earned_points')
+                    ->label('Points')
+                    ->minValue(0)
+                    ->numeric(),
                 Forms\Components\Select::make('status')
                     ->native(false)
                     ->options(ProductStatus::class)
@@ -109,6 +113,8 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('review'),
+                Tables\Columns\TextColumn::make('earned_points')
+                    ->label('Points'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -119,9 +125,9 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->headerActions([
-                Actions\ClearSortAction::make('clear-sort'),
-                Actions\RandomizeSortAction::make('randomize-sort'),
                 Actions\RandomizeMissingSortOrderAction::make('randomize-missing-sort'),
+                Actions\RandomizeSortAction::make('randomize-sort'),
+                Actions\ClearSortAction::make('clear-sort'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
