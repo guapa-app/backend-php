@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Services\PaymentService;
-use App\Services\V3_1\OrderService;
+use App\Services\V3_1\OrderPaymentService;
 use Illuminate\Support\Facades\Log;
 use App\Services\MarketingCampaignService;
 use App\Services\V3_1\AppointmentOfferService;
@@ -19,13 +19,13 @@ class PaymentController extends BaseApiController
     protected $paymentService;
 
     public function __construct(
-        OrderService $orderService,
+        OrderPaymentService $orderPaymentService,
         MarketingCampaignService $marketingCampaignService,
         AppointmentOfferService $appointmentOfferService,
         PaymentService $paymentService
     ) {
         parent::__construct();
-        $this->orderService = $orderService;
+        $this->orderPaymentService = $orderPaymentService;
         $this->marketingCampaignService = $marketingCampaignService;
         $this->appointmentOfferService = $appointmentOfferService;
         $this->paymentService = $paymentService;
@@ -44,12 +44,12 @@ class PaymentController extends BaseApiController
     {
         $data = $request->validated();
         $payment_id = $request->payment_id;
-        if ($this->paymentService->isPaymentPaidSuccessfully($payment_id)) {
+//        if ($this->paymentService->isPaymentPaidSuccessfully($payment_id)) {
             $type = $request->type;
             try {
                 switch ($type) {
                     case 'order':
-                        $this->orderService->changeOrderStatus($data);
+                        $this->orderPaymentService->changeOrderStatus($data);
                         break;
                     case 'campaign':
                         $this->marketingCampaignService->changePaymentStatus($data);
@@ -66,9 +66,9 @@ class PaymentController extends BaseApiController
                 Log::error('Error changing payment status: ' . $e->getMessage());
                 return $this->errorJsonRes([], __('api.error_payment_status'));
             }
-        } else {
-            return $this->errorJsonRes([], __('Payment details are incorrect. Please check your payment again.'));
-        }
+//        } else {
+//            return $this->errorJsonRes([], __('Payment details are incorrect. Please check your payment again.'));
+//        }
     }
 
     /**
@@ -88,7 +88,7 @@ class PaymentController extends BaseApiController
 
             switch ($type) {
                 case 'order':
-                    $this->orderService->payViaWallet($user, $data);
+                    $this->orderPaymentService->payViaWallet($user, $data);
                     break;
                 case 'campaign':
                     $this->marketingCampaignService->payViaWallet($user, $data);
