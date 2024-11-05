@@ -16,13 +16,6 @@ use App\Http\Resources\LoyaltyPointHistoryResource;
 
 class LoyaltyPointsService
 {
-    protected $transactionService;
-
-    public function __construct(TransactionService $transactionService)
-    {
-        $this->transactionService = $transactionService;
-    }
-
     /**
      * Add points for a specific action.
      *
@@ -88,7 +81,9 @@ class LoyaltyPointsService
             $amount = $cashAmount;
 
             // Call the service to create the transaction
-            $transaction = $this->transactionService->createTransaction($userId, $amount, $transactionType);
+            $transactionService = app(TransactionService::class);
+
+            $transaction = $transactionService->createTransaction($userId, $amount, $transactionType);
 
             $user = User::find($userId)->first();
 
