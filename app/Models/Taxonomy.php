@@ -165,4 +165,9 @@ class Taxonomy extends BaseTaxonomy implements Listable
     {
         return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
     }
+
+    public function appointmentFormTaxonomy(): HasMany
+    {
+        return $this->hasMany(AppointmentFormTaxonomy::class);
+    }
 }
