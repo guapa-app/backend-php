@@ -263,7 +263,7 @@ class OrderService
             $this->sendOrderNotifications($order);
             Log::info("Order notifications sent");
 
-            $this->loyaltyPointsService->addPurchasePoints($order);
+//            $this->loyaltyPointsService->addPurchasePoints($order);
             Log::info("Loyalty points added");
         }else {
             $order->status = $data['status'];
