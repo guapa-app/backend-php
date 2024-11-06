@@ -54,6 +54,16 @@ class Taxonomy extends BaseTaxonomy implements Listable
         'slug', 'title', 'description',
     ];
 
+    protected $appends = [
+        'title_en_ar'
+    ];
+
+    public function getTitleEnArAttribute(): string
+    {
+        $title = json_decode($this->attributes['title']);
+        return $title->en . ' - ' . $title->ar;
+    }
+
     /**
      * Get the options for generating the slug.
      */
@@ -154,5 +164,10 @@ class Taxonomy extends BaseTaxonomy implements Listable
     public function appointmentForms(): BelongsToMany
     {
         return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
+    }
+
+    public function appointmentFormTaxonomy(): HasMany
+    {
+        return $this->hasMany(AppointmentFormTaxonomy::class);
     }
 }

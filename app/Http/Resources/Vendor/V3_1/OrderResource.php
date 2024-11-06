@@ -18,8 +18,13 @@ class OrderResource extends JsonResource
             'remaining_amount' => (float) $this->remaining_amount,
             'status' => $this->status,
             'type' => $this->type,
+
+            'name'        => (string) $this->name,
+            'phone'       => (string) $this->phone,
+
             'invoice_url' => (string) $this->invoice_url,
             'cancellation_reason' => (string) $this->cancellation_reason,
+
             'created_at' => Carbon::parse($this->created_at)->diffForHumans(),
             'updated_at' => Carbon::parse($this->updated_at)->diffForHumans(),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),

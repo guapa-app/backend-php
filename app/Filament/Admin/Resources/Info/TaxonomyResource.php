@@ -10,6 +10,7 @@ use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -53,6 +54,7 @@ class TaxonomyResource extends Resource
                         'specialty' => 'Procedures',
                         'blog_category' => 'Blog',
                     ])
+                    ->reactive()
                     ->native(false)
                     ->required(),
                 Forms\Components\TextInput::make('fixed_price')
@@ -63,10 +65,31 @@ class TaxonomyResource extends Resource
                 Forms\Components\Select::make('parent_id')
                     ->label('Parent Category')
                     ->native(false)
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
-                    ->relationship('parent', 'title'),
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title_en_ar}")
+                    ->relationship('parent', 'title', function (Builder $query, callable $get) {
+                        return $query->where('type', $get('type'));
+                    })
+                    ->preload()
+                    ->hint('select type before assign parent category')
+                    ->searchable(),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('media')
                     ->collection('taxonomy_icons'),
+
+                    Forms\Components\Repeater::make('appointmentForms')
+                        ->label('Appointment Forms')
+                        ->relationship('appointmentFormTaxonomy')
+                        ->schema([
+                            Forms\Components\Select::make('appointment_form_id')
+                                ->label('Select Form')
+                                ->relationship('appointmentForm', 'type')
+                                ->native(false)
+                                ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->type->value} - {$record->key}")
+                                ->required(),
+                        ])
+
+                        ->columnSpanFull()
+                        ->columns(),
             ]);
     }
 

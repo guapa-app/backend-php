@@ -11,6 +11,7 @@ use App\Http\Resources\Vendor\V3_1\OrderResource;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Services\V3_1\OrderService;
+use Illuminate\Http\Request;
 
 class OrderController extends BaseApiController
 {
@@ -39,6 +40,24 @@ class OrderController extends BaseApiController
     public function single($id)
     {
         $item = $this->orderService->getOrderDetails((int) $id);
+
+        return OrderResource::make($item)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
+    public function update($id, Request $request)
+    {
+        $this->logReq("Update order number - $id");
+
+        $data = $this->validate($request, [
+            'status' => 'required|in:'.implode(',', OrderStatus::availableForUpdate()),
+            'cancellation_reason' => 'required_if:status,Cancel Request',
+        ]);
+
+        $item = $this->orderService->update((int) $id, $data);
 
         return OrderResource::make($item)
             ->additional([

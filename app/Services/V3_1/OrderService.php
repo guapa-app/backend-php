@@ -230,18 +230,25 @@ class OrderService
     //changeOrderStatus
     public function changeOrderStatus(array $data): void
     {
+        Log::info("Starting changeOrderStatus", ['order_id' => $data['id']]);
+
         $order = Order::findOrFail($data['id']);
+        Log::info("Order fetched", ['order' => $order]);
+
         if ($data['status'] == 'paid') {
             $order->status = 'Accepted';
             $order->payment_id = $data['payment_id'];
             $order->payment_gateway = $data['payment_gateway'];
 
-//            if (!str_contains($order->invoice_url, '.s3.')) {
-//                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
-//            }
+            if (!str_contains($order->invoice_url, '.s3.')) {
+                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+            }
             $order->save();
+            Log::info("Order status saved", ['status' => $order->status]);
+
             // Update invoice status
             $order->invoice->update(['status' => 'paid']);
+            Log::info("Invoice status updated");
 
             if ($order->type == OrderTypeEnum::Appointment->value) {
                 $order->appointmentOfferDetails->update([
@@ -254,7 +261,10 @@ class OrderService
 
             // Send email notifications
             $this->sendOrderNotifications($order);
-            $this->loyaltyPointsService->addPurchasePoints($order);
+            Log::info("Order notifications sent");
+
+//            $this->loyaltyPointsService->addPurchasePoints($order);
+            Log::info("Loyalty points added");
         }else {
             $order->status = $data['status'];
             $order->save();

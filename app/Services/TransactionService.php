@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionService
 {
-    protected $pdfService;
-
-    public function __construct(PDFService $pdfService)
-    {
-        $this->pdfService = $pdfService;
-    }
+//    protected $pdfService;
+//
+//    public function __construct(PDFService $pdfService)
+//    {
+//        $this->pdfService = $pdfService;
+//    }
 
     /**
      * Create a new transaction.
