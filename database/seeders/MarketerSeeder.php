@@ -36,15 +36,6 @@ class MarketerSeeder extends Seeder
 
             $marketer->givePermissionTo(['view_influencers', 'create_influencers', 'update_influencers', 'delete_influencers']);
 
-            $roles = Role::query()
-                ->where('guard_name', 'admin')
-                ->whereNot('name', 'marketer')
-                ->get(); // Fetch roles with 'admin' guard
-
-            foreach ($roles as $role) {
-                $role->givePermissionTo($permissions);
-            }
-
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback the transaction in case of error
