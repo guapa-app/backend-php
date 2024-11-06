@@ -34,15 +34,11 @@ class OrderPaymentService
             DB::commit();
 
             if ($data['status'] == 'paid') {
-                // Send notifications
-                dispatch(function () use ($order) {
-                    $this->sendOrderNotifications($order);
-                })->onQueue('notifications');
 
-                dispatch(function () use ($order) {
-                    $loyaltyPointsService = app(LoyaltyPointsService::class);
-                    $loyaltyPointsService->addPurchasePoints($order);
-                })->onQueue('loyalty-points');
+                $loyaltyPointsService = app(LoyaltyPointsService::class);
+                $loyaltyPointsService->addPurchasePoints($order);
+
+                $this->sendOrderNotifications($order);
             }
 
         } catch (\Exception $e) {
@@ -95,9 +91,9 @@ class OrderPaymentService
     {
         try {
             // Send email to admin
-            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-            Notification::route('mail', $adminEmails)
-                ->notify(new OrderNotification($order));
+//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+//            Notification::route('mail', $adminEmails)
+//                ->notify(new OrderNotification($order));
 
             // Send email to vendor staff
             Notification::send($order->vendor->staff, new OrderNotification($order));
