@@ -18,63 +18,94 @@ use Illuminate\Validation\ValidationException;
 
 class OrderPaymentService
 {
-    protected $loyaltyPointsService;
-    protected $walletService;
-    public function __construct(
-        LoyaltyPointsService $loyaltyPointsService,
-        WalletService $walletService
-    ) {
-        $this->loyaltyPointsService = $loyaltyPointsService;
-        $this->walletService = $walletService;
-    }
     public function changeOrderStatus(array $data): void
     {
-        $order = Order::findOrFail($data['id']);
+        try {
+            DB::beginTransaction();
 
-        if ($data['status'] == 'paid') {
-            $order->status = 'Accepted';
-            $order->payment_id = $data['payment_id'];
-            $order->payment_gateway = $data['payment_gateway'];
+            $order = Order::findOrFail($data['id']);
 
-            if (!str_contains($order->invoice_url, '.s3.')) {
-                $order->invoice_url = (new PDFService)->addInvoicePDF($order);
-            }
-            $order->save();
-            // Update invoice status
-            $order->invoice->update(['status' => 'paid']);
-
-            if ($order->type == OrderTypeEnum::Appointment->value) {
-                $order->appointmentOfferDetails->update([
-                    'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value,
-                ]);
-                $order->appointmentOfferDetails->appointmentOffer->update([
-                    'status' => AppointmentOfferEnum::Paid_Appointment_Fees->value,
-                ]);
+            if ($data['status'] == 'paid') {
+                $this->processPaidOrder($order, $data);
+            } else {
+                $order->update(['status' => $data['status']]);
             }
 
-            // Send email notifications
-            $this->sendOrderNotifications($order);
+            DB::commit();
 
-//            $this->loyaltyPointsService->addPurchasePoints($order);
+            if ($data['status'] == 'paid') {
+                $loyaltyPointsService = app(LoyaltyPointsService::class);
+                $loyaltyPointsService->addPurchasePoints($order);
 
-            gc_collect_cycles();
-        }else {
-            $order->status = $data['status'];
-            $order->save();
+                $this->sendOrderNotifications($order);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order status change failed: ' . $e->getMessage(), [
+                'order_id' => $data['id'],
+                'status' => $data['status']
+            ]);
+            throw $e;
         }
     }
+
+    protected function processPaidOrder(Order $order, array $data): void
+    {
+        // Update order details
+        $order->fill([
+            'status' => 'Accepted',
+            'payment_id' => $data['payment_id'],
+            'payment_gateway' => $data['payment_gateway']
+        ]);
+
+        // Generate invoice if needed
+        if (!str_contains($order->invoice_url, '.s3.')) {
+            $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+        }
+        $order->save();
+
+        // Update related records
+        $order->invoice->update(['status' => 'paid']);
+
+        if ($order->type == OrderTypeEnum::Appointment->value) {
+            $this->updateAppointmentStatus($order);
+        }
+    }
+
+    protected function updateAppointmentStatus(Order $order): void
+    {
+        $status = AppointmentOfferEnum::Paid_Appointment_Fees->value;
+
+        DB::table('appointment_offer_details')
+            ->where('order_id', $order->id)
+            ->update(['status' => $status]);
+
+        DB::table('appointment_offers')
+            ->where('id', $order->appointmentOfferDetails->appointment_offer_id)
+            ->update(['status' => $status]);
+    }
+
     protected function sendOrderNotifications(Order $order)
     {
-        // Send email to admin
-        $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-        Notification::route('mail', $adminEmails)
-            ->notify(new OrderNotification($order));
+        try {
+            // Send email to admin
+//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+//            Notification::route('mail', $adminEmails)
+//                ->notify(new OrderNotification($order));
 
-        // Send email to vendor staff
-        Notification::send($order->vendor->staff, new OrderNotification($order));
+            // Send email to vendor staff
+            Notification::send($order->vendor->staff, new OrderNotification($order));
 
-        // Send email to customer
-        $order->user->notify(new OrderNotification($order));
+            // Send email to customer
+            $order->user->notify(new OrderNotification($order));
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send order notifications: ' . $e->getMessage(), [
+                'order_id' => $order->id
+            ]);
+            // Don't throw the exception as this is a non-critical operation
+        }
     }
     /**
      * Pay Via Wallet
@@ -91,7 +122,8 @@ class OrderPaymentService
             if ($wallet->balance >= $orderPrice) {
                 try {
                     DB::beginTransaction();
-                    $transaction = $this->walletService->debit($user, $orderPrice);
+                    $walletService = app(WalletService::class);
+                    $transaction = $walletService->debit($user, $orderPrice);
                     $data['payment_id'] = $transaction->transaction_number;
                     $this->changeOrderStatus($data);
                     DB::commit();
