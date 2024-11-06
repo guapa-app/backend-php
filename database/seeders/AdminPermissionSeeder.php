@@ -56,6 +56,9 @@ class AdminPermissionSeeder extends Seeder
             'WorkDay',
             'WalletChargingPackage',
             'WheelOfFortune',
+            'Influencer',
+            'SocialMedia',
+            'SupportMessageType',
         ];
 
         $permissions_arr = [
