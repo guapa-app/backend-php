@@ -48,7 +48,7 @@ class OrderNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return [FirebaseChannel::class, 'database', 'mail'];
+        return [FirebaseChannel::class, 'database'];
     }
 
     /**
@@ -63,14 +63,6 @@ class OrderNotification extends Notification implements ShouldQueue
             'type' => $this->orderType(),
             'title' => 'New Order',
             'image' => '',
-        ];
-    }
-
-    public function toWhatsapp($notifiable): array
-    {
-        return [
-            'message' => $this->getWhatsappMessage(),
-            'phones' => [$notifiable->phone],
         ];
     }
 
@@ -95,56 +87,6 @@ class OrderNotification extends Notification implements ShouldQueue
             ]);
         }
         return $mailMessage;
-    }
-
-    public function getWhatsappMessage(): string
-    {
-        $this->order->loadMissing('items.product');
-
-        $message = "------------------------\n".
-            "فريق قوابا يشعركم بوجود طلب جديد ارجو التحقق من مركز الطلبات في التطبيق\n".
-            "------------------------\n".
-            'نوع الطلب: '.$this->orderType()."\n".
-            'الاسم: '.$this->user->name."\n".
-            'الرقم: '.$this->user->phone."\n";
-
-        if ($this->orderType() == 'new-order') {
-            $message .= "------------------------\n".
-                "المنتجات: \n";
-            foreach ($this->order->items as $item) {
-                $message .= $item->product->name.' - '.$item->quantity.'-'.$item->amount."\n";
-            }
-        }
-
-        $message .= "------------------------\n".
-            'قوابا';
-
-        return $message;
-    }
-
-    /**
-     * Get fcm representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     *
-     * @return FcmMessage
-     */
-    public function toFcm($notifiable): FcmMessage
-    {
-        $message = new FcmMessage();
-        $message->content([
-            'title' => 'New order',
-            'body' => 'New order from '.$this->user->name.' #'.$this->order->id,
-            'sound' => 'default',
-            'icon' => '',
-            'click_action' => '',
-        ])->data([
-            'type' => $this->orderType(),
-            'summary' => $this->getSummary(),
-            'id' => $this->order->id,
-        ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
-
-        return $message;
     }
 
     public function toFirebase()

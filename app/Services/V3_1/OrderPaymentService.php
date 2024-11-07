@@ -37,7 +37,7 @@ class OrderPaymentService
                 $loyaltyPointsService = app(LoyaltyPointsService::class);
                 $loyaltyPointsService->addPurchasePoints($order);
 
-                $this->sendOrderNotifications($order);
+//                $this->sendOrderNotifications($order);
             }
 
         } catch (\Exception $e) {
@@ -90,9 +90,9 @@ class OrderPaymentService
     {
         try {
             // Send email to admin
-//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-//            Notification::route('mail', $adminEmails)
-//                ->notify(new OrderNotification($order));
+            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+            Notification::route('mail', $adminEmails)
+                ->notify(new OrderNotification($order));
 
             // Send email to vendor staff
             Notification::send($order->vendor->staff, new OrderNotification($order));
@@ -104,7 +104,6 @@ class OrderPaymentService
             Log::error('Failed to send order notifications: ' . $e->getMessage(), [
                 'order_id' => $order->id
             ]);
-            // Don't throw the exception as this is a non-critical operation
         }
     }
     /**
