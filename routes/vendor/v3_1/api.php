@@ -19,9 +19,7 @@ Route::prefix("vendor/v3.1")->middleware('api-vendor')->group(function () {
     Route::prefix('vendors')->group(base_path('routes/vendor/v3_1/api/vendors.php'));
     Route::prefix('clients')->group(base_path('routes/vendor/v3_1/api/clients.php'));
     Route::prefix('history')->group(base_path('routes/vendor/v3_1/api/history.php'));
-    Route::prefix('reviews')->group(base_path('routes/vendor/v3_1/api/reviews.php'));
     Route::prefix('products')->group(base_path('routes/vendor/v3_1/api/products.php'));
-    Route::prefix('comments')->group(base_path('routes/vendor/v3_1/api/comments.php'));
     Route::prefix('favorites')->group(base_path('routes/vendor/v3_1/api/favorites.php'));
     Route::prefix('addresses')->group(base_path('routes/vendor/v3_1/api/addresses.php'));
     Route::prefix('messaging')->group(base_path('routes/vendor/v3_1/api/messaging.php'));
