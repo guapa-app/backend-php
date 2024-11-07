@@ -34,15 +34,11 @@ class OrderPaymentService
             DB::commit();
 
             if ($data['status'] == 'paid') {
-                // Send notifications
-                dispatch(function () use ($order) {
-                    $this->sendOrderNotifications($order);
-                })->onQueue('notifications');
 
-                dispatch(function () use ($order) {
-                    $loyaltyPointsService = app(LoyaltyPointsService::class);
-                    $loyaltyPointsService->addPurchasePoints($order);
-                })->onQueue('loyalty-points');
+                $loyaltyPointsService = app(LoyaltyPointsService::class);
+                $loyaltyPointsService->addPurchasePoints($order);
+
+//                $this->sendOrderNotifications($order);
             }
 
         } catch (\Exception $e) {
@@ -109,7 +105,6 @@ class OrderPaymentService
             Log::error('Failed to send order notifications: ' . $e->getMessage(), [
                 'order_id' => $order->id
             ]);
-            // Don't throw the exception as this is a non-critical operation
         }
     }
     /**

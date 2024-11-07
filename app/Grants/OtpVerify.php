@@ -9,6 +9,7 @@ use http\Exception\RuntimeException;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\Bridge\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
+use League\OAuth2\Server\Exception\OAuthServerException;
 
 class OtpVerify extends PassportGrant
 {
@@ -33,36 +34,20 @@ class OtpVerify extends PassportGrant
     /**
      *  Retrieve a user by the given auth parameters.
      *
-     * @param \Illuminate\Database\Eloquent\Model  $model The model being authenticated
+     * @param Model $model The model being authenticated
      * @param array  $authParams Request parameters used to authenticate the user
      * @param string $guard          The guard used for authentication
      * @param string $grantType
-     * @param \League\OAuth2\Server\Entities\ClientEntityInterface  $clientEntity
+     * @param ClientEntityInterface $clientEntity
      *
-     * @return \Laravel\Passport\Bridge\User|null
-     * @throws \League\OAuth2\Server\Exception\OAuthServerException
+     * @return User|null
+     * @throws OAuthServerException
      */
-    protected function getUserEntityByAuthParams(
-        Model $model,
-        $authParams,
-        $guard,
-        $grantType,
-        ClientEntityInterface $clientEntity
-    ) {
-        // It is hard to get a valid firebase jwt token while testing
-        // So we will override verification while testing
-        $isTesting = config('app.env') === 'testing';
-        if ($isTesting) {
-            // Check if testing requires authentication to fail
-            if ($authParams['jwt_token'] === 'wrongjwttoken' || $authParams['otp'] === 'wrongotp') {
-                // Return to cause authentication to fail with 401
-                return;
-            }
-        }
-
+    protected function getUserEntityByAuthParams(Model $model, $authParams, $guard, $grantType, ClientEntityInterface $clientEntity)
+    {
         $smsService = app(SMSService::class);
 
-        $isOtpCorrect = $isTesting || $smsService->verifyOtp($authParams['phone_number'], $authParams['otp']);
+        $isOtpCorrect = $smsService->verifyOtp($authParams['phone_number'], $authParams['otp']);
 
         if (!$isOtpCorrect) {
             return;
