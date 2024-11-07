@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Requests\ChangePhoneRequest;
-use App\Models\User;
-use App\Models\Setting;
-use App\Services\SMSService;
-use GuzzleHttp\Exception\ClientException;
-use Illuminate\Http\Request;
-use App\Services\AuthService;
-use App\Exceptions\ApiException;
-use App\Services\V3\UserService;
-use Illuminate\Http\JsonResponse;
-use App\Http\Requests\PhoneRequest;
-use Illuminate\Auth\Events\Registered;
-use App\Http\Requests\VerifyPhoneRequest;
-use App\Services\V3_1\ReferralCodeService;
-use App\Exceptions\PhoneNotVerifiedException;
-use App\Http\Requests\V3_1\User\LoginRequest;
-use App\Http\Resources\User\V3_1\UserResource;
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\V3_1\User\RegisterRequest;
 use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Exceptions\ApiException;
+use App\Exceptions\PhoneNotVerifiedException;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\ChangePhoneRequest;
+use App\Http\Requests\PhoneRequest;
+use App\Http\Requests\V3_1\User\LoginRequest;
+use App\Http\Requests\V3_1\User\RegisterRequest;
+use App\Http\Requests\VerifyPhoneRequest;
+use App\Http\Resources\User\V3_1\UserResource;
 use App\Http\Resources\User\V3_1\UserWithPointsResource;
+use App\Models\User;
+use App\Services\AuthService;
+use App\Services\SMSService;
+use App\Services\V3\UserService;
+use App\Services\V3_1\ReferralCodeService;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class AuthController extends BaseApiController
@@ -59,7 +59,7 @@ class AuthController extends BaseApiController
         $user = $this->userService->create($data);
 
         // send otp to the user to verify account.
-        if (!Setting::checkTestingMode()) {
+        if (!$this->authService->testingCheck($data['phone'])) {
             $this->smsService->sendOtp($data['phone']);
         }
 
@@ -119,11 +119,12 @@ class AuthController extends BaseApiController
 
         $this->checkIfUserDeleted($user->status);
 
-        if (Setting::checkTestingMode()) {
+        // send otp to the user to verify account.
+        if ($this->authService->testingCheck($data['phone'])) {
             $token['access_token'] = $user->createToken('Temp Personal Token', ['*'])->accessToken;
 
             if ($request->filled('referral_code')) {
-                $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
+                $this->referralCodeService->createReferralCodeUsage($user, $request->referral_code);
             }
 
             $this->prepareUserResponse($user, $token);
@@ -148,7 +149,7 @@ class AuthController extends BaseApiController
             $user = $this->prepareUserResponse($user, $token);
 
             if ($request->filled('referral_code')) {
-                $this->referralCodeService->createReferralCodeUsage($user,$request->referral_code);
+                $this->referralCodeService->createReferralCodeUsage($user, $request->referral_code);
             }
 
             return UserWithPointsResource::make($user)
@@ -175,7 +176,7 @@ class AuthController extends BaseApiController
     public function sendOtp(PhoneRequest $request)
     {
         try {
-            if (Setting::checkTestingMode()) {
+            if ($this->authService->testingCheck($request->get('phone'))) {
                 return $this->successJsonRes([
                     'is_otp_sent' => true,
                     'otp' => 1111,
@@ -189,12 +190,12 @@ class AuthController extends BaseApiController
             return $this->successJsonRes([
                 'is_otp_sent' => true,
             ], __('api.otp_sent'), 200);
-        } catch (\Throwable $th) {
-            if ($th instanceof \Illuminate\Validation\ValidationException) {
+        } catch (Throwable $th) {
+            if ($th instanceof ValidationException) {
                 throw $th;
             }
             $res = json_decode((string) $th->getResponse()?->getBody());
-            if ($th instanceof \GuzzleHttp\Exception\ClientException) {
+            if ($th instanceof ClientException) {
                 if ($th->getCode() == 402) {
                     // 402 Not enough credit.
                 } elseif ($th->getCode() == 400) {
@@ -352,5 +353,4 @@ class AuthController extends BaseApiController
             throw new ApiException(__('api.account_deleted'), 401);
         }
     }
-
 }

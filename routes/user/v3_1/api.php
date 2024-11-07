@@ -1,24 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
-use App\Http\Controllers\Api\User\V3_1\HomeController;
-use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DeviceController;
-use App\Http\Controllers\Api\User\V3_1\WalletController;
-use App\Http\Controllers\Api\User\V3_1\TransactionController;
+use App\Http\Controllers\Api\User\V3_1\HomeController;
 use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
-use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
-use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
+use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\PaymentController;
+use App\Http\Controllers\Api\User\V3_1\TransactionController;
+use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
+use App\Http\Controllers\Api\User\V3_1\WalletController;
+use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix("user/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index']);
 
     Route::prefix('auth')->group(base_path('routes/user/v3_1/api/auth.php'));
     Route::prefix('users')->group(base_path('routes/user/v3_1/api/users.php'));
-    Route::prefix('staff')->group(base_path('routes/user/v3_1/api/staff.php'));
     Route::prefix('posts')->group(base_path('routes/user/v3_1/api/posts.php'));
     Route::prefix('pages')->group(base_path('routes/user/v3_1/api/pages.php'));
     Route::prefix('offers')->group(base_path('routes/user/v3_1/api/offers.php'));

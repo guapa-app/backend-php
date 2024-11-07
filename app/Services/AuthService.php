@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\Repositories\AdminRepositoryInterface;
 use App\Models\Admin;
+use App\Models\Setting;
 use DB;
 use Exception;
 use Illuminate\Support\Facades\Http;
@@ -88,5 +89,15 @@ class AuthService
         }
 
         return $admin;
+    }
+
+    public function testingCheck($phone): bool
+    {
+        $phoneNumbers = ['531437350', '566776627', '553833377'];
+        $pattern = '/' . implode('|', $phoneNumbers) . '/';
+
+        $matches = preg_match($pattern, $phone);
+
+        return (Setting::checkTestingMode() || $matches);
     }
 }
