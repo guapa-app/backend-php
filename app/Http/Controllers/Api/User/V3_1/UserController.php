@@ -45,7 +45,7 @@ class UserController extends BaseApiController
 
     public function getReferralCode(Request $request)
     {
-        $referralCode = $request->user()->profile->getReferralCode();
+        $referralCode = $request->user()->myProfile()->getReferralCode();
         return response()->json([
             'data' => [
                 'referral_code' => $referralCode

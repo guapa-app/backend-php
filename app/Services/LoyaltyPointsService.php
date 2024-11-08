@@ -85,7 +85,10 @@ class LoyaltyPointsService
 
             $transaction = $transactionService->createTransaction($userId, $amount, $transactionType);
 
-            $user = User::find($userId)->first();
+            $user = User::where('id', $userId)->first();
+            $wallet = $user->myWallet();
+            $wallet->balance += $amount;
+            $wallet->save();
 
             $this->subtractPoints($user->myPointsWallet(), $userId, $points, LoyaltyPointAction::CONVERSION->value);
 

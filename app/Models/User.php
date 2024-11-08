@@ -347,6 +347,26 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     }
 
     /**
+     * User Profile
+     * Get user profile data.
+     *
+     * @return UserProfile
+     */
+    public function myProfile(): UserProfile
+    {
+        // Check if the user has a UserProfile
+        if (!$this->profile) {
+            // Create a new profile if it doesn't exist
+            $profile = $this->profile()->create([
+            ]);
+        } else {
+            $profile = $this->profile;
+        }
+
+        return $profile;
+    }
+
+    /**
      * User Wallet
      * Get user wallet data.
      *
