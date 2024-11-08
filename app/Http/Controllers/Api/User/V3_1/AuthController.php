@@ -138,7 +138,7 @@ class AuthController extends BaseApiController
 
         $requestPayload = [
             'grant_type' => 'otp_verify',
-            'phone_number' => $data['phone'],
+            'phone_number' => '+'.$data['phone'],
             'otp' => $data['otp'],
             'scope' => '*',
         ];
@@ -186,7 +186,7 @@ class AuthController extends BaseApiController
             $data = $request->validated();
 
             $phone = '+'.$data['phone'];
-            
+
             $this->smsService->sendOtp($phone);
 
             return $this->successJsonRes([
