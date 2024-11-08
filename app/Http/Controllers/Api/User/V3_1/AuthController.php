@@ -185,7 +185,7 @@ class AuthController extends BaseApiController
 
             $data = $request->validated();
 
-            $this->smsService->sendOtp($data['phone']);
+            $this->smsService->sendOtp('+'.$data['phone']);
 
             return $this->successJsonRes([
                 'is_otp_sent' => true,
