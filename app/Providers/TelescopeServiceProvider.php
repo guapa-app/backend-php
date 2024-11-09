@@ -21,10 +21,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         Telescope::tag(function (IncomingEntry $entry) {
             if ($entry->type === 'request') {
                 $version = 'unknown';
-                if (preg_match('/api\/(v\d+)/', $entry->content['uri'], $matches)) {
-                    $version =  $matches[1];
+                if (preg_match('/\/v(\d+(\.\d+)?)\//', $entry->content['uri'], $matches)) {
+                    $version =  'v'.$matches[1];
                 }
-
                 return ['status:' . $entry->content['response_status'], $version];
             }
 
