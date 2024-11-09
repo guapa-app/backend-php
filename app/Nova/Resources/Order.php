@@ -1,0 +1,166 @@
+<?php
+
+namespace App\Nova\Resources;
+
+use App\Nova\Actions\ChangeOrderStatus;
+use App\Nova\Actions\SendWhatsAppReminder;
+use Bissolli\NovaPhoneField\PhoneNumber;
+use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Http\Requests\NovaRequest;
+
+class Order extends Resource
+{
+    /**
+     * The model the resource corresponds to.
+     *
+     * @var string
+     */
+    public static $model = \App\Models\Order::class;
+
+    /**
+     * The single value that should be used to represent the resource when being displayed.
+     *
+     * @var string
+     */
+    public static $title = 'id';
+
+    /**
+     * The columns that should be searched.
+     *
+     * @var array
+     */
+    public static $search = [
+        'id',
+        'note',
+        'name',
+        'phone',
+    ];
+
+    public static function authorizedToCreate(Request $request): bool
+    {
+        return false;
+    }
+
+    /**
+     * Get the fields displayed by the resource.
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function fields(Request $request)
+    {
+        $returned_arr = [
+            ID::make(__('ID'), 'id')->sortable(),
+
+            BelongsTo::make(__('address'), 'address', Address::class)->showCreateRelationButton(),
+
+            Number::make(__('total'), 'total')->step(0.001),
+
+            Text::make(__('note'), 'note'),
+
+            Text::make(__('name'), 'name'),
+            Text::make(__('phone'), 'phone'),
+
+            Select::make(__('status'), 'status')
+                ->default(2)
+                ->options([
+                    'Pending' => 'Pending',
+                    'Accepted' => 'Accepted',
+                    'Canceled' => 'Canceled',
+                    'Rejected' => 'Rejected',
+                ])
+                ->displayUsingLabels()
+                ->required(),
+
+            HasMany::make(__('items'), 'items', OrderItem::class),
+
+            DateTime::make(__('created at'), 'created_at')->exceptOnForms()->readonly(),
+            DateTime::make(__('updated at'), 'updated_at')->onlyOnDetail()->readonly(),
+
+            // BelongsTo::make(__('user'), 'user', User::class)->showCreateRelationButton(),
+            // BelongsTo::make(__('vendor'), 'vendor', Vendor::class)->showCreateRelationButton(),
+        ];
+
+        return $returned_arr;
+    }
+
+    /**
+     * Get the cards available for the request.
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function cards(Request $request)
+    {
+        return [];
+    }
+
+    /**
+     * Get the filters available for the resource.
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function filters(Request $request)
+    {
+        return [];
+    }
+
+    /**
+     * Get the lenses available for the resource.
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function lenses(Request $request)
+    {
+        return [];
+    }
+
+    /**
+     * Get the actions available for the resource.
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function actions(Request $request): array
+    {
+        return [
+            ChangeOrderStatus::make()
+                ->canSee(function ($req) {
+                    return true;
+                })
+                ->canRun(function ($req) {
+                    return true;
+                }),
+
+            SendWhatsAppReminder::make()
+                ->canSee(function ($req) {
+                    return true;
+                })
+                ->canRun(function ($req) {
+                    return true;
+                })
+                ->confirmText('Are you sure you want to send WhatsApp reminders?')
+                ->confirmButtonText('Send Reminders')
+                ->cancelButtonText('Cancel'),
+        ];
+    }
+
+    public function authorizedToUpdate(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
+    }
+}
