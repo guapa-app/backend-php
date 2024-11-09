@@ -294,6 +294,10 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $query->hasAnyTaxonomy((array) $request->get('category_ids'));
         }
 
+        if ($request->has('category_id')) {
+            $query->hasAnyTaxonomy([$request->get('category_id')]);
+        }
+
         // Filter by price range
         if ($request->hasAny(['min_price', 'max_price'])) {
             $query->priceRange($request->get('min_price'), $request->get('max_price'));
