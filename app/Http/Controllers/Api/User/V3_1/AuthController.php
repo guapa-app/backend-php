@@ -138,7 +138,7 @@ class AuthController extends BaseApiController
 
         $requestPayload = [
             'grant_type' => 'otp_verify',
-            'phone_number' => '+'.$data['phone'],
+            'phone_number' => $data['phone'],
             'otp' => $data['otp'],
             'scope' => '*',
         ];
@@ -185,9 +185,7 @@ class AuthController extends BaseApiController
 
             $data = $request->validated();
 
-            $phone = '+'.$data['phone'];
-
-            $this->smsService->sendOtp($phone);
+            $this->smsService->sendOtp($data['phone']);
 
             return $this->successJsonRes([
                 'is_otp_sent' => true,
@@ -214,6 +212,7 @@ class AuthController extends BaseApiController
             ], __('api.contact_support'), 422);
         }
     }
+
     /**
      * Get logged in user.
      *
@@ -226,6 +225,7 @@ class AuthController extends BaseApiController
     {
         $this->user->loadProfileFields();
         $this->user->append('user_vendors_ids');
+
         return UserResource::make($this->user)
             ->additional([
                 'success' => true,
@@ -303,7 +303,6 @@ class AuthController extends BaseApiController
 
             return $this->successJsonRes(['is_otp_sent' => true], __('api.otp_sent'), 200);
         } catch (Throwable $th) {
-
             if ($th instanceof ClientException) {
                 if ($th->getCode() == 402) {
                     // 402 Not enough credit.

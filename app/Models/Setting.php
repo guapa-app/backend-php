@@ -113,6 +113,7 @@ class Setting extends Model
 
         return $record->s_value;
     }
+
     public static function getCampaignAvailableCustomers()
     {
         $record = static::firstOrCreate(['s_key' => 'campaign_available_customers'], [
@@ -214,7 +215,20 @@ class Setting extends Model
             'instructions' => "0 to prevent version check, Please be careful when changing the app version. Ensure that any changes are aligned with the mobile team's requirements to avoid breaking the app. Forcing app updates can impact user experience, so proceed with caution.",
         ]);
 
-        return (float)$record->s_value;
+        return (float) $record->s_value;
+    }
+
+    public static function getTestingPhoneNum()
+    {
+        $record = static::firstOrCreate(['s_key' => 'testing_phone_num'], [
+            's_value'           => '531437350,566776627',
+            's_unit'            => 'string',
+            's_validation_type' => 'string',
+            's_validation'      => null,
+            'instructions'      => 'testing phone numbers should seperated be comma (,)',
+        ]);
+
+        return explode(',', $record->s_value);
     }
 
     public function scopeByKey(Builder $query, string $key = ''): Builder

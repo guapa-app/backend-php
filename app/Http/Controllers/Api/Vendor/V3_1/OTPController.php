@@ -11,7 +11,7 @@ class OTPController extends BaseApiController
 {
     private $smsService;
 
-    public function __construct(SMSService $smsService,)
+    public function __construct(SMSService $smsService)
     {
         parent::__construct();
         $this->smsService = $smsService;
@@ -53,5 +53,4 @@ class OTPController extends BaseApiController
             ], __('api.contact_support'), 422);
         }
     }
-
 }

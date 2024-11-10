@@ -25,11 +25,16 @@ class SMSService
 
     public function sendOtp(string $phone)
     {
-        return $this->smsService->sendOtp($phone);
+        return $this->smsService->sendOtp($this->preparePhoneNumber($phone));
     }
 
     public function verifyOtp(string $phone, string $otp): bool
     {
-        return $this->smsService->verifyOtp(trim($phone), trim($otp));
+        return $this->smsService->verifyOtp(trim($this->preparePhoneNumber($phone)), trim($otp));
+    }
+
+    protected function preparePhoneNumber(string $phone): string
+    {
+        return preg_replace('/^(?!\+)/', '+', $phone);
     }
 }

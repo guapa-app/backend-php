@@ -5,19 +5,21 @@ namespace App\Http\Controllers\Api\Vendor\V3_1;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\PhoneRequest;
 use App\Http\Requests\V3_1\Vendor\RegisterRequest;
 use App\Http\Requests\VerifyPhoneRequest;
 use App\Http\Resources\Vendor\V3_1\LoginResource;
 use App\Http\Resources\Vendor\V3_1\VendorProfileResource;
-use App\Models\Setting;
 use App\Services\AuthService;
 use App\Services\SMSService;
 use App\Services\V3\UserService;
 use App\Services\V3_1\VendorService;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends BaseApiController
 {
@@ -65,7 +67,7 @@ class AuthController extends BaseApiController
             $user = $this->userService->create($user_data);
 
             // send otp to the user to verify account.
-            if (!Setting::checkTestingMode()) {
+            if (!$this->authService->testingCheck($data['phone'])) {
                 $this->smsService->sendOtp($data['phone']);
             }
         });
@@ -73,6 +75,55 @@ class AuthController extends BaseApiController
         return $this->successJsonRes([
             'is_otp_sent' => true,
         ], __('api.otp_sent'));
+    }
+
+    /**
+     * Send otp.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam phone string required Phone number
+     *
+     * @param  Request  $request
+     */
+    public function sendOtp(PhoneRequest $request)
+    {
+        try {
+            if ($this->authService->testingCheck($request->get('phone'))) {
+                return $this->successJsonRes([
+                    'is_otp_sent' => true,
+                    'otp' => 1111,
+                ], __('api.otp_sent'), 200);
+            }
+
+            $data = $request->validated();
+
+            $this->smsService->sendOtp($data['phone']);
+
+            return $this->successJsonRes([
+                'is_otp_sent' => true,
+            ], __('api.otp_sent'), 200);
+        } catch (\Throwable $th) {
+            if ($th instanceof ValidationException) {
+                throw $th;
+            }
+            $res = json_decode((string) $th->getResponse()?->getBody());
+            if ($th instanceof ClientException) {
+                if ($th->getCode() == 402) {
+                    // 402 Not enough credit.
+                } elseif ($th->getCode() == 400) {
+                    // 400 Invalid phone number.
+                    return $this->errorJsonRes([
+                        'phone' => [__('api.invalid_phone')],
+                    ], __('api.otp_not_sent'), 422);
+                }
+            }
+            $this->logReq($res?->message);
+
+            return $this->successJsonRes([
+                'is_otp_sent' => false,
+            ], __('api.contact_support'), 422);
+        }
     }
 
     public function verifyOtp(VerifyPhoneRequest $request)
@@ -89,7 +140,7 @@ class AuthController extends BaseApiController
 
         $user->loadMissing('vendor');
 
-        if (Setting::checkTestingMode()) {
+        if ($this->authService->testingCheck($data['phone'])) {
             $token = $user->createToken('Temp Personal Token', ['*']);
             $tokenData = [
                 'access_token' => $token->accessToken,
@@ -214,5 +265,4 @@ class AuthController extends BaseApiController
             ], __('api.phone_exist'), 200);
         }
     }
-
 }

@@ -57,7 +57,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'phone', 'about', 'whatsapp', 'twitter',
         'instagram', 'snapchat', 'type', 'working_days',
         'working_hours', 'website_url', 'known_url', 'tax_number',
-        'cat_number', 'reg_number', 'health_declaration','accept_appointment'
+        'cat_number', 'reg_number', 'health_declaration', 'accept_appointment',
     ];
 
     /**
@@ -76,7 +76,7 @@ class Vendor extends Model implements HasMedia, HasReviews
     protected $appends = [
         'specialty_ids', 'likes_count', 'is_liked',
         'views_count', 'shares_count', 'work_days',
-        'shared_link', 'staff_id'
+        'shared_link', 'staff_id',
     ];
 
     /**
@@ -185,7 +185,7 @@ class Vendor extends Model implements HasMedia, HasReviews
      */
     public function receivesBroadcastNotificationsOn()
     {
-        return 'vendor.'.$this->id;
+        return 'vendor.' . $this->id;
     }
 
     /**
@@ -495,31 +495,33 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('logo', 'staff', 'specialties', 'workDays', 'appointments', 'addresses', 'socialMedia',
-            'socialMedia.icon');
+        $query->with(
+            'logo',
+            'staff',
+            'specialties',
+            'workDays',
+            'appointments',
+            'addresses',
+            'socialMedia',
+            'socialMedia.icon'
+        );
         $query->withCount('products', 'activeOffers', 'services', 'orders_order', 'orders_consultations');
 
         if (\request()->load_products) {
             $query->with([
-                'products' => function ($query) {
-                    $query->take(5);
-                },
+                'products',
                 'products.taxonomies',
                 'products.media',
                 'products.offer',
                 'products.offer.image',
 
-                'services' => function ($query) {
-                    $query->take(5);
-                },
+                'services',
                 'services.taxonomies',
                 'services.media',
                 'services.offer',
                 'services.offer.image',
 
-                'productsHasOffers' => function ($query) {
-                    $query->take(5);
-                },
+                'productsHasOffers',
                 'productsHasOffers.taxonomies',
                 'productsHasOffers.media',
                 'productsHasOffers.offer',

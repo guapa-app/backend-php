@@ -93,11 +93,12 @@ class AuthService
 
     public function testingCheck($phone): bool
     {
-        $phoneNumbers = ['531437350', '566776627', '553833377'];
+        $phoneNumbers = Setting::getTestingPhoneNum();
+
         $pattern = '/' . implode('|', $phoneNumbers) . '/';
 
         $matches = preg_match($pattern, $phone);
 
-        return (Setting::checkTestingMode() || $matches);
+        return Setting::checkTestingMode() || $matches;
     }
 }
