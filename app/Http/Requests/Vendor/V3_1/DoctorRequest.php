@@ -30,12 +30,13 @@ class DoctorRequest extends FailedValidationRequest
 
         $this->replace($input);
 
-        $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation();
+        $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' :  '|' .Common::phoneValidation();
 
         $rules = [
             'name' => 'required|string|min:5|max:150',
-            'email' => 'required|email|unique:vendors,email,unique:users,email',
-            'phone' => 'required|unique:vendors,phone,unique:users,phone' . $phoneNumbersRule,
+            'email' => 'required|email|unique:vendors,email|unique:users,email',
+            'phone' => 'required|unique:vendors,phone|unique:users,phone' . $phoneNumbersRule,
+
             'about' => 'nullable|string|min:10|max:1024',
 
             'specialty_ids' => 'sometimes|array|min:1',
