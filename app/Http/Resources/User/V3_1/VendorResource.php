@@ -16,6 +16,8 @@ class VendorResource extends JsonResource
             'verified' => (bool) $this->verified,
             'verified_badge' => (bool) $this->verified_badge,
             'is_deleted' => (bool) $this->deleted_at,
+            'is_liked'   => (bool) $this->is_liked,
+            'likes_count' => (int) $this->likes_count,
             'status' => $this->resource::STATUSES[$this->status],
             'type' => $this->resource::TYPES[$this->type],
             'specialties' => TaxonomyResource::collection($this->whenLoaded('specialties')),
