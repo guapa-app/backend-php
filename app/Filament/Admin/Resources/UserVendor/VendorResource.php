@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources\UserVendor;
 
 use App\Filament\Admin\Resources\UserVendor\VendorResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
-use App\Models\User;
 use App\Models\Vendor;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -128,13 +127,16 @@ class VendorResource extends Resource
                         0 => 'disabled',
                         1 => 'active',
                     ]),
-                // check or select box verified_badge
                 Tables\Columns\SelectColumn::make('verified_badge')
                     ->options([
                         0 => 'not verified',
                         1 => 'verified',
                     ]),
-
+                Tables\Columns\TextColumn::make('favorites_count')
+                    ->label('Favorited By')
+                    ->getStateUsing(function (Vendor $record): string {
+                        return $record->favoritedBy()->count() . ' users';
+                    }),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -164,6 +166,7 @@ class VendorResource extends Resource
             RelationManagers\StaffRelationManager::class,
             RelationManagers\ProductsRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
+            RelationManagers\FavoritesRelationManager::class,
         ];
     }
 
