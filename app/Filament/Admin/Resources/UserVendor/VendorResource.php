@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\UserVendor;
 
 use App\Filament\Admin\Resources\UserVendor\VendorResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
+use App\Models\User;
 use App\Models\Vendor;
 use Filament\Forms;
 use Filament\Forms\Form;
