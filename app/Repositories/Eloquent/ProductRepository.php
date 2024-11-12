@@ -37,7 +37,7 @@ class ProductRepository extends EloquentRepository implements ProductRepositoryI
      */
     public function all(Request $request): object
     {
-        $perPage = (int)($request->has('perPage') ? $request->get('perPage') : $this->perPage);
+        $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
 
         if ($perPage > 50) {
             $perPage = 50;
@@ -60,6 +60,12 @@ class ProductRepository extends EloquentRepository implements ProductRepositoryI
             ->when(!$this->isAdmin(), function ($query) use ($request) {
                 $query->withApiListRelations($request);
             });
+
+        if (Schema::hasColumn('taxonomies', 'is_published')) {
+            $query->whereHas('taxonomies', function ($query) {
+                $query->where('is_published', true);
+            });
+        }
 
         if ($request->has('perPage')) {
             return $query->paginate($perPage);
