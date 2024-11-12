@@ -20,9 +20,10 @@ class Taxonomy extends BaseTaxonomy implements Listable
     use ListableTrait, HasRecursiveRelationships, HasFactory;
 
     protected $fillable = [
-        'fees', 'fixed_price',
-        'is_appointment', 'appointment_price',
-        'title', 'description', 'font_icon', 'type', 'parent_id',
+        'title', 'slug', 'fees',
+        'fixed_price', 'description', 'font_icon',
+        'type', 'is_appointment', 'appointment_price',
+        'parent_id', 'sort_order', 'is_published',
     ];
 
     /**
@@ -55,13 +56,35 @@ class Taxonomy extends BaseTaxonomy implements Listable
     ];
 
     protected $appends = [
-        'title_en_ar'
+        'title_en_ar',  'products_counter',
     ];
+
+    // =========== Attributes Section ===========
+    /**
+     * Get constraint key based on table name
+     * of current model
+     * Override this method in the listable trait
+     * to remove table name as it conflicts with
+     * HasRecursiveRelationships trait.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    public function getConstraintKey(string $key): string
+    {
+        return $key;
+    }
 
     public function getTitleEnArAttribute(): string
     {
         $title = json_decode($this->attributes['title']);
+
         return $title->en . ' - ' . $title->ar;
+    }
+
+    public function getProductsCounterAttribute(): string
+    {
+        return $this->products()->count();
     }
 
     /**
@@ -73,6 +96,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
             ->doNotGenerateSlugsOnUpdate();
     }
 
+    // =========== Relations Section ===========
     public function parent(): BelongsTo
     {
         return $this->belongsTo('App\Models\Taxonomy', 'parent_id');
@@ -89,9 +113,35 @@ class Taxonomy extends BaseTaxonomy implements Listable
         return $this->hasMany('App\Models\Attribute', 'category_id');
     }
 
+    public function appointmentForms(): BelongsToMany
+    {
+        return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
+    }
+
+    public function appointmentFormTaxonomy(): HasMany
+    {
+        return $this->hasMany(AppointmentFormTaxonomy::class);
+    }
+
+    public function products()
+    {
+        return $this->morphedByMany(Product::class, 'taxable');
+    }
+
+    // =========== Scopes Section ===========
     public function scopeParents(Builder $query): Builder
     {
         return $query->whereNull('taxonomies.parent_id');
+    }
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('is_published', true);
+    }
+
+    public function scopeDraft(Builder $query): Builder
+    {
+        return $query->where('is_published', false);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
@@ -144,30 +194,5 @@ class Taxonomy extends BaseTaxonomy implements Listable
         $query->with('parent', 'icon');
 
         return $query;
-    }
-
-    /**
-     * Get constraint key based on table name
-     * of current model
-     * Override this method in the listable trait
-     * to remove table name as it conflicts with
-     * HasRecursiveRelationships trait.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    public function getConstraintKey(string $key): string
-    {
-        return $key;
-    }
-
-    public function appointmentForms(): BelongsToMany
-    {
-        return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
-    }
-
-    public function appointmentFormTaxonomy(): HasMany
-    {
-        return $this->hasMany(AppointmentFormTaxonomy::class);
     }
 }
