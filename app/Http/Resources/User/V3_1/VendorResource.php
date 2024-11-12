@@ -15,6 +15,8 @@ class VendorResource extends JsonResource
             'parent_name' => $this->parent->name ?? null,
             'verified' => (bool) $this->verified,
             'is_deleted' => (bool) $this->deleted_at,
+            'is_liked'   => (bool) $this->is_liked,
+            'likes_count' => (int) $this->likes_count,
             'status' => $this->resource::STATUSES[$this->status],
             'type' => $this->resource::TYPES[$this->type],
             'specialties' => TaxonomyResource::collection($this->whenLoaded('specialties')),
