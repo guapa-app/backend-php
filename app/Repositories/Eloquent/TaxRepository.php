@@ -6,6 +6,8 @@ use App\Contracts\Repositories\TaxRepositoryInterface;
 use App\Models\Taxonomy;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Taxonomy Repository.
@@ -75,6 +77,44 @@ class TaxRepository extends EloquentRepository implements TaxRepositoryInterface
             return $taxonomy;
         } else {
             return $taxonomy->ancestors()->isRoot()->first();
+        }
+    }
+
+
+    public function all(Request $request): object
+    {
+        $perPage = (int) ($request->has('perPage') ? $request->get('perPage') : $this->perPage);
+
+        if ($perPage > 50) {
+            $perPage = 50;
+        }
+
+        $query = $this->model->applyFilters($request);
+
+        $order = $request->get('order');
+        if (Schema::hasColumn('taxonomies', 'sort_order')) {
+            $sortColumn = ($request->get('sort') ?? 'sort_order');
+            $order = 'asc';
+        } else {
+            $sortColumn = $request->get('sort');
+        }
+
+        $query->applyOrderBy($sortColumn, $order);
+
+        $query->withListRelations($request)
+            ->withListCounts($request)
+            ->when(!$this->isAdmin(), function ($query) use ($request) {
+                $query->withApiListRelations($request);
+            });
+
+        if (Schema::hasColumn('taxonomies', 'is_published')) {
+            $query->where('is_published', true);
+        }
+
+        if ($request->has('perPage')) {
+            return $query->paginate($perPage);
+        } else {
+            return $query->get();
         }
     }
 }
