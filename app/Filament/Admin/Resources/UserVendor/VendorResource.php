@@ -48,8 +48,8 @@ class VendorResource extends Resource
                     ->rules([
                         'required',
                         'email',
-                        Rule::unique('users', 'email')->ignore(fn($record) => $record->id),
                     ])
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
