@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Info;
 
+use App\Filament\Admin\Resources\Info\TaxonomyResource\Actions;
 use App\Filament\Admin\Resources\Info\TaxonomyResource\Pages;
 use App\Models\Taxonomy;
 use Filament\Forms;
@@ -72,6 +73,13 @@ class TaxonomyResource extends Resource
                     ->preload()
                     ->hint('select type before assign parent category')
                     ->searchable(),
+
+                Forms\Components\Radio::make('is_published')
+                    ->boolean()
+                    ->label('Published'),
+                Forms\Components\TextInput::make('sort_order')
+                    ->numeric()
+                    ->minValue(1),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('media')
                     ->collection('taxonomy_icons'),
 
@@ -102,6 +110,9 @@ class TaxonomyResource extends Resource
                     ->collection('taxonomy_icons'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('fees')
                     ->numeric()
                     ->sortable(),
@@ -109,6 +120,11 @@ class TaxonomyResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('products_counter')
+                    ->label('Items Counter')
+                    ->numeric(),
+                Tables\Columns\ToggleColumn::make('is_published')
+                    ->label('Publish'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -120,6 +136,11 @@ class TaxonomyResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                Actions\ClearSortAction::make('clear-sort'),
+                Actions\RandomizeSortAction::make('randomize-sort'),
+                Actions\RandomizeMissingSortOrderAction::make('randomize-missing-sort'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
