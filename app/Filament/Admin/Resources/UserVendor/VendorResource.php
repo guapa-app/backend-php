@@ -10,7 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Validation\Rule;
 
 class VendorResource extends Resource
 {
@@ -152,6 +151,7 @@ class VendorResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\WorkDaysRelationManager::class,
             RelationManagers\StaffRelationManager::class,
             RelationManagers\ProductsRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
