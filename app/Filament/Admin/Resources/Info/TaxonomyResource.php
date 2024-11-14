@@ -74,30 +74,31 @@ class TaxonomyResource extends Resource
                     ->hint('select type before assign parent category')
                     ->searchable(),
 
-                Forms\Components\Radio::make('is_published')
-                    ->boolean()
-                    ->label('Published'),
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric()
                     ->minValue(1),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('media')
                     ->collection('taxonomy_icons'),
 
-                    Forms\Components\Repeater::make('appointmentForms')
-                        ->label('Appointment Forms')
-                        ->relationship('appointmentFormTaxonomy')
-                        ->schema([
-                            Forms\Components\Select::make('appointment_form_id')
-                                ->label('Select Form')
-                                ->relationship('appointmentForm', 'type')
-                                ->native(false)
-                                ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->type->value} - {$record->key}")
-                                ->required(),
-                        ])
+                Forms\Components\Radio::make('is_published')
+                    ->boolean()
+                    ->default(false)
+                    ->label('Published'),
 
-                        ->columnSpanFull()
-                        ->columns(),
+                Forms\Components\Repeater::make('appointmentForms')
+                    ->label('Appointment Forms')
+                    ->relationship('appointmentFormTaxonomy')
+                    ->schema([
+                        Forms\Components\Select::make('appointment_form_id')
+                            ->label('Select Form')
+                            ->relationship('appointmentForm', 'type')
+                            ->native(false)
+                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->type->value} - {$record->key}")
+                            ->required(),
+                    ])
+                    ->columnSpanFull()
+                    ->columns(),
             ]);
     }
 
@@ -105,6 +106,8 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable(),
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
                     ->label('Icon')
                     ->collection('taxonomy_icons'),
