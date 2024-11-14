@@ -56,7 +56,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
     ];
 
     protected $appends = [
-        'title_en_ar',  'products_counter',
+        'title_en_ar', 'products_counter',
     ];
 
     // =========== Attributes Section ===========
@@ -77,9 +77,12 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function getTitleEnArAttribute(): string
     {
-        $title = json_decode($this->attributes['title']);
+        $title = json_decode($this->attributes['title'] ?? '');
 
-        return $title->en . ' - ' . $title->ar;
+        $en = optional($title)->en ?? 'N/A';
+        $ar = optional($title)->ar ?? 'N/A';
+
+        return "{$en} - {$ar}";
     }
 
     public function getProductsCounterAttribute(): string
