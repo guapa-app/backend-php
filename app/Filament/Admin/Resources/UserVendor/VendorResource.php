@@ -126,6 +126,7 @@ class VendorResource extends Resource
                         0 => 'disabled',
                         1 => 'active',
                     ]),
+
                 Tables\Columns\SelectColumn::make('verified_badge')
                     ->options([
                         0 => 'not verified',
@@ -136,6 +137,7 @@ class VendorResource extends Resource
                     ->getStateUsing(function (Vendor $record): string {
                         return $record->favoritedBy()->count() . ' users';
                     }),
+
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
