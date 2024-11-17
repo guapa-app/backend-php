@@ -406,6 +406,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->belongsToMany(AppointmentForm::class)->withTimestamps();
     }
 
+    public function favoritedBy()
+    {
+        return $this->morphToMany(User::class, 'favorable', 'favorables');
+    }
+
     // =========== Scopes Section ===========
     public function scopeSubVendors(Builder $query, $parent): Builder
     {

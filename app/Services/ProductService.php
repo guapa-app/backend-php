@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Contracts\Repositories\ProductRepositoryInterface;
-use App\Events\ProductCreated;
 use App\Models\Product;
 
 /**
@@ -43,8 +42,6 @@ class ProductService
         }
 
         $this->updateAddresses($product, $data);
-
-        event(new ProductCreated($product));
 
         return $product;
     }
