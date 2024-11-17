@@ -25,7 +25,23 @@ class OfferCreatedListener
     public function handle(OfferCreated $event)
     {
         $event->offer->load('product', 'product.vendor');
-        $users = User::inRandomOrder()->limit(200)->get();
-        Notification::send($users, new OfferNotification($event->offer));
+        $vendor = $event->offer->product->vendor;
+
+        // Get users who favorited this vendor using the relation
+        $favoritedUsers = $vendor->favoritedBy()->get();
+
+        // Get 50 random users excluding those who already favorited
+        $randomUsers = User::whereNotIn('id', $favoritedUsers->pluck('id'))
+            ->inRandomOrder()
+            ->limit(200)
+            ->get();
+
+        // Merge both collections while avoiding duplicates
+        $usersToNotify = $favoritedUsers->concat($randomUsers)->unique('id');
+
+        // Send notifications in chunks to avoid timeout
+        $usersToNotify->chunk(100)->each(function ($chunk) use ($event) {
+            Notification::send($chunk, new OfferNotification($event->offer));
+        });
     }
 }
