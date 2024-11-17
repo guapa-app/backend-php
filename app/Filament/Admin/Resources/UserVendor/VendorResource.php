@@ -126,6 +126,14 @@ class VendorResource extends Resource
                         0 => 'disabled',
                         1 => 'active',
                     ]),
+                // check or select box verified_badge
+                Tables\Columns\SelectColumn::make('verified_badge')
+                    ->options([
+                        0 => 'not verified',
+                        1 => 'verified',
+                    ]),
+
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

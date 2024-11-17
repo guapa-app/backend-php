@@ -17,6 +17,7 @@ class VendorDetailsResource extends JsonResource
             'about'                                     => (string) $this->about,
             'status'                                    => $this->resource::STATUSES[$this->status],
             'verified'                                  => (bool) $this->verified,
+            'verified_badge'                            => (bool) $this->verified_badge,
             'is_deleted'                                => (bool) $this->deleted_at,
             'whatsapp'                                  => (string) $this->whatsapp,
             'twitter'                                   => (string) $this->twitter,
