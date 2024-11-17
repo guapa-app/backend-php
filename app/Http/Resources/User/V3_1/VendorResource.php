@@ -14,6 +14,7 @@ class VendorResource extends JsonResource
             'name' => (string) $this->name,
             'parent_name' => $this->parent->name ?? null,
             'verified' => (bool) $this->verified,
+            'verified_badge' => (bool) $this->verified_badge,
             'is_deleted' => (bool) $this->deleted_at,
             'is_liked'   => (bool) $this->is_liked,
             'likes_count' => (int) $this->likes_count,

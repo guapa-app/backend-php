@@ -57,7 +57,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'phone', 'about', 'whatsapp', 'twitter',
         'instagram', 'snapchat', 'type', 'working_days',
         'working_hours', 'website_url', 'known_url', 'tax_number',
-        'cat_number', 'reg_number', 'health_declaration', 'accept_appointment',
+        'cat_number', 'reg_number', 'health_declaration', 'accept_appointment','verified_badge',
     ];
 
     /**

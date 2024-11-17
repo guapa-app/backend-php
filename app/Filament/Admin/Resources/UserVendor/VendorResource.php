@@ -10,7 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Validation\Rule;
 
 class VendorResource extends Resource
 {
@@ -48,8 +47,8 @@ class VendorResource extends Resource
                     ->rules([
                         'required',
                         'email',
-                        Rule::unique('users', 'email')->ignore(fn($record) => $record->id),
                     ])
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
@@ -127,6 +126,7 @@ class VendorResource extends Resource
                         0 => 'disabled',
                         1 => 'active',
                     ]),
+
                 Tables\Columns\SelectColumn::make('verified_badge')
                     ->options([
                         0 => 'not verified',
@@ -137,6 +137,7 @@ class VendorResource extends Resource
                     ->getStateUsing(function (Vendor $record): string {
                         return $record->favoritedBy()->count() . ' users';
                     }),
+
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -163,6 +164,7 @@ class VendorResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\WorkDaysRelationManager::class,
             RelationManagers\StaffRelationManager::class,
             RelationManagers\ProductsRelationManager::class,
             RelationManagers\OrdersRelationManager::class,

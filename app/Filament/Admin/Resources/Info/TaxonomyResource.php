@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Info;
 
+use App\Filament\Admin\Resources\Info\TaxonomyResource\Actions;
 use App\Filament\Admin\Resources\Info\TaxonomyResource\Pages;
 use App\Models\Taxonomy;
 use Filament\Forms;
@@ -72,24 +73,32 @@ class TaxonomyResource extends Resource
                     ->preload()
                     ->hint('select type before assign parent category')
                     ->searchable(),
+
+                Forms\Components\TextInput::make('sort_order')
+                    ->numeric()
+                    ->minValue(1),
                 Forms\Components\SpatieMediaLibraryFileUpload::make('media')
                     ->collection('taxonomy_icons'),
 
-                    Forms\Components\Repeater::make('appointmentForms')
-                        ->label('Appointment Forms')
-                        ->relationship('appointmentFormTaxonomy')
-                        ->schema([
-                            Forms\Components\Select::make('appointment_form_id')
-                                ->label('Select Form')
-                                ->relationship('appointmentForm', 'type')
-                                ->native(false)
-                                ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->type->value} - {$record->key}")
-                                ->required(),
-                        ])
+                Forms\Components\Radio::make('is_published')
+                    ->boolean()
+                    ->default(false)
+                    ->label('Published'),
 
-                        ->columnSpanFull()
-                        ->columns(),
+                Forms\Components\Repeater::make('appointmentForms')
+                    ->label('Appointment Forms')
+                    ->relationship('appointmentFormTaxonomy')
+                    ->schema([
+                        Forms\Components\Select::make('appointment_form_id')
+                            ->label('Select Form')
+                            ->relationship('appointmentForm', 'type')
+                            ->native(false)
+                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->type->value} - {$record->key}")
+                            ->required(),
+                    ])
+                    ->columnSpanFull()
+                    ->columns(),
             ]);
     }
 
@@ -97,11 +106,16 @@ class TaxonomyResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable(),
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
                     ->label('Icon')
                     ->collection('taxonomy_icons'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('fees')
                     ->numeric()
                     ->sortable(),
@@ -109,6 +123,11 @@ class TaxonomyResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('products_counter')
+                    ->label('Items Counter')
+                    ->numeric(),
+                Tables\Columns\ToggleColumn::make('is_published')
+                    ->label('Publish'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -120,6 +139,11 @@ class TaxonomyResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                Actions\ClearSortAction::make('clear-sort'),
+                Actions\RandomizeSortAction::make('randomize-sort'),
+                Actions\RandomizeMissingSortOrderAction::make('randomize-missing-sort'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
