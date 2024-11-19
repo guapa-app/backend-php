@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Info;
 
 use App\Filament\Admin\Resources\Info\TaxonomyResource\Actions;
 use App\Filament\Admin\Resources\Info\TaxonomyResource\Pages;
+use App\Filament\Admin\Resources\Info\TaxonomyResource\Pages\ManageProducts;
 use App\Models\Taxonomy;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -153,7 +154,12 @@ class TaxonomyResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Actions\ManageProductsAction::make(),
+                Tables\Actions\Action::make('manageProducts')
+                    ->label('Manage Products')
+                    ->icon('heroicon-o-cog')
+                    ->url(fn($record) => Self::getUrl('manageProducts', ['record' => $record]))
+                    ->color('primary')
+                    ->visible(fn($record) => $record->type === 'special'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -175,6 +181,7 @@ class TaxonomyResource extends Resource
             'index' => Pages\ListTaxonomies::route('/'),
             'create' => Pages\CreateTaxonomy::route('/create'),
             'edit' => Pages\EditTaxonomy::route('/{record}/edit'),
+            'manageProducts' => ManageProducts::route('/{record}/manage-products'),
         ];
     }
 }
