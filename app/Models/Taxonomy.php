@@ -221,7 +221,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('parent', 'icon');
+        $query->with('parent', 'icon', 'photo');
 
         return $query;
     }
@@ -238,7 +238,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('parent', 'icon');
+        $query->with('parent', 'icon', 'photo');
 
         return $query;
     }
