@@ -85,7 +85,7 @@ class TaxonomyResource extends Resource
 
                 Forms\Components\SpatieMediaLibraryFileUpload::make('media')
                     ->label('Photo')
-                    ->collection('taxonomy_photo'),
+                    ->collection('taxonomy_photos'),
 
                 Forms\Components\Radio::make('is_published')
                     ->boolean()
