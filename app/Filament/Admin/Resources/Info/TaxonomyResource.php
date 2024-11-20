@@ -79,11 +79,11 @@ class TaxonomyResource extends Resource
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric()
                     ->minValue(1),
-                Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('icon')
                     ->label('Icon')
                     ->collection('taxonomy_icons'),
 
-                Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('photo')
                     ->label('Photo')
                     ->collection('taxonomy_photos'),
 
@@ -115,7 +115,7 @@ class TaxonomyResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('icon')
                     ->label('Icon')
                     ->collection('taxonomy_icons'),
                 Tables\Columns\TextColumn::make('title')
