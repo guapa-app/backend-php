@@ -49,7 +49,8 @@ class TaxonomyResource extends Resource
                     ->reactive()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('fixed_price', null))
                     ->requiredWithout('fixed_price')
-                    ->numeric(),
+                    ->numeric()
+                    ->visible(fn (callable $get) => $get('type') !== 'special'),
                 Forms\Components\Select::make('type')
                     ->options([
                         'category' => 'Products',
@@ -64,7 +65,8 @@ class TaxonomyResource extends Resource
                     ->reactive()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('fees', null))
                     ->requiredWithout('fees')
-                    ->numeric(),
+                    ->numeric()
+                    ->visible(fn (callable $get) => $get('type') !== 'special'),
                 Forms\Components\Select::make('parent_id')
                     ->label('Parent Category')
                     ->native(false)
