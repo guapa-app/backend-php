@@ -1,12 +1,13 @@
-@php use Illuminate\Support\Str; @endphp
 @extends('frontend.layouts.app')
 
+@php
+    app()->setLocale('ar');
+@endphp
+
 @section('title')
-    @php
-        app()->setLocale('ar')
-    @endphp
-    {{ ucfirst(__('blogs')) }}
+    {{ ucfirst(__('blog')) }}
 @endsection
+
 @section('content')
     <main>
         <section class="sub-header large-sub-header">
@@ -40,44 +41,30 @@
                     <div class="row">
                         <div class="col-lg-6 col-12">
                             <div class="data-contain">
-                                <p class="badge">زراعة الشعر</p>
+                                @php
+                                    $post = $posts->random();
+                                @endphp
+                                <p class="badge">{{ $post->category?->title }}</p>
 
-                                <h1>أفضل الأدوية والفيتامينات للشعر المزروع</h1>
+                                <h1>{{ $post->title }}</h1>
 
-                                <p class="desc">
-                                    زراعة الشعر هي استثمار في مظهرك وثقتك بنفسك، ولكن هذا
-                                    الاستثمار يحتاج إلى عناية مستمرة حتى يحقق أقصى نتائجه. ومن
-                                    أهم العوامل التي تساهم في نجاح عملية زراعة الشعر هي التغذية
-                                    السليمة، التي تزود الجسم بالفيتامينات والمعادن اللازمة لنمو
-                                    الشعر وتقويته.
-                                </p>
+                                <p>{{ Str::limit(strip_tags($post->content, false), 50) }}</p>
 
                                 <ul class="list">
                                     <li>
-                                        <img
-                                            src="{{ asset('frontend/assets/images/blogs/user.png')}}"
-                                            loading="lazy"
-                                            class="full-radius-img"
-                                            alt=""
-                                        />
-
-                                        <span> بقلم دكتور فراس </span>
+                                        <img src="{{ asset('frontend/assets/images/blogs/user.png')}}" loading="lazy" class="full-radius-img" alt=""/>
+                                        <span> {{ $post->admin->name }} </span>
                                     </li>
 
                                     <li>
-                                        <img
-                                            src="{{ asset('frontend/assets/images/sub-header/calendar-white.svg')}}"
-                                            loading="lazy"
-                                            alt=""
-                                        />
-
-                                        <span> 22 أكتوبر 2024 </span>
+                                        <img src="{{ asset('frontend/assets/images/sub-header/calendar-white.svg')}}" loading="lazy" alt=""/>
+                                        <span> {{ \Carbon\Carbon::parse($post->created_at)->translatedFormat('l j F Y') }}</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-                    <img src="{{ asset('frontend/assets/images/sub-header/banner.png')}}" loading="lazy" class="banner-img" alt=""/>
+                    <img src="{{ $post->getFirstMediaUrl('posts', 'large') }}" class="banner-img" loading="lazy" alt=""/>
                 </div>
             </div>
         </section>
@@ -96,6 +83,11 @@
 
                                 <ul class="list">
                                     <!-- categories -->
+                                    <li>
+                                        <a href="{{ route('blogs') }}">
+                                            <span class="data">الكل</span>
+                                        </a>
+                                    </li>
                                     @foreach($postCategories as $category)
                                         <li>
                                             <a href="{{ route('blogs', "filter[category_id]=$category->id") }}">
@@ -161,7 +153,7 @@
 
                                                 <li>
                                                     <img src="{{ asset('frontend/assets/images/sub-header/calendar.svg')}}" loading="lazy" class="light-filter" alt=""/>
-                                                    <span> {{ $post->created_at->format('d/m/Y') }} </span>
+                                                    <span> {{ \Carbon\Carbon::parse($post->created_at)->translatedFormat('j F Y') }}</span>
                                                 </li>
                                             </ul>
 
