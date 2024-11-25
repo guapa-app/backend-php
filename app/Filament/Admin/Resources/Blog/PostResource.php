@@ -41,6 +41,23 @@ class PostResource extends Resource
                     ->columnSpanFull()
                     ->maxLength(255),
                 Forms\Components\RichEditor::make('content')
+                    ->toolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        'bulletList',
+                        'codeBlock',
+                        'h1',
+                        'h2',
+                        'h3',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'underline',
+                        'undo',
+                    ])
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')
