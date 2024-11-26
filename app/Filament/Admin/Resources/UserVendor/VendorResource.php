@@ -22,7 +22,7 @@ class VendorResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return true;
     }
 
     public static function form(Form $form): Form
