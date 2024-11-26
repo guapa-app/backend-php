@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Contracts\Listable;
+use Illuminate\Http\Request;
+use App\Models\Scopes\CountryScope;
+use Illuminate\Database\Eloquent\Model;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 
 class Address extends Model implements Listable
 {
@@ -50,6 +51,11 @@ class Address extends Model implements Listable
         'address_1',
         'address_2',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CountryScope());
+    }
 
     public function addressable()
     {

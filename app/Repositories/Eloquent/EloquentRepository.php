@@ -63,9 +63,6 @@ class EloquentRepository implements EloquentRepositoryInterface
                 $query->withApiListRelations($request);
             });
 
-        if (Schema::hasColumn($this->model->getTable(), 'country_id')) {
-            $query->where('country_id', $request->country->id);
-        }
 
         if ($request->has('perPage')) {
             return $query->paginate($perPage);
