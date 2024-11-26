@@ -2,14 +2,15 @@
 
 namespace App\Filament\Admin\Resources\UserVendor;
 
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Vendor;
+use App\Models\Country;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use App\Filament\Admin\Resources\UserVendor\VendorResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
-use App\Models\Vendor;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
 
 class VendorResource extends Resource
 {
@@ -50,6 +51,11 @@ class VendorResource extends Resource
                     ])
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                Forms\Components\Select::make('country_id')
+                    ->label('Country')
+                    ->required()
+                    ->options(Country::query()->pluck('name', 'id'))
+                    ->searchable(),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
                     ->required()

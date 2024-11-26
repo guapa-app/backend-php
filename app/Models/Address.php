@@ -23,17 +23,32 @@ class Address extends Model implements Listable
     ];
 
     protected $fillable = [
-        'addressable_id', 'addressable_type', 'title', 'city_id',
-        'postal_code', 'lat', 'lng', 'address_1', 'address_2',
-        'type', 'phone',
+        'country_id',
+        'addressable_id',
+        'addressable_type',
+        'title',
+        'city_id',
+        'postal_code',
+        'lat',
+        'lng',
+        'address_1',
+        'address_2',
+        'type',
+        'phone',
     ];
 
     protected $filterable = [
-        'addressable_id', 'addressable_type', 'city_id', 'type',
+        'country_id',
+        'addressable_id',
+        'addressable_type',
+        'city_id',
+        'type',
     ];
 
     protected $search_attributes = [
-        'title', 'address_1', 'address_2',
+        'title',
+        'address_1',
+        'address_2',
     ];
 
     public function addressable()

@@ -49,6 +49,7 @@ class RegisterRequest extends FailedValidationRequest
             'phone' => 'required|unique:users,phone|'.(Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
             'gender' => 'nullable|string|in:'.implode(',', UserProfile::GENDER),
             'referral_code' => 'nullable|exists:user_profiles,referral_code',
+            'country_id' => 'nullable|exists:countries,id',
         ];
     }
 }
