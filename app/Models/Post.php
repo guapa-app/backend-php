@@ -27,21 +27,31 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     protected $fillable = [
-        'admin_id', 'category_id', 'title',
-        'content', 'status', 'youtube_url',
-        'tag_id',
+        'admin_id',
+        'category_id',
+        'title',
+        'content',
+        'status',
+        'youtube_url',
+        'tag_id'
     ];
 
     protected $filterable = [
-        'admin_id', 'category_id', 'status', 'tag_id',
+        'country_id',
+        'admin_id',
+        'category_id',
+        'status',
+        'tag_id',
     ];
 
     protected $search_attributes = [
-        'title', 'content',
+        'title',
+        'content',
     ];
 
     protected $appends = [
-        'likes_count', 'is_liked',
+        'likes_count',
+        'is_liked',
     ];
 
     /**
@@ -72,6 +82,11 @@ class Post extends Model implements Listable, HasMedia
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 600, 600)
             ->performOnCollections('posts');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function admin(): BelongsTo

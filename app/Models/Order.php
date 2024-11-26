@@ -22,9 +22,25 @@ class Order extends Model implements Listable
     use HasFactory, ListableTrait;
 
     protected $fillable = [
-        'hash_id', 'user_id', 'vendor_id', 'address_id', 'total', 'status',
-        'note', 'name', 'phone', 'invoice_url', 'cancellation_reason', 'coupon_id', 'discount_amount',
-        'last_reminder_sent', 'type', 'staff_id', 'payment_gateway', 'payment_id'
+        'country_id',
+        'hash_id',
+        'user_id',
+        'vendor_id',
+        'address_id',
+        'total',
+        'status',
+        'note',
+        'name',
+        'phone',
+        'invoice_url',
+        'cancellation_reason',
+        'coupon_id',
+        'discount_amount',
+        'last_reminder_sent',
+        'type',
+        'staff_id',
+        'payment_gateway',
+        'payment_id'
     ];
 
     /**
@@ -34,7 +50,10 @@ class Order extends Model implements Listable
      * @var array
      */
     protected $filterable = [
-        'status', 'user_id', 'vendor_id','type'
+        'status',
+        'user_id',
+        'vendor_id',
+        'type'
     ];
 
     /**
@@ -43,7 +62,8 @@ class Order extends Model implements Listable
      * @var array
      */
     protected $search_attributes = [
-        'name', 'phone',
+        'name',
+        'phone',
     ];
 
     protected $casts = [
@@ -51,7 +71,9 @@ class Order extends Model implements Listable
     ];
 
     protected $appends = [
-        'paid_amount_with_taxes', 'paid_amount', 'remaining_amount',
+        'paid_amount_with_taxes',
+        'paid_amount',
+        'remaining_amount',
     ];
 
     public function getPaidAmountWithTaxesAttribute()
@@ -61,13 +83,20 @@ class Order extends Model implements Listable
 
     public function getPaidAmountAttribute()
     {
-        return number_format(($this->invoice?->amount - $this->invoice?->taxes), decimal_separator: '',
-            thousands_separator: '');
+        return number_format(($this->invoice?->amount - $this->invoice?->taxes),
+            decimal_separator: '',
+            thousands_separator: ''
+        );
     }
 
     public function getRemainingAmountAttribute(): float
     {
         return $this->total - ($this->paid_amount);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function user(): BelongsTo
@@ -122,9 +151,9 @@ class Order extends Model implements Listable
             $request = new Request($filter);
         }
 
-//        if ($request->has('user_id')) {
-//            $query->forUserWithFilteredItems();
-//        }
+        //        if ($request->has('user_id')) {
+        //            $query->forUserWithFilteredItems();
+        //        }
 
         $query->dateRange($request->get('startDate'), $request->get('endDate'));
 
@@ -150,8 +179,16 @@ class Order extends Model implements Listable
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('vendor', 'user', 'address', 'items.product.offer', 'items.product.taxonomies',
-            'items.product.media', 'appointmentOfferDetails', 'staff');
+        $query->with(
+            'vendor',
+            'user',
+            'address',
+            'items.product.offer',
+            'items.product.taxonomies',
+            'items.product.media',
+            'appointmentOfferDetails',
+            'staff'
+        );
 
         return $query;
     }
@@ -163,8 +200,17 @@ class Order extends Model implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('invoice', 'vendor', 'user', 'address', 'items', 'items.product.image', 'items.user',
-            'appointmentOfferDetails', 'staff');
+        $query->with(
+            'invoice',
+            'vendor',
+            'user',
+            'address',
+            'items',
+            'items.product.image',
+            'items.user',
+            'appointmentOfferDetails',
+            'staff'
+        );
 
         return $query;
     }
@@ -212,5 +258,4 @@ class Order extends Model implements Listable
     {
         return $this->belongsTo(AppointmentOfferDetail::class, 'appointment_offer_detail_id', 'id');
     }
-
 }
