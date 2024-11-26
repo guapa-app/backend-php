@@ -67,10 +67,6 @@ class ProductRepository extends EloquentRepository implements ProductRepositoryI
             });
         }
 
-        if (Schema::hasColumn('products', 'country_id')) {
-            $query->where('country_id', $request->country->id);
-        }
-
         if ($request->has('perPage')) {
             return $query->paginate($perPage);
         } else {
