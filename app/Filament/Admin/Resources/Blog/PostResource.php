@@ -38,11 +38,20 @@ class PostResource extends Resource
                 Forms\Components\Select::make('category_id')
                     ->required()
                     ->native(false)
-                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->title}")
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
                 Forms\Components\Select::make('tag_id')
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('title.en')
+                            ->label('Title in English')
+                            ->required(),
+                        Forms\Components\TextInput::make('title.ar')
+                            ->label('Title in Arabic')
+                            ->required(),
+                    ])
                     ->required()
                     ->searchable()
                     ->native(false)
@@ -93,7 +102,7 @@ class PostResource extends Resource
                     ])
                     ->columnSpanFull()
                     ->columns()
-                    ->itemLabel(fn(array $state): ?string => $state['link']),
+                    ->itemLabel(fn (array $state): ?string => $state['link']),
             ]);
     }
 
