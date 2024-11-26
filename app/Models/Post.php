@@ -34,6 +34,7 @@ class Post extends Model implements Listable, HasMedia
         'content',
         'status',
         'youtube_url',
+        'tag_id'
     ];
 
     protected $filterable = [
@@ -41,6 +42,7 @@ class Post extends Model implements Listable, HasMedia
         'admin_id',
         'category_id',
         'status',
+        'tag_id',
     ];
 
     protected $search_attributes = [
@@ -101,6 +103,11 @@ class Post extends Model implements Listable, HasMedia
     public function category(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class, 'category_id')->withDefault();
+    }
+
+    public function tag(): BelongsTo
+    {
+        return $this->belongsTo(Tag::class)->withDefault();
     }
 
     public function socialMedia(): BelongsToMany

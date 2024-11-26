@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Info;
 
 use App\Filament\Admin\Resources\Info\TaxonomyResource\Actions;
 use App\Filament\Admin\Resources\Info\TaxonomyResource\Pages;
+use App\Filament\Admin\Resources\Info\TaxonomyResource\Pages\ManageProducts;
 use App\Models\Taxonomy;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -48,12 +49,14 @@ class TaxonomyResource extends Resource
                     ->reactive()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('fixed_price', null))
                     ->requiredWithout('fixed_price')
-                    ->numeric(),
+                    ->numeric()
+                    ->visible(fn (callable $get) => $get('type') !== 'special'),
                 Forms\Components\Select::make('type')
                     ->options([
                         'category' => 'Products',
                         'specialty' => 'Procedures',
                         'blog_category' => 'Blog',
+                        'special'=> 'Special',
                     ])
                     ->reactive()
                     ->native(false)
@@ -62,7 +65,8 @@ class TaxonomyResource extends Resource
                     ->reactive()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('fees', null))
                     ->requiredWithout('fees')
-                    ->numeric(),
+                    ->numeric()
+                    ->visible(fn (callable $get) => $get('type') !== 'special'),
                 Forms\Components\Select::make('parent_id')
                     ->label('Parent Category')
                     ->native(false)
@@ -77,8 +81,13 @@ class TaxonomyResource extends Resource
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric()
                     ->minValue(1),
-                Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                Forms\Components\SpatieMediaLibraryFileUpload::make('icon')
+                    ->label('Icon')
                     ->collection('taxonomy_icons'),
+
+                Forms\Components\SpatieMediaLibraryFileUpload::make('photo')
+                    ->label('Photo')
+                    ->collection('taxonomy_photos'),
 
                 Forms\Components\Radio::make('is_published')
                     ->boolean()
@@ -108,7 +117,7 @@ class TaxonomyResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('icon')
                     ->label('Icon')
                     ->collection('taxonomy_icons'),
                 Tables\Columns\TextColumn::make('title')
@@ -147,6 +156,12 @@ class TaxonomyResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('manageProducts')
+                    ->label('Manage Products')
+                    ->icon('heroicon-o-cog')
+                    ->url(fn($record) => Self::getUrl('manageProducts', ['record' => $record]))
+                    ->color('primary')
+                    ->visible(fn($record) => $record->type === 'special'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -168,6 +183,7 @@ class TaxonomyResource extends Resource
             'index' => Pages\ListTaxonomies::route('/'),
             'create' => Pages\CreateTaxonomy::route('/create'),
             'edit' => Pages\EditTaxonomy::route('/{record}/edit'),
+            'manageProducts' => ManageProducts::route('/{record}/manage-products'),
         ];
     }
 }

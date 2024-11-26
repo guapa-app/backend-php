@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
+use Spatie\Image\Manipulations;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sluggable\SlugOptions;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
@@ -74,6 +76,42 @@ class Taxonomy extends BaseTaxonomy implements Listable
     {
         return $key;
     }
+    public function registerMediaCollections(): void
+    {
+        // Keep the existing icon collection
+        $this->addMediaCollection(config('taxonomies.icon_collection_name', 'taxonomy_icons'))
+            ->singleFile();
+
+        // Add the new photo collection
+        $this->addMediaCollection(config('taxonomies.photo_collection_name', 'taxonomy_photos'))
+            ->singleFile();
+    }
+    /**
+     * Register media conversions
+     * @return void
+     */
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $conversions = config('taxonomies.icon_conversions', ['thumb' => [120, 120]]);
+        foreach ($conversions as $key => $value) {
+            $this->addMediaConversion($key)
+                ->fit(Manipulations::FIT_CROP, $value[0], $value[1])
+                ->performOnCollections(config('taxonomies.icon_collection_name', 'taxonomy_icons'));
+        }
+
+        $this->addMediaConversion('small')
+            ->fit(Manipulations::FIT_MAX, 300, 500)
+            ->performOnCollections(config('taxonomies.photo_collection_name', 'taxonomy_photos'));
+
+        $this->addMediaConversion('medium')
+            ->fit(Manipulations::FIT_CROP, 600, 1000)
+            ->performOnCollections(config('taxonomies.photo_collection_name', 'taxonomy_photos'));
+
+        $this->addMediaConversion('large')
+            ->fit(Manipulations::FIT_CROP, 900, 1500)
+            ->performOnCollections(config('taxonomies.photo_collection_name', 'taxonomy_photos'));
+    }
+
 
     public function getTitleEnArAttribute(): string
     {
@@ -111,6 +149,12 @@ class Taxonomy extends BaseTaxonomy implements Listable
             ->where('collection_name', config('taxonomies.icon_collection_name'));
     }
 
+    public function photo(): MorphOne
+    {
+        return $this->morphOne('App\Models\Media', 'model')
+            ->where('collection_name', config('taxonomies.photo_collection_name', 'taxonomy_photos'));
+    }
+
     public function attributes(): HasMany
     {
         return $this->hasMany('App\Models\Attribute', 'category_id');
@@ -129,6 +173,11 @@ class Taxonomy extends BaseTaxonomy implements Listable
     public function products()
     {
         return $this->morphedByMany(Product::class, 'taxable');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'category_id');
     }
 
     // =========== Scopes Section ===========
@@ -177,7 +226,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('parent', 'icon');
+        $query->with('parent', 'icon', 'photo');
 
         return $query;
     }
@@ -194,7 +243,7 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('parent', 'icon');
+        $query->with('parent', 'icon', 'photo');
 
         return $query;
     }
