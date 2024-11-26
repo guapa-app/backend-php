@@ -36,6 +36,12 @@ class PostResource extends Resource
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
+                Forms\Components\Select::make('tag_id')
+                    ->required()
+                    ->searchable()
+                    ->native(false)
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->relationship('tag', 'title'),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->columnSpanFull()
