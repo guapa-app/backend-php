@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
-use App\Contracts\Listable;
 use App\Enums\OrderStatus;
-use App\Enums\OrderTypeEnum;
 use App\Enums\ProductType;
+use App\Contracts\Listable;
+use App\Enums\OrderTypeEnum;
+use Illuminate\Http\Request;
+use App\Models\Scopes\CountryScope;
+use Illuminate\Database\Eloquent\Model;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Order extends Model implements Listable
 {
@@ -75,6 +76,11 @@ class Order extends Model implements Listable
         'paid_amount',
         'remaining_amount',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CountryScope());
+    }
 
     public function getPaidAmountWithTaxesAttribute()
     {
