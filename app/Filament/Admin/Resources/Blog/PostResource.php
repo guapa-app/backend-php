@@ -25,6 +25,14 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                            ->collection('posts')
+                            ->multiple()
+                            ->hiddenLabel(),
+                    ])
+                    ->collapsible(),
                 Forms\Components\Select::make('admin_id')
                     ->required()
                     ->native(false)
