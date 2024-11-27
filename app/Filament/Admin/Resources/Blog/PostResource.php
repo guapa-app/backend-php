@@ -36,11 +36,43 @@ class PostResource extends Resource
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
+                Forms\Components\Select::make('tag_id')
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('title.en')
+                            ->label('Title in English')
+                            ->required(),
+                        Forms\Components\TextInput::make('title.ar')
+                            ->label('Title in Arabic')
+                            ->required(),
+                    ])
+                    ->required()
+                    ->searchable()
+                    ->native(false)
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->relationship('tag', 'title'),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->columnSpanFull()
                     ->maxLength(255),
                 Forms\Components\RichEditor::make('content')
+                    ->toolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        'bulletList',
+                        'codeBlock',
+                        'h1',
+                        'h2',
+                        'h3',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'underline',
+                        'undo',
+                    ])
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')

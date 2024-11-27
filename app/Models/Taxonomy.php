@@ -131,6 +131,11 @@ class Taxonomy extends BaseTaxonomy implements Listable
         return $this->morphedByMany(Product::class, 'taxable');
     }
 
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'category_id');
+    }
+
     // =========== Scopes Section ===========
     public function scopeParents(Builder $query): Builder
     {

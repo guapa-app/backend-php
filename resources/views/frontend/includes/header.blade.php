@@ -32,6 +32,12 @@
                     </li>
 
                     <li class="nav-item">
+                        <a href="{{ route('blogs') }}" class="nav-link">
+                            المقالات
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a href="{{ route('about') }}" class="nav-link">
                             عن قوابا
                         </a>
