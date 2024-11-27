@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Info\TagResource\Pages;
+namespace App\Filament\Admin\Resources\Blog\TagResource\Pages;
 
-use App\Filament\Admin\Resources\Info\TagResource;
+use App\Filament\Admin\Resources\Blog\TagResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

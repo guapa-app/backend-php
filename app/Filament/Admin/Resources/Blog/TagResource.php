@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Info;
+namespace App\Filament\Admin\Resources\Blog;
 
-use App\Filament\Admin\Resources\Info\TagResource\Pages;
+use App\Filament\Admin\Resources\Blog\TagResource\Pages;
 use App\Models\Tag;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -19,7 +19,7 @@ class TagResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Info';
+    protected static ?string $navigationGroup = 'Blog';
 
     public static function form(Form $form): Form
     {
@@ -34,6 +34,8 @@ class TagResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
