@@ -22,7 +22,14 @@ class PhoneRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'phone' => 'required|string|numeric',
+            'phone' => 'required|string|numeric|exists:users,phone',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'phone.exists' => __('Sorry, the mobile number you entered is not registered with us. Please register a new account to benefit from our services.'),
         ];
     }
 }
