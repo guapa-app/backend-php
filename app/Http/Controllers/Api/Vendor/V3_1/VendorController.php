@@ -26,6 +26,10 @@ class VendorController extends BaseApiController
     public function create(CreateVendorRequest $request)
     {
         try {
+            $data = array_merge($request->validated(), [
+                'email' => $this->user->email,
+                'phone' => $this->user->phone,
+            ]);
             $vendor = $this->vendorService->create($request->validated());
 
             return VendorProfileResource::make($vendor)
@@ -36,7 +40,7 @@ class VendorController extends BaseApiController
         } catch (Exception $exception) {
             $this->logReq($exception->getMessage());
 
-            return $this->errorJsonRes(__('api.something_went_wrong'));
+            return $this->errorJsonRes([],__('api.something_went_wrong'));
         }
     }
 
