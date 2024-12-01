@@ -23,6 +23,7 @@ class PostResource extends JsonResource
             'admin'       => AdminResource::make($this->whenLoaded('admin')),
             'category'    => TaxonomyResource::make($this->whenLoaded('category')),
             'images'      => MediaResource::collection($this->whenLoaded('media')),
+            'social_media'  => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
         ];
     }
 }
