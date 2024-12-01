@@ -26,11 +26,7 @@ class VendorController extends BaseApiController
     public function create(CreateVendorRequest $request)
     {
         try {
-            $data = array_merge($request->validated(), [
-                'email' => $this->user->email,
-                'phone' => $this->user->phone,
-            ]);
-            $vendor = $this->vendorService->create($data);
+            $vendor = $this->vendorService->create($request->validated());
 
             return VendorProfileResource::make($vendor)
                 ->additional([
