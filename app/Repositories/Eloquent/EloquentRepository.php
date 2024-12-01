@@ -2,14 +2,15 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Contracts\Repositories\EloquentRepositoryInterface;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Contracts\Repositories\EloquentRepositoryInterface;
 
 /**
  * The base class for all eloquent repositories.
@@ -61,6 +62,7 @@ class EloquentRepository implements EloquentRepositoryInterface
             ->when(!$this->isAdmin(), function ($query) use ($request) {
                 $query->withApiListRelations($request);
             });
+
 
         if ($request->has('perPage')) {
             return $query->paginate($perPage);

@@ -2,20 +2,22 @@
 
 namespace App\Filament\Admin\Resources\Shop;
 
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Vendor;
+use App\Helpers\Common;
+use App\Models\Country;
+use App\Models\Product;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use App\Enums\ProductReview;
 use App\Enums\ProductStatus;
-use App\Filament\Admin\Resources\Shop\ProductResource\Actions;
-use App\Filament\Admin\Resources\Shop\ProductResource\Pages;
-use App\Filament\Admin\Resources\Shop\ProductResource\RelationManagers;
-use App\Helpers\Common;
-use App\Models\Product;
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Admin\Resources\Shop\ProductResource\Pages;
+use App\Filament\Admin\Resources\Shop\ProductResource\Actions;
+use App\Filament\Admin\Resources\Shop\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
@@ -41,10 +43,34 @@ class ProductResource extends Resource
                 Forms\Components\Hidden::make('hash_id')
                     ->label('Number')
                     ->default(Common::generateUniqueHashForModel(self::$model, 16)),
-                Forms\Components\TextInput::make('sort_order')
-                    ->numeric(),
                 Forms\Components\Hidden::make('type')
                     ->default(request('type')),
+                Forms\Components\Select::make('country_id')
+                    ->label('Country')
+                    ->required()
+                    ->options(Country::query()->pluck('name', 'id'))
+                    ->searchable()
+                    ->reactive() // Makes the field reactive to changes
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        // Reset the vendor_id field when the country changes
+                        $set('vendor_id', null);
+                    }),
+                Forms\Components\Select::make('vendor_id')
+                    ->label('Vendor')
+                    ->required()
+                    ->options(function ($get) {
+                        $countryId = $get('country_id'); // Get the selected country_id
+                        if ($countryId) {
+                            // Fetch vendors for the selected country
+                            return Vendor::where('country_id', $countryId)
+                                ->pluck('name', 'id');
+                        }
+                        return []; // Return an empty list if no country is selected
+                    })
+                    ->searchable()
+                    ->reactive(), // Refreshes options when dependent state changes
+                Forms\Components\TextInput::make('sort_order')
+                    ->numeric(),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
@@ -52,18 +78,18 @@ class ProductResource extends Resource
                     ->label(__('Categories'))
                     ->relationship(
                         name: 'taxonomies',
-                        modifyQueryUsing: fn (Builder $query, $record) => ($record->type?->value ?? request('type')) == 'service' ?
+                        modifyQueryUsing: fn(Builder $query, $record) => ($record->type?->value ?? request('type')) == 'service' ?
                             $query->where('type', 'specialty') :
                             $query->where('type', 'category')
                     )
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->title}")
                     ->required(),
-                Forms\Components\Select::make('vendor_id')
-                    ->label(__('Vendor'))
-                    ->native(false)
-                    ->relationship(name: 'vendor')
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name}")
-                    ->required(),
+                // Forms\Components\Select::make('vendor_id')
+                //     ->label(__('Vendor'))
+                //     ->native(false)
+                //     ->relationship(name: 'vendor')
+                //     ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->name}")
+                //     ->required(),
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
@@ -102,6 +128,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('country.name')->label('Country'),
                 Tables\Columns\TextColumn::make('vendor.name')
                     ->numeric()
                     ->sortable(),

@@ -25,17 +25,25 @@ class Offer extends Model implements Listable, HasMedia
     use HasFactory, ListableTrait, InteractsWithMedia, Likable;
 
     protected $fillable = [
-        'product_id', 'discount', 'title', 'description',
-        'terms', 'starts_at', 'expires_at',
+        'product_id',
+        'discount',
+        'title',
+        'description',
+        'terms',
+        'starts_at',
+        'expires_at',
     ];
 
     protected $appends = [
-        'discount_string', 'status',
-        'expires_countdown', 'price',
+        'discount_string',
+        'status',
+        'expires_countdown',
+        'price',
     ];
 
     protected $search_attributes = [
-        'title', 'description',
+        'title',
+        'description',
     ];
 
     protected $filterable_attributes = [

@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Contracts\Listable;
+use Illuminate\Http\Request;
+use App\Models\Scopes\CountryScope;
+use Illuminate\Database\Eloquent\Model;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 
 class Address extends Model implements Listable
 {
@@ -23,18 +24,38 @@ class Address extends Model implements Listable
     ];
 
     protected $fillable = [
-        'addressable_id', 'addressable_type', 'title', 'city_id',
-        'postal_code', 'lat', 'lng', 'address_1', 'address_2',
-        'type', 'phone',
+        'country_id',
+        'addressable_id',
+        'addressable_type',
+        'title',
+        'city_id',
+        'postal_code',
+        'lat',
+        'lng',
+        'address_1',
+        'address_2',
+        'type',
+        'phone',
     ];
 
     protected $filterable = [
-        'addressable_id', 'addressable_type', 'city_id', 'type',
+        'country_id',
+        'addressable_id',
+        'addressable_type',
+        'city_id',
+        'type',
     ];
 
     protected $search_attributes = [
-        'title', 'address_1', 'address_2',
+        'title',
+        'address_1',
+        'address_2',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CountryScope());
+    }
 
     public function addressable()
     {

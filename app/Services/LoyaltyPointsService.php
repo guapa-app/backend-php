@@ -196,7 +196,7 @@ class LoyaltyPointsService
         $items = $order->items;
         foreach ($items as $item) {
             $product = $item->product;
-            if ($product->earned_points) {
+            if ($product->earned_points > 0) {
                 $product->loyaltyPointHistories()->create([
                     'user_id' => $order->user_id,
                     'points' => $product->earned_points,

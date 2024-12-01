@@ -2,16 +2,17 @@
 
 namespace App\Filament\Admin\Resources\Blog;
 
+use Filament\Forms;
+use App\Models\Post;
+use Filament\Tables;
+use App\Models\Country;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Admin\Resources\Blog\PostResource\Pages;
 use App\Filament\Admin\Resources\Blog\PostResource\RelationManagers;
-use App\Models\Post;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class PostResource extends Resource
 {
@@ -25,6 +26,11 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('country_id')
+                    ->label('Country')
+                    ->required()
+                    ->options(Country::query()->pluck('name', 'id'))
+                    ->searchable(),
                 Forms\Components\Select::make('admin_id')
                     ->required()
                     ->native(false)
@@ -36,11 +42,43 @@ class PostResource extends Resource
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
+                Forms\Components\Select::make('tag_id')
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('title.en')
+                            ->label('Title in English')
+                            ->required(),
+                        Forms\Components\TextInput::make('title.ar')
+                            ->label('Title in Arabic')
+                            ->required(),
+                    ])
+                    ->required()
+                    ->searchable()
+                    ->native(false)
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->relationship('tag', 'title'),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->columnSpanFull()
                     ->maxLength(255),
                 Forms\Components\RichEditor::make('content')
+                    ->toolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        'bulletList',
+                        'codeBlock',
+                        'h1',
+                        'h2',
+                        'h3',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'underline',
+                        'undo',
+                    ])
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')

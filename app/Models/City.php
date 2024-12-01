@@ -29,6 +29,11 @@ class City extends Model implements Listable
         'name',
     ];
 
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');

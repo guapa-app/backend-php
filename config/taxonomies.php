@@ -6,6 +6,7 @@ return [
 
     // Taxonomy icon collection name for media library
     'icon_collection_name' => 'taxonomy_icons',
+    'photo_collection_name' => 'taxonomy_photos',
 
     // Define conversions for taxonomy icons
     'icon_conversions' => [
