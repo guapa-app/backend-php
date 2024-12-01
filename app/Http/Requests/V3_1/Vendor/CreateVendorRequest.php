@@ -63,8 +63,6 @@ class CreateVendorRequest extends FailedValidationRequest
 
         $rules = [
             'name' => 'required|string|min:5|max:150',
-            'email' => 'sometimes|email|unique:vendors,email',
-            'phone' => 'sometimes|' . $phoneNumbersRule,
             'about' => 'nullable|string|min:10|max:1024',
             'logo' => ['nullable', new ImageOrArray(), 'max:10240'],
             'type' => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
