@@ -30,7 +30,7 @@ class VendorController extends BaseApiController
                 'email' => $this->user->email,
                 'phone' => $this->user->phone,
             ]);
-            $vendor = $this->vendorService->create($request->validated());
+            $vendor = $this->vendorService->create($data);
 
             return VendorProfileResource::make($vendor)
                 ->additional([
