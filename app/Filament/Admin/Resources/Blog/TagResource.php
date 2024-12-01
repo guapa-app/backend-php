@@ -1,39 +1,31 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Info;
+namespace App\Filament\Admin\Resources\Blog;
 
+use App\Filament\Admin\Resources\Blog\TagResource\Pages;
+use App\Models\Tag;
 use Filament\Forms;
-use App\Models\City;
-use Filament\Tables;
-use App\Models\Country;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
 use Filament\Resources\Concerns\Translatable;
-use App\Filament\Admin\Resources\Info\CityResource\Pages;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
-class CityResource extends Resource
+class TagResource extends Resource
 {
     use Translatable;
 
-    protected static ?string $model = City::class;
+    protected static ?string $model = Tag::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe-asia-australia';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Info';
-
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationGroup = 'Blog';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('country_id')
-                    ->label('Country')
-                    ->required()
-                    ->options(Country::query()->pluck('name', 'id'))
-                    ->searchable(),
-                Forms\Components\TextInput::make('name')
+                Forms\Components\TextInput::make('title')
                     ->required(),
             ]);
     }
@@ -44,8 +36,7 @@ class CityResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('country.name')->label('Country'),
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -79,9 +70,9 @@ class CityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCities::route('/'),
-            'create' => Pages\CreateCity::route('/create'),
-            'edit' => Pages\EditCity::route('/{record}/edit'),
+            'index' => Pages\ListTags::route('/'),
+            'create' => Pages\CreateTag::route('/create'),
+            'edit' => Pages\EditTag::route('/{record}/edit'),
         ];
     }
 }

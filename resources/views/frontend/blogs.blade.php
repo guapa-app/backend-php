@@ -143,7 +143,7 @@
                                         </div>
 
                                         <div class="contain">
-                                            <h2 style="height: 100px">{{ $post->title }}</h2>
+                                            <h2>{{ $post->title }}</h2>
 
                                             <ul class="list">
                                                  <li>
