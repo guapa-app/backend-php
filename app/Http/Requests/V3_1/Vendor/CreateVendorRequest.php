@@ -63,8 +63,8 @@ class CreateVendorRequest extends FailedValidationRequest
 
         $rules = [
             'name' => 'required|string|min:5|max:150',
-            'email' => 'required|email|unique:vendors,email',
-            'phone' => 'required|' . $phoneNumbersRule,
+            'email' => 'sometimes|email|unique:vendors,email',
+            'phone' => 'sometimes|' . $phoneNumbersRule,
             'about' => 'nullable|string|min:10|max:1024',
             'logo' => ['nullable', new ImageOrArray(), 'max:10240'],
             'type' => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
@@ -104,5 +104,17 @@ class CreateVendorRequest extends FailedValidationRequest
         ];
 
         return $rules;
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'email' => $this->user()->email,
+            'phone' => $this->user()->phone,
+        ]);
+
     }
 }
