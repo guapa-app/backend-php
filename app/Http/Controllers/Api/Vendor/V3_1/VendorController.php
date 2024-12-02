@@ -36,7 +36,7 @@ class VendorController extends BaseApiController
         } catch (Exception $exception) {
             $this->logReq($exception->getMessage());
 
-            return $this->errorJsonRes(__('api.something_went_wrong'));
+            return $this->errorJsonRes([],__('api.something_went_wrong'));
         }
     }
 
