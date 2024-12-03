@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Contracts\Listable;
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
+use App\Traits\Listable as ListableTrait;
 
-class Country extends Model
+class Country extends Model implements Listable
 {
-    use HasFactory;
+    use ListableTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -31,6 +35,18 @@ class Country extends Model
      */
     protected $casts = [
         'active' => 'boolean',
+    ];
+
+    protected $translatable = [
+        'name',
+    ];
+
+    /**
+     * Attributes to be searched using like operator.
+     * @var array
+     */
+    protected $search_attributes = [
+        'name',
     ];
 
     /**
@@ -71,5 +87,39 @@ class Country extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function scopeApplyFilters(Builder $query, Request $request): Builder
+    {
+        $filter = $request->get('filter');
+        if (is_array($filter)) {
+            $request = new Request($filter);
+        }
+
+        $query->searchLike($request);
+
+        $query->applyDirectFilters($request);
+
+        return $query;
+    }
+
+    public function scopeWithListRelations(Builder $query, Request $request): Builder
+    {
+        return $query;
+    }
+
+    public function scopewithApiListRelations(Builder $query, Request $request): Builder
+    {
+        return $query;
+    }
+
+    public function scopeWithListCounts(Builder $query, Request $request): Builder
+    {
+        return $query;
+    }
+
+    public function scopeWithSingleRelations(Builder $query): Builder
+    {
+        return $query;
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Country;
 use Illuminate\Http\Request;
 use App\Http\Resources\CountryResource;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\Vendor\V3_1\CountryCollection;
 
 class CountryController extends BaseApiController
 {
@@ -15,9 +16,9 @@ class CountryController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $countries = Country::all();
+        $countries = Country::get();
 
-        return CountryResource::collection($countries)
+        return CountryCollection::make($countries)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),
