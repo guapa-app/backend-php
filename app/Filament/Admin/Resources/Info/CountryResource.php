@@ -41,6 +41,12 @@ class CountryResource extends Resource
                     ->label('Phone Code')
                     ->required()
                     ->maxLength(5),
+                Forms\Components\TextInput::make('phone_length')
+                    ->label('Phone Length')
+                    ->numeric()
+                    ->required()
+                    ->maxValue(16)
+                    ->minValue(8),
                 Forms\Components\TextInput::make('tax_percentage')
                     ->label('Tax Percentage')
                     ->numeric()

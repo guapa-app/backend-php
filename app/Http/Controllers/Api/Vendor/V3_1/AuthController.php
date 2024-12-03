@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Contracts\Repositories\UserRepositoryInterface;
-use App\Exceptions\ApiException;
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Requests\PhoneRequest;
-use App\Http\Requests\V3_1\Vendor\RegisterRequest;
-use App\Http\Requests\VerifyPhoneRequest;
-use App\Http\Resources\Vendor\V3_1\LoginResource;
-use App\Http\Resources\Vendor\V3_1\VendorProfileResource;
-use App\Services\AuthService;
+use App\Helpers\Common;
 use App\Services\SMSService;
-use App\Services\V3\UserService;
-use App\Services\V3_1\VendorService;
-use GuzzleHttp\Exception\ClientException;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Services\AuthService;
+use App\Exceptions\ApiException;
+use App\Services\V3\UserService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\PhoneRequest;
+use App\Services\V3_1\VendorService;
+use Illuminate\Auth\Events\Registered;
+use App\Http\Requests\VerifyPhoneRequest;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Validation\ValidationException;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\Vendor\V3_1\LoginResource;
+use App\Http\Requests\V3_1\Vendor\RegisterRequest;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Http\Resources\Vendor\V3_1\VendorProfileResource;
 
 class AuthController extends BaseApiController
 {
@@ -253,6 +254,8 @@ class AuthController extends BaseApiController
         $data = $this->validate($request, [
             'phone' => 'required|string|max:40',
         ]);
+
+        $data['phone'] = Common::removePlusFromPhoneNumber($data['phone']);
 
         $user = $this->userRepository->getByPhone($data['phone']);
         if ($user == null) {

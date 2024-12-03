@@ -18,6 +18,7 @@ class Country extends Model
         'name',
         'currency_code',
         'phone_code',
+        'phone_length',
         'tax_percentage',
         'active',
         'icon',
