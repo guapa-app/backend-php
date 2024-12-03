@@ -15,6 +15,9 @@ class ReviewResource extends JsonResource
             'stars'         => $this->stars,
 
             'user'          => UserResource::make($this->whenLoaded('user')),
+            'order'         => OrderResource::make($this->whenLoaded('order')),
+            'image_before'  => MediaResource::make($this->whenLoaded('imageBefore')),
+            'image_after'   => MediaResource::make($this->whenLoaded('imageAfter')),
 
             'created_at'    => Carbon::parse($this->created_at)->diffForHumans(),
             'updated_at'    => Carbon::parse($this->updated_at)->diffForHumans(),
