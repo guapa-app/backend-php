@@ -30,8 +30,7 @@ class GetReviewsRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'reviewable_type'   => 'required|string|in:' . implode(',', Review::TYPES),
-            'reviewable_id'     => 'required|integer',
+            'order_id'          => 'nullable|integer|exists:orders,id',
             'page'              => 'sometimes|integer|min:1',
             'per_page'          => 'sometimes|integer|min:5|max:30',
         ];

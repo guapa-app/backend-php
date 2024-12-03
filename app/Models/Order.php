@@ -145,6 +145,11 @@ class Order extends Model implements Listable
         return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function scopeCurrentVendor($query, $value): void
     {
         $query->where('vendor_id', $value);
