@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::table('reviews', function (Blueprint $table) {
             $table->foreignId('order_id')->after('id')->constrained()->cascadeOnDelete();
-//            $table->boolean('show')->default(false)->after('stars');
+            $table->boolean('show')->default(false)->after('stars');
             // change stars to decimal
-//            $table->decimal('stars', 2, 1)->change();
+            $table->decimal('stars', 2, 1)->change();
 
             // Drop morphs if exists
             if (Schema::hasColumn('reviews', 'reviewable_id') && Schema::hasColumn('reviews', 'reviewable_type')) {
