@@ -58,8 +58,7 @@ class ReviewService
         $review->load('order','order.items', 'user', 'imageBefore', 'imageAfter');
 
         // send notification to the vendor
-//        $order->vendor->notify(new ReviewNotification($order));
-        Notification::send($order->vendor, new ReviewNotification($order));
+//        Notification::send($order->vendor, new ReviewNotification($order));
 
         return $review;
     }

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reviews', function (Blueprint $table) {
-//            $table->foreignId('order_id')->after('id')->constrained()->cascadeOnDelete();
+            $table->foreignId('order_id')->after('id')->constrained()->cascadeOnDelete();
             $table->boolean('show')->default(false)->after('stars');
             // change stars to decimal
             $table->decimal('stars', 2, 1)->change();
