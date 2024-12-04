@@ -30,7 +30,7 @@ class TransactionService
     public function createTransaction(int $userId, float $amount, TransactionType $transactionType, TransactionOperation $transactionOperation = TransactionOperation::DEPOSIT): Transaction
     {
         try {
-            DB::beginTransaction();
+//            DB::beginTransaction();
 
             // Generate a unique transaction number
             $transactionNumber = $this->generateTransactionNumber();
@@ -49,11 +49,11 @@ class TransactionService
             // $transaction->invoice_link = $invoiceLink;
             // $transaction->save();
 
-            DB::commit();
+//            DB::commit();
 
             return $transaction;
         } catch (\Exception $e) {
-            DB::rollBack();
+//            DB::rollBack();
             Log::error('Transaction creation failed: ' . $e->getMessage());
             throw $e;
         }
