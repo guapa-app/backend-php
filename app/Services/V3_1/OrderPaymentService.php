@@ -38,7 +38,7 @@ class OrderPaymentService
                 $loyaltyPointsService = app(LoyaltyPointsService::class);
                 $loyaltyPointsService->addPurchasePoints($order);
 
-//                $this->sendOrderNotifications($order);
+                $this->sendOrderNotifications($order);
             }
 
         } catch (\Exception $e) {
