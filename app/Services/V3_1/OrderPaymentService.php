@@ -20,9 +20,8 @@ class OrderPaymentService
 {
     public function changeOrderStatus(array $data): void
     {
-        try {
-            DB::beginTransaction();
-
+        try
+        {
             $order = Order::findOrFail($data['id']);
 
             if ($data['status'] == 'paid') {
@@ -30,8 +29,6 @@ class OrderPaymentService
             } else {
                 $order->update(['status' => $data['status']]);
             }
-
-            DB::commit();
 
             if ($data['status'] == 'paid') {
 
@@ -42,7 +39,6 @@ class OrderPaymentService
             }
 
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Order status change failed: ' . $e->getMessage(), [
                 'order_id' => $data['id'],
                 'status' => $data['status']
