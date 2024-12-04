@@ -35,7 +35,7 @@ class OrderPaymentService
                 $loyaltyPointsService = app(LoyaltyPointsService::class);
                 $loyaltyPointsService->addPurchasePoints($order);
 
-                $this->sendOrderNotifications($order);
+
             }
 
         } catch (\Exception $e) {
@@ -123,6 +123,7 @@ class OrderPaymentService
                     $data['payment_id'] = $transaction->transaction_number;
                     $this->changeOrderStatus($data);
                     DB::commit();
+                    $this->sendOrderNotifications($order);
                 } catch (\Exception $e) {
                     DB::rollBack();
                     Log::error('Transaction failed: ' . $e->getMessage());
