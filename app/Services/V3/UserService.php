@@ -64,11 +64,12 @@ class UserService extends BaseUserService
             ];
         }
 
-        if (!in_array($data['gender'], UserProfile::GENDER)) {
-            $data['gender'] = null;
-        }
-
         if (isset($data['gender'])) {
+
+            if (!in_array($data['gender'], UserProfile::GENDER)) {
+                $data['gender'] = null;
+            }
+            
             $result['profile']['gender'] = $data['gender'];
         }
 
