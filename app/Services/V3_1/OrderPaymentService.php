@@ -112,29 +112,29 @@ class OrderPaymentService
     public function payViaWallet(User $user, array $data): void
     {
         $order = Order::findOrFail($data['id']);
-        if ($order->status->value != 'Accepted') {
-            $wallet = $user->myWallet();
-            $orderPrice = $order->paid_amount_with_taxes;
-            if ($wallet->balance >= $orderPrice) {
-                try {
-                    DB::beginTransaction();
-                    $walletService = app(WalletService::class);
-                    $transaction = $walletService->debit($user, $orderPrice);
-                    $data['payment_id'] = $transaction->transaction_number;
-                    $this->changeOrderStatus($data);
-                    DB::commit();
-                    $this->sendOrderNotifications($order);
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    Log::error('Transaction failed: ' . $e->getMessage());
-                    throw $e;
-                }
-            }else{
-                throw ValidationException::withMessages([
-                    'message' => __('There is no sufficient balance'),
-                ]);
-            }
-        }
+        $this->sendOrderNotifications($order);
+//        if ($order->status->value != 'Accepted') {
+//            $wallet = $user->myWallet();
+//            $orderPrice = $order->paid_amount_with_taxes;
+//            if ($wallet->balance >= $orderPrice) {
+//                try {
+//                    DB::beginTransaction();
+//                    $walletService = app(WalletService::class);
+//                    $transaction = $walletService->debit($user, $orderPrice);
+//                    $data['payment_id'] = $transaction->transaction_number;
+//                    $this->changeOrderStatus($data);
+//                    DB::commit();
+//                } catch (\Exception $e) {
+//                    DB::rollBack();
+//                    Log::error('Transaction failed: ' . $e->getMessage());
+//                    throw $e;
+//                }
+//            }else{
+//                throw ValidationException::withMessages([
+//                    'message' => __('There is no sufficient balance'),
+//                ]);
+//            }
+//        }
     }
 
 }
