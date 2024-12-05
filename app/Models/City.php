@@ -15,6 +15,7 @@ class City extends Model implements Listable
     use ListableTrait, HasTranslations;
 
     protected $fillable = [
+        'country_id',
         'name',
     ];
 
