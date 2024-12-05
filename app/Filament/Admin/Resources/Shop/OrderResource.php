@@ -4,6 +4,8 @@ namespace App\Filament\Admin\Resources\Shop;
 
 use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
 use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
+use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersStatusChart;
+use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
