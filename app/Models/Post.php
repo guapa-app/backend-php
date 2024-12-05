@@ -28,6 +28,7 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     protected $fillable = [
+        'country_id',
         'admin_id',
         'category_id',
         'title',
