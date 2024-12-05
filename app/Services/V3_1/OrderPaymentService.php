@@ -92,7 +92,7 @@ class OrderPaymentService
 //                ->notify(new OrderNotification($order));
 
             // Send email to vendor staff
-            Notification::send($order->vendor, new OrderNotification($order));
+//            Notification::send($order->vendor, new OrderNotification($order));
 
             // Send email to customer
             $order->user->notify(new OrderNotification($order));
@@ -112,6 +112,7 @@ class OrderPaymentService
     public function payViaWallet(User $user, array $data): void
     {
         $order = Order::findOrFail($data['id']);
+        gc_collect_cycles();
         $this->sendOrderNotifications($order);
 //        if ($order->status->value != 'Accepted') {
 //            $wallet = $user->myWallet();
