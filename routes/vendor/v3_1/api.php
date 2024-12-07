@@ -12,7 +12,7 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::get('countries', [CountryController::class, 'index']);
 });
 
-Route::prefix("vendor/v3.1")->middleware('api-vendor')->group(function () {
+Route::prefix("vendor/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
 
     Route::prefix('auth')->group(base_path('routes/vendor/v3_1/api/auth.php'));

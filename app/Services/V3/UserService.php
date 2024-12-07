@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Exceptions\ApiException;
 use App\Exceptions\PhoneNotVerifiedException;
 use Illuminate\Validation\ValidationException;
+use App\Models\UserProfile;
 use App\Services\UserService as BaseUserService;
 
 class UserService extends BaseUserService
@@ -66,6 +67,11 @@ class UserService extends BaseUserService
         }
 
         if (isset($data['gender'])) {
+
+            if (!in_array($data['gender'], UserProfile::GENDER)) {
+                $data['gender'] = null;
+            }
+
             $result['profile']['gender'] = $data['gender'];
         }
 
