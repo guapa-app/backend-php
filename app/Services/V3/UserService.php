@@ -92,13 +92,14 @@ class UserService extends BaseUserService
                 $country = Country::whereRaw('? LIKE CONCAT(phone_code, "%")', ['+' . $result['phone']])->first();
 
                 // Default country_id if no match is found
-
                 if (!$country) {
                     throw ValidationException::withMessages([
                         'phone' => ['The phone number does not match any country code.'],
                     ]);
                 }
                 $result['country_id'] = $country->id;
+            } elseif (isset($data['country_id'])) {
+                $result['country_id'] = $data['country_id'];
             }
 
             $normalizedPhone = preg_replace('/\D/', '', $result['phone']);
