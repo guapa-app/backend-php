@@ -47,7 +47,7 @@ class TaxonomyResource extends Resource
                 Forms\Components\TextInput::make('description'),
                 Forms\Components\TextInput::make('fees')
                     ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('fixed_price', null))
+                    ->afterStateUpdated(fn($state, callable $set) => $set('fixed_price', null))
                     ->requiredWithout('fixed_price')
                     ->numeric()
                     ->visible(fn (callable $get) => $get('type') !== 'special'),
@@ -63,14 +63,14 @@ class TaxonomyResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('fixed_price')
                     ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('fees', null))
+                    ->afterStateUpdated(fn($state, callable $set) => $set('fees', null))
                     ->requiredWithout('fees')
                     ->numeric()
                     ->visible(fn (callable $get) => $get('type') !== 'special'),
                 Forms\Components\Select::make('parent_id')
                     ->label('Parent Category')
                     ->native(false)
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title_en_ar}")
+                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->title_en_ar}")
                     ->relationship('parent', 'title', function (Builder $query, callable $get) {
                         return $query->where('type', $get('type'));
                     })
@@ -103,11 +103,60 @@ class TaxonomyResource extends Resource
                             ->relationship('appointmentForm', 'type')
                             ->native(false)
                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->type->value} - {$record->key}")
+                            ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->type->value} - {$record->key}")
                             ->required(),
                     ])
                     ->columnSpanFull()
                     ->columns(),
+
+                Forms\Components\Repeater::make('categoryFees')
+                    ->label('Category Fees by Country')
+                    ->relationship('categoryFees')
+                    ->schema([
+                        Forms\Components\Select::make('country_id')
+                            ->label('Country')
+                            ->relationship('country', 'name')
+                            ->searchable()
+                            ->required()
+                            ->options(function ($livewire) {
+                                // Get the current record (category) being edited
+                                $record = $livewire->record;
+
+                                // If no record is loaded return all countries
+                                if (!$record) {
+                                    return \App\Models\Country::pluck('name', 'id');
+                                }
+
+                                // Get already-selected country IDs for the current category
+                                $selectedCountryIds = $record->categoryFees()->pluck('country_id')->toArray();
+
+                                // Exclude those countries from the dropdown
+                                return \App\Models\Country::whereNotIn('id', $selectedCountryIds)->pluck('name', 'id');
+                            }),
+
+                        Forms\Components\Select::make('fee_option')
+                            ->label('Fee Type')
+                            ->options([
+                                'percentage' => 'Percentage',
+                                'fixed' => 'Fixed',
+                            ])
+                            ->default('percentage')
+                            ->required(),
+
+                        Forms\Components\TextInput::make('fee_percentage')
+                            ->label('Fee Percentage')
+                            ->numeric()
+                            ->step(0.01)
+                            ->nullable(),
+
+                        Forms\Components\TextInput::make('fee_fixed')
+                            ->label('Fixed Fee')
+                            ->numeric()
+                            ->step(0.01)
+                            ->nullable(),
+                    ])
+                    ->columns(4)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -125,11 +174,17 @@ class TaxonomyResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable(),
+                // Tables\Columns\TextColumn::make('fees')
+                //     ->numeric()
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('fixed_price')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('fees')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('fixed_price')
-                    ->searchable(),
+                    ->label('Fees')
+                    ->getStateUsing(function ($record) {
+                        return $record->categoryFees->count() . ' fees defined';
+                    })
+                    ->color('success'),
                 Tables\Columns\TextColumn::make('type')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('products_counter')

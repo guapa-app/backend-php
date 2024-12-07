@@ -22,7 +22,22 @@ class PhoneRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'phone' => 'required|string|numeric',
+            'phone' => [
+                'required',
+                'string',
+                'numeric',
+                function ($attribute, $value, $fail) {
+                    $normalizedPhone = ltrim($value, '+'); // remove + is exist
+                    $exists = \App\Models\User::where('phone', $value)
+                        ->orWhere('phone', "+$normalizedPhone") // search with +
+                        ->orWhere('phone', $normalizedPhone) // search without +
+                        ->exists();
+
+                    if (!$exists) {
+                        $fail(__('Sorry, the mobile number you entered is not registered with us. Please register a new account to benefit from our services.'));
+                    }
+                },
+            ],
         ];
     }
 }

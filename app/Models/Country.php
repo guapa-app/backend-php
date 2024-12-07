@@ -89,6 +89,14 @@ class Country extends Model implements Listable
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * Define a relationship with the CategoryFee model.
+     */
+    public function categoryFees()
+    {
+        return $this->hasMany(CategoryFee::class);
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');

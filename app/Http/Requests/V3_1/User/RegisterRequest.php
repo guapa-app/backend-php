@@ -47,7 +47,7 @@ class RegisterRequest extends FailedValidationRequest
             'name' => 'required|string|min:3|max:64',
             'email' => 'sometimes|required|email|unique:users,email',
             'phone' => 'required|unique:users,phone|'.(Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
-            'gender' => 'nullable|string|in:'.implode(',', UserProfile::GENDER),
+            'gender' => 'nullable|string',
             'referral_code' => 'nullable|exists:user_profiles,referral_code',
             'country_id' => 'nullable|exists:countries,id',
         ];

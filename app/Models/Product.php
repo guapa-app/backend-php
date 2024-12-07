@@ -481,13 +481,44 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function calculateProductFees($finalPrice)
     {
         $productCategory = $this->taxonomies()->first();
+        $categoryCountryFees = $this->getCategoryCountryFees($productCategory->id, $finalPrice);
 
-        if ($productCategory?->fees) {
-            $productFees = $productCategory->fees;
+        if($categoryCountryFees !== false){
+            return $categoryCountryFees;
+        }else{
+            if ($productCategory?->fees) {
+                $productFees = $productCategory->fees;
 
+                return ($productFees / 100) * $finalPrice;
+            } else {
+                return $productCategory?->fixed_price ?? 0;
+            }
+        }
+    }
+
+    public function getCategoryCountryFees($categoryId, $finalPrice)
+    {
+        $request = request();
+
+        $country = $request->get('country'); // Get country from middleware CountryHeader
+
+        if (!$country) {
+            return false;
+        }
+
+        $fees = CategoryFee::where('category_id', $categoryId)
+            ->where('country_id', $country->id)
+            ->first();
+
+        if (!$fees) {
+            return false;
+        }
+
+        if ($fees?->fee_percentage) {
+            $productFees = $fees->fee_percentage;
             return ($productFees / 100) * $finalPrice;
         } else {
-            return $productCategory?->fixed_price ?? 0;
+            return $fees?->fee_fixed ?? 0;
         }
     }
 

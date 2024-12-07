@@ -22,10 +22,18 @@ class Taxonomy extends BaseTaxonomy implements Listable
     use ListableTrait, HasRecursiveRelationships, HasFactory;
 
     protected $fillable = [
-        'title', 'slug', 'fees',
-        'fixed_price', 'description', 'font_icon',
-        'type', 'is_appointment', 'appointment_price',
-        'parent_id', 'sort_order', 'is_published',
+        'title',
+        'slug',
+        'fees',
+        'fixed_price',
+        'description',
+        'font_icon',
+        'type',
+        'is_appointment',
+        'appointment_price',
+        'parent_id',
+        'sort_order',
+        'is_published',
     ];
 
     /**
@@ -35,7 +43,8 @@ class Taxonomy extends BaseTaxonomy implements Listable
      * @var array
      */
     protected $filterable_attributes = [
-        'type', 'parent_id',
+        'type',
+        'parent_id',
     ];
 
     /**
@@ -54,11 +63,14 @@ class Taxonomy extends BaseTaxonomy implements Listable
      * @var array
      */
     protected $search_attributes = [
-        'slug', 'title', 'description',
+        'slug',
+        'title',
+        'description',
     ];
 
     protected $appends = [
-        'title_en_ar', 'products_counter',
+        'title_en_ar',
+        'products_counter',
     ];
 
     // =========== Attributes Section ===========
@@ -175,6 +187,11 @@ class Taxonomy extends BaseTaxonomy implements Listable
         return $this->morphedByMany(Product::class, 'taxable');
     }
 
+    public function categoryFees()
+    {
+        return $this->hasMany(CategoryFee::class, 'category_id');
+    }
+    
     public function posts()
     {
         return $this->hasMany(Post::class, 'category_id');

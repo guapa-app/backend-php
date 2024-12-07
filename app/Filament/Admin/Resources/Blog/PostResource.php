@@ -31,6 +31,14 @@ class PostResource extends Resource
                     ->required()
                     ->options(Country::query()->pluck('name', 'id'))
                     ->searchable(),
+                Forms\Components\Section::make('Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                            ->collection('posts')
+                            ->multiple()
+                            ->hiddenLabel(),
+                    ])
+                    ->collapsible(),
                 Forms\Components\Select::make('admin_id')
                     ->required()
                     ->native(false)
