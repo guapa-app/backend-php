@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\UserVendor;
 
 use App\Filament\Admin\Resources\UserVendor\UserResource\Actions;
 use App\Filament\Admin\Resources\UserVendor\UserResource\Pages;
+use App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -92,7 +93,8 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
+            RelationManagers\OrdersRelationManager::class,
         ];
     }
 
