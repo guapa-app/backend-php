@@ -14,8 +14,8 @@ class AddressResource extends JsonResource
             'city_id' => (int) $this->city_id,
             'city' => CityResource::make($this->whenLoaded('city')),
             'address_1'            => (string) $this->address_1,
-            'lat'                  => (float) $this->lat,
-            'lng'                  => (float) $this->lng,
+            'lat'                  => (float) $this->lat ?: null,
+            'lng'                  => (float) $this->lng ?: null,
         ];
     }
 }
