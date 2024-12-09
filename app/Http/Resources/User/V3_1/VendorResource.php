@@ -21,6 +21,7 @@ class VendorResource extends JsonResource
             'status' => $this->resource::STATUSES[$this->status],
             'type' => $this->resource::TYPES[$this->type],
             'specialties' => TaxonomyResource::collection($this->whenLoaded('specialties')),
+            'address' => $this->country?->name,
             'addresses' => AddressResource::collection($this->whenLoaded('addresses')),
             'logo' => MediaResource::make($this->whenLoaded('logo')),
         ];
