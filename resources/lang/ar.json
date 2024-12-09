@@ -823,5 +823,6 @@
     "Points conversion":"تحويل نقاط",
     "System Addition":"إضافة من النظام",
     "System Deduction":"خصم من النظام",
-    "There is no sufficient balance": "لا يوجد رصيد كافي."
+    "There is no sufficient balance": "لا يوجد رصيد كافي.",
+    "Sorry, the mobile number you entered is not registered with us. Please register a new account to benefit from our services.": "عذرًا، رقم الجوال الذي أدخلته غير مسجل لدينا. يرجى تسجيل حساب جديد للاستفادة من خدماتنا."
 }

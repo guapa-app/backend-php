@@ -4,12 +4,17 @@ namespace App\Filament\Admin\Resources\UserVendor;
 
 use App\Filament\Admin\Resources\UserVendor\UserResource\Actions;
 use App\Filament\Admin\Resources\UserVendor\UserResource\Pages;
+use App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
+use App\Filament\Admin\Resources\UserVendor\UserResource\Widgets\UserOrderStats;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists\Components;
+
 
 class UserResource extends Resource
 {
@@ -50,6 +55,17 @@ class UserResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                 Components\TextEntry::make('name'),
+                 Components\TextEntry::make('email'),
+                 Components\TextEntry::make('phone'),
+                 Components\TextEntry::make('status'),
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -75,6 +91,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
                 Actions\ManageUserPointAction::make('manage-points'),
             ])
             ->bulkActions([
@@ -92,7 +109,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\OrdersRelationManager::class,
         ];
     }
 
@@ -102,6 +119,7 @@ class UserResource extends Resource
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view' => Pages\ViewUser::route('/{record}'),
         ];
     }
 }
