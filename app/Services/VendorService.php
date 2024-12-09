@@ -207,6 +207,7 @@ class VendorService
      */
     public function createAddress(Vendor $vendor, array $data): Vendor
     {
+        $data['country_id'] = auth()->user()->country_id;
         $address = $vendor->addresses()->create($data);
 
         return $vendor;
