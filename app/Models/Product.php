@@ -133,11 +133,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getAddressAttribute()
     {
-        $countryName = request()->header('Accept-Language') == 'en' ? 'KSA' : 'السعودية';
+        $countryName = $this->vendor?->address?->city?->country?->name;
 
         $city = $this->vendor?->address?->city?->name;
 
-        return $city ? "$city - $countryName" : $countryName;
+        return $city ? "$city - $countryName" : $this->country?->name;
     }
 
     public function getSharedLinkAttribute()
