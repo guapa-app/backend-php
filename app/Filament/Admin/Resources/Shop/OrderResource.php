@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\Shop;
 
+use App\Enums\OrderStatus;
+use App\Filament\Admin\Resources\Shop\OrderResource\Actions\SendWhatsAppReminderAction;
 use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
 use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
 use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersStatusChart;
@@ -78,6 +80,8 @@ class OrderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                SendWhatsAppReminderAction::make()
+                    ->visible(fn (Order $record) => $record->status == OrderStatus::Pending),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([]),

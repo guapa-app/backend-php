@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
 
+use App\Enums\OrderStatus;
+use App\Filament\Admin\Resources\Shop\OrderResource\Actions\SendWhatsAppReminderAction;
+use App\Models\Order;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -28,7 +31,6 @@ class OrdersRelationManager extends RelationManager
                 Components\TextEntry::make('discount_amount'),
             ]);
     }
-
     public function table(Table $table): Table
     {
         return $table
@@ -62,6 +64,8 @@ class OrdersRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                SendWhatsAppReminderAction::make()
+                    ->visible(fn (Order $record) => $record->status == OrderStatus::Pending),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
