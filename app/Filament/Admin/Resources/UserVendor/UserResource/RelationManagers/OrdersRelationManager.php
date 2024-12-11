@@ -1,30 +1,22 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Shop;
+namespace App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
 
-use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
-use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
-use App\Models\Order;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class OrderResource extends Resource
+class OrdersRelationManager extends RelationManager
 {
-    protected static ?string $model = Order::class;
+    protected static string $relationship = 'orders';
 
-    protected static ?string $navigationIcon = 'heroicon-o-currency-pound';
-
-    protected static ?string $navigationGroup = 'Shop';
-
-    public static function infolist(Infolist $infolist): Infolist
+    public function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
                 Components\TextEntry::make('id'),
-                Components\TextEntry::make('vendor.name'),
                 Components\TextEntry::make('address.title'),
                 Components\TextEntry::make('name'),
                 Components\TextEntry::make('phone'),
@@ -32,12 +24,12 @@ class OrderResource extends Resource
                 Components\TextEntry::make('status'),
                 Components\TextEntry::make('note'),
                 Components\TextEntry::make('cancellation_reason'),
-                Components\TextEntry::make('coupon.code'),
+                Components\TextEntry::make('coupon_id'),
                 Components\TextEntry::make('discount_amount'),
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -45,9 +37,6 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hash_id')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('vendor.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
@@ -78,20 +67,5 @@ class OrderResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            RelationManagers\OrderItemsRelationManager::class,
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListOrders::route('/'),
-            'view' => Pages\ViewOrder::route('/{record}'),
-        ];
     }
 }

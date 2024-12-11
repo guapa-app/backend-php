@@ -2,11 +2,12 @@
 
 namespace App\Services\V3;
 
+use App\Models\User;
+use App\Models\UserProfile;
+use Illuminate\Http\Request;
 use App\Exceptions\ApiException;
 use App\Exceptions\PhoneNotVerifiedException;
-use App\Models\User;
 use App\Services\UserService as BaseUserService;
-use Illuminate\Http\Request;
 
 class UserService extends BaseUserService
 {
@@ -64,6 +65,11 @@ class UserService extends BaseUserService
         }
 
         if (isset($data['gender'])) {
+
+            if (!in_array($data['gender'], UserProfile::GENDER)) {
+                $data['gender'] = null;
+            }
+            
             $result['profile']['gender'] = $data['gender'];
         }
 

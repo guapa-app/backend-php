@@ -175,12 +175,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getPaymentDetailsAttribute()
     {
-        $finalPrice = (float) $this->offer_price; // Use the getOfferPriceAttribute method
-        $fees = (float) $this->calculateProductFees($finalPrice);
-        $taxPercentage = (float) Setting::getTaxes(); // Example tax percentage
-        $taxes = ($taxPercentage / 100) * $fees;
-        $remaining = $finalPrice - $fees;
-        $feesWithTaxes = $fees + $taxes;
+        $finalPrice = round((float) $this->offer_price, 2); // Use the getOfferPriceAttribute method
+        $fees = round((float) $this->calculateProductFees($finalPrice), 2);
+        $taxPercentage = (float) Setting::getTaxes(); // tax percentage
+        $taxes = round(($taxPercentage / 100) * $fees, 2);
+        $remaining = round($finalPrice - $fees, 2);
+        $feesWithTaxes = round($fees + $taxes, 2);
 
         return [
             'fees' => $fees,
@@ -188,8 +188,8 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             'remaining' => $remaining,
             'fees_with_taxes' => $feesWithTaxes,
             'tax_percentage' => $taxPercentage,
-            'price_after_discount' => $this->offer ? $this->offer_price : (float) $this->price,
-            'discount_percentage' => (float) $this->offer?->discount ?? 0.0,
+            'price_after_discount' => $this->offer ? round($this->offer_price, 2) : round((float) $this->price, 2),
+            'discount_percentage' => round((float) $this->offer?->discount ?? 0.0, 2),
         ];
     }
 
@@ -461,7 +461,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      * @return int
      */
     function calcProductPoints() {
-        if($this->earned_points) return $this->earned_points;
+        if($this->earned_points > 0) return $this->earned_points;
         $conversionRate = Setting::purchasePointsConversionRate();
         $paidAmount = $this->payment_details['fees_with_taxes'];
         $points = (int) ($paidAmount * $conversionRate);
