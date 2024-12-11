@@ -149,7 +149,7 @@ class Post extends Model implements Listable, HasMedia
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('admin', 'media', 'category');
-        if ($request->has('type') && $request->get('type') === 'blog') {
+        if ($request->has('type') && $request->get('type') !== 'blog') {
             $query->with('user','product');
         }
         return $query;
