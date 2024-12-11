@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\Repositories\PostRepositoryInterface;
+use App\Models\Post;
 use App\Models\Tag;
 use App\Models\Taxonomy;
 use App\Services\PostService;
@@ -24,6 +25,8 @@ class PostController extends Controller
         $request->merge([
             'perPage' => 12,
             'order' => 'desc',
+            'type' => 'blog',
+            'status' => '1',
         ]);
 
         $posts = $this->postRepository

@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources\Shop\OrderResource\Pages;
 
 use App\Enums\OrderStatus;
 use App\Filament\Admin\Resources\Shop\OrderResource;
-use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersChart;
 use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersStatusChart;
 use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrderStats;
 use Filament\Actions;

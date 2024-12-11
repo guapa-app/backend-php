@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
-use App\Traits\Likable;
 use App\Contracts\Listable;
+use App\Traits\Likable;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
-use App\Models\Scopes\CountryScope;
-use Illuminate\Database\Eloquent\Model;
-use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Post extends Model implements Listable, HasMedia
@@ -28,42 +27,22 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     protected $fillable = [
-        'country_id',
-        'admin_id',
-        'category_id',
-        'title',
-        'content',
-        'status',
-        'youtube_url',
-        'tag_id'
+        'country_id', 'admin_id', 'category_id',
+        'title', 'content', 'status', 'youtube_url', 'tag_id',
+        'type','product_id','stars','user_id','show_user','service_date'
     ];
 
     protected $filterable = [
-        'country_id',
-        'admin_id',
-        'category_id',
-        'status',
-        'tag_id',
-        'admin_id', 'title',
-        'content', 'status', 'youtube_url',
-        'tag_id',
+        'admin_id', 'category_id', 'status', 'tag_id','type','product_id','stars','user_id'
     ];
 
-
     protected $search_attributes = [
-        'title',
-        'content',
+        'title', 'content',
     ];
 
     protected $appends = [
-        'likes_count',
-        'is_liked',
+        'likes_count', 'is_liked',
     ];
-
-    protected static function booted()
-    {
-        static::addGlobalScope(new CountryScope());
-    }
 
     /**
      * Register media collections.
@@ -84,25 +63,25 @@ class Post extends Model implements Listable, HasMedia
     {
         $this->addMediaConversion('small')
             ->fit(Manipulations::FIT_CROP, 200, 200)
-            ->performOnCollections('posts');
+            ->performOnCollections('posts', 'before', 'after');
 
         $this->addMediaConversion('medium')
             ->fit(Manipulations::FIT_CROP, 300, 300)
-            ->performOnCollections('posts');
+            ->performOnCollections('posts', 'before', 'after');
 
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 600, 600)
-            ->performOnCollections('posts');
-    }
-
-    public function country()
-    {
-        return $this->belongsTo(Country::class);
+            ->performOnCollections('posts', 'before', 'after');
     }
 
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class)->withDefault();
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class)->withDefault();
     }
 
     public function category(): BelongsTo
@@ -113,6 +92,11 @@ class Post extends Model implements Listable, HasMedia
     public function tag(): BelongsTo
     {
         return $this->belongsTo(Tag::class)->withDefault();
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id')->withDefault();
     }
 
     public function socialMedia(): BelongsToMany
@@ -145,6 +129,13 @@ class Post extends Model implements Listable, HasMedia
 
         $query->applyDirectFilters($request);
 
+        // if request has type = blog else get all without blog type
+        if ($request->has('type')) {
+            $query->where('type', $request->get('type'));
+        } else {
+            $query->where('type', '!=', 'blog');
+        }
+
         return $query;
     }
 
@@ -157,7 +148,7 @@ class Post extends Model implements Listable, HasMedia
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('admin', 'media', 'category');
+        $query->with('admin', 'media', 'category','user','product');
 
         return $query;
     }
