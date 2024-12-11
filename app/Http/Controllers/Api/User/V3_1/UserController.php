@@ -47,10 +47,7 @@ class UserController extends BaseApiController
     public function getCountry()
     {
         return response()->json([
-            'data' => [
-                'country_id' => $this->user->country_id,
-                'country' => $this->user->country
-            ],
+            'data' => $this->user->country,
             'success' => true,
             'message' => __('api.success'),
         ]);
@@ -64,10 +61,7 @@ class UserController extends BaseApiController
         );
 
         return response()->json([
-            'data' => [
-                'country_id' => $this->user->country_id,
-                'country' => $this->user->country
-            ],
+            'data' => $this->user->country,
             'success' => true,
             'message' => __('api.success'),
         ]);
