@@ -24,16 +24,18 @@ class Post extends Model implements Listable, HasMedia
     public const STATUSES = [
         1 => 'Published',
         2 => 'Draft',
+        3 => 'Pending',
     ];
 
     protected $fillable = [
         'admin_id', 'category_id', 'title',
         'content', 'status', 'youtube_url',
         'tag_id',
+        'type','product_id','stars','user_id','show_user','service_date'
     ];
 
     protected $filterable = [
-        'admin_id', 'category_id', 'status', 'tag_id',
+        'admin_id', 'category_id', 'status', 'tag_id','type','product_id','stars','user_id'
     ];
 
     protected $search_attributes = [
@@ -52,6 +54,8 @@ class Post extends Model implements Listable, HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('posts');
+        $this->addMediaCollection('before');
+        $this->addMediaCollection('after');
     }
 
     /**
@@ -63,20 +67,24 @@ class Post extends Model implements Listable, HasMedia
     {
         $this->addMediaConversion('small')
             ->fit(Manipulations::FIT_CROP, 200, 200)
-            ->performOnCollections('posts');
+            ->performOnCollections('posts', 'before', 'after');
 
         $this->addMediaConversion('medium')
             ->fit(Manipulations::FIT_CROP, 300, 300)
-            ->performOnCollections('posts');
+            ->performOnCollections('posts', 'before', 'after');
 
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 600, 600)
-            ->performOnCollections('posts');
+            ->performOnCollections('posts', 'before', 'after');
     }
 
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class)->withDefault();
+    }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class)->withDefault();
     }
 
     public function category(): BelongsTo
@@ -87,6 +95,11 @@ class Post extends Model implements Listable, HasMedia
     public function tag(): BelongsTo
     {
         return $this->belongsTo(Tag::class)->withDefault();
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id')->withDefault();
     }
 
     public function socialMedia(): BelongsToMany
@@ -119,6 +132,13 @@ class Post extends Model implements Listable, HasMedia
 
         $query->applyDirectFilters($request);
 
+        // if request has type = blog else get all without blog type
+        if ($request->has('type')) {
+            $query->where('type', $request->get('type'));
+        } else {
+            $query->where('type', '!=', 'blog');
+        }
+
         return $query;
     }
 
@@ -131,7 +151,7 @@ class Post extends Model implements Listable, HasMedia
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('admin', 'media', 'category');
+        $query->with('admin', 'media', 'category','user','product');
 
         return $query;
     }
