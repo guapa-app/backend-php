@@ -119,6 +119,7 @@ class OrderService
                 // Generate invoice for the order
                 $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $orderData['fees'], $this->taxes);
                 $order->invoice_url = $invoice->url;
+                $order->country_id = $order->vendor->country_id;
                 $order->save();
 
                 $orders->push($order);
@@ -136,7 +137,7 @@ class OrderService
     public function checkVendorUsers(int $vendorId, array $userIds): bool
     {
         return UserVendor::where('vendor_id', $vendorId)
-                ->whereIn('user_id', $userIds)->count() === count(array_unique($userIds));
+            ->whereIn('user_id', $userIds)->count() === count(array_unique($userIds));
     }
 
     public function update(int $id, array $data): Order
@@ -263,9 +264,9 @@ class OrderService
             $this->sendOrderNotifications($order);
             Log::info("Order notifications sent");
 
-//            $this->loyaltyPointsService->addPurchasePoints($order);
+            //            $this->loyaltyPointsService->addPurchasePoints($order);
             Log::info("Loyalty points added");
-        }else {
+        } else {
             $order->status = $data['status'];
             $order->save();
         }
@@ -290,7 +291,7 @@ class OrderService
             : null;
     }
 
-    private function calculateOrderData($vendorProducts, $data, $couponResult) : array
+    private function calculateOrderData($vendorProducts, $data, $couponResult): array
     {
         $orderData = $data;
         $orderData['total'] = 0;
@@ -300,7 +301,7 @@ class OrderService
         $couponProductDiscounts = $couponResult ? $couponResult['data']['product_discounts'] : [];
 
         foreach ($vendorProducts as $product) {
-            $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
+            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
             $quantity = $inputItem['quantity'];
 
             if (isset($couponProductDiscounts[$product->id])) {
@@ -326,7 +327,7 @@ class OrderService
     private function createOrderItems($vendorProducts, $data, $order, $now, $vendorId, $couponResult): Collection
     {
         return $vendorProducts->map(function ($product) use ($data, $order, $now, $vendorId, $couponResult) {
-            $inputItem = Arr::first($data['products'], fn ($value) => (int) $value['id'] === $product->id);
+            $inputItem = Arr::first($data['products'], fn($value) => (int) $value['id'] === $product->id);
 
             if (isset($inputItem['appointment'])) {
                 $appointment = Appointment::find($inputItem['appointment']['id']);
@@ -373,7 +374,7 @@ class OrderService
         });
     }
 
-    private function getDiscountedPrice($product) : float|int
+    private function getDiscountedPrice($product): float|int
     {
         $price = $product->price;
         if ($product->offer) {
@@ -397,7 +398,7 @@ class OrderService
         }
     }
 
-    private function productAmountToPay($product, $quantity, $couponResult) : float|int
+    private function productAmountToPay($product, $quantity, $couponResult): float|int
     {
         if ($couponResult && isset($couponResult['data']['product_discounts'][$product->id])) {
             $discountedProduct = $couponResult['data']['product_discounts'][$product->id];
@@ -411,7 +412,7 @@ class OrderService
         return $productFees;
     }
 
-    private function updateCouponUsage($couponId, $userId) : void
+    private function updateCouponUsage($couponId, $userId): void
     {
         $coupon = Coupon::find($couponId);
         $coupon->usages()->updateOrCreate(
@@ -444,7 +445,7 @@ class OrderService
                     Log::error('Transaction failed: ' . $e->getMessage());
                     throw $e;
                 }
-            }else{
+            } else {
                 throw ValidationException::withMessages([
                     'message' => __('There is no sufficient balance'),
                 ]);

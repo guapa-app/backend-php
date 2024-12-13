@@ -42,6 +42,7 @@ class VendorService
         */
         return DB::transaction(function () use ($data) {
             $data['status'] = array_flip(Vendor::STATUSES)['active'];
+            $data['country_id'] = auth()->user()->country_id;
 
             // Create vendor
             $vendor = $this->vendorRepository->create($data);
@@ -141,7 +142,7 @@ class VendorService
         // Update logo
         if (isset($data['remove_logo'])) {
             $logoData = Arr::only($data, ['logo', 'remove_logo']);
-        }else{
+        } else {
             $logoData = Arr::only($data, ['logo']);
         }
         $this->updateLogo($vendor, $logoData);
@@ -206,6 +207,7 @@ class VendorService
      */
     public function createAddress(Vendor $vendor, array $data): Vendor
     {
+        $data['country_id'] = auth()->user()->country_id;
         $address = $vendor->addresses()->create($data);
 
         return $vendor;
@@ -293,8 +295,9 @@ class VendorService
         return $vendor->socialMedia()
             ->attach(
                 $data['social_media_id'],
-                ['link' => $data['link'],
-        ]
+                [
+                    'link' => $data['link'],
+                ]
             );
     }
 
@@ -303,8 +306,9 @@ class VendorService
         return $vendor->socialMedia()
             ->updateExistingPivot(
                 $socialMediaId,
-                ['link' => $data['link'],
-        ]
+                [
+                    'link' => $data['link'],
+                ]
             );
     }
 

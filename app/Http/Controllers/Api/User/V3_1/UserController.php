@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Contracts\Repositories\UserRepositoryInterface;
+use Illuminate\Http\Request;
+use App\Services\UserService;
+use App\Http\Resources\User\V3_1\UserResource;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\UpdateUserRequest;
-use App\Http\Resources\User\V3_1\UserResource;
-use App\Services\UserService;
-use Illuminate\Http\Request;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Http\Requests\V3_1\User\UpdateUserCountryRequest;
 
 class UserController extends BaseApiController
 {
@@ -41,6 +42,29 @@ class UserController extends BaseApiController
                 'success' => true,
                 'message' => __('api.success'),
             ]);
+    }
+
+    public function getCountry()
+    {
+        return response()->json([
+            'data' => $this->user->country,
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
+    }
+
+    public function updateCountry(UpdateUserCountryRequest $request)
+    {
+        $this->userService->update(
+            $this->user,
+            ['country_id' => $request->country_id]
+        );
+
+        return response()->json([
+            'data' => $this->user->country,
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
     }
 
     public function getReferralCode(Request $request)

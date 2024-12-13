@@ -38,7 +38,7 @@ class RegisterRequest extends FailedValidationRequest
 
         // Check and modify the phone number for the user
         if (isset($input['phone'])) {
-            $input['phone'] = Common::removeZeroFromPhoneNumber($input['phone']);
+            $input['phone'] = Common::removePlusFromPhoneNumber($input['phone']);
         }
 
         $this->replace($input);
@@ -49,6 +49,7 @@ class RegisterRequest extends FailedValidationRequest
             'phone' => 'required|unique:users,phone|'.(Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
             'gender' => 'nullable|string',
             'referral_code' => 'nullable|exists:user_profiles,referral_code',
+            'country_id' => 'nullable|exists:countries,id',
         ];
     }
 }

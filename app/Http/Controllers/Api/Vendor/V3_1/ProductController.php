@@ -52,7 +52,8 @@ class ProductController extends BaseApiController
     {
         $data = $request->validated();
         $data['vendor_id'] = $this->user->managerVendorId();
-
+        $data['country_id'] = auth()->user()->country_id;
+        
         $item = $this->productService->create($data);
 
         return ProductResource::make($item)

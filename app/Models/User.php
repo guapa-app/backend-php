@@ -25,8 +25,13 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements Listable, FcmNotifiable, FilamentUser
 {
-    use HasFactory, Notifiable, HasApiTokens, HasRoles,
-        ListableTrait, HasFavorites, FcmNotifiableTrait,
+    use HasFactory,
+        Notifiable,
+        HasApiTokens,
+        HasRoles,
+        ListableTrait,
+        HasFavorites,
+        FcmNotifiableTrait,
         Messageable;
 
     /**
@@ -54,6 +59,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         'phone',
         'status',
         'phone_verified_at',
+        'country_id'
     ];
 
     /**
@@ -95,7 +101,9 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
      * @var array
      */
     protected $search_attributes = [
-        'name', 'email', 'phone',
+        'name',
+        'email',
+        'phone',
     ];
 
     /**
@@ -126,7 +134,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $isEmail ?
             $this->where('email', $username)->first() :
             $this->whereIn('phone', Common::getPhoneVariations($username))
-                ->first();
+            ->first();
     }
 
     /**
@@ -136,7 +144,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
      */
     public function receivesBroadcastNotificationsOn()
     {
-        return 'user.'.$this->id;
+        return 'user.' . $this->id;
     }
 
     public function getRoleAttribute()
@@ -144,6 +152,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         $relations = $this->getRelations();
 
         return isset($relations['roles']) ? $relations['roles']->pluck('name') : [];
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function profile(): HasOne
@@ -311,7 +324,9 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         return $query->with([
-            'profile', 'profile.photo', 'roles',
+            'profile',
+            'profile.photo',
+            'roles',
         ]);
     }
 
@@ -357,8 +372,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         // Check if the user has a UserProfile
         if (!$this->profile) {
             // Create a new profile if it doesn't exist
-            $profile = $this->profile()->create([
-            ]);
+            $profile = $this->profile()->create([]);
         } else {
             $profile = $this->profile;
         }

@@ -2,16 +2,17 @@
 
 namespace App\Filament\Admin\Resources\Blog;
 
+use Filament\Forms;
+use App\Models\Post;
+use Filament\Tables;
+use App\Models\Country;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Admin\Resources\Blog\PostResource\Pages;
 use App\Filament\Admin\Resources\Blog\PostResource\RelationManagers;
-use App\Models\Post;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class PostResource extends Resource
 {
@@ -25,6 +26,11 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('country_id')
+                    ->label('Country')
+                    ->required()
+                    ->options(Country::query()->pluck('name', 'id'))
+                    ->searchable(),
                 Forms\Components\Section::make('Images')
                     ->schema([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('media')
@@ -40,7 +46,7 @@ class PostResource extends Resource
                 Forms\Components\Select::make('category_id')
                     ->required()
                     ->native(false)
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
+                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->title}")
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
@@ -104,7 +110,7 @@ class PostResource extends Resource
                     ])
                     ->columnSpanFull()
                     ->columns()
-                    ->itemLabel(fn (array $state): ?string => $state['link']),
+                    ->itemLabel(fn(array $state): ?string => $state['link']),
             ]);
     }
 
