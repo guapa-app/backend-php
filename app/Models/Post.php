@@ -41,7 +41,7 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     protected $appends = [
-        'likes_count', 'is_liked',
+        'likes_count', 'is_liked','comments_count'
     ];
 
     /**
@@ -116,6 +116,16 @@ class Post extends Model implements Listable, HasMedia
         return $this->hasMany(Comment::class);
     }
 
+    public function voteOptions(): HasMany
+    {
+        return $this->hasMany(VoteOption::class);
+    }
+
+    public function userVotes(): HasMany
+    {
+        return $this->hasMany(UserVote::class);
+    }
+
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
         $filter = $request->get('filter');
@@ -149,8 +159,8 @@ class Post extends Model implements Listable, HasMedia
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
         $query->with('admin', 'media', 'category');
-        if ($request->has('type') && $request->get('type') !== 'blog') {
-            $query->with('user','product');
+        if (!$request->has('type') || $request->get('type') !== 'blog') {
+            $query->with('user','product','voteOptions');
         }
         return $query;
     }
