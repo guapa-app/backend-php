@@ -25,7 +25,7 @@ class DoctorRequest extends FailedValidationRequest
 
         // Check and modify the phone number for the vendor
         if (isset($input['phone'])) {
-            $input['phone'] = Common::removeZeroFromPhoneNumber($input['phone']);
+            $input['phone'] = Common::removePlusFromPhoneNumber($input['phone']);
         }
 
         $this->replace($input);

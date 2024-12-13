@@ -32,6 +32,7 @@ class VendorService extends BaseVendorService
     {
         return DB::transaction(function () use ($data) {
             // Create vendor
+            $data['country_id'] = auth()->user()->country_id;
             $vendor = $this->vendorRepository->create($data);
 
             if (!$this->vendorRepository->isAdmin()) {
@@ -49,6 +50,7 @@ class VendorService extends BaseVendorService
     public function addDoctor(array $data, $user): Vendor
     {
         $data['status'] = array_flip(Vendor::STATUSES)['active'];
+        $data['country_id'] = auth()->user()->country_id;
 
         $vendor = $this->vendorRepository->create($data);
 

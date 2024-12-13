@@ -3,10 +3,12 @@
 namespace App\Services\V3;
 
 use App\Models\User;
-use App\Models\UserProfile;
+use App\Models\Country;
 use Illuminate\Http\Request;
 use App\Exceptions\ApiException;
 use App\Exceptions\PhoneNotVerifiedException;
+use Illuminate\Validation\ValidationException;
+use App\Models\UserProfile;
 use App\Services\UserService as BaseUserService;
 
 class UserService extends BaseUserService
@@ -69,7 +71,7 @@ class UserService extends BaseUserService
             if (!in_array($data['gender'], UserProfile::GENDER)) {
                 $data['gender'] = null;
             }
-            
+
             $result['profile']['gender'] = $data['gender'];
         }
 
@@ -83,6 +85,25 @@ class UserService extends BaseUserService
 
         if (isset($data['phone'])) {
             $result['phone'] = $data['phone'];
+
+            if (!isset($data['country_id'])) {
+
+                // Find the matching country based on phone_code
+                $country = Country::whereRaw('? LIKE CONCAT(phone_code, "%")', ['+' . $result['phone']])->first();
+
+                // Default country_id if no match is found
+                if (!$country) {
+                    throw ValidationException::withMessages([
+                        'phone' => ['The phone number does not match any country code.'],
+                    ]);
+                }
+                $result['country_id'] = $country->id;
+            } elseif (isset($data['country_id'])) {
+                $result['country_id'] = $data['country_id'];
+            }
+
+            $normalizedPhone = preg_replace('/\D/', '', $result['phone']);
+            $result['phone'] = $normalizedPhone;
         }
 
         return $result;
