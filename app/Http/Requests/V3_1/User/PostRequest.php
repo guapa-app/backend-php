@@ -36,6 +36,10 @@ class PostRequest extends FailedValidationRequest
             'show_user'       => 'sometimes|boolean',
             'service_date'    => 'sometimes|date',
 
+            // votes options required for post type vote
+            'vote_options'   => 'required_if:type,' . PostType::Vote->value . '|array|min:2|max:10',
+            'vote_options.*' => 'required|string|max:255',
+
             'media'           => 'sometimes|array|min:1',
             'media.*'         => ['required', new ImageOrBase64(), 'max:10240'],
             'before_images'   => 'sometimes|array|min:1',

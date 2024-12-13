@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Contracts\Repositories\PostRepositoryInterface;
+use App\Enums\PostType;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\PostRequest;
 use App\Http\Resources\User\V3_1\PostCollection;
@@ -80,5 +81,23 @@ class PostController extends BaseApiController
         $this->postService->delete((int) $id);
 
         return $this->successJsonRes([], __('api.deleted'));
+    }
+
+    public function vote(Request $request, Post $post)
+    {
+        $request->validate([
+            'option_id' => 'required|exists:vote_options,id',
+        ]);
+
+        if ($post->type != PostType::Vote->value) {
+            return $this->errorJsonRes([],__('This post is not a vote post'));
+        }
+        $this->postService->vote($post, $request->option_id);
+
+        return PostResource::make($post)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 }

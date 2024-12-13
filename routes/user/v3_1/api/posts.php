@@ -10,5 +10,6 @@ Route::group(['middleware' => 'auth:api','as'=>'posts.'], function () {
     Route::post('/', [PostController::class, 'store']);
     Route::put('/{id}', [PostController::class, 'update']);
     Route::delete('/{id}', [PostController::class, 'delete']);
+    Route::post('/{post}/vote', [PostController::class, 'vote']);
 });
 
