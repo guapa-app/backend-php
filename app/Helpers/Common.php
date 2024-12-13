@@ -61,6 +61,16 @@ class Common
     }
 
     /**
+     * Remove leading "+" or "00" or "+00" or "00+"
+     * @param string $phone
+     * @return string
+     */
+    public static function removePlusFromPhoneNumber(string $phone): string
+    {
+        return preg_replace('/^(\+00|\+0|\+|00\+)/', '', $phone);
+    }
+
+    /**
      * Rules to validate requiested phone number.
      * @return string
      */

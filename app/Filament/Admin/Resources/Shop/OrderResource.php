@@ -47,6 +47,9 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hash_id')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('country.name')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('vendor.name')
                     ->numeric()
                     ->sortable(),
@@ -77,8 +80,7 @@ class OrderResource extends Resource
                 Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                ]),
+                Tables\Actions\BulkActionGroup::make([]),
             ]);
     }
 

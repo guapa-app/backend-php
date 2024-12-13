@@ -22,9 +22,20 @@ class VendorClientRequest extends FailedValidationRequest
      */
     public function rules(): array
     {
+        $input = $this->all();
+
+        // Check and modify the phone number for the vendor
+        if (isset($input['phone'])) {
+            $input['phone'] = Common::removePlusFromPhoneNumber($input['phone']);
+        }
+
+        $this->replace($input);
+
+        $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' :  '|' .Common::phoneValidation();
+
         return [
             'name'      => 'required|string|min:3|max:100',
-            'phone'     => 'required|string|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
+            'phone'     => 'required|string|' . $phoneNumbersRule,
 
         ];
     }
