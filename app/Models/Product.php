@@ -481,6 +481,9 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function calculateProductFees($finalPrice)
     {
         $productCategory = $this->taxonomies()->first();
+        if(!$productCategory){
+            return 0;
+        }
         $categoryCountryFees = $this->getCategoryCountryFees($productCategory->id, $finalPrice);
 
         if($categoryCountryFees !== false){
