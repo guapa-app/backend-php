@@ -18,7 +18,7 @@ class PostResource extends JsonResource
 
             'type'        => $this->type,
             'stars'       => $this->stars,
-            'show_user'   => $this->show_user,
+            'show_user'   =>  (bool) $this->show_user,
             'service_date'=> $this->service_date,
 
             'likes_count'   => $this->likes_count,
