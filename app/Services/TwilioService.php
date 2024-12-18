@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Exception;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Twilio\Rest\Client as TwilioClient;
 
 /**
@@ -36,8 +36,6 @@ class TwilioService
             return true;
         } catch (Exception $e) {
             Log::error($e->getMessage());
-
-            // Report the error or do anything with it
             return false;
         }
     }
@@ -57,8 +55,6 @@ class TwilioService
             return $result->valid;
         } catch (Exception $e) {
             Log::error($e);
-
-            // Report the error or do anything with it
             return false;
         }
     }
