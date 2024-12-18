@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Blog;
 
+use App\Enums\PostType;
 use App\Filament\Admin\Resources\Blog\PostResource\Pages;
 use App\Filament\Admin\Resources\Blog\PostResource\RelationManagers;
 use App\Models\Post;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 class PostResource extends Resource
 {
@@ -33,6 +36,10 @@ class PostResource extends Resource
                             ->hiddenLabel(),
                     ])
                     ->collapsible(),
+                Forms\Components\Select::make('type')
+                    ->options(collect(PostType::cases())->pluck('value', 'value'))
+                    ->required()
+                    ->native(false),
                 Forms\Components\Select::make('admin_id')
                     ->required()
                     ->native(false)
@@ -117,6 +124,15 @@ class PostResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->limit(50)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'blog' => 'success',
+                        'review' => 'warning',
+                        'vote' => 'danger',
+                        'question' => 'info',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('youtube_url')
                     ->limit(30),
                 Tables\Columns\SelectColumn::make('status')
@@ -133,7 +149,18 @@ class PostResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                TernaryFilter::make('type')
+                    ->placeholder('All Types')
+                    ->queries(
+                        true: fn (Builder $query) => $query->where('type', 'blog'),
+                        false: fn (Builder $query) => $query->whereIn('type', ['review', 'vote', 'question']),
+                        blank: fn (Builder $query) => $query,
+                    )
+                    ->trueLabel('Blog Posts')
+                    ->falseLabel('User Posts'),
+                SelectFilter::make('specific_type')
+                    ->options(collect(PostType::cases())->pluck('value', 'value'))
+                    ->label('Post Type'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -143,7 +170,8 @@ class PostResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->persistFilters();
     }
 
     public static function getRelations(): array

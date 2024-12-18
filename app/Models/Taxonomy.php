@@ -177,6 +177,10 @@ class Taxonomy extends BaseTaxonomy implements Listable
             $query->whereIsAppointment((bool) $request->get('is_appointment'));
         }
 
+        if ($request->has('has_posts') && $request->get('has_posts')) {
+            $query->whereHas('posts');
+        }
+
         return $query;
     }
 

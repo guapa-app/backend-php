@@ -41,11 +41,11 @@ class PostRequest extends FailedValidationRequest
             'vote_options.*' => 'required|string|max:255',
 
             'media'           => 'sometimes|array|min:1',
-            'media.*'         => ['required', new ImageOrBase64(), 'max:10240'],
+            'media.*'         => ['required', new ImageOrBase64()],
             'before_images'   => 'sometimes|array|min:1',
-            'before_images.*' => ['required', new ImageOrBase64(), 'max:10240'],
+            'before_images.*' => ['required', new ImageOrBase64()],
             'after_images'    => 'sometimes|array|min:1',
-            'after_images.*'  => ['required', new ImageOrBase64(), 'max:10240'],
+            'after_images.*'  => ['required', new ImageOrBase64()],
             'keep_media'      => 'sometimes|array|min:1',
             'keep_media.*'    => 'required|integer|exists:media,id',
         ];
