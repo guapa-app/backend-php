@@ -59,6 +59,7 @@ class VendorDetailsResource extends JsonResource
                 'distance'                                  => (float) $this->distance,
             ]),
 
+            'address'                                   => $this->country?->name,
             'addresses'                                 => AddressResource::collection($this->whenLoaded('addresses')),
             'staff'                                     => StaffResource::collection($this->whenLoaded('staff')),
             'logo'                                      => MediaResource::make($this->whenLoaded('logo')),

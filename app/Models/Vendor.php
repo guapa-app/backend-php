@@ -2,34 +2,43 @@
 
 namespace App\Models;
 
-use App\Contracts\HasReviews;
-use App\Traits\HasAddresses;
 use App\Traits\Likable;
-use App\Traits\Listable as ListableTrait;
 use App\Traits\Reviewable;
-use Hamedov\Messenger\Traits\Messageable;
-use Hamedov\Taxonomies\HasTaxonomies;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasAddresses;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Redis;
+use App\Contracts\HasReviews;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use App\Models\Scopes\CountryScope;
+use Hamedov\Taxonomies\HasTaxonomies;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use App\Traits\Listable as ListableTrait;
+use Hamedov\Messenger\Traits\Messageable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Notifications\Notification;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Vendor extends Model implements HasMedia, HasReviews
 {
-    use HasFactory, ListableTrait, InteractsWithMedia, Messageable,
-        HasTaxonomies, HasAddresses, Reviewable, Likable, Notifiable, SoftDeletes;
+    use HasFactory,
+        ListableTrait,
+        InteractsWithMedia,
+        Messageable,
+        HasTaxonomies,
+        HasAddresses,
+        Reviewable,
+        Likable,
+        Notifiable,
+        SoftDeletes;
 
     public const TYPES = [
         0 => 'hospital',
@@ -53,11 +62,29 @@ class Vendor extends Model implements HasMedia, HasReviews
     ];
 
     protected $fillable = [
-        'parent_id', 'name', 'email', 'status', 'verified',
-        'phone', 'about', 'whatsapp', 'twitter',
-        'instagram', 'snapchat', 'type', 'working_days',
-        'working_hours', 'website_url', 'known_url', 'tax_number',
-        'cat_number', 'reg_number', 'health_declaration', 'accept_appointment','verified_badge',
+        'country_id',
+        'parent_id',
+        'name',
+        'email',
+        'status',
+        'verified',
+        'phone',
+        'about',
+        'whatsapp',
+        'twitter',
+        'instagram',
+        'snapchat',
+        'type',
+        'working_days',
+        'working_hours',
+        'website_url',
+        'known_url',
+        'tax_number',
+        'cat_number',
+        'reg_number',
+        'health_declaration',
+        'accept_appointment',
+        'verified_badge',
     ];
 
     /**
@@ -74,9 +101,14 @@ class Vendor extends Model implements HasMedia, HasReviews
     ];
 
     protected $appends = [
-        'specialty_ids', 'likes_count', 'is_liked',
-        'views_count', 'shares_count', 'work_days',
-        'shared_link', 'staff_id',
+        'specialty_ids',
+        'likes_count',
+        'is_liked',
+        'views_count',
+        'shares_count',
+        'work_days',
+        'shared_link',
+        'staff_id',
     ];
 
     /**
@@ -86,7 +118,9 @@ class Vendor extends Model implements HasMedia, HasReviews
      * @var array
      */
     protected $filterable = [
-        'status', 'verified', 'parent_id',
+        'status',
+        'verified',
+        'parent_id',
     ];
 
     /**
@@ -95,8 +129,16 @@ class Vendor extends Model implements HasMedia, HasReviews
      * @var array
      */
     protected $search_attributes = [
-        'name', 'email', 'phone', 'about',
+        'name',
+        'email',
+        'phone',
+        'about',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CountryScope());
+    }
 
     // =========== Attributes Section ===========
     public function getStaffIdAttribute()
@@ -236,10 +278,10 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function hasUser(User $user, $role = null)
     {
         return $this->users()->where([
-                'user_id' => $user->id,
-            ])->when($role != null, function ($query) use ($role) {
-                $query->where('role', $role);
-            })->first() != null;
+            'user_id' => $user->id,
+        ])->when($role != null, function ($query) use ($role) {
+            $query->where('role', $role);
+        })->first() != null;
     }
 
     public function hasManager(User $user)
@@ -268,6 +310,12 @@ class Vendor extends Model implements HasMedia, HasReviews
     }
 
     // =========== Relations Section ===========
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function shareLink()
     {
         return $this->morphOne(ShareLink::class, 'shareable');

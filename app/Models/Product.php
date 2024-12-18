@@ -2,30 +2,31 @@
 
 namespace App\Models;
 
-use App\Contracts\HasReviews;
+use DB;
+use App\Traits\Likable;
+use App\Enums\ProductType;
+use App\Traits\Reviewable;
 use App\Contracts\Listable;
 use App\Enums\ProductReview;
 use App\Enums\ProductStatus;
-use App\Enums\ProductType;
-use App\Traits\Likable;
-use App\Traits\Listable as ListableTrait;
-use App\Traits\Reviewable;
-use DB;
-use Hamedov\Messenger\Traits\Relatable;
-use Hamedov\Taxonomies\HasTaxonomies;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use App\Contracts\HasReviews;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use App\Models\Scopes\CountryScope;
+use Hamedov\Taxonomies\HasTaxonomies;
+use Hamedov\Messenger\Traits\Relatable;
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Product extends Model implements Listable, HasMedia, HasReviews
@@ -40,14 +41,28 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         SoftDeletes;
 
     protected $fillable = [
-        'hash_id', 'vendor_id', 'title', 'description', 'price', 'earned_points',
-        'status', 'review', 'type', 'terms', 'url', 'sort_order',
+        'country_id',
+        'hash_id',
+        'vendor_id',
+        'title',
+        'description',
+        'price',
+        'earned_points',
+        'status',
+        'review',
+        'type',
+        'terms',
+        'url',
+        'sort_order',
     ];
 
     protected $appends = [
-        'likes_count', 'is_liked',
-        'taxonomy_name', 'taxonomy_id',
-        'taxonomy_type', 'address',
+        'likes_count',
+        'is_liked',
+        'taxonomy_name',
+        'taxonomy_id',
+        'taxonomy_type',
+        'address',
         'shared_link',
     ];
 
@@ -58,7 +73,10 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      * @var array
      */
     protected $filterable = [
-        'status', 'review', 'type', 'vendor_id',
+        'status',
+        'review',
+        'type',
+        'vendor_id',
     ];
 
     /**
@@ -67,7 +85,9 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      * @var array
      */
     protected $search_attributes = [
-        'hash_id', 'title', 'description',
+        'hash_id',
+        'title',
+        'description',
     ];
 
     protected $casts = [
@@ -75,6 +95,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         'status' => ProductStatus::class,
         'review' => ProductReview::class,
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CountryScope());
+    }
 
     /**
      * Register media collections.
@@ -108,11 +133,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getAddressAttribute()
     {
-        $countryName = request()->header('Accept-Language') == 'en' ? 'KSA' : 'السعودية';
+        $countryName = $this->vendor?->address?->city?->country?->name;
 
         $city = $this->vendor?->address?->city?->name;
 
-        return $city ? "$city - $countryName" : $countryName;
+        return $city ? "$city - $countryName" : $this->country?->name;
     }
 
     public function getSharedLinkAttribute()
@@ -191,6 +216,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             'price_after_discount' => $this->offer ? round($this->offer_price, 2) : round((float) $this->price, 2),
             'discount_percentage' => round((float) $this->offer?->discount ?? 0.0, 2),
         ];
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function shareLink(): MorphOne
@@ -374,7 +404,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         $distance_aggregate = "(6371 * acos(cos(radians($lat)) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians($lng)) + sin(radians($lat)) * sin(radians(addresses.lat))))";
 
-        $query->addSelect(DB::raw($distance_aggregate.' AS distance'));
+        $query->addSelect(DB::raw($distance_aggregate . ' AS distance'));
 
         $query->join('addresses', function ($join) use ($lat, $lng, $dist) {
             $join->on('addresses.id', '=', 'product_addresses.address_id');
@@ -434,8 +464,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with([
-            'vendor', 'vendor.logo', 'vendor.addresses', 'offer', 'offer.image',
-            'media', 'taxonomies', 'vendor.appointments',
+            'vendor',
+            'vendor.logo',
+            'vendor.addresses',
+            'offer',
+            'offer.image',
+            'media',
+            'taxonomies',
+            'vendor.appointments',
             'vendor.workDays',
         ]);
 
@@ -445,13 +481,47 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function calculateProductFees($finalPrice)
     {
         $productCategory = $this->taxonomies()->first();
+        if(!$productCategory){
+            return 0;
+        }
+        $categoryCountryFees = $this->getCategoryCountryFees($productCategory->id, $finalPrice);
 
-        if ($productCategory?->fees) {
-            $productFees = $productCategory->fees;
+        if($categoryCountryFees !== false){
+            return $categoryCountryFees;
+        }else{
+            if ($productCategory?->fees) {
+                $productFees = $productCategory->fees;
 
+                return ($productFees / 100) * $finalPrice;
+            } else {
+                return $productCategory?->fixed_price ?? 0;
+            }
+        }
+    }
+
+    public function getCategoryCountryFees($categoryId, $finalPrice)
+    {
+        $request = request();
+
+        $country = $request->get('country'); // Get country from middleware CountryHeader
+
+        if (!$country) {
+            return false;
+        }
+
+        $fees = CategoryFee::where('category_id', $categoryId)
+            ->where('country_id', $country->id)
+            ->first();
+
+        if (!$fees) {
+            return false;
+        }
+
+        if ($fees?->fee_percentage) {
+            $productFees = $fees->fee_percentage;
             return ($productFees / 100) * $finalPrice;
         } else {
-            return $productCategory?->fixed_price ?? 0;
+            return $fees?->fee_fixed ?? 0;
         }
     }
 
@@ -460,8 +530,9 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      *
      * @return int
      */
-    function calcProductPoints() {
-        if($this->earned_points > 0) return $this->earned_points;
+    function calcProductPoints()
+    {
+        if ($this->earned_points > 0) return $this->earned_points;
         $conversionRate = Setting::purchasePointsConversionRate();
         $paidAmount = $this->payment_details['fees_with_taxes'];
         $points = (int) ($paidAmount * $conversionRate);
