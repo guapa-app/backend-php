@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Resources\Blog;
 
-
 use Filament\Forms;
 use App\Models\Post;
 use Filament\Tables;
@@ -14,10 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Admin\Resources\Blog\PostResource\Pages;
 use App\Filament\Admin\Resources\Blog\PostResource\RelationManagers;
-use App\Enums\PostType;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
-
 
 class PostResource extends Resource
 {
@@ -45,10 +40,6 @@ class PostResource extends Resource
                             ->hiddenLabel(),
                     ])
                     ->collapsible(),
-                Forms\Components\Select::make('type')
-                    ->options(collect(PostType::cases())->pluck('value', 'value'))
-                    ->required()
-                    ->native(false),
                 Forms\Components\Select::make('admin_id')
                     ->required()
                     ->native(false)
@@ -130,6 +121,9 @@ class PostResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
+                // user
+                Tables\Columns\TextColumn::make('user.name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('title')
                     ->limit(50)
                     ->searchable(),
@@ -158,18 +152,7 @@ class PostResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('type')
-                    ->placeholder('All Types')
-                    ->queries(
-                        true: fn (Builder $query) => $query->where('type', 'blog'),
-                        false: fn (Builder $query) => $query->whereIn('type', ['review', 'vote', 'question']),
-                        blank: fn (Builder $query) => $query,
-                    )
-                    ->trueLabel('Blog Posts')
-                    ->falseLabel('User Posts'),
-                SelectFilter::make('specific_type')
-                    ->options(collect(PostType::cases())->pluck('value', 'value'))
-                    ->label('Post Type'),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -179,8 +162,7 @@ class PostResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->persistFilters();
+            ]);
     }
 
     public static function getRelations(): array
