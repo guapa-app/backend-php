@@ -159,8 +159,8 @@ class Setting extends Model
             's_value'           => 'twilio',
             's_unit'            => 'string',
             's_validation_type' => 'options',
-            's_validation'      => ['twilio', 'sinch'],
-            'instructions'      => 'Available SMS Services To Use twilio or Sinch only. anything else \'ll get error.',
+            's_validation'      => ['twilio', 'sinch', 'connectsaudi'],
+            'instructions'      => 'Available SMS Services To Use (Twilio,Sinch,Connectsaudi) only. anything else \'ll get error.',
         ]);
 
         return (string) $record->s_value;
