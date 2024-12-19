@@ -85,6 +85,8 @@ class Vendor extends Model implements HasMedia, HasReviews
         'health_declaration',
         'accept_appointment',
         'verified_badge',
+        'activate_wallet',
+        'iban'
     ];
 
     /**

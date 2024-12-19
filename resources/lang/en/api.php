@@ -77,4 +77,5 @@ return [
     'payment_status_changed' => 'Payment status changed successfully',
     'error_payment_status' => 'An error occurred while changing the payment status',
     'paid_successfully' => 'Paid Successfully',
+    'can_not_update_iban' => 'Can not update account data',
 ];
