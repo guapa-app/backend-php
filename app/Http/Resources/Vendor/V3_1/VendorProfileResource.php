@@ -41,6 +41,9 @@ class VendorProfileResource extends JsonResource
 
             'accept_appointment'                       => (bool) $this->accept_appointment,
 
+            'activate_wallet'                            => (bool) $this->activate_wallet,
+            'wallet_info_exists'                       => (bool) $this->iban,
+
             $this->mergeWhen(isset($this->orders_order_count), [
                 'orders_order_count'                        => (int) $this->orders_order_count,
                 'orders_consultations_count'                => (int) $this->orders_consultations_count,
@@ -63,7 +66,6 @@ class VendorProfileResource extends JsonResource
             'products'                                => ProductResource::collection($this->whenLoaded('products')),
             'services'                                => ProductResource::collection($this->whenLoaded('services')),
             'offers'                                  => ProductResource::collection($this->whenLoaded('productsHasOffers')),
-
         ];
 
         return $returned_arr;
