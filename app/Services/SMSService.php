@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Services\ConnectSaudiService;
 
 class SMSService
 {
@@ -15,6 +16,9 @@ class SMSService
         switch ($sms_option) {
             case 'sinch':
                 $this->smsService = new SinchService;
+                break;
+            case 'connectsaudi':
+                $this->smsService = new ConnectSaudiService;
                 break;
             case 'twilio':
             default:

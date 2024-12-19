@@ -11,9 +11,9 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
-use App\Filament\Admin\Resources\Info\CityResource\Pages\EditCountry;
-use App\Filament\Admin\Resources\Info\CityResource\Pages\CreateCountry;
-use App\Filament\Admin\Resources\Info\CityResource\Pages\ListCountries;
+use App\Filament\Admin\Resources\Info\CountryResource\Pages\EditCountry;
+use App\Filament\Admin\Resources\Info\CountryResource\Pages\CreateCountry;
+use App\Filament\Admin\Resources\Info\CountryResource\Pages\ListCountries;
 
 class CountryResource extends Resource
 {
