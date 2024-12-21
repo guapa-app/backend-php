@@ -73,8 +73,35 @@ class OrderNotify extends Model
         'status' => OrderStatus::class,
     ];
 
+    protected $appends = [
+        'paid_amount_with_taxes',
+        'paid_amount',
+        'remaining_amount',
+    ];
 
+    public function getPaidAmountWithTaxesAttribute()
+    {
+        return $this->invoice?->amount ?? 0;
+    }
 
+    public function getPaidAmountAttribute()
+    {
+        return number_format(($this->invoice?->amount - $this->invoice?->taxes),
+            decimal_separator: '',
+            thousands_separator: ''
+        );
+    }
+
+    public function getRemainingAmountAttribute(): float
+    {
+        return $this->total - ($this->paid_amount);
+    }
+
+    public function invoice(): MorphOne
+    {
+        return $this->morphOne(Invoice::class, 'invoiceable');
+    }
+    
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
