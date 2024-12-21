@@ -2,17 +2,18 @@
 
 namespace App\Services\V3_1;
 
-use App\Enums\AppointmentOfferEnum;
-use App\Enums\OrderTypeEnum;
+use App\Models\User;
 use App\Models\Admin;
 use App\Models\Order;
-use App\Models\User;
-use App\Notifications\OrderNotification;
-use App\Services\LoyaltyPointsService;
+use App\Models\OrderNotify;
+use App\Enums\OrderTypeEnum;
 use App\Services\PDFService;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
+use App\Enums\AppointmentOfferEnum;
 use Illuminate\Support\Facades\Log;
+use App\Services\LoyaltyPointsService;
+use App\Notifications\OrderNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
@@ -38,9 +39,8 @@ class OrderPaymentService
                 $loyaltyPointsService = app(LoyaltyPointsService::class);
                 $loyaltyPointsService->addPurchasePoints($order);
 
-//                $this->sendOrderNotifications($order);
+                $this->sendOrderNotifications($order);
             }
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Order status change failed: ' . $e->getMessage(), [
@@ -90,6 +90,9 @@ class OrderPaymentService
     protected function sendOrderNotifications(Order $order)
     {
         try {
+            // Load order notify to handle notification ShouldQueue infinty loop
+            $order = OrderNotify::findOrFail($order->id);
+
             // Send email to admin
             $adminEmails = Admin::role('admin')->pluck('email')->toArray();
             Notification::route('mail', $adminEmails)
@@ -100,7 +103,6 @@ class OrderPaymentService
 
             // Send email to customer
             $order->user->notify(new OrderNotification($order));
-
         } catch (\Exception $e) {
             Log::error('Failed to send order notifications: ' . $e->getMessage(), [
                 'order_id' => $order->id
@@ -132,12 +134,11 @@ class OrderPaymentService
                     Log::error('Transaction failed: ' . $e->getMessage());
                     throw $e;
                 }
-            }else{
+            } else {
                 throw ValidationException::withMessages([
                     'message' => __('There is no sufficient balance'),
                 ]);
             }
         }
     }
-
 }
