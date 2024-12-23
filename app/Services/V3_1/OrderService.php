@@ -117,7 +117,9 @@ class OrderService
 
                 $this->taxes = ($this->taxesPercentage / 100) * $orderData['fees'];
                 // Generate invoice for the order
-                $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $orderData['fees'], $this->taxes);
+                $invoice_amount = $orderData['vendor_wallet'] ? $orderData['total'] : $orderData['fees'];
+
+                $invoice = $this->paymentService->generateInvoice($order, $productsTitles, $invoice_amount, $this->taxes);
                 $order->invoice_url = $invoice->url;
                 $order->country_id = $order->vendor->country_id;
                 $order->save();
@@ -297,6 +299,8 @@ class OrderService
         $orderData['total'] = 0;
         $orderData['fees'] = 0;
         $orderData['discount_amount'] = 0;
+        // is vendor wallet activated
+        $orderData['vendor_wallet'] = $vendorProducts->first()->vendor->activate_wallet;
 
         $couponProductDiscounts = $couponResult ? $couponResult['data']['product_discounts'] : [];
 
