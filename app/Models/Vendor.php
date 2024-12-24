@@ -461,6 +461,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->morphToMany(User::class, 'favorable', 'favorables');
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     // =========== Scopes Section ===========
     public function scopeSubVendors(Builder $query, $parent): Builder
     {

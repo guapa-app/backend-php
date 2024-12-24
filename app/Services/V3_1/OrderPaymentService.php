@@ -35,7 +35,13 @@ class OrderPaymentService
                 $loyaltyPointsService = app(LoyaltyPointsService::class);
                 $loyaltyPointsService->addPurchasePoints($order);
 
+                if ($order->vendor_wallet_payment) {
+                    $walletService = app(WalletService::class);
+                    $amount = $order->total - $order->fees;
+                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+                }
 
+//                $this->sendOrderNotifications($order);
             }
 
         } catch (\Exception $e) {
@@ -61,6 +67,7 @@ class OrderPaymentService
             $order->invoice_url = (new PDFService)->addInvoicePDF($order);
         }
         $order->save();
+
 
         // Update related records
         $order->invoice->update(['status' => 'paid']);
