@@ -79,11 +79,11 @@ class TransactionService
                 'transaction_date' => now(),
             ]);
 
-//            DB::commit();
+            DB::commit();
 
             return $transaction;
         } catch (\Exception $e) {
-//            DB::rollBack();
+            DB::rollBack();
             Log::error('Transaction creation failed: ' . $e->getMessage());
             throw $e;
         }
