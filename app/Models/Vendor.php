@@ -466,6 +466,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(Transaction::class);
     }
 
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
     // =========== Scopes Section ===========
     public function scopeSubVendors(Builder $query, $parent): Builder
     {
