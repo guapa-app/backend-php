@@ -2,13 +2,15 @@
 
 namespace App\Notifications;
 
-use App\Channels\FirebaseChannel;
-use App\Models\Order;
 use App\Models\User;
+use App\Models\Order;
+use App\Models\OrderNotify;
 use Illuminate\Bus\Queueable;
+use Benwilkins\FCM\FcmMessage;
+use App\Channels\FirebaseChannel;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class OrderNotification extends Notification implements ShouldQueue
 {
@@ -17,7 +19,7 @@ class OrderNotification extends Notification implements ShouldQueue
     /**
      * Order object.
      *
-     * @var Order
+     * @var OrderNotify
      */
     public $order;
 
@@ -26,7 +28,7 @@ class OrderNotification extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Order $order)
+    public function __construct(OrderNotify $order)
     {
         $this->order = $order;
     }
@@ -39,7 +41,7 @@ class OrderNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return [FirebaseChannel::class, 'database', 'mail'];
     }
 
     /**
