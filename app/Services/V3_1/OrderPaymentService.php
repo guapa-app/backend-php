@@ -38,13 +38,13 @@ class OrderPaymentService
                 $loyaltyPointsService = app(LoyaltyPointsService::class);
                 $loyaltyPointsService->addPurchasePoints($order);
 
-                if ($order->vendor_wallet_payment) {
+                if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
                     $amount = $order->total - $order->fees;
                     $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
                 }
 
-//                $this->sendOrderNotifications($order);
+                $this->sendOrderNotifications($order);
             }
 
         } catch (\Exception $e) {
