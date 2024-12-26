@@ -94,25 +94,10 @@ class VendorTransactionResource extends Resource
                 Tables\Columns\TextColumn::make('transaction_date')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'completed' => 'success',
-                        'pending' => 'warning',
-                        'failed' => 'danger',
-                        'cancelled' => 'danger',
-                    }),
             ])
             ->filters([
                 SelectFilter::make('vendor')
                     ->relationship('vendor', 'name'),
-                SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'completed' => 'Completed',
-                        'failed' => 'Failed',
-                        'cancelled' => 'Cancelled',
-                    ]),
                 SelectFilter::make('operation')
                     ->options(TransactionType::class),
             ])
