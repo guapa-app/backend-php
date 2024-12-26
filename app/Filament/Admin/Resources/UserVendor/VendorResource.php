@@ -132,6 +132,10 @@ class VendorResource extends Resource
                     ->label('Wallet Balance')
                     ->money()
                     ->sortable(),
+                Tables\Columns\BooleanColumn::make('activate_wallet')
+                    ->label('Wallet Active')
+                    ->toggleable()
+                    ->sortable(),
                 Tables\Columns\SelectColumn::make('status')
                     ->options([
                         0 => 'disabled',
@@ -180,6 +184,7 @@ class VendorResource extends Resource
             RelationManagers\ProductsRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
             RelationManagers\FavoritesRelationManager::class,
+            RelationManagers\TransactionsRelationManager::class,
         ];
     }
 
