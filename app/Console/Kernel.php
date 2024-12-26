@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('order:expire');
         $schedule->command('order:remind')->hourly();
-        $schedule->job(new ProcessVendorPayouts)->weeklyOn(4, '12:00');
+//        $schedule->job(new ProcessVendorPayouts)->weeklyOn(4, '12:00');
     }
 
     /**
