@@ -468,7 +468,7 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function wallet()
     {
-        return $this->hasOne(Wallet::class);
+        return $this->hasOne(Wallet::class)->withDefault();
     }
 
     // =========== Scopes Section ===========

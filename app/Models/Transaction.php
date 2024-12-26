@@ -22,6 +22,7 @@ class Transaction extends Model
         'invoice_link',
         'status',
         'order_id',
+        'notes',
     ];
 
     protected $casts = [

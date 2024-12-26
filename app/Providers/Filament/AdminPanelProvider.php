@@ -60,6 +60,9 @@ class AdminPanelProvider extends PanelProvider
                     ->label('User & Vendor')
                     ->collapsed(),
                 NavigationGroup::make()
+                    ->label('Finance')
+                    ->collapsed(),
+                NavigationGroup::make()
                     ->label('Admin Setting')
                     ->collapsed(),
             ])
