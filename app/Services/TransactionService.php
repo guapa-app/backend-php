@@ -79,7 +79,7 @@ class TransactionService
                 'transaction_date' =>  $data['order_id'] ?? now(),
             ]);
 
-            $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
+            $invoiceLink = $this->pdfService->addVendorTransactionPDF($transaction);
             $transaction->invoice_link = $invoiceLink;
             $transaction->save();
 
