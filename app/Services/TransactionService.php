@@ -45,9 +45,9 @@ class TransactionService
                 'transaction_date' => now(),
             ]);
 
-             $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
-             $transaction->invoice_link = $invoiceLink;
-             $transaction->save();
+//             $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
+//             $transaction->invoice_link = $invoiceLink;
+//             $transaction->save();
 
             DB::commit();
 
@@ -78,6 +78,10 @@ class TransactionService
                 'status' => $data['status'],
                 'transaction_date' => now(),
             ]);
+
+            $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
+            $transaction->invoice_link = $invoiceLink;
+            $transaction->save();
 
             DB::commit();
 
