@@ -74,9 +74,9 @@ class TransactionService
                 'amount' => $data['amount'],
                 'operation' => $data['operation'],
                 'transaction_type' => $data['transaction_type'],
-                'order_id' => $data['order_id'],
-                'status' => $data['status'],
-                'transaction_date' => now(),
+                'status' => $data['status'] ?? null,
+                'order_id' => $data['order_id'] ?? null,
+                'transaction_date' =>  $data['order_id'] ?? now(),
             ]);
 
             $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
