@@ -27,17 +27,18 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     protected $fillable = [
-        'country_id', 'admin_id', 'category_id',
-        'title', 'content', 'status', 'youtube_url', 'tag_id',
-        'type','product_id','stars','user_id','show_user','service_date'
+        'country_id', 'admin_id', 'category_id', 'title',
+        'content', 'status', 'youtube_url', 'tag_id',
+        'type','product_id','stars','user_id','show_user','service_date',
+        'vendor_id','vendor_name'
     ];
 
     protected $filterable = [
-        'admin_id', 'category_id', 'status', 'tag_id','type','product_id','stars','user_id'
+        'admin_id', 'category_id', 'status', 'tag_id','type','product_id','stars','user_id','vendor_id'
     ];
 
     protected $search_attributes = [
-        'title', 'content',
+        'title', 'content','vendor_name'
     ];
 
     protected $appends = [

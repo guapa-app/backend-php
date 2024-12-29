@@ -5,13 +5,14 @@ use App\Http\Middleware\CountryHeader;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
+use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
+use App\Http\Controllers\Api\User\V3_1\MediaController;
 use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DeviceController;
 use App\Http\Controllers\Api\User\V3_1\WalletController;
 use App\Http\Controllers\Api\User\V3_1\CountryController;
 use App\Http\Controllers\Api\User\V3_1\PaymentController;
 use App\Http\Controllers\Api\User\V3_1\TransactionController;
-use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
 use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
 
@@ -75,5 +76,8 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
         Route::get('loyalty-points/history', [LoyaltyPointsController::class, 'pointsHistory']);
         Route::post('loyalty-points/convert-points', [LoyaltyPointsController::class, 'convertPoints']);
         Route::post('loyalty-points/calc-convert-points', [LoyaltyPointsController::class, 'calcConvertPointsToCash']);
+
+        // upload temporary media
+        Route::post('media/upload-temporary', [MediaController::class, 'uploadTemporaryMedia']);
     });
 });

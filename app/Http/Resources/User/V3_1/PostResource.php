@@ -32,7 +32,7 @@ class PostResource extends JsonResource
             ]),
 
             $this->mergeWhen($this->type == PostType::Review->value, [
-                'vendor_name' => $this->product ? $this->product->vendor?->name : null,
+                'vendor_name' => $this->vendor_name,
             ]),
 
             'admin'       => AdminResource::make($this->whenLoaded('admin')),

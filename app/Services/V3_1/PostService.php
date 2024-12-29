@@ -5,6 +5,7 @@ namespace App\Services\V3_1;
 use App\Contracts\Repositories\CommentRepositoryInterface;
 use App\Contracts\Repositories\PostRepositoryInterface;
 use App\Enums\PostType;
+use App\Models\Media;
 use App\Models\Post;
 use App\Models\UserVote;
 use App\Services\MediaService;
@@ -161,9 +162,22 @@ class PostService
         $keep_media = $data['keep_media'] ?? [];
         $post->media()->whereNotIn('id', $keep_media)->delete();
 
-        $this->addMediaToPost($post, $data['before_images'] ?? [], 'before');
-        $this->addMediaToPost($post, $data['after_images'] ?? [], 'after');
-        $this->addMediaToPost($post, $data['media'] ?? []);
+        $mediaCollections = [
+            'media_ids' => 'posts',
+            'before_media_ids' => 'before',
+            'after_media_ids' => 'after'
+        ];
+
+        foreach ($mediaCollections as $mediaKey => $collectionName) {
+            if (!empty($data[$mediaKey])) {
+                Media::whereIn('id', $data[$mediaKey])
+                    ->update([
+                        'model_type' => 'post',
+                        'model_id' => $post->id,
+                        'collection_name' => $collectionName
+                    ]);
+            }
+        }
 
         $post->load('media');
 
