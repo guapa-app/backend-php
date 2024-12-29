@@ -40,12 +40,12 @@ class PostRequest extends FailedValidationRequest
             'vote_options'   => 'required_if:type,' . PostType::Vote->value . '|array|min:2|max:10',
             'vote_options.*' => 'required|string|max:255',
 
-            'media'           => 'sometimes|array|min:1',
-            'media.*'         => ['required', new ImageOrBase64()],
-            'before_images'   => 'sometimes|array|min:1',
-            'before_images.*' => ['required', new ImageOrBase64()],
-            'after_images'    => 'sometimes|array|min:1',
-            'after_images.*'  => ['required', new ImageOrBase64()],
+            'media_ids' => 'sometimes|array|min:1',
+            'media_ids.*' => 'required|integer|exists:media,id',
+            'before_media_ids' => 'sometimes|array|min:1',
+            'before_media_ids.*' => 'required|integer|exists:media,id',
+            'after_media_ids' => 'sometimes|array|min:1',
+            'after_media_ids.*' => 'required|integer|exists:media,id',
             'keep_media'      => 'sometimes|array|min:1',
             'keep_media.*'    => 'required|integer|exists:media,id',
         ];
