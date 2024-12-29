@@ -28,9 +28,10 @@ class PostRequest extends FailedValidationRequest
     public function rules()
     {
         return [
-            'category_id'     => 'required|integer|exists:taxonomies,id',
-            'product_id'      => 'sometimes|integer|exists:products,id',
             'type'            => 'required|string|in:' . implode(',', PostType::availableForCreateByUser()),
+            'category_id'     => 'required|integer|exists:taxonomies,id',
+            'vendor_id'      => 'sometimes|integer|exists:vendors,id',
+            'vendor_name'     => 'string|required_if:type,' . PostType::Review->value,
             'content'         => 'required',
             'stars'           => 'integer|min:1|max:5|required_if:type,' . PostType::Review->value,
             'show_user'       => 'sometimes|boolean',
