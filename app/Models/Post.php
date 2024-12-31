@@ -24,6 +24,7 @@ class Post extends Model implements Listable, HasMedia
     public const STATUSES = [
         1 => 'Published',
         2 => 'Draft',
+        3 => 'Pending',
     ];
 
     protected $fillable = [
