@@ -147,7 +147,8 @@ class Taxonomy extends BaseTaxonomy implements Listable
     {
         return $this->hasMany(CategoryFee::class, 'category_id');
     }
-    
+
+
     public function posts()
     {
         return $this->hasMany(Post::class, 'category_id');
