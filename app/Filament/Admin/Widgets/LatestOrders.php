@@ -27,7 +27,7 @@ class LatestOrders extends BaseWidget
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->url(fn (Order $record): string =>  UserResource::getUrl('show', ['record' => $record->user_id]))
+                    ->url(fn (Order $record): string =>  UserResource::getUrl('view', ['record' => $record->user_id]))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
