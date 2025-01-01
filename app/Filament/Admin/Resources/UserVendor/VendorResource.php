@@ -90,20 +90,6 @@ class VendorResource extends Resource
                 Forms\Components\Textarea::make('about')
                     ->columnSpanFull(),
 
-                Forms\Components\Fieldset::make('Social Media')->schema([
-                    Forms\Components\TextInput::make('whatsapp')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('twitter')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('instagram')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('snapchat')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('website_url')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('known_url')
-                        ->maxLength(255),
-                ]),
                 Forms\Components\Fieldset::make('Additional Information')->schema([
                     Forms\Components\TextInput::make('tax_number')
                         ->maxLength(255),
@@ -152,12 +138,11 @@ class VendorResource extends Resource
                     ->getStateUsing(function (Vendor $record): string {
                         return $record->favoritedBy()->count() . ' users';
                     }),
-
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -167,6 +152,7 @@ class VendorResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -182,6 +168,7 @@ class VendorResource extends Resource
             RelationManagers\WorkDaysRelationManager::class,
             RelationManagers\StaffRelationManager::class,
             RelationManagers\ProductsRelationManager::class,
+            RelationManagers\ServicesRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
             RelationManagers\FavoritesRelationManager::class,
             RelationManagers\TransactionsRelationManager::class,
@@ -194,6 +181,7 @@ class VendorResource extends Resource
             'index' => Pages\ListVendors::route('/'),
             'create' => Pages\CreateVendor::route('/create'),
             'edit' => Pages\EditVendor::route('/{record}/edit'),
+            'view' => Pages\ViewVendor::route('/{record}'),
         ];
     }
 

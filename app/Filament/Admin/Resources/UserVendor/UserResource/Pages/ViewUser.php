@@ -13,11 +13,7 @@ class ViewUser extends ViewRecord
     protected function getHeaderWidgets(): array
     {
         return [
-            UserOrderStats::make(
-                [
-                    'record' => $this->record,
-                ]
-            ),
+            UserOrderStats::make(['record' => $this->record]),
         ];
     }
 }

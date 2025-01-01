@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class SocialMediaVendorResource extends Resource
 {
@@ -22,9 +23,18 @@ class SocialMediaVendorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('social_media_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('social_media_id')
+                    ->label(__('Social Media'))
+                    ->native(false)
+                    ->relationship(name: 'socialMedia')
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name}")
+                    ->required(),
+                Forms\Components\Select::make('vendor_id')
+                    ->label(__('Vendor'))
+                    ->native(false)
+                    ->relationship(name: 'vendor')
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->name}")
+                    ->required(),
                 Forms\Components\Textarea::make('link')
                     ->required()
                     ->columnSpanFull(),
@@ -35,12 +45,17 @@ class SocialMediaVendorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('social_media_id')
+                Tables\Columns\TextColumn::make('socialMedia.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('vendor_id')
+                Tables\Columns\TextColumn::make('vendor.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('link')
+                    ->label('Link')
+                    ->url(fn ($record) => $record->link)
+                    ->formatStateUsing(fn ($state) => 'View Link')
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

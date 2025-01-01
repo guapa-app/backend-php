@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Filament\Admin\Resources\Shop\OrderResource;
+use App\Filament\Admin\Resources\UserVendor\UserResource;
 use App\Models\Order;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,6 +27,7 @@ class LatestOrders extends BaseWidget
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
+                    ->url(fn (Order $record): string =>  UserResource::getUrl('show', ['record' => $record->user_id]))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
