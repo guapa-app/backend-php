@@ -14,14 +14,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductsRelationManager extends RelationManager
+class ServicesRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        $count = $ownerRecord->products()->where('type', 'product')->count();
-        return "Products ($count)";
+        $count = $ownerRecord->products()->where('type', 'service')->count();
+        return "Services ($count)";
     }
 
     public function form(Form $form): Form
@@ -87,7 +87,8 @@ class ProductsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'service'))
+
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
                     ->label('Image')
