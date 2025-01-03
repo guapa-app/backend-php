@@ -2,10 +2,11 @@
 
 namespace App\Filament\Admin\Resources\Shop;
 
+
+use App\Enums\OrderStatus;
+use App\Filament\Admin\Resources\Shop\OrderResource\Actions\SendWhatsAppReminderAction;
 use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
 use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
-use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersStatusChart;
-use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
@@ -78,6 +79,8 @@ class OrderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                SendWhatsAppReminderAction::make()
+                    ->visible(fn (Order $record) => $record->status == OrderStatus::Pending),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([]),

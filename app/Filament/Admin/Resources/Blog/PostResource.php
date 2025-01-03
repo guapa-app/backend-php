@@ -31,6 +31,7 @@ class PostResource extends Resource
                     ->required()
                     ->options(Country::query()->pluck('name', 'id'))
                     ->searchable(),
+
                 Forms\Components\Section::make('Images')
                     ->schema([
                         Forms\Components\SpatieMediaLibraryFileUpload::make('media')
