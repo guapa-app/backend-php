@@ -28,7 +28,7 @@ class SendWhatsAppReminderAction extends Action
             ->modalSubmitActionLabel('Send Reminder');
 
         Notification::make()
-            ->title('Points updated successfully.')
+            ->title('WhatsApp Reminder Sent')
             ->success()
             ->send();
     }
