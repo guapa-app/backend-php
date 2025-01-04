@@ -63,7 +63,7 @@ class OrderNotification extends Notification implements ShouldQueue
     {
         $recipientType = $this->getRecipientType($notifiable);
         $mailMessage = (new MailMessage)
-            ->from('info@guapa.com.sa', 'Guapa')
+            ->from(env('MAIL_FROM_ADDRESS'), 'Guapa')
             ->subject('تأكيد استلام الدفع - ' .  $this->order->id)
             ->view(
                 'emails.order_confirmation',

@@ -35,7 +35,10 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     protected $filterable = [
-        'admin_id', 'category_id', 'status', 'tag_id','type','product_id','stars','user_id','vendor_id'
+        'country_id',
+        'admin_id', 'category_id', 'title',
+        'content', 'status', 'youtube_url',
+        'tag_id',
     ];
 
     protected $search_attributes = [

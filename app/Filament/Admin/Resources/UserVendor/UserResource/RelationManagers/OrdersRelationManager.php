@@ -31,6 +31,7 @@ class OrdersRelationManager extends RelationManager
                 Components\TextEntry::make('discount_amount'),
             ]);
     }
+
     public function table(Table $table): Table
     {
         return $table
