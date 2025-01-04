@@ -26,11 +26,6 @@ class SendWhatsAppReminderAction extends Action
             ->modalHeading('Send WhatsApp Reminder')
             ->modalDescription('Are you sure you want to send a WhatsApp reminder for this order?')
             ->modalSubmitActionLabel('Send Reminder');
-
-        Notification::make()
-            ->title('WhatsApp Reminder Sent')
-            ->success()
-            ->send();
     }
 
     public function handle(): void
@@ -46,6 +41,11 @@ class SendWhatsAppReminderAction extends Action
 
             // Update the last reminder sent timestamp
             $order->update(['last_reminder_sent' => now()]);
+
+            Notification::make()
+                ->title('WhatsApp Reminder Sent')
+                ->success()
+                ->send();
         }
     }
 }
