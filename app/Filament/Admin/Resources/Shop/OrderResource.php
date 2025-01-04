@@ -45,7 +45,8 @@ class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('hash_id')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country.name')
