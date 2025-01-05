@@ -16,79 +16,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServicesRelationManager extends RelationManager
 {
-    protected static string $relationship = 'products';
+    protected static string $relationship = 'services';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        $count = $ownerRecord->products()->where('type', 'service')->count();
+        $count = $ownerRecord->services()->count();
         return "Services ($count)";
     }
 
-    public function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Images')
-                    ->schema([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
-                            ->collection('products')
-                            ->multiple()
-                            ->maxFiles(5)
-                            ->hiddenLabel(),
-                    ])
-                    ->collapsible(),
-                Forms\Components\Hidden::make('hash_id')
-                    ->label('Number')
-                    ->default(Common::generateUniqueHashForModel(Product::class, 16)),
-                Forms\Components\TextInput::make('sort_order')
-                    ->numeric(),
-                Forms\Components\Hidden::make('type')
-                    ->default(request('type')),
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('taxonomies')
-                    ->label(__('Categories'))
-                    ->relationship(
-                        name: 'taxonomies',
-                        modifyQueryUsing: fn(Builder $query, $record) => ($record->type?->value ?? request('type')) == 'service' ?
-                            $query->where('type', 'specialty') :
-                            $query->where('type', 'category')
-                    )
-                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->title}")
-                    ->required(),
-                Forms\Components\Select::make('vendor_id')
-                    ->label(__('Vendor'))
-                    ->native(false)
-                    ->relationship(name: 'vendor')
-                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->name}")
-                    ->required(),
-                Forms\Components\TextInput::make('price')
-                    ->required()
-                    ->numeric()
-                    ->prefix('$'),
-                Forms\Components\Select::make('status')
-                    ->native(false)
-                    ->options(ProductStatus::class)
-                    ->required(),
-                Forms\Components\Select::make('review')
-                    ->native(false)
-                    ->options(ProductReview::class)
-                    ->required(),
-                Forms\Components\TextInput::make('url')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('terms')
-                    ->columnSpanFull(),
-            ]);
-    }
 
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'service'))
-
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
                     ->label('Image')
