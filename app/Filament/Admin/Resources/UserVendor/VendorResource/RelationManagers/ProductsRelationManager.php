@@ -20,7 +20,7 @@ class ProductsRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        $count = $ownerRecord->products()->where('type', 'product')->count();
+        $count = $ownerRecord->products()->count();
         return "Products ($count)";
     }
 
@@ -87,7 +87,6 @@ class ProductsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'product'))
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('media')
                     ->label('Image')
