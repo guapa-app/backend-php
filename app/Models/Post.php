@@ -79,6 +79,10 @@ class Post extends Model implements Listable, HasMedia
             ->performOnCollections('posts', 'before', 'after');
     }
 
+    public function getCommentsCountAttribute()
+    {
+        return $this->comments()->count();
+    }
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class)->withDefault();
