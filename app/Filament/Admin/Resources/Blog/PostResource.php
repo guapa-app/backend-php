@@ -2,10 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Blog;
 
+use App\Enums\PostType;
 use Filament\Forms;
 use App\Models\Post;
 use Filament\Tables;
-use App\Models\Country;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -121,7 +121,6 @@ class PostResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
-                // user
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('title')
@@ -130,10 +129,10 @@ class PostResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'blog' => 'success',
-                        'review' => 'warning',
-                        'vote' => 'danger',
-                        'question' => 'info',
+                        PostType::Blog->value => 'success',
+                        PostType::Review->value => 'warning',
+                        PostType::Vote->value => 'danger',
+                        PostType::Question->value => 'info',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('youtube_url')
