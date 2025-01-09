@@ -17,17 +17,34 @@ class MediaController extends BaseApiController
     public function uploadTemporaryMedia(MediaUploadRequest $request): MediaCollection
     {
         $tempModel = TemporaryUpload::create(['user_id' => auth()->id()]);
-        $collection = 'temporary_uploads';
-        $media = $request->media;
 
-        foreach ($media as $value) {
-            if ($value instanceof UploadedFile) {
-                $tempModel->addMedia($value)->toMediaCollection($collection);
-            } elseif (is_string($value) && Str::startsWith($value, 'data:')) {
-                $tempModel->addMediaFromBase64($value)->toMediaCollection($collection);
+        // Handle video upload
+        if ($request->hasFile('video')) {
+            $video = $request->file('video');
+            if ($video instanceof UploadedFile) {
+                $tempModel->addMedia($video)
+                    ->toMediaCollection('video');
+                return MediaCollection::make([$tempModel->getFirstMedia('video')]);
             }
         }
 
-        return MediaCollection::make($tempModel->getMedia($collection));
+        // Handle image uploads
+        if ($request->has('media')) {
+            $collection = 'temporary_uploads';
+            $media = $request->media;
+
+            foreach ($media as $value) {
+                if ($value instanceof UploadedFile) {
+                    $tempModel->addMedia($value)->toMediaCollection($collection);
+                } elseif (is_string($value) && Str::startsWith($value, 'data:')) {
+                    $tempModel->addMediaFromBase64($value)->toMediaCollection($collection);
+                }
+            }
+
+            return MediaCollection::make($tempModel->getMedia($collection));
+        }
+
+        // If no files were uploaded, return empty collection
+        return MediaCollection::make([]);
     }
 }

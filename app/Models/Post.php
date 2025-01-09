@@ -16,6 +16,7 @@ use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use Spatie\MediaLibrary\Support\File;
 
 class Post extends Model implements Listable, HasMedia
 {
@@ -57,6 +58,17 @@ class Post extends Model implements Listable, HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('posts');
+        $this->addMediaCollection('before');
+        $this->addMediaCollection('after');
+        $this->addMediaCollection('videos')
+            ->acceptsFile(function (File $file) {
+                return in_array($file->mimeType, [
+                    'video/mp4',
+                    'video/quicktime',
+                    'video/x-msvideo',
+                    'video/x-flv',
+                ]);
+            })->singleFile();
     }
 
     /**
@@ -77,6 +89,11 @@ class Post extends Model implements Listable, HasMedia
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 600, 600)
             ->performOnCollections('posts', 'before', 'after');
+
+        $this->addMediaConversion('thumb')
+            ->extractVideoFrameAtSecond(1)
+            ->fit(Manipulations::FIT_CROP, 300, 300)
+            ->performOnCollections('videos');
     }
 
     public function getCommentsCountAttribute()
