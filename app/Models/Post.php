@@ -16,6 +16,7 @@ use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use Spatie\MediaLibrary\Support\File;
 
 class Post extends Model implements Listable, HasMedia
 {
@@ -28,15 +29,17 @@ class Post extends Model implements Listable, HasMedia
     ];
 
     protected $fillable = [
-        'admin_id', 'category_id', 'title',
-        'content', 'status', 'youtube_url',
-        'tag_id',
+        'country_id', 'admin_id', 'category_id', 'title',
+        'content', 'status', 'youtube_url', 'tag_id',
         'type','product_id','stars','user_id','show_user','service_date',
         'vendor_id','vendor_name'
     ];
 
     protected $filterable = [
-        'admin_id', 'category_id', 'status', 'tag_id','type','product_id','stars','user_id','vendor_id'
+        'country_id',
+        'admin_id', 'category_id', 'title',
+        'content', 'status', 'youtube_url',
+        'tag_id',
     ];
 
     protected $search_attributes = [
@@ -57,6 +60,15 @@ class Post extends Model implements Listable, HasMedia
         $this->addMediaCollection('posts');
         $this->addMediaCollection('before');
         $this->addMediaCollection('after');
+        $this->addMediaCollection('videos')
+            ->acceptsFile(function (File $file) {
+                return in_array($file->mimeType, [
+                    'video/mp4',
+                    'video/quicktime',
+                    'video/x-msvideo',
+                    'video/x-flv',
+                ]);
+            })->singleFile();
     }
 
     /**
@@ -77,6 +89,11 @@ class Post extends Model implements Listable, HasMedia
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 600, 600)
             ->performOnCollections('posts', 'before', 'after');
+
+        $this->addMediaConversion('thumb')
+            ->extractVideoFrameAtSecond(1)
+            ->fit(Manipulations::FIT_CROP, 300, 300)
+            ->performOnCollections('videos');
     }
 
     public function getCommentsCountAttribute()
@@ -87,6 +104,7 @@ class Post extends Model implements Listable, HasMedia
     {
         return $this->belongsTo(Admin::class)->withDefault();
     }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withDefault();

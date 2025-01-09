@@ -179,6 +179,15 @@ class PostService
             }
         }
 
+        if (!empty($data['video_id'])) {
+            Media::where('id', $data['video_id'])
+                ->update([
+                    'model_type' => 'post',
+                    'model_id' => $post->id,
+                    'collection_name' => 'video'
+                ]);
+        }
+
         $post->load('media');
 
         return $post;

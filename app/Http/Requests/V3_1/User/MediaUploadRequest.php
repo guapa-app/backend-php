@@ -15,8 +15,9 @@ class MediaUploadRequest  extends FailedValidationRequest
     public function rules()
     {
         return [
-            'media' => 'required|array|min:1',
-            'media.*'         => ['required', new ImageOrBase64()],
+            'media'   => 'sometimes|array|min:1',
+            'media.*' => ['required', new ImageOrBase64()],
+            'video'   => ['nullable', 'mimes:mp4,mov,avi,flv', 'max:102400',] // 100MB max size
         ];
     }
 }
