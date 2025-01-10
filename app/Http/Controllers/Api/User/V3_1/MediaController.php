@@ -26,7 +26,7 @@ class MediaController extends BaseApiController
                 try {
                     $tempModel->addMedia($video)
                         ->toMediaCollection('video');
-                    return MediaCollection::make([$tempModel->getFirstMedia('video')]);
+                    return MediaCollection::make($tempModel->getFirstMedia('video'));
                 } catch (\Exception $e) {
                     \Log::error('Video upload failed: ' . $e->getMessage());
                     throw new \Exception('Failed to process video upload');
