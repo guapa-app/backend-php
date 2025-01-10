@@ -24,8 +24,8 @@ class MediaController extends BaseApiController
             // Check if file was uploaded successfully
             if ($video && $video->isValid()) {
                 try {
-                    $tempModel->addMedia($video)
-                        ->toMediaCollection('video');
+                    $filePath = $video->store('temp/uploads', 's3');
+                    $tempModel->addMediaFromDisk($filePath, 's3')->toMediaCollection('video');
                     return MediaCollection::make($tempModel->getMedia('video'));
                 } catch (\Exception $e) {
                     \Log::error('Video upload failed: ' . $e->getMessage());
