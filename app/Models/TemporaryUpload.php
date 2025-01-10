@@ -26,6 +26,7 @@ class TemporaryUpload extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('temporary_uploads');
+        $this->addMediaCollection('video');
     }
 
     /**
@@ -46,6 +47,10 @@ class TemporaryUpload extends Model implements HasMedia
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 600, 600)
             ->performOnCollections('temporary_uploads');
+
+        $this->addMediaConversion('thumb')
+            ->fit(Manipulations::FIT_CROP, 300, 300)
+            ->performOnCollections('video');
     }
 
     /**
