@@ -32,7 +32,7 @@ class OrderResource extends Resource
                 Components\TextEntry::make('vendor.name'),
                 Components\TextEntry::make('address.title'),
                 Components\TextEntry::make('user.name'),
-                Components\TextEntry::make('user.phone'),
+                Components\TextEntry::make('user.phone')->label('Phone'),
                 Components\TextEntry::make('total'),
                 Components\TextEntry::make('status'),
                 Components\TextEntry::make('note'),
@@ -60,6 +60,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.phone')
+                    ->label('Phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total')
                     ->numeric()
