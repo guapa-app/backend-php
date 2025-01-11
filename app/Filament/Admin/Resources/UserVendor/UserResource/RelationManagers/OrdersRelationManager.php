@@ -21,8 +21,8 @@ class OrdersRelationManager extends RelationManager
             ->schema([
                 Components\TextEntry::make('id'),
                 Components\TextEntry::make('address.title'),
-                Components\TextEntry::make('name'),
-                Components\TextEntry::make('phone'),
+                Components\TextEntry::make('user.name'),
+                Components\TextEntry::make('user.phone'),
                 Components\TextEntry::make('total'),
                 Components\TextEntry::make('status'),
                 Components\TextEntry::make('note'),
@@ -40,9 +40,9 @@ class OrdersRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hash_id')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('user.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
+                Tables\Columns\TextColumn::make('user.phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total')
                     ->numeric()
