@@ -47,7 +47,6 @@ class PostRequest extends FailedValidationRequest
             'before_media_ids.*' => 'required|integer|exists:media,id',
             'after_media_ids' => 'sometimes|array|min:1',
             'after_media_ids.*' => 'required|integer|exists:media,id',
-            'video_id' => 'nullable|exists:media,id',
             'keep_media'      => 'sometimes|array|min:1',
             'keep_media.*'    => 'required|integer|exists:media,id',
         ];

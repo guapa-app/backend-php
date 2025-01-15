@@ -42,7 +42,7 @@ class PostResource extends JsonResource
             ]),
 
             'category'    => TaxonomyResource::make($this->whenLoaded('category')),
-            'images'      => MediaResource::collection($this->whenLoaded('media')),
+            'media'      => MediaResource::collection($this->whenLoaded('media')),
             'social_media'  => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
         ];
     }
