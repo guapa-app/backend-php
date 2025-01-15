@@ -60,15 +60,6 @@ class Post extends Model implements Listable, HasMedia
         $this->addMediaCollection('posts');
         $this->addMediaCollection('before');
         $this->addMediaCollection('after');
-        $this->addMediaCollection('video')
-            ->acceptsFile(function (File $file) {
-                return in_array($file->mimeType, [
-                    'video/mp4',
-                    'video/quicktime',
-                    'video/x-msvideo',
-                    'video/x-flv',
-                ]);
-            })->singleFile();
     }
 
     /**
@@ -93,7 +84,7 @@ class Post extends Model implements Listable, HasMedia
         $this->addMediaConversion('thumb')
             ->extractVideoFrameAtSecond(1)
             ->fit(Manipulations::FIT_CROP, 300, 300)
-            ->performOnCollections('video');
+            ->performOnCollections('posts');
     }
 
     public function getCommentsCountAttribute()
