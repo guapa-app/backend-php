@@ -39,7 +39,7 @@ class Post extends Model implements Listable, HasMedia
         'country_id',
         'admin_id', 'category_id', 'title',
         'content', 'status', 'youtube_url',
-        'tag_id',
+        'tag_id','vendor_id'
     ];
 
     protected $search_attributes = [

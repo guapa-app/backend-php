@@ -49,6 +49,7 @@ class TemporaryUpload extends Model implements HasMedia
             ->performOnCollections('temporary_uploads');
 
         $this->addMediaConversion('thumb')
+            ->extractVideoFrameAtSecond(1)
             ->fit(Manipulations::FIT_CROP, 300, 300)
             ->performOnCollections('video');
     }
