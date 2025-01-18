@@ -17,7 +17,7 @@ class WalletResource extends JsonResource
     {
         return [
             'balance' => (int) $this->wallet?->balance ?? 0,
-            'transactions' => TransactionResource::collection($this->transactions),
+            'transactions' => TransactionResource::collection($this->transactions->sortByDesc('transaction_date')),
         ];
     }
 }
