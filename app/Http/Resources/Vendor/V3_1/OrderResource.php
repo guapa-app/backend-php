@@ -19,8 +19,8 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'type' => $this->type,
 
-            'name'        => (string) $this->name,
-            'phone'       => (string) $this->phone,
+            'name'        => (string) $this->user?->name,
+            'phone'       => (string) $this->user?->phone,
 
             'invoice_url' => (string) $this->invoice_url,
             'cancellation_reason' => (string) $this->cancellation_reason,
