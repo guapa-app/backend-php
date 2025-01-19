@@ -9,12 +9,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
+use Spatie\Translatable\HasTranslations;
 
 class SupportMessageType extends Model implements Listable
 {
-    use HasFactory, ListableTrait;
+    use HasFactory, ListableTrait , HasTranslations;
 
     protected $fillable = ['name'];
+
+    protected $translatable = ['name'];
 
     public function supportMessage(): HasMany
     {
