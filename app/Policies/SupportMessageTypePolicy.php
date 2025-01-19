@@ -17,7 +17,7 @@ class SupportMessageTypePolicy
     {
         try {
             if ($user->isAdmin()) {
-                return $user->hasPermissionTo('view_support_message_type// s');
+                return $user->hasPermissionTo('view_support_message_types');
             } else {
                 return true;
             }
