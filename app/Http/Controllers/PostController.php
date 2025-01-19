@@ -24,6 +24,7 @@ class PostController extends Controller
         $request->merge([
             'perPage' => 12,
             'order' => 'desc',
+            'status' => '1',
         ]);
 
         $posts = $this->postRepository
