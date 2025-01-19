@@ -6,12 +6,15 @@ use App\Filament\Admin\Resources\UserVendor\SupportMessageTypeResource\Pages;
 use App\Models\SupportMessageType;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class SupportMessageTypeResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = SupportMessageType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -24,6 +27,7 @@ class SupportMessageTypeResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->live(onBlur: true)
                     ->maxLength(255),
             ]);
     }
