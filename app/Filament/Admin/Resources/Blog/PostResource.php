@@ -121,9 +121,21 @@ class PostResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
+                // user
+                Tables\Columns\TextColumn::make('user.name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('title')
                     ->limit(50)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'blog' => 'success',
+                        'review' => 'warning',
+                        'vote' => 'danger',
+                        'question' => 'info',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('youtube_url')
                     ->limit(30),
                 Tables\Columns\SelectColumn::make('status')
