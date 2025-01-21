@@ -29,6 +29,7 @@ class PostController extends BaseApiController
         if (!$request->has('user_id')) {
             $request->merge(['status' => '1']);
         }
+
         $posts =  $this->postRepository->all($request);
         return PostCollection::make($posts)
             ->additional([
