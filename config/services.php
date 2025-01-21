@@ -44,4 +44,11 @@ return [
         'business_id' => env('CONNECTLY_BUSINESS_ID'),
     ],
 
+    'connectsaudi' => [
+        'api_url' => env('CONNECT_SAUDI_API_URL'),
+        'user' => env('CONNECT_SAUDI_API_USER'),
+        'password' => env('CONNECT_SAUDI_API_PASSWORD'),
+        'sender_id' => env('CONNECT_SAUDI_API_SENDERID'),
+    ],
+
 ];

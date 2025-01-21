@@ -1,21 +1,24 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\CountryHeader;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
-use App\Http\Controllers\Api\User\V3_1\DeviceController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
-use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\MediaController;
 use App\Http\Controllers\Api\User\V3_1\OrderController;
+use App\Http\Controllers\Api\User\V3_1\DeviceController;
+use App\Http\Controllers\Api\User\V3_1\WalletController;
+use App\Http\Controllers\Api\User\V3_1\CountryController;
 use App\Http\Controllers\Api\User\V3_1\PaymentController;
 use App\Http\Controllers\Api\User\V3_1\TransactionController;
-use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
-use App\Http\Controllers\Api\User\V3_1\WalletController;
+use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
 
-Route::prefix("user/v3.1")->group(function () {
+Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function () {
     Route::get('home', [HomeController::class, 'index']);
+    Route::get('countries', [CountryController::class, 'index']);
 
     Route::prefix('auth')->group(base_path('routes/user/v3_1/api/auth.php'));
     Route::prefix('users')->group(base_path('routes/user/v3_1/api/users.php'));

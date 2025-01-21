@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use App\Contracts\Listable;
+use Illuminate\Http\Request;
+use App\Models\Scopes\CountryScope;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 use App\Traits\Listable as ListableTrait;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Spatie\Translatable\HasTranslations;
 
 class City extends Model implements Listable
 {
     use ListableTrait, HasTranslations;
 
     protected $fillable = [
+        'country_id',
         'name',
     ];
 
@@ -28,6 +30,16 @@ class City extends Model implements Listable
     protected $search_attributes = [
         'name',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CountryScope());
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {

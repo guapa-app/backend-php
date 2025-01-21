@@ -2,14 +2,15 @@
 
 namespace App\Filament\Admin\Resources\UserVendor;
 
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Vendor;
+use App\Models\Country;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use App\Filament\Admin\Resources\UserVendor\VendorResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
-use App\Models\Vendor;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
 
 class VendorResource extends Resource
 {
@@ -50,6 +51,11 @@ class VendorResource extends Resource
                     ])
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                Forms\Components\Select::make('country_id')
+                    ->label('Country')
+                    ->required()
+                    ->options(Country::query()->pluck('name', 'id'))
+                    ->searchable(),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
                     ->required()
@@ -83,20 +89,6 @@ class VendorResource extends Resource
                 Forms\Components\Textarea::make('about')
                     ->columnSpanFull(),
 
-                Forms\Components\Fieldset::make('Social Media')->schema([
-                    Forms\Components\TextInput::make('whatsapp')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('twitter')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('instagram')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('snapchat')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('website_url')
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('known_url')
-                        ->maxLength(255),
-                ]),
                 Forms\Components\Fieldset::make('Additional Information')->schema([
                     Forms\Components\TextInput::make('tax_number')
                         ->maxLength(255),
@@ -137,12 +129,11 @@ class VendorResource extends Resource
                     ->getStateUsing(function (Vendor $record): string {
                         return $record->favoritedBy()->count() . ' users';
                     }),
-
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -152,6 +143,7 @@ class VendorResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -167,6 +159,7 @@ class VendorResource extends Resource
             RelationManagers\WorkDaysRelationManager::class,
             RelationManagers\StaffRelationManager::class,
             RelationManagers\ProductsRelationManager::class,
+            RelationManagers\ServicesRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
             RelationManagers\FavoritesRelationManager::class,
         ];
@@ -178,6 +171,7 @@ class VendorResource extends Resource
             'index' => Pages\ListVendors::route('/'),
             'create' => Pages\CreateVendor::route('/create'),
             'edit' => Pages\EditVendor::route('/{record}/edit'),
+            'view' => Pages\ViewVendor::route('/{record}'),
         ];
     }
 }

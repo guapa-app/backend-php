@@ -45,6 +45,7 @@ class DoctorController extends ApiVendorController
         DB::beginTransaction();
         // create user
         $data = $this->userService->handleUserData($request->validated());
+        $data['country_id'] = auth()->user()->country_id;
 
         $user = $this->userService->create($data);
 

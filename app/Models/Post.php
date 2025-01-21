@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
-use App\Contracts\Listable;
 use App\Traits\Likable;
-use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Contracts\Listable;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use App\Models\Scopes\CountryScope;
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 use Spatie\MediaLibrary\Support\File;
 
@@ -37,9 +38,7 @@ class Post extends Model implements Listable, HasMedia
 
     protected $filterable = [
         'country_id',
-        'admin_id', 'category_id', 'title',
-        'content', 'status', 'youtube_url',
-        'tag_id','vendor_id'
+        'admin_id', 'category_id', 'status', 'tag_id','vendor_id'
     ];
 
     protected $search_attributes = [
@@ -49,6 +48,11 @@ class Post extends Model implements Listable, HasMedia
     protected $appends = [
         'likes_count', 'is_liked','comments_count'
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CountryScope());
+    }
 
     /**
      * Register media collections.
@@ -91,6 +95,12 @@ class Post extends Model implements Listable, HasMedia
     {
         return $this->comments()->count();
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class)->withDefault();

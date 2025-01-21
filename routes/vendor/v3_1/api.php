@@ -1,14 +1,17 @@
 <?php
 
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\Vendor\V3_1\DataController;
-use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
-use App\Http\Controllers\Api\Vendor\V3_1\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Controllers\Api\Vendor\V3_1\DataController;
+use App\Http\Controllers\Api\Vendor\V3_1\HomeController;
+use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
+use App\Http\Controllers\Api\Vendor\V3_1\CountryController;
+
 
 Route::prefix("vendor/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
+    Route::get('countries', [CountryController::class, 'index']);
 
     Route::prefix('auth')->group(base_path('routes/vendor/v3_1/api/auth.php'));
     Route::prefix('users')->group(base_path('routes/vendor/v3_1/api/users.php'));

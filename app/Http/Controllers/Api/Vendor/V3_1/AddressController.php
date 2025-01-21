@@ -51,6 +51,7 @@ class AddressController extends BaseApiController
     public function create(AddressRequest $request)
     {
         $data = $this->prepareAddressData($request->validated());
+        $data['country_id'] = auth()->user()->country_id;
 
         $item = $this->addressRepository->create($data);
 
