@@ -20,6 +20,7 @@ class PostController extends BaseApiController
     }
     public function index(Request $request)
     {
+        $request->merge(['type' => 'blog', 'status' => '1']);
         $posts = $this->postRepository->all($request);
 
         return PostCollection::make($posts)

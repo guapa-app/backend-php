@@ -20,8 +20,10 @@ return new class extends Migration
             $table->unsignedTinyInteger('stars')->nullable()->after('product_id');
             $table->date('service_date')->nullable()->after('youtube_url');
 
-            // make title column nullable
+            // make title , admin_id column nullable
             $table->string('title')->nullable()->change();
+            $table->foreignId('admin_id')->nullable()->change();
+
         });
     }
 
@@ -31,7 +33,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            //
+            $table->dropColumn('type');
+            $table->dropConstrainedForeignId('product_id');
+            $table->dropConstrainedForeignId('user_id');
+            $table->dropColumn('show_user');
+            $table->dropColumn('stars');
+            $table->dropColumn('service_date');
+
+            // make title column not nullable
+            $table->string('title')->nullable(false)->change();
         });
     }
 };
