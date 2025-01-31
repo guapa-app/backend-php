@@ -9,6 +9,8 @@ Route::group(['middleware' => 'auth:api', 'as' => 'vendors.'], function () {
     Route::post('/', [VendorController::class, 'create'])->name('create');
     Route::match(['put', 'patch', 'post'], '/update-profile', [VendorController::class, 'update'])->name('update');
 
+    Route::put('/activate-wallet', [VendorController::class, 'activateWallet'])->name('activate-wallet');
+
     Route::apiResource('{vendor}/social-media', VendorSocialMediaController::class)->only([
         'store', 'update', 'destroy'
     ]);

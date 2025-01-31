@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Vendor\V3_1\WalletController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\BaseApiController;
@@ -36,7 +37,7 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::prefix('')->group(base_path('routes/vendor/v3_1/api/doctors.php')); //sub-vendors
     Route::prefix('social-media')->group(base_path('routes/vendor/v3_1/api/social_media.php')); //sub-vendors
 
-
+    Route::get('wallet', [WalletController::class, 'index'])->middleware('auth:api');
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
     Route::get('address_types', [DataController::class, 'address_types']);

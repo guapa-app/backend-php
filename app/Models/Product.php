@@ -205,12 +205,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $taxPercentage = (float) Setting::getTaxes(); // tax percentage
         $taxes = round(($taxPercentage / 100) * $fees, 2);
         $remaining = round($finalPrice - $fees, 2);
-        $feesWithTaxes = round($fees + $taxes, 2);
+        $feesWithTaxes = round(($this->vendor->activate_wallet ? $finalPrice : $fees) + $taxes, 2);
 
         return [
-            'fees' => $fees,
+            'fees' => $this->vendor->activate_wallet ? $finalPrice : $fees,
             'taxes' => $taxes,
-            'remaining' => $remaining,
+            'remaining' => $this->vendor->activate_wallet ? 0 : $remaining,
             'fees_with_taxes' => $feesWithTaxes,
             'tax_percentage' => $taxPercentage,
             'price_after_discount' => $this->offer ? round($this->offer_price, 2) : round((float) $this->price, 2),
