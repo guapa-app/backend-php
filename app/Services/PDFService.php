@@ -77,6 +77,25 @@ class PDFService
 
         return $url;
     }
+    public function addVendorTransactionPDF(Transaction $transaction)
+    {
+        $data = [
+            'invoice' => $transaction,
+            'cus_name' => $transaction->vendor->name,
+        ];
+        $pdf = PDF::loadView('invoice-transaction-pdf', $data);
+        $pdfContent = $pdf->output();
+        // Define a unique file name for the PDF
+        $fileName = 'mpdf/invoices/invoice_' . time() . '.pdf';
+
+        // Upload the PDF to S3
+        Storage::disk('s3')->put($fileName, $pdfContent, 'public');
+
+        // Get the URL of the uploaded PDF
+        $url = Storage::disk('s3')->url($fileName);
+
+        return $url;
+    }
 
     public function generatePDF($order)
     {

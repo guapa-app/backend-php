@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TransactionStatus;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Setting;
@@ -46,6 +47,35 @@ class WalletService
         $wallet->save();
 
         return $wallet;
+    }
+
+    /**
+     * Credit vendor wallet from order
+     *
+     * @param int $vendorId
+     * @param float $amount
+     * @param int $orderId
+     * @return Transaction
+     */
+    public function creditVendorWallet(int $vendorId, float $amount, int $orderId): Transaction
+    {
+        // get first wallet for vendor or create
+        $wallet = Wallet::firstOrCreate(['vendor_id' => $vendorId]);
+
+        // Create pending transaction
+        $transaction = $this->transactionService->createVendorTransaction([
+            'vendor_id' => $vendorId,
+            'amount' => $amount,
+            'transaction_type' => TransactionType::ORDER_PAYMENT,
+            'operation' => TransactionOperation::DEPOSIT,
+            'order_id' => $orderId,
+            'status' => TransactionStatus::PENDING,
+        ]);
+
+        $wallet->balance += $amount;
+        $wallet->save();
+
+        return $transaction;
     }
 
     /**

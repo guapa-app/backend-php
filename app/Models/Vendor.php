@@ -85,6 +85,8 @@ class Vendor extends Model implements HasMedia, HasReviews
         'health_declaration',
         'accept_appointment',
         'verified_badge',
+        'activate_wallet',
+        'iban'
     ];
 
     /**
@@ -457,6 +459,16 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function favoritedBy()
     {
         return $this->morphToMany(User::class, 'favorable', 'favorables');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class)->withDefault();
     }
 
     // =========== Scopes Section ===========

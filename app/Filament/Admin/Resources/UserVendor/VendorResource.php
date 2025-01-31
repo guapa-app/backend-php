@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\UserVendor;
 
+use App\Filament\Admin\Resources\UserVendor\VendorResource\Widgets\TotalActiveWalletsWidget;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Vendor;
@@ -113,6 +114,14 @@ class VendorResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('wallet.balance')
+                    ->label('Wallet Balance')
+                    ->money()
+                    ->sortable(),
+                Tables\Columns\BooleanColumn::make('activate_wallet')
+                    ->label('Wallet Active')
+                    ->toggleable()
+                    ->sortable(),
                 Tables\Columns\SelectColumn::make('status')
                     ->options([
                         0 => 'disabled',
@@ -162,6 +171,7 @@ class VendorResource extends Resource
             RelationManagers\ServicesRelationManager::class,
             RelationManagers\OrdersRelationManager::class,
             RelationManagers\FavoritesRelationManager::class,
+            RelationManagers\TransactionsRelationManager::class,
         ];
     }
 
@@ -172,6 +182,13 @@ class VendorResource extends Resource
             'create' => Pages\CreateVendor::route('/create'),
             'edit' => Pages\EditVendor::route('/{record}/edit'),
             'view' => Pages\ViewVendor::route('/{record}'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            TotalActiveWalletsWidget::class,
         ];
     }
 }
