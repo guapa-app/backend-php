@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Models\TemporaryUpload;
+use App\Jobs\ProcessVendorPayouts;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -27,9 +27,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('order:expire');
         $schedule->command('order:remind')->hourly();
-        $schedule->call(function () {
-            TemporaryUpload::cleanUp();
-        })->daily();
+//        $schedule->job(new ProcessVendorPayouts)->weeklyOn(4, '12:00');
     }
 
     /**

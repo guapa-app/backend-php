@@ -160,6 +160,13 @@ class VendorService
         return $vendor;
     }
 
+    public function activateWallet($id, $data): Vendor
+    {
+        $vendor = $this->vendorRepository->update($id, $data);
+
+        return $vendor;
+    }
+
     public function deleteStaff($userId, Vendor $vendor): void
     {
         if ($vendor->users()->count() === 1) {

@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionService
 {
-//    protected $pdfService;
-//
-//    public function __construct(PDFService $pdfService)
-//    {
-//        $this->pdfService = $pdfService;
-//    }
+    protected $pdfService;
+
+    public function __construct(PDFService $pdfService)
+    {
+        $this->pdfService = $pdfService;
+    }
 
     /**
      * Create a new transaction.
@@ -45,9 +45,43 @@ class TransactionService
                 'transaction_date' => now(),
             ]);
 
-            // $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
-            // $transaction->invoice_link = $invoiceLink;
-            // $transaction->save();
+//             $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
+//             $transaction->invoice_link = $invoiceLink;
+//             $transaction->save();
+
+            DB::commit();
+
+            return $transaction;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Transaction creation failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function createVendorTransaction(array $data): Transaction
+    {
+        try {
+            DB::beginTransaction();
+
+            // Generate a unique transaction number
+            $transactionNumber = $this->generateTransactionNumber();
+
+            // Create the transaction
+            $transaction = Transaction::create([
+                'vendor_id' => $data['vendor_id'],
+                'transaction_number' => $transactionNumber,
+                'amount' => $data['amount'],
+                'operation' => $data['operation'],
+                'transaction_type' => $data['transaction_type'],
+                'status' => $data['status'] ?? null,
+                'order_id' => $data['order_id'] ?? null,
+                'transaction_date' =>  $data['order_id'] ?? now(),
+            ]);
+
+            $invoiceLink = $this->pdfService->addVendorTransactionPDF($transaction);
+            $transaction->invoice_link = $invoiceLink;
+            $transaction->save();
 
             DB::commit();
 

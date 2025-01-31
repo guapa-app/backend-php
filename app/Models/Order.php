@@ -41,7 +41,9 @@ class Order extends Model implements Listable
         'type',
         'staff_id',
         'payment_gateway',
-        'payment_id'
+        'payment_id',
+        'vendor_wallet',
+        'fees'
     ];
 
     /**
