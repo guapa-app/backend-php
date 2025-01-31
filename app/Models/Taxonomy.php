@@ -147,7 +147,8 @@ class Taxonomy extends BaseTaxonomy implements Listable
     {
         return $this->hasMany(CategoryFee::class, 'category_id');
     }
-    
+
+
     public function posts()
     {
         return $this->hasMany(Post::class, 'category_id');
@@ -192,6 +193,12 @@ class Taxonomy extends BaseTaxonomy implements Listable
 
         if ($request->has('is_appointment')) {
             $query->whereIsAppointment((bool) $request->get('is_appointment'));
+        }
+
+        if ($request->has('is_community') && $request->get('is_community')) {
+            $query->whereHas('posts', function ($q) {
+                $q->where('type', '!=', 'blog');
+            });
         }
 
         return $query;

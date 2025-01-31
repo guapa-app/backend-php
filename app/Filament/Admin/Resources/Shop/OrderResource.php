@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\Shop;
 
+
+use App\Enums\OrderStatus;
+use App\Filament\Admin\Resources\Shop\OrderResource\Actions\SendWhatsAppReminderAction;
 use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
 use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
 use App\Models\Order;
@@ -26,8 +29,8 @@ class OrderResource extends Resource
                 Components\TextEntry::make('id'),
                 Components\TextEntry::make('vendor.name'),
                 Components\TextEntry::make('address.title'),
-                Components\TextEntry::make('name'),
-                Components\TextEntry::make('phone'),
+                Components\TextEntry::make('user.name'),
+                Components\TextEntry::make('user.phone')->label('Phone'),
                 Components\TextEntry::make('total'),
                 Components\TextEntry::make('status'),
                 Components\TextEntry::make('note'),
@@ -42,7 +45,8 @@ class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('hash_id')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country.name')
@@ -51,9 +55,10 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('vendor.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('user.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
+                Tables\Columns\TextColumn::make('user.phone')
+                    ->label('Phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total')
                     ->numeric()
@@ -76,6 +81,8 @@ class OrderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                SendWhatsAppReminderAction::make()
+                    ->visible(fn (Order $record) => $record->status == OrderStatus::Pending),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([]),

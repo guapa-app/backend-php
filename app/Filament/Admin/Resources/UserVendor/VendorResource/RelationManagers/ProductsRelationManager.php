@@ -18,6 +18,12 @@ class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
 
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        $count = $ownerRecord->products()->count();
+        return "Products ($count)";
+    }
+
     public function form(Form $form): Form
     {
         return $form

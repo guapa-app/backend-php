@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
@@ -47,15 +48,19 @@ class FirebaseService
 
     private function getTokens($notifiable)
     {
-        $deviceTokens = $notifiable->devices->pluck('fcmtoken')->toArray();
+        if ($notifiable instanceof User) {
+            $deviceTokens = $notifiable->devices->pluck('fcmtoken')->toArray();
 
-        foreach ($deviceTokens as $token) {
-            if (is_null($token)) {
-                continue;
+            foreach ($deviceTokens as $token) {
+                if (is_null($token)) {
+                    continue;
+                }
+                $tokens[] = $token;
             }
-            $tokens[] = $token;
-        }
 
-        return $tokens ?? [];
+            return $tokens ?? [];
+        } else {
+            return [];
+        }
     }
 }

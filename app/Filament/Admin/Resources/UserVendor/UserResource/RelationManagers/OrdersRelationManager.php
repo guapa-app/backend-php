@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
 
+use App\Enums\OrderStatus;
+use App\Filament\Admin\Resources\Shop\OrderResource\Actions\SendWhatsAppReminderAction;
+use App\Models\Order;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -18,8 +21,8 @@ class OrdersRelationManager extends RelationManager
             ->schema([
                 Components\TextEntry::make('id'),
                 Components\TextEntry::make('address.title'),
-                Components\TextEntry::make('name'),
-                Components\TextEntry::make('phone'),
+                Components\TextEntry::make('user.name'),
+                Components\TextEntry::make('user.phone'),
                 Components\TextEntry::make('total'),
                 Components\TextEntry::make('status'),
                 Components\TextEntry::make('note'),
@@ -37,9 +40,9 @@ class OrdersRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hash_id')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('user.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
+                Tables\Columns\TextColumn::make('user.phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total')
                     ->numeric()
@@ -62,6 +65,9 @@ class OrdersRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+
+                SendWhatsAppReminderAction::make()
+                    ->visible(fn (Order $record) => $record->status == OrderStatus::Pending),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

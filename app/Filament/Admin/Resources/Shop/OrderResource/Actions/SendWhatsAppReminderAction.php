@@ -4,9 +4,10 @@ namespace App\Filament\Admin\Resources\Shop\OrderResource\Actions;
 
 use App\Enums\OrderStatus;
 use App\Notifications\PendingOrderReminderNotification;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
 use Filament\Support\Colors\Color;
+use Illuminate\Support\Facades\Log;
+use Filament\Notifications\Notification;
 
 class SendWhatsAppReminderAction extends Action
 {
@@ -25,27 +26,47 @@ class SendWhatsAppReminderAction extends Action
             ->requiresConfirmation()
             ->modalHeading('Send WhatsApp Reminder')
             ->modalDescription('Are you sure you want to send a WhatsApp reminder for this order?')
-            ->modalSubmitActionLabel('Send Reminder');
+            ->modalSubmitActionLabel('Send Reminder')
+            ->action(function () {
+                $order = $this->getRecord();
 
-        Notification::make()
-            ->title('Points updated successfully.')
-            ->success()
-            ->send();
-    }
+                try {
+                    $order->load('user');
 
-    public function handle(): void
-    {
-        $order = $this->getRecord();
+                    if (!$order->user) {
+                        throw new \Exception('No user associated with this order.');
+                    }
 
-        if ($order->status == OrderStatus::Pending) {
-            // Send WhatsApp notification
-            $order->user->notify(new PendingOrderReminderNotification(
-                $order,
-                ['whatsapp']
-            ));
+                    if ($order->status == OrderStatus::Pending) {
 
-            // Update the last reminder sent timestamp
-            $order->update(['last_reminder_sent' => now()]);
-        }
+                        $notification = new PendingOrderReminderNotification(
+                            $order,
+                            ['whatsapp']
+                        );
+
+                        $order->user->notify($notification);
+                        $order->update(['last_reminder_sent' => now()]);
+
+                        Notification::make()
+                            ->title('Success')
+                            ->body('WhatsApp reminder sent successfully!')
+                            ->success()
+                            ->send();
+                    } else {
+                        throw new \Exception('Order is not in pending status.');
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to send WhatsApp reminder', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+
+                    Notification::make()
+                        ->title('Error')
+                        ->body('Failed to send WhatsApp reminder: ' . $e->getMessage())
+                        ->danger()
+                        ->send();
+                }
+            });
     }
 }

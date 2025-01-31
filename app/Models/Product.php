@@ -533,6 +533,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     function calcProductPoints()
     {
         if ($this->earned_points > 0) return $this->earned_points;
+
         $conversionRate = Setting::purchasePointsConversionRate();
         $paidAmount = $this->payment_details['fees_with_taxes'];
         $points = (int) ($paidAmount * $conversionRate);

@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\UserVendor\UserResource\Pages;
 
 use App\Filament\Admin\Resources\UserVendor\UserResource;
+use App\Filament\Admin\Resources\UserVendor\UserResource\Widgets\UserOrderStats;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
