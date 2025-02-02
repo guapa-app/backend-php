@@ -91,6 +91,12 @@ class Post extends Model implements Listable, HasMedia
     {
         return $this->comments()->count();
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class)->withDefault();

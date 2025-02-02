@@ -32,6 +32,7 @@ class SendWhatsAppReminderAction extends Action
 
                 try {
                     $order->load('user');
+
                     if (!$order->user) {
                         throw new \Exception('No user associated with this order.');
                     }
