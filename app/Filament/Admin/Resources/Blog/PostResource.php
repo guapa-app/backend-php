@@ -138,6 +138,10 @@ class PostResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('youtube_url')
                     ->limit(30),
+
+                Tables\Columns\ToggleColumn::make('show_user')
+                    ->label('Show User'),
+
                 Tables\Columns\SelectColumn::make('status')
                     ->options(Post::STATUSES)
                     ->selectablePlaceholder(false)
