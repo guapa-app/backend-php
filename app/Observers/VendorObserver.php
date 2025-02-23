@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Vendor;
+use App\Services\ShareLinkService;
 use Illuminate\Support\Str;
 
 class VendorObserver
@@ -15,14 +16,12 @@ class VendorObserver
      */
     public function created(Vendor $vendor)
     {
-        // Generate unique identifier
-        $identifier = Str::uuid();
-        $link = url("/s/{$identifier}?ref=v&key=$vendor->id");
+        $data = [
+            'type' => 'vendor',
+            'id' => $vendor->id,
+        ];
 
-        $vendor->shareLink()->createQuietly([
-            // Generate unique identifier
-            'identifier' => $identifier,
-            'link' => $link,
-        ]);
+        $shareLinkService = new ShareLinkService();
+        $shareLinkService->create($data);
     }
 }
