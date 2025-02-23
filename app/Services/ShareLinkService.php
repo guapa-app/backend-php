@@ -103,13 +103,11 @@ class ShareLinkService
 
     private function generateItemUrl($shareLink)
     {
-        $shareable = $shareLink->shareable;
-
-        switch (get_class($shareable)) {
-            case Product::class:
-                return route('products.show', ['id' => $shareLink->shareable->id]);
-            case Vendor::class:
-                return route('vendors.show', ['id' => $shareLink->shareable->id]);
+        switch ($shareLink->shareable_type) {
+            case 'product':
+                return route('products.show', ['id' => $shareLink->shareable_id]);
+            case 'vendor':
+                return route('vendors.show', ['id' => $shareLink->shareable_id]);
             default:
                 abort(404);
         }
