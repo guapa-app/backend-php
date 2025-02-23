@@ -200,7 +200,6 @@ class ShareLinkResource extends Resource
             'index' => Pages\ListShareLinks::route('/'),
             'create' => Pages\CreateShareLink::route('/create'),
             'edit' => Pages\EditShareLink::route('/{record}/edit'),
-//            'view' => Pages\ShareLinkAnalytics::route('/{record}'),
         ];
     }
 }
