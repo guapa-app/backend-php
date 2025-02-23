@@ -73,9 +73,10 @@ class ShareLinkResource extends Resource
                     ->label('Shared Item')
                     ->searchable()
                     ->getStateUsing(function ($record) {
-                        return $record->shareable_type === 'vendor'
-                            ? $record->shareable->name
-                            : $record->shareable->title;
+                        if ($record->shareable_type === 'vendor') {
+                            return $record->shareable?->name ?? 'N/A';
+                        }
+                        return $record->shareable?->title ?? 'N/A';
                     }),
                 TextColumn::make('clicks_count')
                     ->counts('clicks')
