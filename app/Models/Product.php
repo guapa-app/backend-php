@@ -486,7 +486,9 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function scopeBestSelling(Builder $query): Builder
     {
         return $query->withCount(['orderItems' => function ($query) {
-            $query->where('status', OrderStatus::Accepted);
+            $query->whereHas('order', function ($query) {
+                $query->where('status', OrderStatus::Accepted);
+            });
         }])
             ->orderBy('order_items_count', 'desc');
         return $query;
