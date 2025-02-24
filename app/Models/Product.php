@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use DB;
 use App\Traits\Likable;
 use App\Enums\ProductType;
@@ -345,6 +346,10 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $query->nearBy($request->get('lat'), $request->get('lng'), $request->get('distance'));
         }
 
+        // Get best selling products
+        if ($request->has('best_selling') && $request->get('best_selling')) {
+            $query->bestSelling();
+        }
         $user = app('cosmo')->user();
         // We need to return only active products owned by active vendors
         // Excluding admins and vendors displaying their own products.
@@ -476,6 +481,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         ]);
 
         return $query;
+    }
+
+    public function scopeBestSelling(Builder $query): Builder
+    {
+        return $query->withCount(['orderItems' => function ($query) {
+            $query->where('status', OrderStatus::Accepted);
+        }])
+            ->orderBy('order_items_count', 'desc');
     }
 
     public function calculateProductFees($finalPrice)
