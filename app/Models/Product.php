@@ -489,6 +489,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $query->where('status', OrderStatus::Accepted);
         }])
             ->orderBy('order_items_count', 'desc');
+        return $query;
     }
 
     public function calculateProductFees($finalPrice)
