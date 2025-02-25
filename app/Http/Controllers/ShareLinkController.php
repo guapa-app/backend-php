@@ -31,9 +31,8 @@ class ShareLinkController extends Controller
 
     public function redirectLink($identifier)
     {
-        list($shareLink, $itemUrl) = $this->linkService->redirectLink($identifier);
-
+        $shareLink = $this->linkService->getLinkByIdentifier($identifier);
         // Redirect based on user agent
-        return $this->linkService->handleRedirect($itemUrl, $shareLink);
+        return $this->linkService->handleRedirect($shareLink);
     }
 }
