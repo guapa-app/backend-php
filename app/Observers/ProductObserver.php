@@ -6,6 +6,7 @@ use App\Enums\ProductStatus;
 use App\Events\ProductCreated;
 use App\Helpers\Common;
 use App\Models\Product;
+use App\Services\ShareLinkService;
 use Exception;
 use Illuminate\Support\Str;
 
@@ -31,14 +32,22 @@ class ProductObserver
     public function created(Product $product)
     {
         // Generate unique identifier
-        $identifier = Str::uuid();
-        $link = url("/s/{$identifier}?ref=p&key=$product->id");
+//        $identifier = Str::uuid();
+//        $link = url("/s/{$identifier}?ref=p&key=$product->id");
+//
+//        $product->shareLink()->createQuietly([
+//            // Generate unique identifier
+//            'identifier' => $identifier,
+//            'link' => $link,
+//        ]);
+        // create shrer link from service
+        $data = [
+            'type' => 'product',
+            'id' => $product->id,
+        ];
 
-        $product->shareLink()->createQuietly([
-            // Generate unique identifier
-            'identifier' => $identifier,
-            'link' => $link,
-        ]);
+        $shareLinkService = new ShareLinkService();
+        $shareLinkService->create($data);
 
         event(new ProductCreated($product));
     }
