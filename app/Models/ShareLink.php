@@ -22,6 +22,11 @@ class ShareLink extends Model
         return $this->morphTo();
     }
 
+    public function clicks()
+    {
+        return $this->hasMany(ShareLinkClick::class);
+    }
+
     public function scopeVendor(Builder $query): Builder
     {
         return $query->where('shareable_type', 'vendor');

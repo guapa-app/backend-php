@@ -42,6 +42,7 @@
         "michielfb/laravel-nova-time-field": "^2.0",
         "misterspelik/laravel-pdf": "^2.1",
         "moyasar/moyasar": "^1.1",
+        "php-ffmpeg/php-ffmpeg": "*",
         "predis/predis": "^2.2",
         "prgayman/laravel-zatca": "^1.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
