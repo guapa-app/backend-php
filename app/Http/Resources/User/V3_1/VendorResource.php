@@ -25,9 +25,9 @@ class VendorResource extends JsonResource
             'addresses' => AddressResource::collection($this->whenLoaded('addresses')),
             'logo' => MediaResource::make($this->whenLoaded('logo')),
 
-            $this->mergeWhen(isset($this->distance), [
+//            $this->mergeWhen(isset($this->distance), [
                 'distance' => (float) $this->distance,
-            ]),
+//            ]),
         ];
 
         return $returned_arr;
