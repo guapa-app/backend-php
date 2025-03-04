@@ -26,6 +26,7 @@ class LoyaltyPointsController extends BaseApiController
         return response()->json([
             'data' => [
                 'points' => (int) $totalPoints,
+                'conversion_rate' => Setting::pointsConversionRate(),
             ],
             'success' => true,
             'message' => __('api.success'),
