@@ -7,7 +7,21 @@
 @section('title')
     {{ ucfirst(__('blog')) }}
 @endsection
+@section('heads')
+    <script type='text/javascript'>
+        (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+        {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+            a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+            r.src=n;var u=t.getElementsByTagName(s)[0];
+            u.parentNode.insertBefore(r,u);})(window,document,
+            'https://sc-static.net/scevent.min.js');
 
+        snaptr('init', '25f2dedb-b32d-4dca-be95-152a0448e6c9', {});
+
+        snaptr('track', 'PAGE_VIEW');
+
+    </script>
+@endsection
 @section('content')
     <main>
         <section class="sub-header large-sub-header">
