@@ -489,12 +489,6 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
     {
-        $filter = $request->get('filter');
-
-        if (is_array($filter)) {
-            $request = new Request($filter);
-        }
-
         $query->dateRange($request->get('startDate'), $request->get('endDate'));
 
         $query->searchLike($request);
