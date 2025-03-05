@@ -17,7 +17,8 @@ class CountryScope implements Scope
         // Check if the 'X-Country-ID' header exists and apply the scope
         $countryId = request()->header('X-Country-ID');
         if ($countryId and Schema::hasColumn($model->getTable(), 'country_id')) {
-            $builder->where('country_id', $countryId);
+//            $builder->where('country_id', $countryId);
+            $builder->where($model->getTable() . '.country_id', $countryId);
         }
     }
 }

@@ -528,7 +528,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         if ($request->has('parent_id')) {
             $query->whereParentId($request->get('parent_id'));
         }
-
+//        dd($query->toSql());
         return $query;
     }
 
