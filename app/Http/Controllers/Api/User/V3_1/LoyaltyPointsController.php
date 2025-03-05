@@ -27,6 +27,7 @@ class LoyaltyPointsController extends BaseApiController
             'data' => [
                 'points' => (int) $totalPoints,
                 'conversion_rate' => Setting::pointsConversionRate(),
+                'amount' => $totalPoints / Setting::pointsConversionRate(),
             ],
             'success' => true,
             'message' => __('api.success'),
