@@ -14,7 +14,7 @@ class WorkDay extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'vendor_id', 'day',
+        'vendor_id', 'day','start_time', 'end_time'
     ];
 
     protected $casts = [
