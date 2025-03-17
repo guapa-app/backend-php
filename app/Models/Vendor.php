@@ -86,7 +86,10 @@ class Vendor extends Model implements HasMedia, HasReviews
         'accept_appointment',
         'verified_badge',
         'activate_wallet',
-        'iban'
+        'iban',
+        'accept_online_consultation',
+        'session_duration',
+        'consultation_fee',
     ];
 
     /**
@@ -220,6 +223,23 @@ class Vendor extends Model implements HasMedia, HasReviews
         $this->addMediaConversion('large')
             ->fit(Manipulations::FIT_MAX, 600, 600)
             ->performOnCollections('logos');
+    }
+
+    public function getConsultationFeesAttribute(): array
+    {
+        $consultationFees = round((float) $this->consultation_fee, 2);
+        $taxPercentage = Setting::getTaxes(); // tax percentage
+        $taxAmount = round(((float) Setting::getTaxes() / 100) * $consultationFees, 2);
+        $applicationFee = (float) Setting::getOnlineConsultationFee();
+        $totalAmount = round($consultationFees + $applicationFee + $taxAmount, 2);
+
+        return [
+            'consultation_fees' => $consultationFees,
+            'application_fee' => $applicationFee,
+            'tax_amount' => $taxAmount,
+            'total_amount' => $totalAmount,
+            'tax_percentage' => $taxPercentage,
+        ];
     }
 
     /**
