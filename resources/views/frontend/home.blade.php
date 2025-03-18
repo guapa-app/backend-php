@@ -72,803 +72,116 @@
 
                 <div class="swiper swiper-offers">
                     <div class="swiper-wrapper offer-wrapper">
-                        <div class="swiper-slide">
-                            <div class="offer-box">
-                                <div class="contain">
-                                    <div class="company-name">
-                                        <div class="data">
+                        @foreach($products as $product)
+                            <div class="swiper-slide">
+                                <div class="offer-box">
+                                    <div class="contain">
+                                        <div class="company-name">
+                                            <div class="data">
+                                                <img
+                                                    src="{{$product->vendor?->photo?->getUrl()}}"
+                                                    loading="lazy"
+                                                    alt=""
+                                                />
+                                                <h2>{{$product->vendor?->name}}</h2>
+                                            </div>
+
+                                            <ul class="list">
+                                                <li>
+                                                    <img
+                                                        src="{{ asset('frontend/assets/images/offers/location.svg') }}"
+                                                        loading="lazy"
+                                                        alt=""
+                                                    />
+
+                                                    <span> {{$product->address}} </span>
+                                                </li>
+
+                                                <li>
+                                                    <img
+                                                        src="{{ asset('frontend/assets/images/offers/money-recive.svg') }}"
+                                                        loading="lazy"
+                                                        alt=""
+                                                    />
+
+                                                    <span> {{$product->calcProductPoints()}} </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <a href="{{$product->share_link}}" class="fav">
                                             <img
-                                                src="assets/images/offers/hosptial.png"
+                                                src="{{ asset('frontend/assets/images/offers/heart.svg') }}"
                                                 loading="lazy"
                                                 alt=""
                                             />
-                                            <h2>مركز طب وجراحة التجميل</h2>
-                                        </div>
-
-                                        <ul class="list">
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/location.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> الرياض - السعودية </span>
-                                            </li>
-
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/money-recive.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> 50 نقطة </span>
-                                            </li>
-                                        </ul>
+                                        </a>
                                     </div>
 
-                                    <a href="#" class="fav">
-                                        <img
-                                            src="assets/images/offers/heart.svg"
-                                            loading="lazy"
-                                            alt=""
-                                        />
-                                    </a>
-                                </div>
-
-                                <div class="image-contain">
-                                    <div class="swiper swiper-header">
-                                        <div class="swiper-wrapper">
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_1.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
+                                    <div class="image-contain">
+                                        <div class="swiper swiper-header">
+                                            <div class="swiper-wrapper">
+                                                <div class="swiper-slide">
+                                                    <img
+                                                        src="{{$product->offer->image?->getUrl()}}"
+                                                        loading="lazy"
+                                                        alt=""
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_2.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_3.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_4.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
+                                            <div class="swiper-pagination"></div>
                                         </div>
-
-                                        <div class="swiper-pagination"></div>
-                                    </div>
-                                </div>
-
-                                <div class="price-contain">
-                                    <div class="data">
-                                        <div class="price-list">
-                                            <p class="after">346.96ر.س</p>
-
-                                            <p class="before">346.96ر.س</p>
-                                        </div>
-
-                                        <span> لا يشمل ضريبة القيمة المضافة </span>
                                     </div>
 
-                                    <div class="discount">-33%</div>
-                                </div>
+                                    <div class="price-contain">
+                                        <div class="data">
+                                            <div class="price-list">
+                                                <p class="after"> {{ $product->price }}ر.س</p>
 
-                                <div class="offer-time">
-                                    <p>مده العرض</p>
+                                                <p class="before">{{ $product->offer_price }} ر.س</p>
+                                            </div>
 
-                                    <div
-                                        class="countdown-card"
-                                        data-days="4"
-                                        data-hours="16"
-                                        data-minutes="29"
-                                        data-seconds="4"
-                                    >
-                                        <div class="box">
-                                            <span class="time days">4</span>
-                                            <span class="name">أيام</span>
+                                            <span> لا يشمل ضريبة القيمة المضافة </span>
                                         </div>
 
-                                        <div class="box">
-                                            <span class="time hours">16</span>
-                                            <span class="name">ساعة</span>
-                                        </div>
+                                        <div class="discount">-{{$product->offer->discount_string}}</div>
+                                    </div>
+                                    @php($difference = \Carbon\Carbon::parse($product->offer->expires_at)->diff(now()))
+                                    <div class="offer-time">
+                                        <p>مده العرض</p>
 
-                                        <div class="box">
-                                            <span class="time minutes">29</span>
-                                            <span class="name">دقيقة</span>
-                                        </div>
+                                        <div
+                                            class="countdown-card"
+                                            data-days="{{$difference->days}}"
+                                            data-hours="{{$difference->h}}"
+                                            data-minutes="{{$difference->i}}"
+                                            data-seconds="{{$difference->s}}"
+                                        >
+                                            <div class="box">
+                                                <span class="time days">{{$difference->days}}</span>
+                                                <span class="name">أيام</span>
+                                            </div>
 
-                                        <div class="box">
-                                            <span class="time seconds">4</span>
-                                            <span class="name">ثانية</span>
+                                            <div class="box">
+                                                <span class="time hours">{{$difference->h}}</span>
+                                                <span class="name">ساعة</span>
+                                            </div>
+
+                                            <div class="box">
+                                                <span class="time minutes">{{$difference->i}}</span>
+                                                <span class="name">دقيقة</span>
+                                            </div>
+
+                                            <div class="box">
+                                                <span class="time seconds">{{$difference->s}}</span>
+                                                <span class="name">ثانية</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="swiper-slide">
-                            <div class="offer-box">
-                                <div class="contain">
-                                    <div class="company-name">
-                                        <div class="data">
-                                            <img
-                                                src="assets/images/offers/hosptial.png"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                            <h2>مركز طب وجراحة التجميل</h2>
-                                        </div>
-
-                                        <ul class="list">
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/location.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> الرياض - السعودية </span>
-                                            </li>
-
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/money-recive.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> 50 نقطة </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <a href="#" class="fav">
-                                        <img
-                                            src="assets/images/offers/heart.svg"
-                                            loading="lazy"
-                                            alt=""
-                                        />
-                                    </a>
-                                </div>
-
-                                <div class="image-contain">
-                                    <div class="swiper swiper-header">
-                                        <div class="swiper-wrapper">
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_1.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_2.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_3.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_4.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div class="swiper-pagination"></div>
-                                    </div>
-                                </div>
-
-                                <div class="price-contain">
-                                    <div class="data">
-                                        <div class="price-list">
-                                            <p class="after">346.96ر.س</p>
-
-                                            <p class="before">346.96ر.س</p>
-                                        </div>
-
-                                        <span> لا يشمل ضريبة القيمة المضافة </span>
-                                    </div>
-
-                                    <div class="discount">-33%</div>
-                                </div>
-
-                                <div class="offer-time">
-                                    <p>مده العرض</p>
-
-                                    <div
-                                        class="countdown-card"
-                                        data-days="8"
-                                        data-hours="20"
-                                        data-minutes="30"
-                                        data-seconds="4"
-                                    >
-                                        <div class="box">
-                                            <span class="time days">8</span>
-                                            <span class="name">أيام</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time hours">20</span>
-                                            <span class="name">ساعة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time minutes">30</span>
-                                            <span class="name">دقيقة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time seconds">4</span>
-                                            <span class="name">ثانية</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="swiper-slide">
-                            <div class="offer-box">
-                                <div class="contain">
-                                    <div class="company-name">
-                                        <div class="data">
-                                            <img
-                                                src="assets/images/offers/hosptial.png"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                            <h2>مركز طب وجراحة التجميل</h2>
-                                        </div>
-
-                                        <ul class="list">
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/location.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> الرياض - السعودية </span>
-                                            </li>
-
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/money-recive.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> 50 نقطة </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <a href="#" class="fav">
-                                        <img
-                                            src="assets/images/offers/heart.svg"
-                                            loading="lazy"
-                                            alt=""
-                                        />
-                                    </a>
-                                </div>
-
-                                <div class="image-contain">
-                                    <div class="swiper swiper-header">
-                                        <div class="swiper-wrapper">
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_1.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_2.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_3.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_4.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div class="swiper-pagination"></div>
-                                    </div>
-                                </div>
-
-                                <div class="price-contain">
-                                    <div class="data">
-                                        <div class="price-list">
-                                            <p class="after">346.96ر.س</p>
-
-                                            <p class="before">346.96ر.س</p>
-                                        </div>
-
-                                        <span> لا يشمل ضريبة القيمة المضافة </span>
-                                    </div>
-
-                                    <div class="discount">-33%</div>
-                                </div>
-
-                                <div class="offer-time">
-                                    <p>مده العرض</p>
-
-                                    <div
-                                        class="countdown-card"
-                                        data-days="10"
-                                        data-hours="20"
-                                        data-minutes="30"
-                                        data-seconds="4"
-                                    >
-                                        <div class="box">
-                                            <span class="time days">10</span>
-                                            <span class="name">أيام</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time hours">20</span>
-                                            <span class="name">ساعة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time minutes">30</span>
-                                            <span class="name">دقيقة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time seconds">4</span>
-                                            <span class="name">ثانية</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="swiper-slide">
-                            <div class="offer-box">
-                                <div class="contain">
-                                    <div class="company-name">
-                                        <div class="data">
-                                            <img
-                                                src="assets/images/offers/hosptial.png"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                            <h2>مركز طب وجراحة التجميل</h2>
-                                        </div>
-
-                                        <ul class="list">
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/location.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> الرياض - السعودية </span>
-                                            </li>
-
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/money-recive.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> 50 نقطة </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <a href="#" class="fav">
-                                        <img
-                                            src="assets/images/offers/heart.svg"
-                                            loading="lazy"
-                                            alt=""
-                                        />
-                                    </a>
-                                </div>
-
-                                <div class="image-contain">
-                                    <div class="swiper swiper-header">
-                                        <div class="swiper-wrapper">
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_1.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_2.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_3.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_4.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div class="swiper-pagination"></div>
-                                    </div>
-                                </div>
-
-                                <div class="price-contain">
-                                    <div class="data">
-                                        <div class="price-list">
-                                            <p class="after">346.96ر.س</p>
-
-                                            <p class="before">346.96ر.س</p>
-                                        </div>
-
-                                        <span> لا يشمل ضريبة القيمة المضافة </span>
-                                    </div>
-
-                                    <div class="discount">-33%</div>
-                                </div>
-
-                                <div class="offer-time">
-                                    <p>مده العرض</p>
-
-                                    <div
-                                        class="countdown-card"
-                                        data-days="4"
-                                        data-hours="16"
-                                        data-minutes="29"
-                                        data-seconds="4"
-                                    >
-                                        <div class="box">
-                                            <span class="time days">4</span>
-                                            <span class="name">أيام</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time hours">16</span>
-                                            <span class="name">ساعة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time minutes">29</span>
-                                            <span class="name">دقيقة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time seconds">4</span>
-                                            <span class="name">ثانية</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="swiper-slide">
-                            <div class="offer-box">
-                                <div class="contain">
-                                    <div class="company-name">
-                                        <div class="data">
-                                            <img
-                                                src="assets/images/offers/hosptial.png"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                            <h2>مركز طب وجراحة التجميل</h2>
-                                        </div>
-
-                                        <ul class="list">
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/location.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> الرياض - السعودية </span>
-                                            </li>
-
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/money-recive.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> 50 نقطة </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <a href="#" class="fav">
-                                        <img
-                                            src="assets/images/offers/heart.svg"
-                                            loading="lazy"
-                                            alt=""
-                                        />
-                                    </a>
-                                </div>
-
-                                <div class="image-contain">
-                                    <div class="swiper swiper-header">
-                                        <div class="swiper-wrapper">
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_1.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_2.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_3.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_4.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div class="swiper-pagination"></div>
-                                    </div>
-                                </div>
-
-                                <div class="price-contain">
-                                    <div class="data">
-                                        <div class="price-list">
-                                            <p class="after">346.96ر.س</p>
-
-                                            <p class="before">346.96ر.س</p>
-                                        </div>
-
-                                        <span> لا يشمل ضريبة القيمة المضافة </span>
-                                    </div>
-
-                                    <div class="discount">-33%</div>
-                                </div>
-
-                                <div class="offer-time">
-                                    <p>مده العرض</p>
-
-                                    <div
-                                        class="countdown-card"
-                                        data-days="8"
-                                        data-hours="20"
-                                        data-minutes="30"
-                                        data-seconds="4"
-                                    >
-                                        <div class="box">
-                                            <span class="time days">8</span>
-                                            <span class="name">أيام</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time hours">20</span>
-                                            <span class="name">ساعة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time minutes">30</span>
-                                            <span class="name">دقيقة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time seconds">4</span>
-                                            <span class="name">ثانية</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="swiper-slide">
-                            <div class="offer-box">
-                                <div class="contain">
-                                    <div class="company-name">
-                                        <div class="data">
-                                            <img
-                                                src="assets/images/offers/hosptial.png"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                            <h2>مركز طب وجراحة التجميل</h2>
-                                        </div>
-
-                                        <ul class="list">
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/location.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> الرياض - السعودية </span>
-                                            </li>
-
-                                            <li>
-                                                <img
-                                                    src="assets/images/offers/money-recive.svg"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-
-                                                <span> 50 نقطة </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <a href="#" class="fav">
-                                        <img
-                                            src="assets/images/offers/heart.svg"
-                                            loading="lazy"
-                                            alt=""
-                                        />
-                                    </a>
-                                </div>
-
-                                <div class="image-contain">
-                                    <div class="swiper swiper-header">
-                                        <div class="swiper-wrapper">
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_1.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_2.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_3.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-
-                                            <div class="swiper-slide">
-                                                <img
-                                                    src="assets/images/offers/offer_4.png"
-                                                    loading="lazy"
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div class="swiper-pagination"></div>
-                                    </div>
-                                </div>
-
-                                <div class="price-contain">
-                                    <div class="data">
-                                        <div class="price-list">
-                                            <p class="after">346.96ر.س</p>
-
-                                            <p class="before">346.96ر.س</p>
-                                        </div>
-
-                                        <span> لا يشمل ضريبة القيمة المضافة </span>
-                                    </div>
-
-                                    <div class="discount">-33%</div>
-                                </div>
-
-                                <div class="offer-time">
-                                    <p>مده العرض</p>
-
-                                    <div
-                                        class="countdown-card"
-                                        data-days="10"
-                                        data-hours="20"
-                                        data-minutes="30"
-                                        data-seconds="4"
-                                    >
-                                        <div class="box">
-                                            <span class="time days">10</span>
-                                            <span class="name">أيام</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time hours">20</span>
-                                            <span class="name">ساعة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time minutes">30</span>
-                                            <span class="name">دقيقة</span>
-                                        </div>
-
-                                        <div class="box">
-                                            <span class="time seconds">4</span>
-                                            <span class="name">ثانية</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
 
                     <div class="swiper-pagination"></div>
@@ -894,7 +207,7 @@
                             <div class="swiper-slide">
                                 <div class="box">
                                     <img
-                                        src="{{ $vendor->photo?->getUrl() }}"
+                                        src="{{$vendor->photo?->getUrl()}}"
                                         loading="lazy"
                                         class="partner-logo"
                                         alt="logo"

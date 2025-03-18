@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Repositories\OfferRepositoryInterface;
 use App\Models\Offer;
 use App\Models\Post;
 use App\Models\Vendor;
@@ -9,7 +10,12 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    private $offerRepository;
+
+    public function __construct(OfferRepositoryInterface $repository) {
+        $this->offerRepository = $repository;
+    }
+    public function index(Request $request)
     {
         $vendors = Vendor::where(['status'=> 1, 'verified_badge'=> 1])
                         ->with('logo')
@@ -19,14 +25,10 @@ class HomeController extends Controller
                      ->latest()
                      ->take(12)
                      ->get();
-//
-//        $offers = Offer::where('status', 1)
-//                      ->where('end_date', '>', now())
-//                      ->withSingleRelations()
-//                      ->latest()
-//                      ->take(4)
-//                      ->get();
 
-        return view('frontend.home',compact('vendors','posts'));
+        $products = $this->offerRepository->all($request);
+
+
+        return view('frontend.home',compact('vendors','posts','products'));
     }
 }
