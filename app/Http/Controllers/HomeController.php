@@ -21,7 +21,8 @@ class HomeController extends Controller
                         ->with('logo')
                         ->get();
 //
-        $posts = Post::where('status', 1)
+        $posts = Post::where(['status'=> 1, 'type'=> 'blog'])
+                    ->with(['admin','category'])
                      ->latest()
                      ->take(12)
                      ->get();
