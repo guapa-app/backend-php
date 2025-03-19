@@ -11,7 +11,7 @@
                     <div class="col-lg-6 col-12 mb-3">
                         <div class="contain">
                             <h1>
-                                قوابا#  عالم الجمال
+                                قوابا- -  عالم الجمال
                             </h1>
 
                             <p>
