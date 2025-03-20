@@ -137,9 +137,9 @@
                                     <div class="price-contain">
                                         <div class="data">
                                             <div class="price-list">
-                                                <p class="after"> {{ $product->price }}ر.س</p>
+                                                <p class="after"> {{ $product->offer_price }}ر.س</p>
 
-                                                <p class="before">{{ $product->offer_price }} ر.س</p>
+                                                <p class="before">{{ number_format($product->price, 0) }} ر.س</p>
                                             </div>
 
                                             <span> لا يشمل ضريبة القيمة المضافة </span>
