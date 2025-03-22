@@ -174,21 +174,21 @@ class Vendor extends Model implements HasMedia, HasReviews
     }
 
     // TODO to be removed after make sure no use for it, it effects the relation
-//    public function getWorkDaysAttribute()
-//    {
-//        $relations = $this->getRelations();
-//
-//        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
-//            return $relations['workDays'];
-//        }
-//
-//        $days = isset($relations['workDays']) ?
-//            $relations['workDays']->pluck('day') :
-//            [];
-//        $this->setRelation('workDays', $days);
-//
-//        return $days;
-//    }
+    public function getWorkDaysAttribute()
+    {
+        $relations = $this->getRelations();
+
+        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
+            return $relations['workDays'];
+        }
+
+        $days = isset($relations['workDays']) ?
+            $relations['workDays']->pluck('day') :
+            [];
+        $this->setRelation('workDays', $days);
+
+        return $days;
+    }
 
     // =========== Methods Section ===========
     /**
