@@ -74,112 +74,114 @@
                     <div class="swiper-wrapper offer-wrapper">
                         @foreach($products as $product)
                             <div class="swiper-slide">
-                                <div class="offer-box">
-                                    <div class="contain">
-                                        <div class="company-name">
-                                            <div class="data">
+                                    <div class="offer-box">
+                                        <div class="contain">
+                                            <div class="company-name">
+                                                <div class="data">
+                                                    <a href="{{$product->shared_link}}" >
+                                                        <img
+                                                            src="{{$product->vendor?->photo?->getUrl()}}"
+                                                            loading="lazy"
+                                                            alt=""
+                                                        />
+                                                    </a>
+                                                    <a href="{{$product->shared_link}}" ><h2>{{$product->vendor?->name}} </h2></a>
+                                                </div>
+
+                                                <ul class="list">
+                                                    <li>
+                                                        <img
+                                                            src="{{ asset('frontend/assets/images/offers/location.svg') }}"
+                                                            loading="lazy"
+                                                            alt=""
+                                                        />
+
+                                                        <span> {{$product->address}} </span>
+                                                    </li>
+
+                                                    <li>
+                                                        <img
+                                                            src="{{ asset('frontend/assets/images/offers/money-recive.svg') }}"
+                                                            loading="lazy"
+                                                            alt=""
+                                                        />
+
+                                                        <span> {{$product->calcProductPoints()}} </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <a href="{{$product->shared_link}}" class="fav">
                                                 <img
-                                                    src="{{$product->vendor?->photo?->getUrl()}}"
+                                                    src="{{ asset('frontend/assets/images/offers/heart.svg') }}"
                                                     loading="lazy"
                                                     alt=""
                                                 />
-                                                <h2>{{$product->vendor?->name}}</h2>
-                                            </div>
-
-                                            <ul class="list">
-                                                <li>
-                                                    <img
-                                                        src="{{ asset('frontend/assets/images/offers/location.svg') }}"
-                                                        loading="lazy"
-                                                        alt=""
-                                                    />
-
-                                                    <span> {{$product->address}} </span>
-                                                </li>
-
-                                                <li>
-                                                    <img
-                                                        src="{{ asset('frontend/assets/images/offers/money-recive.svg') }}"
-                                                        loading="lazy"
-                                                        alt=""
-                                                    />
-
-                                                    <span> {{$product->calcProductPoints()}} </span>
-                                                </li>
-                                            </ul>
+                                            </a>
                                         </div>
 
-                                        <a href="{{$product->share_link}}" class="fav">
-                                            <img
-                                                src="{{ asset('frontend/assets/images/offers/heart.svg') }}"
-                                                loading="lazy"
-                                                alt=""
-                                            />
-                                        </a>
-                                    </div>
+                                        <div class="image-contain">
+                                            <div class="swiper swiper-header">
+                                                <div class="swiper-wrapper">
+                                                    <div class="swiper-slide">
+                                                        <a href="{{$product->shared_link}}" >
+                                                            <img src="{{$product->offer->image?->getUrl()}}"
+                                                                loading="lazy"
+                                                                alt=""
+                                                            />
+                                                        </a>
+                                                    </div>
+                                                </div>
 
-                                    <div class="image-contain">
-                                        <div class="swiper swiper-header">
-                                            <div class="swiper-wrapper">
-                                                <div class="swiper-slide">
-                                                    <img
-                                                        src="{{$product->offer->image?->getUrl()}}"
-                                                        loading="lazy"
-                                                        alt=""
-                                                    />
+                                                <div class="swiper-pagination"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="price-contain">
+                                            <div class="data">
+                                                <div class="price-list">
+                                                    <p class="after"> {{ $product->offer_price }}ر.س</p>
+
+                                                    <p class="before">{{ number_format($product->price, 0) }} ر.س</p>
+                                                </div>
+
+                                                <span> لا يشمل ضريبة القيمة المضافة </span>
+                                            </div>
+
+                                            <div class="discount">-{{$product->offer->discount_string}}</div>
+                                        </div>
+                                        @php($difference = \Carbon\Carbon::parse($product->offer->expires_at)->diff(now()))
+                                        <div class="offer-time">
+                                            <p>مده العرض</p>
+
+                                            <div
+                                                class="countdown-card"
+                                                data-days="{{$difference->days}}"
+                                                data-hours="{{$difference->h}}"
+                                                data-minutes="{{$difference->i}}"
+                                                data-seconds="{{$difference->s}}"
+                                            >
+                                                <div class="box">
+                                                    <span class="time days">{{$difference->days}}</span>
+                                                    <span class="name">أيام</span>
+                                                </div>
+
+                                                <div class="box">
+                                                    <span class="time hours">{{$difference->h}}</span>
+                                                    <span class="name">ساعة</span>
+                                                </div>
+
+                                                <div class="box">
+                                                    <span class="time minutes">{{$difference->i}}</span>
+                                                    <span class="name">دقيقة</span>
+                                                </div>
+
+                                                <div class="box">
+                                                    <span class="time seconds">{{$difference->s}}</span>
+                                                    <span class="name">ثانية</span>
                                                 </div>
                                             </div>
-
-                                            <div class="swiper-pagination"></div>
                                         </div>
                                     </div>
-
-                                    <div class="price-contain">
-                                        <div class="data">
-                                            <div class="price-list">
-                                                <p class="after"> {{ $product->offer_price }}ر.س</p>
-
-                                                <p class="before">{{ number_format($product->price, 0) }} ر.س</p>
-                                            </div>
-
-                                            <span> لا يشمل ضريبة القيمة المضافة </span>
-                                        </div>
-
-                                        <div class="discount">-{{$product->offer->discount_string}}</div>
-                                    </div>
-                                    @php($difference = \Carbon\Carbon::parse($product->offer->expires_at)->diff(now()))
-                                    <div class="offer-time">
-                                        <p>مده العرض</p>
-
-                                        <div
-                                            class="countdown-card"
-                                            data-days="{{$difference->days}}"
-                                            data-hours="{{$difference->h}}"
-                                            data-minutes="{{$difference->i}}"
-                                            data-seconds="{{$difference->s}}"
-                                        >
-                                            <div class="box">
-                                                <span class="time days">{{$difference->days}}</span>
-                                                <span class="name">أيام</span>
-                                            </div>
-
-                                            <div class="box">
-                                                <span class="time hours">{{$difference->h}}</span>
-                                                <span class="name">ساعة</span>
-                                            </div>
-
-                                            <div class="box">
-                                                <span class="time minutes">{{$difference->i}}</span>
-                                                <span class="name">دقيقة</span>
-                                            </div>
-
-                                            <div class="box">
-                                                <span class="time seconds">{{$difference->s}}</span>
-                                                <span class="name">ثانية</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -206,15 +208,13 @@
                         @foreach($vendors as $vendor)
                             <div class="swiper-slide">
                                 <div class="box">
-                                    <img
-                                        src="{{$vendor->photo?->getUrl()}}"
-                                        loading="lazy"
-                                        class="partner-logo"
-                                        alt="logo"
-                                    />
-
+                                    <a href="{{$vendor->shared_link}}">
+                                        <img src="{{$vendor->photo?->getUrl()}}"
+                                            loading="lazy" class="partner-logo" alt="logo"
+                                        />
+                                    </a>
                                     <div class="data">
-                                        <a href="{{$vendor->share_link}}">
+                                        <a href="{{$vendor->shared_link}}">
                                             <h2>
                                                 {{ $vendor->name }}
 
