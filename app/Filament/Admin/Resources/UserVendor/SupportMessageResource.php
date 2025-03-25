@@ -49,6 +49,9 @@ class SupportMessageResource extends Resource
                     ->tel()
                     ->maxLength(30),
                 Forms\Components\DateTimePicker::make('read_at'),
+
+                Forms\Components\DateTimePicker::make('created_at'),
+
                 Forms\Components\Textarea::make('body')
                     ->required()
                     ->columnSpanFull(),
@@ -80,8 +83,7 @@ class SupportMessageResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
