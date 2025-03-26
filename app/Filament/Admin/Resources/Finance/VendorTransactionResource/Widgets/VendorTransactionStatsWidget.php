@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Admin\Resources\Finance\VendorTransactionResource\Widgets;
 
 use App\Models\Transaction;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;

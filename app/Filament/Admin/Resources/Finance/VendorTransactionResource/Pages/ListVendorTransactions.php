@@ -3,7 +3,7 @@
 namespace App\Filament\Admin\Resources\Finance\VendorTransactionResource\Pages;
 
 use App\Filament\Admin\Resources\Finance\VendorTransactionResource;
-use App\Filament\Widgets\VendorTransactionStatsWidget;
+use App\Filament\Admin\Resources\Finance\VendorTransactionResource\Widgets\VendorTransactionStatsWidget;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
