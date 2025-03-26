@@ -20,8 +20,8 @@ class HomeController extends Controller
         $vendors = Vendor::where(['status'=> 1, 'verified_badge'=> 1])
                         ->with('logo')
                         ->get();
-//
-        $posts = Post::where(['status'=> 1, 'type'=> 'blog'])
+
+        $posts = Post::where(['status'=> "1", 'type'=> 'blog'])
                     ->with(['admin','category'])
                      ->latest()
                      ->take(12)
