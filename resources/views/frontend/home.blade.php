@@ -70,6 +70,259 @@
             </a>
         </header>
 
+        <section class="offers general-section">
+            <div class="container">
+                <div class="custom-heading">
+                    <h1>عروض قوابا</h1>
+
+                    <p>
+                        انها منصة تهدف الى تمكين وصول المهتمين بعالم الجمال والإطلاع على
+                        اخر العروض الخاصة بعالم الجمال سواء كانت اجراءات او منتجات
+                    </p>
+                </div>
+
+                <div class="swiper swiper-offers">
+                    <div class="swiper-wrapper offer-wrapper">
+                        @foreach($products as $product)
+                            <div class="swiper-slide">
+                                    <div class="offer-box">
+                                        <div class="contain">
+                                            <div class="company-name">
+                                                <div class="data">
+                                                    <a href="{{$product->shared_link}}" >
+                                                        <img
+                                                            src="{{$product->vendor?->photo?->getUrl()}}"
+                                                            loading="lazy"
+                                                            alt=""
+                                                        />
+                                                    </a>
+                                                    <a href="{{$product->shared_link}}" ><h2>{{$product->vendor?->name}} </h2></a>
+                                                </div>
+
+                                                <ul class="list">
+                                                    <li>
+                                                        <img
+                                                            src="{{ asset('frontend/assets/images/offers/location.svg') }}"
+                                                            loading="lazy"
+                                                            alt=""
+                                                        />
+
+                                                        <span> {{$product->address}} </span>
+                                                    </li>
+
+                                                    <li>
+                                                        <img
+                                                            src="{{ asset('frontend/assets/images/offers/money-recive.svg') }}"
+                                                            loading="lazy"
+                                                            alt=""
+                                                        />
+
+                                                        <span> {{$product->calcProductPoints()}} </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <a href="{{$product->shared_link}}" class="fav">
+                                                <img
+                                                    src="{{ asset('frontend/assets/images/offers/heart.svg') }}"
+                                                    loading="lazy"
+                                                    alt=""
+                                                />
+                                            </a>
+                                        </div>
+
+                                        <div class="image-contain">
+                                            <div class="swiper swiper-header">
+                                                <div class="swiper-wrapper">
+                                                    <div class="swiper-slide">
+                                                        <a href="{{$product->shared_link}}" >
+                                                            <img src="{{$product->offer->image?->getUrl()}}"
+                                                                loading="lazy"
+                                                                alt=""
+                                                            />
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="swiper-pagination"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="price-contain">
+                                            <div class="data">
+                                                <div class="price-list">
+                                                    <p class="after"> {{ $product->offer_price }}ر.س</p>
+
+                                                    <p class="before">{{ number_format($product->price, 0) }} ر.س</p>
+                                                </div>
+
+                                                <span> لا يشمل ضريبة القيمة المضافة </span>
+                                            </div>
+
+                                            <div class="discount">-{{$product->offer->discount_string}}</div>
+                                        </div>
+                                        @php($difference = \Carbon\Carbon::parse($product->offer->expires_at)->diff(now()))
+                                        <div class="offer-time">
+                                            <p>مده العرض</p>
+
+                                            <div
+                                                class="countdown-card"
+                                                data-days="{{$difference->days}}"
+                                                data-hours="{{$difference->h}}"
+                                                data-minutes="{{$difference->i}}"
+                                                data-seconds="{{$difference->s}}"
+                                            >
+                                                <div class="box">
+                                                    <span class="time days">{{$difference->days}}</span>
+                                                    <span class="name">أيام</span>
+                                                </div>
+
+                                                <div class="box">
+                                                    <span class="time hours">{{$difference->h}}</span>
+                                                    <span class="name">ساعة</span>
+                                                </div>
+
+                                                <div class="box">
+                                                    <span class="time minutes">{{$difference->i}}</span>
+                                                    <span class="name">دقيقة</span>
+                                                </div>
+
+                                                <div class="box">
+                                                    <span class="time seconds">{{$difference->s}}</span>
+                                                    <span class="name">ثانية</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="partners general-section">
+            <div class="container">
+                <div class="custom-heading">
+                    <h1>شركائنا بالنجاح</h1>
+
+                    <p>
+                        شركاؤنا في النجاح هم الأفراد والجهات التي تعمل معنا بشكل مستمر
+                        ومتواصل لتحقيق الأهداف والرؤية المشتركة. يمثلون جزءًا لا يتجزأ من
+                        فريقنا، ويساهمون بشكل كبير.
+                    </p>
+                </div>
+
+                <div class="swiper swiper-partners">
+                    <div class="swiper-wrapper offer-wrapper">
+                        @foreach($vendors as $vendor)
+                            <div class="swiper-slide">
+                                <div class="box">
+                                    <a href="{{$vendor->shared_link}}">
+                                        <img src="{{$vendor->photo?->getUrl()}}"
+                                            loading="lazy" class="partner-logo" alt="logo"
+                                        />
+                                    </a>
+                                    <div class="data">
+                                        <a href="{{$vendor->shared_link}}">
+                                            <h2>
+                                                {{ $vendor->name }}
+
+                                                <img
+                                                    src="{{ asset('frontend/assets/images/offers/verified.svg')}}"
+                                                    loading="lazy"
+                                                    alt=""
+                                                />
+                                            </h2>
+                                        </a>
+
+                                        <ul class="list">
+                                            <li>
+                                                <img
+                                                    src="{{ asset('frontend/assets/images/offers/location.svg')}}"
+                                                    loading="lazy"
+                                                    alt=""
+                                                />
+
+                                                <span> {{ $vendor->address->address_1 }} </span>
+                                            </li>
+
+                                            <li>
+                                                <a href="#"> {{__(\App\Models\Vendor::TYPES[$vendor->type],[],'ar')}} </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="all-blogs general-section">
+            <div class="container">
+                <div class="custom-heading">
+                    <h1>المدونات الحديثه</h1>
+
+                    <p>
+                        انها منصة تهدف الى تمكين وصول المهتمين بعالم الجمال والإطلاع على
+                        اخر العروض الخاصة بعالم الجمال سواء كانت اجراءات او منتجات
+                    </p>
+                </div>
+
+                <div class="swiper swiper-blogs">
+                    <div class="swiper-wrapper offer-wrapper">
+                        @foreach($posts as $post)
+                            <div class="swiper-slide">
+                                <div class="new-blog">
+                                    <div class="image-contain">
+                                        <img src="{{ $post->getFirstMediaUrl('posts', 'large') }}" class="banner-img" loading="lazy" alt=""/>
+                                    </div>
+
+                                    <div class="contain">
+                                        <div class="flex-data">
+                                            <span class="badge"> {{ $post->category?->title }} </span>
+
+                                            <div class="user-data">
+                                                <img src="{{ asset('frontend/assets/images/blogs/user.png')}}" loading="lazy"  alt=""/>
+                                                <span> {{ $post->admin->name }} </span>
+                                            </div>
+                                        </div>
+
+                                        <h2>{{ $post->title }}</h2>
+                                        <p>{{ Str::limit(strip_tags($post->content, false), 50) }}</p>
+
+                                        <div class="flex-data">
+                                            <div class="date">
+                                                <img src="{{ asset('frontend/assets/images/offers/calender.svg')}}" loading="lazy" alt=""/>
+                                                <span> {{ \Carbon\Carbon::parse($post->created_at)->format('Y-m-d') }}</span>
+                                            </div>
+                                            <a href="{{route('single-blog',$post->id)}}" class="see-more">
+                                                <span> إقرأ المزيد </span>
+
+                                                <img
+                                                    src="{{ asset('frontend/assets/images/offers/see-more.svg')}}"
+                                                    loading="lazy"
+                                                    alt=""
+                                                />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
         <section id="features" class="features general-section">
             <div class="container">
                 <div class="custom-heading">
