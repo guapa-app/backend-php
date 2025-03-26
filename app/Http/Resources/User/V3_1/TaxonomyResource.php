@@ -13,6 +13,7 @@ class TaxonomyResource extends JsonResource
             'title' => $this->title,
             'type' => $this->type,
             'icon' => MediaResource::make($this->whenLoaded('icon')),
+            'photo' => MediaResource::make($this->whenLoaded('photo')),
         ];
     }
 }

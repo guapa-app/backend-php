@@ -27,6 +27,7 @@ class ListTaxonomies extends ListRecords
             'Procedures' => Tab::make()->query(fn ($query) => $query->type('specialty')),
             'Products' => Tab::make()->query(fn ($query) => $query->type('category')),
             'Blogs' => Tab::make()->query(fn ($query) => $query->type('blog_category')),
+            'Special' => Tab::make()->query(fn ($query) => $query->type('special')),
         ];
     }
 }
