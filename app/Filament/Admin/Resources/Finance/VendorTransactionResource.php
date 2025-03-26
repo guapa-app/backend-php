@@ -5,7 +5,7 @@ namespace App\Filament\Admin\Resources\Finance;
 use App\Enums\TransactionOperation;
 use App\Enums\TransactionType;
 use App\Filament\Admin\Resources\Finance\VendorTransactionResource\Pages;
-use App\Filament\Widgets\VendorTransactionStatsWidget;
+use App\Filament\Admin\Resources\Finance\VendorTransactionResource\Widgets\VendorTransactionStatsWidget;
 use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Resources\Resource;
