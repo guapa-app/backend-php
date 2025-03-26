@@ -5,6 +5,7 @@ use App\Http\Middleware\CountryHeader;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
+use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\MediaController;
 use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DeviceController;
@@ -12,7 +13,6 @@ use App\Http\Controllers\Api\User\V3_1\WalletController;
 use App\Http\Controllers\Api\User\V3_1\CountryController;
 use App\Http\Controllers\Api\User\V3_1\PaymentController;
 use App\Http\Controllers\Api\User\V3_1\TransactionController;
-use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
 use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
 

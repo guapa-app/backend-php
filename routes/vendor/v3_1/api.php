@@ -9,11 +9,11 @@ use App\Http\Controllers\Api\Vendor\V3_1\HomeController;
 use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
 use App\Http\Controllers\Api\Vendor\V3_1\CountryController;
 
-
 Route::prefix("vendor/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
     Route::get('countries', [CountryController::class, 'index']);
 
+    Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
     Route::prefix('auth')->group(base_path('routes/vendor/v3_1/api/auth.php'));
     Route::prefix('users')->group(base_path('routes/vendor/v3_1/api/users.php'));
     Route::prefix('staff')->group(base_path('routes/vendor/v3_1/api/staff.php'));

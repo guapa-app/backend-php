@@ -17,13 +17,6 @@ class OrderNotification extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * The user who made the order.
-     *
-     * @var User
-     */
-    public $user;
-
-    /**
      * Order object.
      *
      * @var OrderNotify
@@ -37,7 +30,6 @@ class OrderNotification extends Notification implements ShouldQueue
      */
     public function __construct(OrderNotify $order)
     {
-        $this->user = $order->user;
         $this->order = $order;
     }
 
@@ -94,7 +86,7 @@ class OrderNotification extends Notification implements ShouldQueue
     {
         return [
             'title' => 'New order',
-            'body' => 'New order from ' . $this->user->name . ' #' . $this->order->id,
+            'body' => 'New order from ' . $this->order->user->name . ' #' . $this->order->id,
         ];
     }
 
@@ -106,12 +98,12 @@ class OrderNotification extends Notification implements ShouldQueue
     private function orderType(): string
     {
         $type = 'new-';
-        $this->order->loadMissing('items');
-        foreach ($this->order->items as $item) {
-            if ($item->appointment != null) {
-                return $type.'consultation';
-            }
-        }
+//        $this->order->loadMissing('items');
+//        foreach ($this->order->items as $item) {
+//            if ($item->appointment != null) {
+//                return $type.'consultation';
+//            }
+//        }
 
         return $type.'order';
     }

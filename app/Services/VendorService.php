@@ -264,7 +264,9 @@ class VendorService
             $workDays = array_map(function ($day) use ($vendor) {
                 return [
                     'vendor_id' => $vendor->id,
-                    'day' => $day,
+                    'day' => $day['day'],
+                    'start_time' => $day['start_time'],
+                    'end_time' => $day['end_time'],
                 ];
             }, $data['work_days']);
 

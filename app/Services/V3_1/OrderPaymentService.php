@@ -21,9 +21,8 @@ class OrderPaymentService
 {
     public function changeOrderStatus(array $data): void
     {
-        try {
-            DB::beginTransaction();
-
+        try
+        {
             $order = Order::findOrFail($data['id']);
 
             if ($data['status'] == 'paid') {
@@ -31,8 +30,6 @@ class OrderPaymentService
             } else {
                 $order->update(['status' => $data['status']]);
             }
-
-            DB::commit();
 
             if ($data['status'] == 'paid') {
 
@@ -48,7 +45,6 @@ class OrderPaymentService
                 $this->sendOrderNotifications($order);
             }
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Order status change failed: ' . $e->getMessage(), [
                 'order_id' => $data['id'],
                 'status' => $data['status']
@@ -101,12 +97,12 @@ class OrderPaymentService
             $order = OrderNotify::findOrFail($order->id);
 
             // Send email to admin
-            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-            Notification::route('mail', $adminEmails)
-                ->notify(new OrderNotification($order));
+//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+//            Notification::route('mail', $adminEmails)
+//                ->notify(new OrderNotification($order));
 
             // Send email to vendor staff
-            Notification::send($order->vendor->staff, new OrderNotification($order));
+//            Notification::send($order->vendor, new OrderNotification($order));
 
             // Send email to customer
             $order->user->notify(new OrderNotification($order));
