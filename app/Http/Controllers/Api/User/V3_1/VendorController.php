@@ -25,7 +25,7 @@ class VendorController extends BaseApiController
     public function index(Request $request)
     {
         if (!($request->has('verified') || $request->has('filter.verified'))) {
-            $request->merge(['filter' => ['verified' => 1]]);
+            $request->merge(['verified' => 1]);
         }
 
         $vendors  = $this->vendorRepository->all($request);

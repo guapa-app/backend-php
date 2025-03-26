@@ -35,15 +35,15 @@ trait HasAddresses
      * @param int $dist
      * @return Builder
      */
-    public function scopeNearBy($query, $lat, $lng, $dist = 50)
+    public function scopeNearBy($query, $lat, $lng, $dist = 0)
     {
         $table = $this->getTable();
 
         $query->select($table . '.*');
 
-        if (!isset($dist) || !is_numeric($dist) || (int) $dist < 1) {
-            $dist = 50;
-        }
+//        if (!isset($dist) || !is_numeric($dist) || (int) $dist < 1) {
+//            $dist = 50;
+//        }
 
         $distanceAggregate = "ROUND( (6371 * acos(cos(radians($lat)) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians($lng)) + sin(radians($lat)) * sin(radians(addresses.lat)))) , 1)";
 
@@ -57,7 +57,9 @@ trait HasAddresses
             $join->where('addresses.addressable_type', '=', $this->getMorphClass());
         });
 
-        $query->havingRaw("distance <= {$dist}");
+        if ($dist > 0){
+            $query->havingRaw("distance <= {$dist}");
+        }
 
         // Need to make sure no order by is provided elsewhere
         $query->orderBy('distance', 'asc');
