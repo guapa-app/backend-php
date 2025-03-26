@@ -21,9 +21,7 @@ Route::get('/.well-known/apple-developer-merchantid-domain-association', functio
 
 Route::get('/{id}/show-invoice', [OrderController::class, 'showInvoice']);
 
-Route::get('/', function () {
-    return view('frontend.home');
-})->name('landing');
+Route::get('/', [\App\Http\Controllers\HomeController::class,'index'])->name('landing');
 
 Route::get('/about', function () {
     return view('frontend.about');
