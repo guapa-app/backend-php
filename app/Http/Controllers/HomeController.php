@@ -17,7 +17,7 @@ class HomeController extends Controller
     }
     public function index(Request $request)
     {
-        $vendors = Vendor::where(['status'=> 1, 'verified_badge'=> 1])
+        $vendors = Vendor::where(['status'=> "1", 'verified_badge'=> 1])
                         ->with('logo')
                         ->get();
 
