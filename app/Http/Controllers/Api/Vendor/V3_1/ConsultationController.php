@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
+use App\Http\Resources\Vendor\V3_1\AppointmentOfferResource;
 use App\Http\Resources\Vendor\V3_1\ConsultationCollection;
 use App\Models\Consultation;
 use Carbon\Carbon;
@@ -45,46 +46,25 @@ class ConsultationController extends BaseApiController
             ]);
     }
 
+    public function show(int $id): ConsultationResource
+    {
+        return ConsultationResource::make($this->consultationRepository->getOneWithRelations($id))
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
     /**
      * Reject a consultation
      *
-     * @param int $id
+     * @param int $consultation
      * @return \Illuminate\Http\JsonResponse
      */
-    public function reject($id)
+    public function reject(Consultation $consultation)
     {
         try {
-            $vendor = Auth::user()->vendor;
-            if (!$vendor) {
-                return $this->errorJsonRes([], __('Vendor not found'), 404);
-            }
-
-            // Use repository to find the consultation
-            $consultation = $this->consultationRepository->find($id, $vendor->id);
-
-            if (!$consultation) {
-                return $this->errorJsonRes([], __('Consultation not found'), 404);
-            }
-
-            // Check if the consultation can be rejected
-            if (!$consultation->canReject()) {
-                return $this->errorJsonRes([], __('Cannot reject this consultation. It must be at least 6 hours before the appointment time.'), 400);
-            }
-
-            // Check if the consultation is already cancelled or rejected
-            if ($consultation->status === Consultation::STATUS_CANCELLED) {
-                return $this->errorJsonRes([], __('Consultation is already cancelled'), 400);
-            }
-
-            if ($consultation->status === Consultation::STATUS_REJECTED) {
-                return $this->errorJsonRes([], __('Consultation is already rejected'), 400);
-            }
-
-            $consultation->status = Consultation::STATUS_REJECTED;
-            $consultation->rejected_at = now();
-            $consultation->save();
-
-            // TODO: Send notification to the user about the rejection
+            $this->consultationService->reject($consultation);
 
             return response()->json([
                 'success' => true,
