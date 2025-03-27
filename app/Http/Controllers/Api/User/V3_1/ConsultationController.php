@@ -33,6 +33,7 @@ class ConsultationController extends BaseApiController
     public function index(Request $request)
     {
         $consultations = $this->consultationRepository->all($request);
+
         return response()->json([
             'success' => true,
             'message' => 'Consultations fetched successfully',
@@ -62,34 +63,6 @@ class ConsultationController extends BaseApiController
         } catch (\Exception $e) {
             return $this->errorJsonRes([], $e->getMessage());
         }
-    }
-
-    /**
-     * Check if a specific time slot is available
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function checkTimeSlotAvailability(Request $request)
-    {
-        $request->validate([
-            'vendor_id' => 'required|exists:vendors,id',
-            'appointment_date' => 'required|date',
-            'appointment_time' => 'required|date_format:H:i',
-        ]);
-
-        $isAvailable = $this->consultationService->isTimeSlotAvailable(
-            $request->vendor_id,
-            $request->appointment_date,
-            $request->appointment_time
-        );
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'is_available' => $isAvailable
-            ]
-        ]);
     }
 
     /**

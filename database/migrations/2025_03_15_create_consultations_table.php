@@ -24,8 +24,9 @@ return new class extends Migration
             $table->decimal('consultation_fee', 10, 2);
             $table->decimal('application_fees', 10, 2);
 
-            $table->string('status')->default('pending');
+            $table->string('status')->default('scheduled');
             $table->string('rejection_reason')->nullable();
+
             $table->string('payment_status')->default('pending');
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();
@@ -34,6 +35,11 @@ return new class extends Migration
             $table->string('chief_complaint')->nullable();
             $table->string('invoice_url')->nullable();
             $table->string('session_url')->nullable();
+
+            // Timestamps for different stages of consultation
+            $table->timestamp('rejected_at')->nullable();
+            $table->timestamp('cancelled_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
 
             $table->timestamps();
         });

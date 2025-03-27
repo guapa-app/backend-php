@@ -8,7 +8,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\WalletService;
 use App\Services\PaymentService;
-use App\Exceptions\TimeSlotNotAvailableException;
 
 class ConsultationService
 {
@@ -48,9 +47,10 @@ class ConsultationService
             // Process payment
             $paymentData = $this->processPayment($user, $data['payment_method'], $data['payment_reference'] ?? null, $data['total_amount']);
             $data = array_merge($data, $paymentData);
-
             // Create consultation
             $consultation = Consultation::create($data);
+
+            $this->updateMedia($consultation, $data);
 
             // Send notifications
             $this->sendNotifications($consultation);
@@ -223,5 +223,14 @@ class ConsultationService
     {
         // Implement notification logic here
         // This could include sending emails, push notifications, etc.
+    }
+
+    public function updateMedia(Consultation $consultation, array $data): Consultation
+    {
+        (new MediaService())->handleMedia($consultation, $data);
+
+        $consultation->load('media');
+
+        return $consultation;
     }
 }
