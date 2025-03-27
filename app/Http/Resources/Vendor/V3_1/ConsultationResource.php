@@ -20,7 +20,7 @@ class ConsultationResource extends JsonResource
             'username' => $this->user->name,
             'appointment_date' => $this->appointment_date->format('Y-m-d'),
             'appointment_time' => $this->appointment_time->format('H:i'),
-            'consultation_reason' => $this->consultation_reason,
+            'chief_complaint' => $this->chief_complaint,
             'medical_history' => $this->medical_history,
             'session_url' => $this->session_url,
             'status' => $this->status,
