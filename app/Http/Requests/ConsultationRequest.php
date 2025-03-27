@@ -24,6 +24,7 @@ class ConsultationRequest extends FailedValidationRequest
             'medical_history.*.question' => 'required|string',
             'medical_history.*.type' => 'required|in:numeric,boolean,text,choice',
             'medical_history.*.answer' => 'nullable',
+            'medical_history.*.options' => 'required_if:medical_history.*.type,choice|array',
 
             // Chief complaint directly at top level, not in medical history
             'chief_complaint' => 'required|string|max:500',

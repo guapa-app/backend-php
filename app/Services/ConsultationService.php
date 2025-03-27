@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Consultation;
 use App\Models\Vendor;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Services\WalletService;
 use App\Services\PaymentService;
@@ -230,6 +231,40 @@ class ConsultationService
         (new MediaService())->handleMedia($consultation, $data);
 
         $consultation->load('media');
+
+        return $consultation;
+    }
+
+    public function reject($consultation): Consultation
+    {
+        $vendor = Auth::user()->vendor;
+        if (!$vendor || $vendor->id !== $consultation->vendor_id) {
+            throw new \Exception(__('Unauthorized'), 403);
+        }
+
+        if (!$consultation) {
+            throw new \Exception(__('Consultation not found'), 404);
+        }
+
+        // Check if the consultation can be rejected
+        if (!$consultation->canReject()) {
+            throw new \Exception(__('Cannot reject this consultation. It must be at least 6 hours before the appointment time.'), 400);
+        }
+
+        // Check if the consultation is already cancelled or rejected
+        if ($consultation->status === Consultation::STATUS_CANCELLED) {
+            throw new \Exception(__('Consultation is already cancelled'), 400);
+        }
+
+        if ($consultation->status === Consultation::STATUS_REJECTED) {
+            throw new \Exception(__('Consultation is already rejected'), 400);
+        }
+
+        $consultation->status = Consultation::STATUS_REJECTED;
+        $consultation->rejected_at = now();
+        $consultation->save();
+
+        // TODO: Send notification to the user about the rejection
 
         return $consultation;
     }
