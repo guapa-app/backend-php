@@ -28,6 +28,10 @@ class VendorResource extends JsonResource
 //            $this->mergeWhen(isset($this->distance), [
                 'distance' => (float) $this->distance,
 //            ]),
+
+            $this->mergeWhen($this->accept_online_consultation, [
+                'consultation_price' => $this->consultation_fees,
+            ]),
         ];
 
         return $returned_arr;
