@@ -158,6 +158,10 @@ return [
         'title'                 => 'العنوان',
         'username'              => 'اسم المُستخدم',
         'year'                  => 'السنة',
+        'terms'                 => 'الشروط والأحكام',
+
+        'firstname'                       => 'الاسم الاول',
+        'lastname'                        => 'الاسم الاخير',
 
         'user.firstname'                       => 'الاسم الاول',
         'user.lastname'                        => 'الاسم الاخير',
