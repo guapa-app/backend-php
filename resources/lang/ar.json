@@ -837,5 +837,6 @@
     "System Addition":"إضافة من النظام",
     "System Deduction":"خصم من النظام",
     "There is no sufficient balance": "لا يوجد رصيد كافي.",
-    "Sorry, the mobile number you entered is not registered with us. Please register a new account to benefit from our services.": "عذرًا، رقم الجوال الذي أدخلته غير مسجل لدينا. يرجى تسجيل حساب جديد للاستفادة من خدماتنا."
+    "Sorry, the mobile number you entered is not registered with us. Please register a new account to benefit from our services.": "عذرًا، رقم الجوال الذي أدخلته غير مسجل لدينا. يرجى تسجيل حساب جديد للاستفادة من خدماتنا.",
+    "Your account has been successfully registered. Please log in from the application and activate the account." : "تم تسجيل حسابك بنجاح يرجى تسجيل الدخول من التطبيق وتفعيل الحساب"
 }
