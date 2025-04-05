@@ -94,7 +94,7 @@
                             </div>
 
                             <div class="wrapper">
-                                <input type="checkbox" name="privacyPolicy" id="terms" class="radio-check" />
+                                <input type="checkbox" name="terms" id="terms" class="radio-check" />
 
                                 <label class="radio-title" for="terms">
                                     بالتسجيل، أنتِ توافقين على
