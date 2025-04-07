@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V2\OrderController;
 use App\Http\Controllers\RegistrationController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegistrationInterestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,9 @@ Route::get('/user-terms', function () {
 
 Route::get('/register', [RegistrationController::class, 'registerForm'])->name('register.form');
 Route::post('/register', [RegistrationController::class, 'register'])->name('register')->middleware('throttle:10');
+
+Route::get('/register-interest', [RegistrationInterestController::class, 'registerInterestForm'])->name('registerInterest.form');
+Route::post('/register-interest', [RegistrationInterestController::class, 'registerInterest'])->name('registerInterest')->middleware('throttle:10');
 
 Route::get('/navigation', function () {
     return view('welcome');
