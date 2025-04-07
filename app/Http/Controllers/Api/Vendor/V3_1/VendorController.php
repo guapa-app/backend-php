@@ -78,7 +78,7 @@ class VendorController extends BaseApiController
         foreach ($workingDays as $workDay) {
             $dayName = strtolower($workDay->day->getLabel());
             $formattedWorkingDays[$dayName] = [
-                'is_active' => $workDay->is_active,
+                'is_active' => (bool) $workDay->is_active,
                 'from' => $workDay->start_time,
                 'to' => $workDay->end_time,
                 'type' => $workDay->type,
@@ -99,7 +99,7 @@ class VendorController extends BaseApiController
         foreach ($workingDays as $workDay) {
             $dayName = strtolower($workDay->day->getLabel());
             $formattedWorkingDays[$dayName] = [
-                'is_active' => $workDay->is_active,
+                'is_active' => (bool) $workDay->is_active,
                 'from' => $workDay->start_time,
                 'to' => $workDay->end_time,
                 'type' => $workDay->type,
