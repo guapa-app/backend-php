@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers\Api\Vendor\V3_1;
 
-use App\Http\Resources\Vendor\V3_1\AppointmentOfferResource;
 use App\Http\Resources\Vendor\V3_1\ConsultationCollection;
 use App\Models\Consultation;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Contracts\Repositories\ConsultationRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Services\ConsultationService;
