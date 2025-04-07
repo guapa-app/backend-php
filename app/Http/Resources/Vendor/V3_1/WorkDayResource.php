@@ -8,13 +8,13 @@ class WorkDayResource extends JsonResource
 {
     public function toArray($request)
     {
-        $returned_arr = [
-            'day'                  => $this->day->value,
-            'day_name'             => $this->day->name,
-            'start_time'           => $this->start_time,
-            'end_time'             => $this->end_time,
+        return [
+            strtolower($this->day->getLabel()) => [
+                'is_active' => $this->is_active,
+                'from' => $this->start_time,
+                'type'   => $this->type,
+                'to' => $this->end_time,
+            ],
         ];
-
-        return $returned_arr;
     }
 }
