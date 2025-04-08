@@ -73,7 +73,7 @@ class VendorDetailsResource extends JsonResource
             'services'                                => ProductResource::collection($this->whenLoaded('services')),
             'offers'                                  => ProductResource::collection($this->whenLoaded('productsHasOffers')),
             'reviews_count' => $this->reviews_count,
-        'rating' => $this->rating,
+            'rating' => $this->rating,
         ];
 
         return $returned_arr;
