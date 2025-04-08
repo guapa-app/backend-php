@@ -28,8 +28,6 @@
         "hamedov/passport-grants": "5.0.0.x-dev",
         "inspheric/nova-email-field": "^2.0",
         "inspheric/nova-url-field": "^2.0",
-        "kreait/firebase-tokens": "^4.2",
-        "kreait/laravel-firebase": "^5.8",
         "laravel/framework": "^10.10",
         "laravel/helpers": "^1.6",
         "laravel/nova": "^4.0",
