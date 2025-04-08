@@ -613,7 +613,7 @@ class Vendor extends Model implements HasMedia, HasReviews
                 'productsHasOffers.media',
                 'productsHasOffers.offer',
                 'productsHasOffers.offer.image',
-'reviews' // Add this to eager-load reviews
+// 'reviews' // Add this to eager-load reviews
             ]);
         }
 
