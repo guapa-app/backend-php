@@ -83,7 +83,7 @@
                                 <div class="form-icon">
                                     <img src="{{ asset('interest/assets/images/forms/phone.svg') }}" loading="lazy"
                                         class="icon" />
-                                    <input type="number" name="phone" class="form-control" placeholder="رقم الجوال"
+                                    <input type="number" name="phone" class="form-control" placeholder="(966xxxxxxxxx) رقم الجوال"
                                         value="{{ old('phone') }}" />
                                 </div>
 
