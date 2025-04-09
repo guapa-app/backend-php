@@ -37,7 +37,7 @@ class RegisterUserRequest extends FormRequest
 
         $this->replace($input);
 
-        $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation();
+        $phoneNumbersRule = Common::phoneValidation();
 
         $user_rules = [
             'firstname'                => 'required|string|min:3|max:32',
