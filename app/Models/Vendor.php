@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Vendor extends Model implements HasMedia, HasReviews
@@ -114,6 +115,8 @@ class Vendor extends Model implements HasMedia, HasReviews
         'work_days',
         'shared_link',
         'staff_id',
+        'reviews_count',
+    'rating'
     ];
 
     /**
@@ -271,6 +274,11 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         return $this->logo();
     }
+
+    public function posts(): HasMany
+{
+    return  $this->hasMany(Post::class)->where('type', 'review');
+}
 
     public function specialties()
     {
@@ -605,10 +613,25 @@ class Vendor extends Model implements HasMedia, HasReviews
                 'productsHasOffers.media',
                 'productsHasOffers.offer',
                 'productsHasOffers.offer.image',
-
+// 'reviews' // Add this to eager-load reviews
             ]);
         }
 
         return $query;
+    }
+
+    // Attributes Section
+    public function getReviewsCountAttribute()
+    {
+        return $this->posts()->count();
+    }
+
+    public function getRatingAttribute()
+    {
+        $reviews = $this->posts();
+        if ($reviews->count() === 0) {
+            return null;
+        }
+        return round($reviews->avg('stars'), 1);
     }
 }

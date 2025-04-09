@@ -71,6 +71,8 @@ class VendorResource extends JsonResource
             'products'                                => ProductResource::collection($this->whenLoaded('products')),
             'services'                                => ProductResource::collection($this->whenLoaded('services')),
             'offers'                                  => ProductResource::collection($this->whenLoaded('productsHasOffers')),
+            // 'reviews_count' => $this->reviews_count, // Include reviews count
+            // 'rating' => $this->rating
 
         ];
 
