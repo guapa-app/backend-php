@@ -98,7 +98,11 @@
                                                     </a>
                                                     <a href="{{$product->shared_link}}" ><h2>{{$product->vendor?->name}} </h2></a>
                                                 </div>
-
+                                                <ul class="list">
+                                                    <li>
+                                                        <h6 style="font-weight: 700;">{{$product->title}} </h6>
+                                                    </li>
+                                                </ul>
                                                 <ul class="list">
                                                     <li>
                                                         <img
@@ -245,7 +249,7 @@
                                                     alt=""
                                                 />
 
-                                                <span> {{ $vendor->address->address_1 }} </span>
+                                                <span> {{ $vendor->address?->address_1 }} </span>
                                             </li>
 
                                             <li>
