@@ -53,6 +53,9 @@ class ConsultationService
 
             $this->updateMedia($consultation, $data);
 
+            // create vendor transaction
+            $this->walletService->creditVendorWallet($data['vendor_id'], $data['consultation_fee'], $consultation);
+
             // Send notifications
             $this->sendNotifications($consultation);
 
@@ -129,6 +132,8 @@ class ConsultationService
         $dayOfWeek = Carbon::parse($date)->dayOfWeek;
 
         $schedule = $vendor->workDays()
+            ->where('type', 'online')
+            ->where('is_active', true)
             ->where(function($query) use ($dayOfWeek) {
                 $query->where('day', $dayOfWeek)
                     ->orWhere('day', 7); // 7 is for all days

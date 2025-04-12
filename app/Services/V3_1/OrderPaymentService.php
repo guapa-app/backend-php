@@ -42,7 +42,8 @@ class OrderPaymentService
                 if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
                     $amount = $order->total - $order->fees;
-                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+//                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
                 }
 
                 $this->sendOrderNotifications($order);
