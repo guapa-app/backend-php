@@ -127,25 +127,10 @@ class ConsultationController extends BaseApiController
     {
         try {
             $consultation = Consultation::findOrFail($id);
+            $user = Auth::user();
 
-            // Check if the consultation belongs to the authenticated user
-            if ($consultation->user_id !== Auth::id()) {
-                return $this->errorJsonRes([], __('Unauthorized'), 403);
-            }
-
-            // Check if the consultation can be cancelled
-            if ($consultation->status === 'cancelled') {
-                return $this->errorJsonRes([], __('Consultation is already cancelled'), 400);
-            }
-
-            // Check if consultation is in the past
-            if (Carbon::parse($consultation->appointment_date . ' ' . $consultation->appointment_time)->isPast()) {
-                return $this->errorJsonRes([], __('Cannot cancel a past consultation'), 400);
-            }
-
-            $consultation->status = 'cancelled';
-            $consultation->cancelled_at = now();
-            $consultation->save();
+            // Cancel the consultation
+            $this->consultationService->cancel($consultation, $user);
 
             return response()->json([
                 'success' => true,
