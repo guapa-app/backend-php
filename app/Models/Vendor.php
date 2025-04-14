@@ -112,7 +112,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'is_liked',
         'views_count',
         'shares_count',
-        'work_days',
+//        'work_days',
         'shared_link',
         'staff_id',
         'reviews_count',

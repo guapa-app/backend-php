@@ -26,7 +26,6 @@ class Consultation extends Model implements Listable, HasMedia
         'type',
         'chief_complaint',
         'medical_history',
-        'session_url',
         'invoice_url',
         'consultation_reason',
         'status',
@@ -37,7 +36,11 @@ class Consultation extends Model implements Listable, HasMedia
         'payment_status',
         'payment_method',
         'cancelled_at',
-        'rejected_at'
+        'rejected_at',
+        'meeting_provider',
+        'session_url',
+        'session_password',
+        'meeting_data'
     ];
 
     protected $filterable = [
@@ -50,7 +53,7 @@ class Consultation extends Model implements Listable, HasMedia
 
     protected $casts = [
         'appointment_date' => 'date',
-        'appointment_time' => 'datetime',
+        'appointment_time' => 'date',
         'medical_history' => 'array',
         'total_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
@@ -99,6 +102,7 @@ class Consultation extends Model implements Listable, HasMedia
         return $this->belongsTo(Vendor::class);
     }
 
+    const STATUS_PENDING = 'pending';
     const STATUS_SCHEDULED = 'scheduled';
     const STATUS_CONFIRMED = 'confirmed';
     const STATUS_COMPLETED = 'completed';
@@ -122,6 +126,49 @@ class Consultation extends Model implements Listable, HasMedia
 
         return Carbon::now()->lt($sixHoursBefore);
 
+    }
+
+    /**
+     * Check if the consultation can be cancelled by the user
+     *
+     * @return bool
+     */
+    public function canCancel(): bool
+    {
+        if ($this->status === self::STATUS_CANCELLED || $this->status === self::STATUS_REJECTED) {
+            return false;
+        }
+
+        // Can't cancel if already completed
+        if ($this->status === self::STATUS_COMPLETED) {
+            return false;
+        }
+
+        // Check if consultation is in the past
+        $appointmentDateTime = Carbon::parse($this->appointment_date->format('Y-m-d') . ' ' . $this->appointment_time->format('H:i:s'));
+        return !$appointmentDateTime->isPast();
+    }
+
+    /**
+     * Check if the user can join the consultation session
+     *
+     * @return bool
+     */
+    public function canJoin(): bool
+    {
+        // Can only join if status is confirmed and there's a session URL
+        if ($this->status !== self::STATUS_CONFIRMED || !$this->session_url) {
+            return false;
+        }
+
+        // Can join from 10 minutes before until 15 minutes after the appointment time
+        $appointmentDateTime = Carbon::parse($this->appointment_date->format('Y-m-d') . ' ' . $this->appointment_time->format('H:i:s'));
+        $now = Carbon::now();
+
+        $tenMinutesBefore = $appointmentDateTime->copy()->subMinutes(10);
+        $fifteenMinutesAfter = $appointmentDateTime->copy()->addMinutes(15);
+
+        return $now->between($tenMinutesBefore, $fifteenMinutesAfter);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
@@ -151,6 +198,7 @@ class Consultation extends Model implements Listable, HasMedia
     }
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
+        $query->with(['media']);
         return $query;
     }
 
