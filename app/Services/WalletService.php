@@ -51,7 +51,7 @@ class WalletService
 
     /**
      * Credit amount to vendor wallet and create a transaction
-     * 
+     *
      * @param int $vendorId Vendor ID to credit
      * @param float $amount Amount to credit
      * @param mixed $source The source model (Order or Transaction)
@@ -76,7 +76,7 @@ class WalletService
             'sourceable_type' => $sourceableType,
             'sourceable_id' => $sourceableId,
             'status' => TransactionStatus::PENDING,
-        ]);
+        ]); 
 
         $wallet->balance += $amount;
         $wallet->save();

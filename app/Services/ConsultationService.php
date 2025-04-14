@@ -7,18 +7,19 @@ use App\Models\Vendor;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Services\WalletService;
-use App\Services\PaymentService;
+use App\Services\Meetings\MeetingServiceFactory;
 
 class ConsultationService
 {
     protected $walletService;
     protected $paymentService;
+    protected $meetingProvider;
 
     public function __construct(WalletService $walletService, PaymentService $paymentService)
     {
         $this->walletService = $walletService;
         $this->paymentService = $paymentService;
+        $this->meetingProvider = config('services.meetings.default_provider', 'zoom');
     }
 
     /**
@@ -45,19 +46,17 @@ class ConsultationService
             $consultationFees = $this->calculateConsultationFees($data['vendor_id']);
             $data = array_merge($data, $consultationFees);
 
-            // Process payment
-            $paymentData = $this->processPayment($user, $data['payment_method'], $data['payment_reference'] ?? null, $data['total_amount']);
-            $data = array_merge($data, $paymentData);
+            // Set initial status as pending
+            $data['status'] = Consultation::STATUS_PENDING;
+            $data['payment_status'] = 'pending';
+
             // Create consultation
             $consultation = Consultation::create($data);
 
-            $this->updateMedia($consultation, $data);
-
-            // create vendor transaction
-            $this->walletService->creditVendorWallet($data['vendor_id'], $data['consultation_fee'], $consultation);
-
-            // Send notifications
-            $this->sendNotifications($consultation);
+            // Attach media if provided
+            if (isset($data['media'])) {
+                $this->updateMedia($consultation, $data);
+            }
 
             DB::commit();
             return $consultation;
@@ -65,6 +64,104 @@ class ConsultationService
             DB::rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Change payment status for credit card payments
+     *
+     * @param array $data Contains consultation_id and payment_id
+     * @return \App\Models\Consultation
+     */
+    public function changePaymentStatus(array $data)
+    {
+        DB::beginTransaction();
+
+        try {
+            $consultation = Consultation::findOrFail($data['consultation_id']);
+
+            if ($consultation->payment_status === 'paid') {
+                throw new \Exception('Payment already processed for this consultation');
+            }
+
+            // Update payment data
+            $consultation->payment_status = 'paid';
+            $consultation->payment_reference = $data['payment_id'];
+            $consultation->save();
+
+            // Create the virtual meeting
+            $this->completeConsultationProcess($consultation);
+
+            DB::commit();
+            return $consultation;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Process wallet payment for consultations
+     *
+     * @param \App\Models\User $user
+     * @param array $data Contains consultation_id
+     * @return \App\Models\Consultation
+     */
+    public function payViaWallet($user, array $data)
+    {
+        DB::beginTransaction();
+
+        try {
+            $consultation = Consultation::findOrFail($data['consultation_id']);
+
+            if ($consultation->payment_status === 'paid') {
+                throw new \Exception('Payment already processed for this consultation');
+            }
+
+            // Check wallet balance
+            $walletAmount = $user->myWallet()->balance;
+            if ($walletAmount < $consultation->total_amount) {
+                throw new \Exception('Insufficient wallet balance');
+            }
+
+            // Deduct from wallet
+            $transaction = $this->walletService->debit($user, $consultation->total_amount);
+
+            // Update payment data
+            $consultation->payment_status = 'paid';
+            $consultation->payment_reference = $transaction->transaction_number;
+            $consultation->save();
+
+            // Create the virtual meeting
+            $this->completeConsultationProcess($consultation);
+
+            DB::commit();
+            return $consultation;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Complete consultation process after payment
+     *
+     * @param \App\Models\Consultation $consultation
+     * @return \App\Models\Consultation
+     */
+    private function completeConsultationProcess(Consultation $consultation)
+    {
+        // Create the virtual meeting if this is an online consultation
+        $vendor = Vendor::findOrFail($consultation->vendor_id);
+        $meetingData = $this->createVirtualMeeting($consultation, $vendor);
+        $consultation->update($meetingData);
+
+        // Update vendor's wallet
+        $this->walletService->creditVendorWallet($vendor->id, $consultation->consultation_fee, $consultation);
+
+        // Send notifications
+        $this->sendNotifications($consultation);
+
+        return $consultation;
     }
 
     /**
@@ -182,53 +279,22 @@ class ConsultationService
     }
 
     /**
-     * Process payment
-     *
-     * @param \App\Models\User $user
-     * @param string $paymentMethod
-     * @param string|null $paymentReference
-     * @param float $amount
-     * @return array
-     */
-    protected function processPayment($user, $paymentMethod, $paymentReference, $amount)
-    {
-        $paymentData = [];
-
-        if ($paymentMethod === 'wallet') {
-            $walletAmount = $user->myWallet()->balance;
-
-            if ($walletAmount < $amount) {
-                throw new \Exception('Insufficient wallet balance');
-            }
-
-            // Deduct the amount from the wallet
-            $transaction = $this->walletService->debit($user, $amount);
-
-            $paymentData['payment_reference'] = $transaction->transaction_number;
-            $paymentData['payment_status'] = 'paid';
-        } elseif ($paymentMethod === 'credit_card') {
-            if (!$this->paymentService->isPaymentPaidSuccessfully($paymentReference)) {
-                throw new \Exception('Payment details are incorrect. Please check your payment again.');
-            }
-
-            $paymentData['payment_reference'] = $paymentReference;
-            $paymentData['payment_status'] = 'paid';
-        } else {
-            throw new \Exception('Invalid payment method');
-        }
-
-        return $paymentData;
-    }
-
-    /**
      * Send notifications to user and vendor
      *
      * @param \App\Models\Consultation $consultation
      */
     protected function sendNotifications($consultation)
     {
-        // Implement notification logic here
-        // This could include sending emails, push notifications, etc.
+        // Only send meeting invitations if there's a session URL
+        if ($consultation->session_url) {
+            // Notify the user
+            $consultation->user->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, false));
+
+            // Notify the vendor
+            $consultation->vendor->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, true));
+        } else {
+            \Log::warning('No meeting URL available for consultation #' . $consultation->id . '. Email invitations not sent.');
+        }
     }
 
     public function updateMedia(Consultation $consultation, array $data): Consultation
@@ -240,6 +306,9 @@ class ConsultationService
         return $consultation;
     }
 
+    /**
+     * Update the reject method to also cancel the video conference
+     */
     public function reject($consultation): Consultation
     {
         $vendor = Auth::user()->vendor;
@@ -269,8 +338,128 @@ class ConsultationService
         $consultation->rejected_at = now();
         $consultation->save();
 
-        // TODO: Send notification to the user about the rejection
+        // Cancel the video conference
+        $this->cancelVideoConference($consultation);
+
+        // Send cancellation notification to the user
+        $consultation->user->notify(new \App\Notifications\ConsultationCancelled($consultation));
 
         return $consultation;
+    }
+
+    /**
+     * Cancel a consultation
+     *
+     * @param \App\Models\Consultation $consultation
+     * @param \App\Models\User $user
+     * @return \App\Models\Consultation
+     */
+    public function cancel(Consultation $consultation, $user): Consultation
+    {
+        if ($user->id !== $consultation->user_id) {
+            throw new \Exception(__('Unauthorized'), 403);
+        }
+
+        if (!$consultation) {
+            throw new \Exception(__('Consultation not found'), 404);
+        }
+
+        // Check if the consultation is already cancelled or rejected
+        if ($consultation->status === Consultation::STATUS_CANCELLED) {
+            throw new \Exception(__('Consultation is already cancelled'), 400);
+        }
+
+        if ($consultation->status === Consultation::STATUS_REJECTED) {
+            throw new \Exception(__('Consultation is already rejected'), 400);
+        }
+
+        // Add logic here for refunds if needed based on your cancellation policy
+
+        $consultation->status = Consultation::STATUS_CANCELLED;
+        $consultation->cancelled_at = now();
+        $consultation->save();
+
+        // Cancel the video conference
+        $this->cancelVideoConference($consultation);
+
+        // Send cancellation notification to the vendor
+        $consultation->vendor->user->notify(new \App\Notifications\ConsultationCancelled($consultation));
+
+        return $consultation;
+    }
+
+    /**
+     * Create a virtual meeting for the consultation
+     *
+     * @param Consultation $consultation
+     * @param Vendor $vendor
+     * @return array Meeting data to save to the consultation
+     */
+    protected function createVirtualMeeting(Consultation $consultation, Vendor $vendor)
+    {
+        try {
+            // Get meeting duration from vendor settings or use default
+            $duration = $vendor->session_duration ?? 60;
+
+            // Create meeting
+            $meetingService = MeetingServiceFactory::create($this->meetingProvider);
+
+            $meetingData = $meetingService->createMeeting([
+                'topic' => 'Consultation with ' . $vendor->name,
+                'agenda' => 'Online medical consultation',
+                'date' => $consultation->appointment_date->format('Y-m-d'),
+                'time' => $consultation->appointment_time->format('H:i:s'),
+                'duration' => $duration
+            ]);
+
+            return [
+                'meeting_provider' => $meetingData['provider'],
+                'session_url' => $meetingData['join_url'],
+                'session_password' => $meetingData['password'] ?? null,
+                'meeting_data' => json_encode($meetingData['data']),
+            ];
+        } catch (\Exception $e) {
+            // Log the error but don't fail the consultation creation
+            \Log::error('Failed to create meeting for consultation: ' . $e->getMessage());
+
+            return [
+                'meeting_provider' => null,
+                'session_url' => null,
+                'session_password' => null,
+                'meeting_data' => null,
+            ];
+        }
+    }
+
+    /**
+     * Cancel a consultation's video conference
+     * This would be called when a consultation is cancelled or rejected
+     *
+     * @param \App\Models\Consultation $consultation
+     * @return void
+     */
+    public function cancelVideoConference(Consultation $consultation)
+    {
+        // Skip if no session metadata
+        if (empty($consultation->session_metadata)) {
+            return;
+        }
+
+        $meetingId = $consultation->session_metadata['meeting_id'];
+
+        $meetingService = MeetingServiceFactory::create($this->meetingProvider);
+        $success = $meetingService->deleteMeeting($meetingId);
+
+        if ($success) {
+            // Clear session URLs but keep metadata for reference
+            $consultation->session_url = null;
+            $consultation->session_metadata = array_merge(
+                $consultation->session_metadata,
+                ['cancelled_at' => now()->toDateTimeString()]
+            );
+            $consultation->save();
+        } else {
+            \Log::error('Failed to cancel video conference for consultation: ' . $consultation->id);
+        }
     }
 }

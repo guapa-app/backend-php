@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Http\Resources\User\V3_1\ConsultationCollection;
+use App\Http\Resources\User\V3_1\ConsultationResource;
 use App\Models\Consultation;
 use App\Models\Vendor;
 use Carbon\Carbon;
@@ -32,13 +34,15 @@ class ConsultationController extends BaseApiController
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+        $request->merge(['user_id', $user->id]);
         $consultations = $this->consultationRepository->all($request);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Consultations fetched successfully',
-            'data' => $consultations
-        ]);
+        return ConsultationCollection::make($consultations)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
     /**
@@ -77,11 +81,11 @@ class ConsultationController extends BaseApiController
             $user = Auth::user();
             $consultation = $this->consultationService->createConsultation($request->validated(), $user);
 
-            return response()->json([
-                'success' => true,
-                'message' => __('Consultation request created successfully'),
-                'data' => $consultation
-            ], 201);
+            return ConsultationResource::make($consultation)
+                ->additional([
+                    'success' => true,
+                    'message' => __('api.success'),
+                ]);
         } catch (\Exception $e) {
             return $this->errorJsonRes([], $e->getMessage(), 400);
         } catch (\Exception $e) {

@@ -29,12 +29,6 @@ class ConsultationRequest extends FailedValidationRequest
             // Chief complaint directly at top level, not in medical history
             'chief_complaint' => 'required|string|max:500',
 
-            // Payment information
-            'payment_method' => 'required|in:wallet,credit_card',
-            'payment_reference' => 'required_if:payment_method,credit_card|nullable|string',
-
-            'total_amount' => 'required|numeric',
-
             'media' => 'nullable|array|min:1',
             'media.*' => 'nullable|string',
         ];

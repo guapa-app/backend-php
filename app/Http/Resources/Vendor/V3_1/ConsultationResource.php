@@ -35,6 +35,7 @@ class ConsultationResource extends JsonResource
             'cancelled_at' => $this->cancelled_at ? $this->cancelled_at->format('Y-m-d H:i:s') : null,
             'rejected_at' => $this->rejected_at ? $this->rejected_at->format('Y-m-d H:i:s') : null,
             'can_reject' => $this->canReject(),
+            'can_join' => $this->canJoin(),
             'media' => MediaResource::collection($this->whenLoaded('media')),
         ];
     }

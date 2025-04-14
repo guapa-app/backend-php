@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Services\ConsultationService;
 use App\Services\PaymentService;
 use App\Services\V3_1\OrderPaymentService;
 use Illuminate\Support\Facades\Log;
@@ -17,18 +18,21 @@ class PaymentController extends BaseApiController
     protected $marketingCampaignService;
     protected $appointmentOfferService;
     protected $paymentService;
+    protected $consultationService;
 
     public function __construct(
         OrderPaymentService $orderPaymentService,
         MarketingCampaignService $marketingCampaignService,
         AppointmentOfferService $appointmentOfferService,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        ConsultationService $consultationService
     ) {
         parent::__construct();
         $this->orderPaymentService = $orderPaymentService;
         $this->marketingCampaignService = $marketingCampaignService;
         $this->appointmentOfferService = $appointmentOfferService;
         $this->paymentService = $paymentService;
+        $this->consultationService = $consultationService;
     }
 
     /**
@@ -56,6 +60,9 @@ class PaymentController extends BaseApiController
                         break;
                     case 'appointment':
                         $this->appointmentOfferService->changePaymentStatus($data);
+                        break;
+                    case 'consultation':
+                        $this->consultationService->changePaymentStatus($data);
                         break;
                     default:
                         return $this->errorJsonRes([], __('api.invalid_type'));
@@ -95,6 +102,9 @@ class PaymentController extends BaseApiController
                     break;
                 case 'appointment':
                     $this->appointmentOfferService->payViaWallet($user, $data);
+                    break;
+                case 'consultation':
+                    $this->consultationService->payViaWallet($user, $data);
                     break;
                 default:
                     return $this->errorJsonRes([], __('api.invalid_type'));
