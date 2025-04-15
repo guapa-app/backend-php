@@ -74,6 +74,7 @@ class AdminPanelProvider extends PanelProvider
             )
             ->pages([
                 Pages\Dashboard::class,
+                \App\Filament\Admin\Pages\MyCustomDashboardPage::class, // Add this line
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->middleware([
