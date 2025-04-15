@@ -86,6 +86,10 @@ class ConsultationService
             // Update payment data
             $consultation->payment_status = 'paid';
             $consultation->payment_reference = $data['payment_id'];
+            $consultation->payment_method = 'credit_card';
+
+            // update status to scheduled
+            $consultation->status = Consultation::STATUS_SCHEDULED;
             $consultation->save();
 
             // Create the virtual meeting
@@ -129,6 +133,10 @@ class ConsultationService
             // Update payment data
             $consultation->payment_status = 'paid';
             $consultation->payment_reference = $transaction->transaction_number;
+            $consultation->payment_method = 'wallet';
+
+            // update status to scheduled
+            $consultation->status = Consultation::STATUS_SCHEDULED;
             $consultation->save();
 
             // Create the virtual meeting

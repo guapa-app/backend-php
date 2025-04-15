@@ -53,7 +53,7 @@ class Consultation extends Model implements Listable, HasMedia
 
     protected $casts = [
         'appointment_date' => 'date',
-        'appointment_time' => 'date',
+        'appointment_time' => 'datetime',
         'medical_history' => 'array',
         'total_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
