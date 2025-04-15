@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('transactions', function (Blueprint $table) {
             // Add polymorphic columns
-            $table->nullableMorphs('sourceable')->after('transaction_number');
+            $table->nullableMorphs('sourceable');
         });
 
         // Migrate existing data
