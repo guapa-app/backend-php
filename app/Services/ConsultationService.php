@@ -77,7 +77,7 @@ class ConsultationService
         DB::beginTransaction();
 
         try {
-            $consultation = Consultation::findOrFail($data['consultation_id']);
+            $consultation = Consultation::findOrFail($data['id']);
 
             if ($consultation->payment_status === 'paid') {
                 throw new \Exception('Payment already processed for this consultation');
@@ -111,7 +111,7 @@ class ConsultationService
         DB::beginTransaction();
 
         try {
-            $consultation = Consultation::findOrFail($data['consultation_id']);
+            $consultation = Consultation::findOrFail($data['id']);
 
             if ($consultation->payment_status === 'paid') {
                 throw new \Exception('Payment already processed for this consultation');
