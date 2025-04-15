@@ -293,16 +293,12 @@ class ConsultationService
      */
     protected function sendNotifications($consultation)
     {
-        // Only send meeting invitations if there's a session URL
-        if ($consultation->session_url) {
-            // Notify the user
-            $consultation->user->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, false));
+        // Notify the user
+        $consultation->user->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, false));
 
-            // Notify the vendor
-            $consultation->vendor->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, true));
-        } else {
-            \Log::warning('No meeting URL available for consultation #' . $consultation->id . '. Email invitations not sent.');
-        }
+        // Notify the vendor
+        $consultation->vendor->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, true));
+
     }
 
     public function updateMedia(Consultation $consultation, array $data): Consultation
