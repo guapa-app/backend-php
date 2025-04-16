@@ -11,6 +11,7 @@
         "php": "^8.0",
         "alexwenzel/nova-dependency-container": "^1.12",
         "benwilkins/laravel-fcm-notification": "dev-l10-compatibility",
+        "bezhansalleh/filament-google-analytics": "^2.1",
         "bissolli/nova-phone-field": "^0.0.4",
         "codezero/laravel-unique-translation": "^4.1",
         "ebess/advanced-nova-media-library": "^4.1",
