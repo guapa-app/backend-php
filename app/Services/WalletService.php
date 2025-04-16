@@ -50,17 +50,22 @@ class WalletService
     }
 
     /**
-     * Credit vendor wallet from order
+     * Credit amount to vendor wallet and create a transaction
      *
-     * @param int $vendorId
-     * @param float $amount
-     * @param int $orderId
+     * @param int $vendorId Vendor ID to credit
+     * @param float $amount Amount to credit
+     * @param mixed $source The source model (Order or Transaction)
+     * @param string|null $sourceType Optional override for source type
      * @return Transaction
      */
-    public function creditVendorWallet(int $vendorId, float $amount, int $orderId): Transaction
+    public function creditVendorWallet(int $vendorId, float $amount, $source, ?string $sourceType = null): Transaction
     {
         // get first wallet for vendor or create
         $wallet = Wallet::firstOrCreate(['vendor_id' => $vendorId]);
+
+        // Determine source type and ID
+        $sourceableType = $sourceType ?? get_class($source);
+        $sourceableId = $source->id;
 
         // Create pending transaction
         $transaction = $this->transactionService->createVendorTransaction([
@@ -68,9 +73,10 @@ class WalletService
             'amount' => $amount,
             'transaction_type' => TransactionType::ORDER_PAYMENT,
             'operation' => TransactionOperation::DEPOSIT,
-            'order_id' => $orderId,
+            'sourceable_type' => $sourceableType,
+            'sourceable_id' => $sourceableId,
             'status' => TransactionStatus::PENDING,
-        ]);
+        ]); 
 
         $wallet->balance += $amount;
         $wallet->save();

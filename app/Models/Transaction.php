@@ -21,7 +21,8 @@ class Transaction extends Model
         'transaction_date',
         'invoice_link',
         'status',
-        'order_id',
+        'sourceable_id',
+        'sourceable_type',
         'notes',
     ];
 
@@ -39,5 +40,10 @@ class Transaction extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function sourceable()
+    {
+        return $this->morphTo();
     }
 }

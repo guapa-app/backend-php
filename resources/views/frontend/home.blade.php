@@ -1,3 +1,14 @@
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-11502298872">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-11502298872');
+</script>
+
 @extends('frontend.layouts.app')
 
 @section('title')
@@ -87,7 +98,11 @@
                                                     </a>
                                                     <a href="{{$product->shared_link}}" ><h2>{{$product->vendor?->name}} </h2></a>
                                                 </div>
-
+                                                <ul class="list">
+                                                    <li>
+                                                        <h6 style="font-weight: 700;">{{$product->title}} </h6>
+                                                    </li>
+                                                </ul>
                                                 <ul class="list">
                                                     <li>
                                                         <img
@@ -234,7 +249,7 @@
                                                     alt=""
                                                 />
 
-                                                <span> {{ $vendor->address->address_1 }} </span>
+                                                <span> {{ $vendor->address?->address_1 }} </span>
                                             </li>
 
                                             <li>
