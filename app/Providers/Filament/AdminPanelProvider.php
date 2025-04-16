@@ -26,7 +26,6 @@ class AdminPanelProvider extends PanelProvider
     public function boot()
     {
         DB::getDoctrineSchemaManager()?->getDatabasePlatform()?->registerDoctrineTypeMapping('enum', 'string');
-
         FilamentColor::register([
             'indigo' => Color::Indigo,
         ]);
