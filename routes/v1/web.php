@@ -22,7 +22,7 @@ Route::get('/.well-known/apple-developer-merchantid-domain-association', functio
 
 Route::get('/{id}/show-invoice', [OrderController::class, 'showInvoice']);
 
-Route::get('/', [\App\Http\Controllers\HomeController::class,'index'])->name('landing');
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('landing');
 
 Route::get('/about', function () {
     return view('frontend.about');
@@ -34,6 +34,12 @@ Route::get('/about-app', function () {
 
 Route::get('/blogs', [\App\Http\Controllers\PostController::class, 'index'])->name('blogs');
 Route::get('/single-blog/{id}', [\App\Http\Controllers\PostController::class, 'show'])->name('single-blog');
+Route::get('/single-blog/{id}/{slug}', [\App\Http\Controllers\PostController::class, 'show'])->name('post.show');
+
+Route::get('/single-blog/{id}', function ($id) {
+    $post = \App\Models\Post::findOrFail($id);
+    return redirect()->route('post.show', ['id' => $id, 'slug' => \Str::slug($post->title)], 301);
+});
 
 Route::get('/download-app', function () {
     return view('frontend.download-app');
