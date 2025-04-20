@@ -14,6 +14,7 @@ use App\Enums\AppointmentOfferEnum;
 use Illuminate\Support\Facades\Log;
 use App\Services\LoyaltyPointsService;
 use App\Notifications\OrderNotification;
+use App\Notifications\InvoiceNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
@@ -21,9 +22,8 @@ class OrderPaymentService
 {
     public function changeOrderStatus(array $data): void
     {
-        try {
-            DB::beginTransaction();
-
+        try
+        {
             $order = Order::findOrFail($data['id']);
 
             if ($data['status'] == 'paid') {
@@ -31,8 +31,6 @@ class OrderPaymentService
             } else {
                 $order->update(['status' => $data['status']]);
             }
-
-            DB::commit();
 
             if ($data['status'] == 'paid') {
 
@@ -42,13 +40,13 @@ class OrderPaymentService
                 if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
                     $amount = $order->total - $order->fees;
-                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+//                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
                 }
 
                 $this->sendOrderNotifications($order);
             }
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Order status change failed: ' . $e->getMessage(), [
                 'order_id' => $data['id'],
                 'status' => $data['status']
@@ -69,6 +67,7 @@ class OrderPaymentService
         // Generate invoice if needed
         if (!str_contains($order->invoice_url, '.s3.')) {
             $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+            Notification::send($order->user, new InvoiceNotification($order->invoice_url));
         }
         $order->save();
 
@@ -101,12 +100,12 @@ class OrderPaymentService
             $order = OrderNotify::findOrFail($order->id);
 
             // Send email to admin
-            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-            Notification::route('mail', $adminEmails)
-                ->notify(new OrderNotification($order));
+//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+//            Notification::route('mail', $adminEmails)
+//                ->notify(new OrderNotification($order));
 
             // Send email to vendor staff
-            Notification::send($order->vendor->staff, new OrderNotification($order));
+//            Notification::send($order->vendor, new OrderNotification($order));
 
             // Send email to customer
             $order->user->notify(new OrderNotification($order));

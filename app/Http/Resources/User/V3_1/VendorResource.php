@@ -24,10 +24,15 @@ class VendorResource extends JsonResource
             'address' => $this->country?->name,
             'addresses' => AddressResource::collection($this->whenLoaded('addresses')),
             'logo' => MediaResource::make($this->whenLoaded('logo')),
-
+            'reviews_count' => $this->reviews_count,
+            'rating' => $this->rating,
 //            $this->mergeWhen(isset($this->distance), [
                 'distance' => (float) $this->distance,
 //            ]),
+
+            $this->mergeWhen($this->accept_online_consultation, [
+                'consultation_price' => $this->consultation_fees,
+            ]),
         ];
 
         return $returned_arr;
