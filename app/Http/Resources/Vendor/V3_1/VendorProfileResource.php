@@ -40,6 +40,8 @@ class VendorProfileResource extends JsonResource
             'shared_link'                               => (string) $this->shared_link,
 
             'accept_appointment'                       => (bool) $this->accept_appointment,
+            'accept_online_consultation'               => (bool) $this->accept_online_consultation,
+            'consultation_fee'                       => (float) $this->consultation_fee,
 
             'activate_wallet'                            => (bool) $this->activate_wallet,
             'wallet_info_exists'                       => (bool) $this->iban,

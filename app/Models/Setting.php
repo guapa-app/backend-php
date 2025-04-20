@@ -48,6 +48,18 @@ class Setting extends Model
 
         return $record->s_value;
     }
+    public static function getOnlineConsultationFee()
+    {
+        $record = static::firstOrCreate(['s_key' => 'online_consultation_fees'], [
+            's_value'           => 0.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Fees are a percentage of the vendor fees (example: 10% of 150 riyals = 15 riyals)',
+        ]);
+
+        return $record->s_value;
+    }
 
     public static function pointsConversionRate()
     {

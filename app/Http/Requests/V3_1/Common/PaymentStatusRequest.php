@@ -29,7 +29,7 @@ class PaymentStatusRequest extends FailedValidationRequest
             'payment_gateway' => ['required', 'string'],
             'status' => ['required', 'string'],
             'id' => ['required', 'integer'],
-            'type' => ['required', 'string', Rule::in(['order', 'campaign', 'appointment'])]
+            'type' => ['required', 'string', Rule::in(['order', 'campaign', 'appointment','consultation'])],
         ];
 
         return $rules;
