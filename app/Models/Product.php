@@ -203,19 +203,78 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     {
         $finalPrice = round((float) $this->offer_price, 2); // Use the getOfferPriceAttribute method
         $fees = round((float) $this->calculateProductFees($finalPrice), 2);
-        $taxPercentage = (float) Setting::getTaxes(); // tax percentage
+        $taxPercentage = (float) Setting::getTaxes(); // Tax percentage (default: 15%)
         $taxes = round(($taxPercentage / 100) * $fees, 2);
         $remaining = round($finalPrice - $fees, 2);
         $feesWithTaxes = round(($this->vendor->activate_wallet ? $finalPrice : $fees) + $taxes, 2);
 
+        // Fetch the authenticated user's points
+        $user = auth()->user();
+        $userPoints = 0;
+
+        if ($user) {
+            try {
+                $pointsWallet = $user->myPointsWallet; // Call the method without ()
+                $userPoints = $pointsWallet ? (int) $pointsWallet->points : 0; // Ensure points is an integer
+            } catch (\Exception $e) {
+                // Log the error for debugging
+                \Log::error('Error fetching user points: ' . $e->getMessage());
+                $userPoints = 0;
+                return [
+                    'error' => 'Failed to fetch user points.',
+                ];
+            }
+        }
+
+        // Get the points-to-cash conversion rate (e.g., 100 points = 1 SR)
+        $exchangeRate = (float) Setting::pointsConversionRate() ?: 100; // Default to 100 if not set
+        $pointsValueInSr = $userPoints / $exchangeRate; // Convert points to SR (e.g., 1000 points = 10 SR, no rounding)
+
+        // Calculate the points-based discount (in SR)
+        $pointsDiscount = min($fees, $pointsValueInSr); // SR amount to discount using points
+        $pointsUsed = (int) ($pointsDiscount * $exchangeRate); // Convert SR back to points as an integer
+        $pointsDiscount = round($pointsDiscount, 2); // Round the SR value for consistency in the response
+
+        // Apply the points discount to the fees
+        $feesAfterPointsDiscount = max(0, $fees - $pointsDiscount); // Ensure fees don't go below 0
+
+        // Recalculate taxes, remaining, and fees_with_taxes based on the adjusted fees
+        $taxesAfterPointsDiscount = round(($taxPercentage / 100) * $feesAfterPointsDiscount, 2);
+        $remainingAfterPointsDiscount = round($finalPrice - $feesAfterPointsDiscount, 2);
+        $feesWithTaxesAfterPointsDiscount = round(($this->vendor->activate_wallet ? $finalPrice : $feesAfterPointsDiscount) + $taxesAfterPointsDiscount, 2);
+
+        // Update the user's points (deduct the used points)
+        if ($user && $pointsUsed > 0) {
+            try {
+                $pointsWallet = $user->myPointsWallet; // Call the method without ()
+                if ($pointsWallet) {
+                    $pointsWallet->points = (int) ($pointsWallet->points - $pointsUsed); // Ensure points remains an integer
+                    $pointsWallet->save();
+                }
+            } catch (\Exception $e) {
+                // Log the error for debugging
+                \Log::error('Error updating user points: ' . $e->getMessage());
+                return [
+                    'error' => 'Failed to update user points.',
+                ];
+            }
+        }
+
         return [
-            'fees' => $this->vendor->activate_wallet ? $finalPrice : $fees,
-            'taxes' => $taxes,
-            'remaining' => $this->vendor->activate_wallet ? 0 : $remaining,
-            'fees_with_taxes' => $feesWithTaxes,
+            'fees' => $this->vendor->activate_wallet ? $finalPrice : $fees, // Original fees before points discount
+            'taxes' => $taxes, // Original taxes before points discount
+            'remaining' => $this->vendor->activate_wallet ? 0 : $remaining, // Original remaining before points discount
+            'fees_with_taxes' => $feesWithTaxes, // Original fees_with_taxes before points discount
             'tax_percentage' => $taxPercentage,
             'price_after_discount' => $this->offer ? round($this->offer_price, 2) : round((float) $this->price, 2),
             'discount_percentage' => round((float) $this->offer?->discount ?? 0.0, 2),
+            // New parameters for points discount
+            'points_discount' => $pointsDiscount, // SR amount discounted using points
+            'points_used' => $pointsUsed, // Number of points used (integer)
+            'fees_after_points_discount' => $this->vendor->activate_wallet ? $finalPrice : $feesAfterPointsDiscount, // Fees after points discount
+            'taxes_after_points_discount' => $taxesAfterPointsDiscount, // Taxes after points discount
+            'remaining_after_points_discount' => $this->vendor->activate_wallet ? 0 : $remainingAfterPointsDiscount, // Remaining after points discount
+            'fees_with_taxes_after_points_discount' => $feesWithTaxesAfterPointsDiscount, // Fees with taxes after points discount
         ];
     }
 
@@ -497,14 +556,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     public function calculateProductFees($finalPrice)
     {
         $productCategory = $this->taxonomies()->first();
-        if(!$productCategory){
+        if (!$productCategory) {
             return 0;
         }
         $categoryCountryFees = $this->getCategoryCountryFees($productCategory->id, $finalPrice);
 
-        if($categoryCountryFees !== false){
+        if ($categoryCountryFees !== false) {
             return $categoryCountryFees;
-        }else{
+        } else {
             if ($productCategory?->fees) {
                 $productFees = $productCategory->fees;
 
@@ -548,7 +607,8 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      */
     function calcProductPoints()
     {
-        if ($this->earned_points > 0) return $this->earned_points;
+        if ($this->earned_points > 0)
+            return $this->earned_points;
 
         $conversionRate = Setting::purchasePointsConversionRate();
         $paidAmount = $this->payment_details['fees_with_taxes'];
