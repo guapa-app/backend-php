@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use DB;
 use App\Traits\Likable;
 use App\Enums\ProductType;
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use App\Services\LoyaltyPointsService;
 
 class Product extends Model implements Listable, HasMedia, HasReviews
 {
@@ -207,23 +209,22 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $remaining = round($finalPrice - $fees, 2);
         $feesWithTaxes = round(($this->vendor->activate_wallet ? $finalPrice : $fees) + $taxes, 2);
 
-        // Fetch the authenticated user's points
-        $user = auth()->user();
         $userPoints = 0;
 
+       try {
+        // Fetch the authenticated user
+        $user = auth('api')->user();
+        
         if ($user) {
-            try {
-                $pointsWallet = $user->myPointsWallet; // Call the method without ()
-                $userPoints = $pointsWallet ? (int) $pointsWallet->points : 0; // Ensure points is an integer
-            } catch (\Exception $e) {
-                // Log the error for debugging
-                \Log::error('Error fetching user points: ' . $e->getMessage());
-                $userPoints = 0;
-                return [
-                    'error' => 'Failed to fetch user points.',
-                ];
-            }
+            // Use LoyaltyPointsService to get points instead of accessing wallet directly
+            $loyaltyPointsService = app(LoyaltyPointsService::class);
+            $userPoints = $loyaltyPointsService->getTotalPoints($user->id);
         }
+    } catch (\Exception $e) {
+        $userPoints = 0;
+
+    }
+
 
         // Get the points-to-cash conversion rate (e.g., 100 points = 1 SR)
         $exchangeRate = (float) Setting::pointsConversionRate() ?: 100; // Default to 100 if not set
@@ -242,22 +243,6 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $remainingAfterPointsDiscount = round($finalPrice - $feesAfterPointsDiscount, 2);
         $feesWithTaxesAfterPointsDiscount = round(($this->vendor->activate_wallet ? $finalPrice : $feesAfterPointsDiscount) + $taxesAfterPointsDiscount, 2);
 
-        // Update the user's points (deduct the used points)
-        if ($user && $pointsUsed > 0) {
-            try {
-                $pointsWallet = $user->myPointsWallet; // Call the method without ()
-                if ($pointsWallet) {
-                    $pointsWallet->points = (int) ($pointsWallet->points - $pointsUsed); // Ensure points remains an integer
-                    $pointsWallet->save();
-                }
-            } catch (\Exception $e) {
-                // Log the error for debugging
-                \Log::error('Error updating user points: ' . $e->getMessage());
-                return [
-                    'error' => 'Failed to update user points.',
-                ];
-            }
-        }
 
         return [
             'fees' => $this->vendor->activate_wallet ? $finalPrice : $fees, // Original fees before points discount
