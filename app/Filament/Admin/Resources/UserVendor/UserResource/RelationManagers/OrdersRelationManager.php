@@ -65,7 +65,6 @@ class OrdersRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-
                 SendWhatsAppReminderAction::make()
                     ->visible(fn (Order $record) => $record->status == OrderStatus::Pending),
             ])

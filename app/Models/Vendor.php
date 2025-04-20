@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Vendor extends Model implements HasMedia, HasReviews
@@ -86,7 +87,10 @@ class Vendor extends Model implements HasMedia, HasReviews
         'accept_appointment',
         'verified_badge',
         'activate_wallet',
-        'iban'
+        'iban',
+        'accept_online_consultation',
+        'session_duration',
+        'consultation_fee',
     ];
 
     /**
@@ -108,9 +112,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         'is_liked',
         'views_count',
         'shares_count',
-        'work_days',
+//        'work_days',
         'shared_link',
         'staff_id',
+        'reviews_count',
+    'rating'
     ];
 
     /**
@@ -174,21 +180,21 @@ class Vendor extends Model implements HasMedia, HasReviews
     }
 
     // TODO to be removed after make sure no use for it, it effects the relation
-    public function getWorkDaysAttribute()
-    {
-        $relations = $this->getRelations();
-
-        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
-            return $relations['workDays'];
-        }
-
-        $days = isset($relations['workDays']) ?
-            $relations['workDays']->pluck('day') :
-            [];
-        $this->setRelation('workDays', $days);
-
-        return $days;
-    }
+//    public function getWorkDaysAttribute()
+//    {
+//        $relations = $this->getRelations();
+//
+//        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
+//            return $relations['workDays'];
+//        }
+//
+//        $days = isset($relations['workDays']) ?
+//            $relations['workDays']->pluck('day') :
+//            [];
+//        $this->setRelation('workDays', $days);
+//
+//        return $days;
+//    }
 
     // =========== Methods Section ===========
     /**
@@ -222,6 +228,23 @@ class Vendor extends Model implements HasMedia, HasReviews
             ->performOnCollections('logos');
     }
 
+    public function getConsultationFeesAttribute(): array
+    {
+        $consultationFees = round((float) $this->consultation_fee, 2);
+        $taxPercentage = Setting::getTaxes(); // tax percentage
+        $taxAmount = round(((float) Setting::getTaxes() / 100) * $consultationFees, 2);
+        $applicationFee = (float) Setting::getOnlineConsultationFee();
+        $totalAmount = round($consultationFees + $applicationFee + $taxAmount, 2);
+
+        return [
+            'consultation_fees' => $consultationFees,
+            'application_fee' => $applicationFee,
+            'tax_amount' => $taxAmount,
+            'total_amount' => $totalAmount,
+            'tax_percentage' => $taxPercentage,
+        ];
+    }
+
     /**
      * The channels the vendor receives notification broadcasts on.
      *
@@ -251,6 +274,11 @@ class Vendor extends Model implements HasMedia, HasReviews
     {
         return $this->logo();
     }
+
+    public function posts(): HasMany
+{
+    return  $this->hasMany(Post::class)->where('type', 'review');
+}
 
     public function specialties()
     {
@@ -585,10 +613,25 @@ class Vendor extends Model implements HasMedia, HasReviews
                 'productsHasOffers.media',
                 'productsHasOffers.offer',
                 'productsHasOffers.offer.image',
-
+// 'reviews' // Add this to eager-load reviews
             ]);
         }
 
         return $query;
+    }
+
+    // Attributes Section
+    public function getReviewsCountAttribute()
+    {
+        return $this->posts()->count();
+    }
+
+    public function getRatingAttribute()
+    {
+        $reviews = $this->posts();
+        if ($reviews->count() === 0) {
+            return null;
+        }
+        return round($reviews->avg('stars'), 1);
     }
 }

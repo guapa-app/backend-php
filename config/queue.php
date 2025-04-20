@@ -67,6 +67,14 @@ return [
             'block_for' => null,
         ],
 
+        'emails' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'emails',
+            'retry_after' => 90,
+            'block_for' => null,
+        ],
+
     ],
 
     /*

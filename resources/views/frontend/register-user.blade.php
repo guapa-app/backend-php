@@ -80,11 +80,13 @@
                             </div>
 
                             <div class="form-group">
-                                <div class="form-icon">
+                                <div class="form-icon phone-input-wrapper">
                                     <img src="{{ asset('interest/assets/images/forms/phone.svg') }}" loading="lazy"
                                         class="icon" />
-                                    <input type="number" name="phone" class="form-control" placeholder="(966xxxxxxxxx) رقم الجوال"
-                                        value="{{ old('phone') }}" />
+                                    <div class="phone-prefix">966</div>
+                                    <input type="number" name="phone_without_prefix" id="phone_without_prefix" class="form-control phone-with-prefix" 
+                                        placeholder="5xxxxxxxx" value="{{ old('phone_without_prefix') }}" />
+                                    <input type="hidden" name="phone" id="full_phone" value="{{ old('phone') }}" />
                                 </div>
 
                                 @error('phone')
@@ -112,7 +114,7 @@
                                 @enderror
                             </div>
 
-                            <a href="javascript:$('.register-form').submit();" class="custom-btn primary-btn">
+                            <a href="javascript:validateAndSubmit();" class="custom-btn primary-btn">
                                 <span> تسجيل </span>
                             </a>
                         </form>
@@ -140,5 +142,85 @@
         </div>
     </div>
 </section>
+
+<style>
+    .phone-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .phone-prefix {
+        position: absolute;
+        left: 40px;
+        font-size: 14px;
+        color: #666;
+        z-index: 2;
+        padding-right: 8px;
+        border-right: 1px solid #ddd;
+    }
+
+    .phone-with-prefix {
+        padding-left: 70px !important;
+    }
+
+    .error {
+        font-size: 12px !important;
+        margin-top: 5px;
+        padding-right: 10px;
+        display: inline-block;
+    }
+    
+    .custom-btn.primary-btn {
+        background: linear-gradient(90deg, #FF8A00, #FF5C5C);
+        border: none;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phone_without_prefix');
+        const fullPhoneInput = document.getElementById('full_phone');
+        
+        // Update hidden full phone field when user types
+        phoneInput.addEventListener('input', function() {
+            fullPhoneInput.value = '966' + this.value;
+        });
+        
+        // Initialize with any existing value
+        if (phoneInput.value) {
+            fullPhoneInput.value = '966' + phoneInput.value;
+        }
+    });
+    
+    function validateAndSubmit() {
+        const phoneInput = document.getElementById('phone_without_prefix');
+        let isValid = true;
+        
+        // Clear any existing error message
+        let existingError = document.querySelector('.phone-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Validate phone number format (Saudi format)
+        const phoneValue = phoneInput.value;
+        const normalized = phoneValue.startsWith('0') ? phoneValue : '0' + phoneValue;
+        const pattern = /^05[0-9]{8}$/;
+        
+        if (!pattern.test(normalized)) {
+            isValid = false;
+            const errorMsg = document.createElement('small');
+            errorMsg.className = 'error phone-error';
+            errorMsg.textContent = 'يرجى إدخال رقم جوال سعودي صحيح (5xxxxxxxx)';
+            
+            phoneInput.parentElement.parentElement.appendChild(errorMsg);
+        }
+        
+        if (isValid) {
+            document.querySelector('.register-form').submit();
+        }
+    }
+</script>
 
 @endsection

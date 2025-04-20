@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserVendor;
 use App\Models\Vendor;
 use App\Models\WorkDay;
+use App\Enums\WorkDay as WorkDayEnum;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -70,7 +71,7 @@ class VendorService
                 auth()->user()->assignRole('manager');
             }
 
-            $this->updateWorkingDaysAndAppointments($vendor, $data);
+            $this->updateAppointments($vendor, $data);
 
             $this->updateStaff($vendor, $data);
 
@@ -149,7 +150,7 @@ class VendorService
 
         $this->updateStaff($vendor, $data);
 
-        $this->updateWorkingDaysAndAppointments($vendor, $data);
+        $this->updateAppointments($vendor, $data);
 
         if (isset($data['specialty_ids'])) {
             $this->updateSpecialties($vendor, $data['specialty_ids']);
@@ -257,20 +258,8 @@ class VendorService
         return $vendor;
     }
 
-    public function updateWorkingDaysAndAppointments(Vendor $vendor, array $data): Vendor
+    public function updateAppointments(Vendor $vendor, array $data): Vendor
     {
-        if (isset($data['work_days'])) {
-            $vendor->workDays()->delete();
-            $workDays = array_map(function ($day) use ($vendor) {
-                return [
-                    'vendor_id' => $vendor->id,
-                    'day' => $day,
-                ];
-            }, $data['work_days']);
-
-            WorkDay::insert($workDays);
-        }
-
         if (isset($data['appointments'])) {
             $vendor->appointments()->delete();
             $appointments = array_map(function ($appointment) use ($vendor) {
@@ -287,6 +276,57 @@ class VendorService
         return $vendor;
     }
 
+    public function updateWorkingDays(Vendor $vendor, array $data)
+    {
+
+        // Map day names to enum cases
+        foreach (WorkDayEnum::cases() as $day) {
+            $dayName = strtolower($day->getLabel());
+            $dayKey = str_replace(' ', '_', $dayName); // Convert "All Days" to "all_days"
+
+            $dayNameToEnumValue[$dayKey] = $day->value;
+            $dayNameToEnumCase[$dayKey] = $day;
+        }
+
+        if (isset($data['working_days'])) {
+
+            // Delete existing working days
+            $vendor->workDays()
+                ->when($data['type'] ?? null, function ($query) use ($data) {
+                    return $query->where('type', $data['type']);
+                })->delete();
+
+            $workDays = [];
+
+            // Process each day
+            foreach ($data['working_days'] as $dayKey => $dayData) {
+                // Use the enum value instead of the day name
+                $workDays[] = [
+                    'vendor_id' => $vendor->id,
+                    'type' => $data['type'] ?? null,
+                    'day' => $dayNameToEnumValue[$dayKey], // Store the integer value
+                    'start_time' => $dayData['from'],
+                    'end_time' => $dayData['to'],
+                    'is_active' => $dayData['is_active'] ?? false,
+                ];
+
+                // If all_days is set, break the loop after processing it
+                if ($dayKey === 'all_days') {
+                    break;
+                }
+            }
+
+            // Insert all working days at once if there are any
+            if (!empty($workDays)) {
+                WorkDay::insert($workDays);
+            }
+        }
+        return $vendor->workDays()
+            ->when($data['type'] ?? null, function ($query) use ($data) {
+                return $query->where('type', $data['type']);
+            })
+            ->get();
+    }
     public function share(int $id): int
     {
         return (int) Redis::hincrby("vendor:{$id}", 'shares_count', 1);

@@ -49,5 +49,6 @@ class EventServiceProvider extends ServiceProvider
         Models\Setting::observe(Observers\SettingObserver::class);
         Models\SupportMessage::observe(Observers\SupportMessageObserver::class);
         Models\ShareLink::observe(Observers\ShareLinkObserver::class);
+        Models\Comment::observe(Observers\CommentObserver::class);
     }
 }

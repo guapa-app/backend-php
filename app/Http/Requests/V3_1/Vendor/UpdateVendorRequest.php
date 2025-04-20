@@ -108,10 +108,19 @@ class UpdateVendorRequest extends FailedValidationRequest
 
             // Work days array validation (optional)
             'work_days'             => 'sometimes|required|array|min:1',
-            'work_days.*'           => 'required|integer|min:0|max:6',
+            'work_days.*.day'           => 'required|integer|min:0|max:7',
+            'work_days.*.start_time' => 'required|date_format:H:i:s',
+            'work_days.*.end_time'   => 'required|date_format:H:i:s',
+            'work_days.*.is_off'     => 'sometimes|boolean',
+
 
             // Appointments array validation (optional)
             'accept_appointment'       => 'sometimes|boolean',
+
+            'accept_online_consultation' => 'sometimes|boolean',
+            'session_duration'         => 'sometimes|integer|min:5|max:60',
+            'consultation_fee'         => 'sometimes|numeric|min:0',
+
             'appointments'             => 'sometimes|required|array|min:1',
             'appointments.*'           => 'required|array|min:2',
             'appointments.*.from_time' => 'required|date_format:H:i:s',

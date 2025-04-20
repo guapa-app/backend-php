@@ -7,34 +7,72 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
+use Spatie\Image\Manipulations;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
-class Review extends Model
+class Review extends Model  implements HasMedia
 {
-    use HasFactory, ListableTrait;
+    use HasFactory, ListableTrait, InteractsWithMedia;
 
     protected $fillable = [
-        'user_id', 'reviewable_id', 'reviewable_type',
-        'stars', 'comment',
+        'user_id', 'order_id', 'stars', 'comment',
     ];
 
     protected $filterable = [
-        'user_id', 'reviewable_id', 'reviewable_type', 'stars',
+        'user_id', 'order_id', 'stars', 'show'
     ];
 
     protected $search_attributes = [
         'comment',
     ];
 
-    const TYPES = [
-        'product',
-        'vendor',
-    ];
-
-    public function reviewable(): MorphTo
+    public function registerMediaCollections(): void
     {
-        return $this->morphTo();
+        $this->addMediaCollection('before')->singleFile();
+        $this->addMediaCollection('after')->singleFile();
+    }
+
+    /**
+     * Register media conversions.
+     *
+     * @return void
+     */
+    public function registerMediaConversions(BaseMedia $media = null): void
+    {
+        $this->addMediaConversion('small')
+            ->fit(Manipulations::FIT_CROP, 200, 200)
+            ->performOnCollections('before', 'after');
+
+        $this->addMediaConversion('medium')
+            ->fit(Manipulations::FIT_CROP, 300, 300)
+            ->performOnCollections('before', 'after');
+
+        $this->addMediaConversion('large')
+            ->fit(Manipulations::FIT_MAX, 600, 600)
+            ->performOnCollections('before', 'after');
+    }
+
+    public function imageBefore(): MorphOne
+    {
+        return $this->morphOne(Media::class, 'model')
+            ->where('collection_name', 'before');
+    }
+
+    public function imageAfter(): MorphOne
+    {
+        return $this->morphOne(Media::class, 'model')
+            ->where('collection_name', 'after');
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function user(): BelongsTo
@@ -42,23 +80,39 @@ class Review extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(ReviewRating::class);
+    }
+    public function vendor()
+    {
+        return $this->hasOneThrough(
+            Vendor::class,
+            Order::class,
+            'id', // Foreign key on orders table
+            'id', // Foreign key on vendors table
+            'order_id', // Local key on reviews table
+            'vendor_id' // Local key on orders table
+        );
+    }
+
+    public function products()
+    {
+        return $this->hasManyThrough(
+            Product::class,
+            OrderItem::class,
+            'order_id', // Foreign key on order_items table
+            'id', // Foreign key on products table
+            'order_id', // Local key on reviews table
+            'product_id' // Local key on order_items table
+        );
+    }
+
     public function scopeCurrentVendor($query, $value)
     {
-        return $query->whereHasMorph('reviewable', [Product::class], function (Builder $query) use ($value) {
+        return $query->whereHas('order', function (Builder $query) use ($value) {
             $query->where('vendor_id', $value);
-        })->orWhereHasMorph('reviewable', [Vendor::class], function (Builder $query) use ($value) {
-            $query->where('id', $value);
         });
-    }
-
-    public function scopeVendor($query): void
-    {
-        $query->whereHasMorph('reviewable', [Vendor::class]);
-    }
-
-    public function scopeProduct($query): void
-    {
-        $query->whereHasMorph('reviewable', [Product::class]);
     }
 
     public function scopeApplyFilters(Builder $query, Request $request): Builder
@@ -69,9 +123,7 @@ class Review extends Model
         }
 
         $query->dateRange($request->get('startDate'), $request->get('endDate'));
-
         $query->searchLike($request);
-
         $query->applyDirectFilters($request);
 
         return $query;
@@ -79,14 +131,27 @@ class Review extends Model
 
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('user', 'reviewable');
+        $query->with([
+            'user',
+            'order',
+            'order.vendor',
+            'order.items.product'
+        ]);
 
         return $query;
     }
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('user');
+
+        $query->with([
+            'user',
+            'order',
+            'order.vendor',
+            'order.items.product',
+            'imageBefore',
+            'imageAfter',
+        ]);
 
         return $query;
     }
@@ -98,7 +163,15 @@ class Review extends Model
 
     public function scopeWithSingleRelations(Builder $query): Builder
     {
-        $query->with('user', 'reviewable');
+        $query->with([
+            'user',
+            'order',
+            'order.vendor',
+            'order.items.product',
+            'imageBefore',
+            'imageAfter',
+            'ratings'
+        ]);
 
         return $query;
     }

@@ -5,6 +5,7 @@ use App\Http\Middleware\CountryHeader;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
+use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\MediaController;
 use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DeviceController;
@@ -12,7 +13,6 @@ use App\Http\Controllers\Api\User\V3_1\WalletController;
 use App\Http\Controllers\Api\User\V3_1\CountryController;
 use App\Http\Controllers\Api\User\V3_1\PaymentController;
 use App\Http\Controllers\Api\User\V3_1\TransactionController;
-use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
 use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
 
@@ -41,6 +41,8 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::prefix('notifications')->group(base_path('routes/user/v3_1/api/notifications.php'));
     Route::prefix('support-msg')->group(base_path('routes/user/v3_1/api/support.php'));
     Route::prefix('appointments')->group(base_path('routes/user/v3_1/api/appointments.php'));
+    // consultation
+    Route::prefix('consultations')->group(base_path('routes/user/v3_1/api/consultations.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);

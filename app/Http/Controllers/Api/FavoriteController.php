@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\FavoriteRequest;
+use App\Notifications\NewLikeNotification;
 use App\Services\FavoritesService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -58,8 +59,14 @@ class FavoriteController extends BaseApiController
     {
         $data = $request->validated();
 
-        return $this->favoritesService
+        $model = $this->favoritesService
             ->addFavorite($this->user, $data['type'], $data['id']);
+
+        // send notification if type is post
+        if ($data['type'] === 'post') {
+            $model->user->notify(new NewLikeNotification($this->user, $model));
+        }
+        return $model;
     }
 
     /**
@@ -79,4 +86,5 @@ class FavoriteController extends BaseApiController
     {
         return $this->favoritesService->removeFavorite($this->user, $type, $id);
     }
+
 }

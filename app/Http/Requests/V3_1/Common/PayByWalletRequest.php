@@ -26,7 +26,7 @@ class PayByWalletRequest extends FailedValidationRequest
     {
         $rules = [
             'id' => ['required', 'integer'],
-            'type' => ['required', 'string', Rule::in(['order', 'campaign', 'appointment'])]
+            'type' => ['required', 'string', Rule::in(['order', 'campaign', 'appointment', 'consultation'])],
         ];
 
         return $rules;
