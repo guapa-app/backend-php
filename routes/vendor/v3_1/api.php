@@ -9,11 +9,11 @@ use App\Http\Controllers\Api\Vendor\V3_1\HomeController;
 use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
 use App\Http\Controllers\Api\Vendor\V3_1\CountryController;
 
-
 Route::prefix("vendor/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
     Route::get('countries', [CountryController::class, 'index']);
 
+    Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
     Route::prefix('auth')->group(base_path('routes/vendor/v3_1/api/auth.php'));
     Route::prefix('users')->group(base_path('routes/vendor/v3_1/api/users.php'));
     Route::prefix('staff')->group(base_path('routes/vendor/v3_1/api/staff.php'));
@@ -36,6 +36,7 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::prefix('campaigns')->group(base_path('routes/vendor/v3_1/api/campaigns.php'));
     Route::prefix('')->group(base_path('routes/vendor/v3_1/api/doctors.php')); //sub-vendors
     Route::prefix('social-media')->group(base_path('routes/vendor/v3_1/api/social_media.php')); //sub-vendors
+    Route::prefix('consultations')->group(base_path('routes/vendor/v3_1/api/consultations.php')); //sub-vendors
 
     Route::get('wallet', [WalletController::class, 'index'])->middleware('auth:api');
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
@@ -44,4 +45,6 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::get('vendor_types', [DataController::class, 'vendor_types']);
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
+
+
 });

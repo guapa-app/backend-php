@@ -30,7 +30,7 @@ class TransactionService
     public function createTransaction(int $userId, float $amount, TransactionType $transactionType, TransactionOperation $transactionOperation = TransactionOperation::DEPOSIT): Transaction
     {
         try {
-            DB::beginTransaction();
+//            DB::beginTransaction();
 
             // Generate a unique transaction number
             $transactionNumber = $this->generateTransactionNumber();

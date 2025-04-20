@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Contracts\Repositories\ReviewRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\GetReviewsRequest;
 use App\Http\Requests\ReviewRequest;
@@ -22,14 +21,9 @@ class ReviewController extends BaseApiController
     }
     public function index(GetReviewsRequest $request)
     {
-        $reviews = $this->reviewService->getReviews($request->validated());
+        $reviews = $this->reviewService->getReviews( $request);
 
-        $reviews->getCollection()->transform(function ($review) {
-            $review->comment = strip_tags($review->comment);
-
-            return $review;
-        });
-        return ReviewCollection::make($reviews)
+        return  ReviewCollection::make($reviews)
             ->additional([
                 'success' => true,
                 'message' => __('api.success'),

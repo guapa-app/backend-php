@@ -47,7 +47,7 @@ class PostResource extends Resource
                 Forms\Components\Select::make('category_id')
                     ->required()
                     ->native(false)
-                    ->getOptionLabelFromRecordUsing(fn(Model $record) => "{$record->title}")
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
                     ->relationship('category', 'title', function (Builder $query) {
                         return $query->where('type', 'blog_category');
                     }),
@@ -111,7 +111,7 @@ class PostResource extends Resource
                     ])
                     ->columnSpanFull()
                     ->columns()
-                    ->itemLabel(fn(array $state): ?string => $state['link']),
+                    ->itemLabel(fn (array $state): ?string => $state['link']),
             ]);
     }
 

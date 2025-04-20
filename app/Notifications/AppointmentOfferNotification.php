@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Channels\FirebaseChannel;
 use App\Models\AppointmentOffer;
 use App\Models\User;
 use Benwilkins\FCM\FcmMessage;
@@ -36,7 +37,7 @@ class AppointmentOfferNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['fcm', 'database'];
+        return [FirebaseChannel::class, 'database'];
     }
 
     /**
@@ -80,6 +81,13 @@ class AppointmentOfferNotification extends Notification implements ShouldQueue
         return $message;
     }
 
+    public function toFirebase()
+    {
+        return [
+            'title' => 'New appointment',
+            'body' => $this->getSummary(),
+        ];
+    }
     public function getSummary(): string
     {
         return 'لديك طلب استشارة جديد';

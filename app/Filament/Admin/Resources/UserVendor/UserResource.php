@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Resources\UserVendor;
 
-
 use App\Filament\Admin\Resources\UserVendor\UserResource\Actions;
 use App\Filament\Admin\Resources\UserVendor\UserResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
@@ -12,7 +11,6 @@ use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use App\Models\Country;
 use Filament\Tables\Table;
 use Filament\Infolists\Components;
 
@@ -53,11 +51,6 @@ class UserResource extends Resource
                         User::STATUS_DELETED => '🗑️ deleted',
                     ])
                     ->required(),
-                Forms\Components\Select::make('country_id')
-                    ->label('Country')
-                    ->required()
-                    ->options(Country::query()->pluck('name', 'id'))
-                    ->searchable(),
             ]);
     }
 
