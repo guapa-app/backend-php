@@ -245,7 +245,7 @@
                                 <ul class="pagintain">
                                     @if ($currentPage > 1)
                                         <li><a href="{{ $posts->previousPageUrl() }}">
-                                                << /a>
+                                                <</a>
                                         </li>
                                     @endif
 
@@ -274,7 +274,7 @@
                                     @endif
 
                                     @if ($currentPage < $lastPage)
-                                        <li><a href="{{ $posts->nextPageUrl() }}">></a></li>
+                                        <li><a href="{{ $posts->nextPageUrl() }}"> > </a></li>
                                     @endif
                                 </ul>
                             </div>
@@ -284,31 +284,34 @@
             </div>
         </section>
 
-        <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        "headline": "{{ $post->title }}",
-        "image": "{{ $post->getFirstMediaUrl('posts', 'large') ?: asset('frontend/assets/images/sub-header/sub-header.png') }}",
-        "author": {
-            "@type": "Person",
-            "name": "{{ $post->admin->name }}"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "قوابا",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "{{ asset('frontend/assets/images/logo.png') }}"
+      @if(isset($post) && Route::currentRouteName() == 'post.show')
+            <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": "{{ $post->title }}",
+                "image": "{{ $post->getFirstMediaUrl('posts', 'large') ?: asset('frontend/assets/images/sub-header/sub-header.png') }}",
+                "author": {
+                    "@type": "Person",
+                    "name": "{{ $post->admin->name }}"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "قوابا",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "{{ asset('frontend/assets/images/logo.png') }}"
+                    }
+                },
+                "datePublished": "{{ $post->created_at->toIso8601String() }}",
+                "dateModified": "{{ $post->updated_at->toIso8601String() }}",
+                "description": "{{ Str::limit(strip_tags($post->content, false), 160) }}",
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": "{{ route('post.show', ['id' => $post->id, 'slug' => \Str::slug($post->title)]) }}"
+                }
             }
-        },
-        "datePublished": "{{ $post->created_at->toIso8601String() }}",
-        "dateModified": "{{ $post->updated_at->toIso8601String() }}",
-        "description": "{{ Str::limit(strip_tags($post->content, false), 160) }}",
-        "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": "{{ route('post.show', ['id' => $post->id, 'slug' => \Str::slug($post->title)]) }}",        }
-    }
-    </script>
+            </script>
+        @endif
     </main>
 @endsection
