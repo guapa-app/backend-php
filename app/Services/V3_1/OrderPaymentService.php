@@ -14,6 +14,7 @@ use App\Enums\AppointmentOfferEnum;
 use Illuminate\Support\Facades\Log;
 use App\Services\LoyaltyPointsService;
 use App\Notifications\OrderNotification;
+use App\Notifications\InvoiceNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
@@ -39,7 +40,8 @@ class OrderPaymentService
                 if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
                     $amount = $order->total - $order->fees;
-                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+//                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
                 }
 
                 $this->sendOrderNotifications($order);
@@ -65,6 +67,7 @@ class OrderPaymentService
         // Generate invoice if needed
         if (!str_contains($order->invoice_url, '.s3.')) {
             $order->invoice_url = (new PDFService)->addInvoicePDF($order);
+            Notification::send($order->user, new InvoiceNotification($order->invoice_url));
         }
         $order->save();
 

@@ -51,4 +51,14 @@ return [
         'sender_id' => env('CONNECT_SAUDI_API_SENDERID'),
     ],
 
+    'zoom' => [
+        'key' => env('ZOOM_API_KEY'),
+        'secret' => env('ZOOM_API_SECRET'),
+        'user_id' => env('ZOOM_USER_ID'),
+    ],
+
+    'meetings' => [
+        'default_provider' => env('DEFAULT_MEETING_PROVIDER', 'zoom'),
+    ],
+
 ];

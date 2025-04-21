@@ -11,6 +11,10 @@ Route::group(['middleware' => 'auth:api', 'as' => 'vendors.'], function () {
 
     Route::put('/activate-wallet', [VendorController::class, 'activateWallet'])->name('activate-wallet');
 
+    Route::match(['put', 'post'],'/working-days', [VendorController::class, 'updateWorkingDays'])->name('activate-wallet');
+
+    Route::get('/working-days', [VendorController::class, 'getWorkingDays'])->name('get-working-days');
+
     Route::apiResource('{vendor}/social-media', VendorSocialMediaController::class)->only([
         'store', 'update', 'destroy'
     ]);
