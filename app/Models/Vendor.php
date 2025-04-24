@@ -129,6 +129,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'status',
         'verified',
         'parent_id',
+        'accept_online_consultation'
     ];
 
     /**
