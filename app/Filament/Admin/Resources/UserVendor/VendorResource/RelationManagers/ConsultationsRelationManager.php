@@ -28,6 +28,11 @@ class ConsultationsRelationManager extends RelationManager
                     Forms\Components\TimePicker::make('appointment_time')
                         ->required(),
                     Forms\Components\Select::make('type')
+                        ->options([
+                            'in_person' => 'In Person',
+                            'Audio' => 'Audio',
+                            'Video' => 'Video'
+                        ])
                         ->required(),
                 ]),
 
@@ -35,10 +40,28 @@ class ConsultationsRelationManager extends RelationManager
                 ->schema([
                     Forms\Components\Textarea::make('chief_complaint')
                         ->columnSpanFull(),
-                    Forms\Components\KeyValue::make('medical_history')
+                    Forms\Components\Repeater::make('medical_history')
                         ->label('Medical History')
-                        ->keyLabel('Condition')
-                        ->valueLabel('Details')
+                        ->schema([
+                            Forms\Components\TextInput::make('question')
+                                ->label('Question')
+                                ->required(),
+                            Forms\Components\Select::make('type')
+                                ->label('Type')
+                                ->options([
+                                    'choice' => 'Choice',
+                                    'text' => 'Text',
+                                ])
+                                ->required(),
+                            Forms\Components\TextInput::make('answer')
+                                ->label('Answer')
+                                ->required(),
+                            Forms\Components\TagsInput::make('options')
+                                ->label('Options')
+                                ->placeholder('Enter options for choice type...')
+                                ->visible(fn($get) => $get('type') === 'choice'),
+                        ])
+                        ->columns(2)
                         ->columnSpanFull(),
                     Forms\Components\Textarea::make('consultation_reason')
                         ->maxLength(500)
@@ -121,8 +144,8 @@ class ConsultationsRelationManager extends RelationManager
                         'danger' => Consultation::STATUS_REJECTED,
                     ])
                     ->label('Status'),
-                     
-                    Tables\Columns\TextColumn::make('type')
+
+                Tables\Columns\TextColumn::make('type')
                     ->label('Type'),
                 Tables\Columns\TextColumn::make('payment_status')
                     ->badge()
