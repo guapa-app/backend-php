@@ -154,7 +154,10 @@ class ConsultationsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->form($this->getFormSchema())
-                    ->modalSubmitAction(fn ($action) => $action->label('Save Changes'))
+                    ->modalWidth('4xl'),
+                
+                Tables\Actions\EditAction::make()
+                    ->form($this->getFormSchema())
                     ->modalWidth('4xl'),
                     
                 Tables\Actions\DeleteAction::make(),
