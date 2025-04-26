@@ -19,6 +19,7 @@ class VendorResource extends JsonResource
             'is_liked'   => (bool) $this->is_liked,
             'likes_count' => (int) $this->likes_count,
             'status' => $this->resource::STATUSES[$this->status],
+            'about' => (string) $this->about,
             'type' => $this->resource::TYPES[$this->type],
             'specialties' => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'address' => $this->country?->name,

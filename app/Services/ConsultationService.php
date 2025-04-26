@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Consultation;
-use App\Models\Vendor;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Media;
+use App\Models\Vendor;
+use App\Models\Consultation;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Services\Meetings\MeetingServiceFactory;
 
 class ConsultationService
@@ -303,7 +304,25 @@ class ConsultationService
 
     public function updateMedia(Consultation $consultation, array $data): Consultation
     {
-        (new MediaService())->handleMedia($consultation, $data);
+        $keep_media = $data['keep_media'] ?? [];
+        $consultation->media()->whereNotIn('id', $keep_media)->delete();
+
+        $mediaCollections = [
+            'media_ids' => 'consultations',
+            'before_media_ids' => 'before',
+            'after_media_ids' => 'after'
+        ];
+
+        foreach ($mediaCollections as $mediaKey => $collectionName) {
+            if (!empty($data[$mediaKey])) {
+                Media::whereIn('id', $data[$mediaKey])
+                    ->update([
+                        'model_type' => 'consultation',
+                        'model_id' => $consultation->id,
+                        'collection_name' => $collectionName
+                    ]);
+            }
+        }
 
         $consultation->load('media');
 
