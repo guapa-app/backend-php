@@ -193,10 +193,7 @@ class ConsultationsRelationManager extends RelationManager
                 Tables\Actions\EditAction::make()
                     ->form($this->getFormSchema())
                     ->modalWidth('4xl')
-                    ->action(function (array $data) {
-                        $this->record->update($data);
-                        $this->notify('success', 'Consultation updated successfully.');
-                    }),
+                    ,
 
             ])
             ->bulkActions([
