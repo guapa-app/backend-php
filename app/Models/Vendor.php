@@ -445,6 +445,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         return $this->hasMany(WorkDay::class);
     }
 
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class);
+    }
+
     public function appointments()
     {
         return $this->hasMany(Appointment::class);

@@ -63,7 +63,6 @@ class VendorResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('working_hours')
                     ->maxLength(255),
-
                 Forms\Components\Section::make()
                     ->columns([
                         'sm' => 2,
@@ -101,6 +100,15 @@ class VendorResource extends Resource
                         ->maxLength(255),
 
                 ]),
+                Forms\Components\Select::make('accept_online_consultation' )
+                    ->options([
+                        0 => 'disabled',
+                        1 => 'active',
+                    ])
+                    ->native(false)
+                    ->default(0)
+                    ->required(),
+
             ]);
     }
 
@@ -172,6 +180,7 @@ class VendorResource extends Resource
             RelationManagers\OrdersRelationManager::class,
             RelationManagers\FavoritesRelationManager::class,
             RelationManagers\TransactionsRelationManager::class,
+            RelationManagers\ConsultationsRelationManager::class,
         ];
     }
 
