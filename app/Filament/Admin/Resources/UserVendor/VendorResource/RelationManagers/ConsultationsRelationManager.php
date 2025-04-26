@@ -5,9 +5,9 @@ namespace App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManager
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
-use App\Models\Consultation;
-use Filament\Tables\Table;
 use Filament\Forms\Form;
+use Filament\Tables\Table;
+use App\Models\Consultation;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -35,8 +35,19 @@ class ConsultationsRelationManager extends RelationManager
                 ->schema([
                     Forms\Components\Textarea::make('chief_complaint')
                         ->columnSpanFull(),
-                    Forms\Components\Textarea::make('medical_history')
+                    Forms\Components\KeyValue::make('medical_history')
+                        ->label('Medical History')
+                        ->keyLabel('Condition')
+                        ->valueLabel('Details')
                         ->columnSpanFull(),
+                    Forms\Components\Textarea::make('consultation_reason')
+                        ->maxLength(500)
+                        ->placeholder('Enter additional details about the consultation...')
+                        ->label('Consultation Reason')
+                        ->columnSpanFull()
+                        ->validationMessages([
+                            'max' => 'Consultation reason cannot exceed 500 characters.',
+                        ]),
                 ]),
 
             Forms\Components\Section::make('Payment')
@@ -155,12 +166,13 @@ class ConsultationsRelationManager extends RelationManager
                 Tables\Actions\ViewAction::make()
                     ->form($this->getFormSchema())
                     ->modalWidth('4xl'),
-                
+
                 Tables\Actions\EditAction::make()
                     ->form($this->getFormSchema())
                     ->modalWidth('4xl'),
-                    
+
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

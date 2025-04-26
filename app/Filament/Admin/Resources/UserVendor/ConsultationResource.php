@@ -51,11 +51,9 @@ class ConsultationResource extends Resource
                         Forms\Components\DatePicker::make('appointment_date')
                             ->native(false)
                             ->required()
-                            ->minDate(now()->startOfDay())
                             ->label('Appointment Date')
                             ->validationMessages([
-                                'required' => 'Please select an appointment date.',
-                                'min_date' => 'Appointment date cannot be in the past.',
+                                'required' => 'Please select an appointment date.'
                             ]),
                         Forms\Components\TimePicker::make('appointment_time')
                             ->native(false)
