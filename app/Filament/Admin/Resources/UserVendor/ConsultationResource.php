@@ -7,11 +7,13 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Consultation;
+use App\Models\Vendor;
 use Filament\Resources\Resource;
 use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Admin\Resources\UserVendor\ConsultationResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\ConsultationResource\RelationManagers;
+use App\Filament\Admin\Resources\UserVendor\ConsultationResource\Widgets\VendorsOverviewWidget;
 
 class ConsultationResource extends Resource
 {
@@ -314,7 +316,14 @@ class ConsultationResource extends Resource
     public static function getRelations(): array
     {
         return [
+            
+        ];
+    }
 
+    public static function getWidgets(): array
+    {
+        return [
+            VendorsOverviewWidget::class,
         ];
     }
 
