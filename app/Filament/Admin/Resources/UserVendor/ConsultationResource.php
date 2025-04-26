@@ -75,6 +75,15 @@ class ConsultationResource extends Resource
                             ->validationMessages([
                                 'required' => 'Please select a consultation type.',
                             ]),
+                        // Forms\Components\TextInput::make('consultation_type')
+                        //     ->label('Consultation Type')
+                        //     ->placeholder('Enter consultation type (e.g., video, in-person)')
+                        //     ->maxLength(50)
+                        //     ->required()
+                        //     ->validationMessages([
+                        //         'required' => 'Consultation type is required.',
+                        //         'max' => 'Consultation type cannot exceed 50 characters.',
+                        //     ]),
                         Forms\Components\Select::make('status')
                             ->options([
                                 Consultation::STATUS_PENDING => 'Pending',

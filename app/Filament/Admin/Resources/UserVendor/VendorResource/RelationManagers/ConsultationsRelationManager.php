@@ -121,15 +121,9 @@ class ConsultationsRelationManager extends RelationManager
                         'danger' => Consultation::STATUS_REJECTED,
                     ])
                     ->label('Status'),
-
-                Tables\Columns\TextColumn::make('type')
-                    ->label('Type')->
-                    enum([
-                        'video' => 'Video',
-                        'audio' => 'Audio',
-                        'in_person' => 'In-Person',
-                    ]),
-
+                     
+                    Tables\Columns\TextColumn::make('type')
+                    ->label('Type'),
                 Tables\Columns\TextColumn::make('payment_status')
                     ->badge()
                     ->colors([
