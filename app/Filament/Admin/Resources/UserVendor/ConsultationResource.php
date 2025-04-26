@@ -65,9 +65,9 @@ class ConsultationResource extends Resource
                             ]),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'general' => 'General',
-                                'specialist' => 'Specialist',
-                                'follow-up' => 'Follow-Up',
+                                'video' => 'Video',
+                                'in-person' => 'In-Person',
+                                'Audio' => 'Audio',
                             ])
                             ->native(false)
                             ->required()
@@ -75,15 +75,7 @@ class ConsultationResource extends Resource
                             ->validationMessages([
                                 'required' => 'Please select a consultation type.',
                             ]),
-                        // Forms\Components\TextInput::make('consultation_type')
-                        //     ->label('Consultation Type')
-                        //     ->placeholder('Enter consultation type (e.g., video, in-person)')
-                        //     ->maxLength(50)
-                        //     ->required()
-                        //     ->validationMessages([
-                        //         'required' => 'Consultation type is required.',
-                        //         'max' => 'Consultation type cannot exceed 50 characters.',
-                        //     ]),
+
                         Forms\Components\Select::make('status')
                             ->options([
                                 Consultation::STATUS_PENDING => 'Pending',
@@ -103,7 +95,7 @@ class ConsultationResource extends Resource
                             ]),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('Medical Information')
+                    Forms\Components\Section::make('Medical Information')
                     ->schema([
                         Forms\Components\Textarea::make('chief_complaint')
                             ->required()
@@ -115,10 +107,28 @@ class ConsultationResource extends Resource
                                 'required' => 'Chief complaint is required.',
                                 'max' => 'Chief complaint cannot exceed 255 characters.',
                             ]),
-                        Forms\Components\KeyValue::make('medical_history')
+                        Forms\Components\Repeater::make('medical_history')
                             ->label('Medical History')
-                            ->keyLabel('Condition')
-                            ->valueLabel('Details')
+                            ->schema([
+                                Forms\Components\TextInput::make('question')
+                                    ->label('Question')
+                                    ->required(),
+                                Forms\Components\Select::make('type')
+                                    ->label('Type')
+                                    ->options([
+                                        'choice' => 'Choice',
+                                        'text' => 'Text',
+                                    ])
+                                    ->required(),
+                                Forms\Components\TextInput::make('answer')
+                                    ->label('Answer')
+                                    ->required(),
+                                Forms\Components\TagsInput::make('options')
+                                    ->label('Options')
+                                    ->placeholder('Enter options for choice type...')
+                                    ->visible(fn ($get) => $get('type') === 'choice'),
+                            ])
+                            ->columns(2)
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make('consultation_reason')
                             ->maxLength(500)
