@@ -63,14 +63,14 @@ class ConsultationsRelationManager extends RelationManager
                         ])
                         ->columns(2)
                         ->columnSpanFull(),
-                    Forms\Components\Textarea::make('consultation_reason')
-                        ->maxLength(500)
-                        ->placeholder('Enter additional details about the consultation...')
-                        ->label('Consultation Reason')
-                        ->columnSpanFull()
-                        ->validationMessages([
-                            'max' => 'Consultation reason cannot exceed 500 characters.',
-                        ]),
+                    // Forms\Components\Textarea::make('consultation_reason')
+                    //     ->maxLength(500)
+                    //     ->placeholder('Enter additional details about the consultation...')
+                    //     ->label('Consultation Reason')
+                    //     ->columnSpanFull()
+                    //     ->validationMessages([
+                    //         'max' => 'Consultation reason cannot exceed 500 characters.',
+                    //     ]),
                 ]),
 
             Forms\Components\Section::make('Payment')
