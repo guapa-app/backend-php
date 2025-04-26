@@ -123,7 +123,12 @@ class ConsultationsRelationManager extends RelationManager
                     ->label('Status'),
 
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Type'),
+                    ->label('Type')->
+                    enum([
+                        'video' => 'Video',
+                        'audio' => 'Audio',
+                        'in_person' => 'In-Person',
+                    ]),
 
                 Tables\Columns\TextColumn::make('payment_status')
                     ->badge()
