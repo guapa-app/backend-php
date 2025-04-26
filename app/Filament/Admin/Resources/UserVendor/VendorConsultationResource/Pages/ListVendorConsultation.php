@@ -6,7 +6,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource;
 
-class ListVendors extends ListRecords
+class ListVendorConsultation extends ListRecords
 {
     protected static string $resource = VendorConsultationResource::class;
 

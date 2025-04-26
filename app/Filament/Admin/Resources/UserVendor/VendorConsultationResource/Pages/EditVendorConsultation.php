@@ -4,19 +4,16 @@ namespace App\Filament\Admin\Resources\UserVendor\VendorConsultationResource\Pag
 
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Pages\ViewRecord;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource;
 
-class ViewVendor extends ViewRecord
+class EditVendorConsultation extends EditRecord
 {
     protected static string $resource = VendorConsultationResource::class;
-    
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }

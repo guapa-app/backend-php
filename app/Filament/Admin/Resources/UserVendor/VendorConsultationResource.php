@@ -249,9 +249,9 @@ class VendorConsultationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVendors::route('/'),
-            'edit' => Pages\EditVendor::route('/{record}/edit'),
-            'view' => Pages\ViewVendor::route('/{record}'),
+            'index' => Pages\ListVendorConsultation::route('/'),
+            'edit' => Pages\EditVendorConsultation::route('/{record}/edit'),
+            'view' => Pages\ViewVendorConsultation::route('/{record}'),
         ];
     }
 }
