@@ -2,11 +2,10 @@
 
 namespace App\Filament\Admin\Resources\UserVendor\ConsultationResource\Pages;
 
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\EditRecord;
 use App\Filament\Admin\Resources\UserVendor\ConsultationResource;
 
-class ListConsultations extends ListRecords
+class EditConsultations extends EditRecord
 {
     protected static string $resource = ConsultationResource::class;
 
