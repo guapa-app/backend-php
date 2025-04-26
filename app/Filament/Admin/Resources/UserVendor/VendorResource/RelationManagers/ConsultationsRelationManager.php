@@ -3,9 +3,11 @@
 namespace App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
 
 use Carbon\Carbon;
+use Filament\Forms;
 use Filament\Tables;
-use Filament\Tables\Table;
 use App\Models\Consultation;
+use Filament\Tables\Table;
+use Filament\Forms\Form;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -15,6 +17,58 @@ use Filament\Resources\RelationManagers\RelationManager;
 class ConsultationsRelationManager extends RelationManager
 {
     protected static string $relationship = 'consultations';
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make('Appointment Details')
+                    ->schema([
+                        Forms\Components\DatePicker::make('appointment_date')
+                            ->required(),
+                        Forms\Components\TimePicker::make('appointment_time')
+                            ->required(),
+                        Forms\Components\Select::make('type')
+                            ->required(),
+                    ]),
+                    
+                Forms\Components\Section::make('Medical Information')
+                    ->schema([
+                        Forms\Components\Textarea::make('chief_complaint')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('medical_history')
+                            ->columnSpanFull(),
+                    ]),
+                    
+                Forms\Components\Section::make('Payment')
+                    ->schema([
+                        Forms\Components\TextInput::make('total_amount')
+                            ->numeric()
+                            ->prefix('$'),
+                        Forms\Components\Select::make('payment_status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'paid' => 'Paid',
+                                'failed' => 'Failed',
+                            ]),
+                        Forms\Components\Select::make('payment_method'),
+                    ]),
+                    
+                Forms\Components\Section::make('Status')
+                    ->schema([
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                Consultation::STATUS_PENDING => 'Pending',
+                                Consultation::STATUS_SCHEDULED => 'Scheduled',
+                                Consultation::STATUS_CONFIRMED => 'Confirmed',
+                                Consultation::STATUS_COMPLETED => 'Completed',
+                                Consultation::STATUS_CANCELLED => 'Cancelled',
+                                Consultation::STATUS_REJECTED => 'Rejected',
+                            ])
+                            ->required(),
+                    ]),
+            ]);
+    }
 
     public function table(Table $table): Table
     {
@@ -64,11 +118,6 @@ class ConsultationsRelationManager extends RelationManager
                         'success' => 'paid',
                         'danger' => 'failed',
                     ]),
-                    
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->label('Created'),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -102,6 +151,7 @@ class ConsultationsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
