@@ -164,8 +164,7 @@ class ConsultationResource extends Resource
                         Forms\Components\Select::make('payment_method')
                             ->options([
                                 'credit_card' => 'Credit Card',
-                                'paypal' => 'PayPal',
-                                'bank_transfer' => 'Bank Transfer',
+                                'wallet' => 'Wallet',
                             ])
                             ->native(false)
                             ->label('Payment Method'),
