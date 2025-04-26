@@ -167,12 +167,15 @@ class ConsultationsRelationManager extends RelationManager
                     ->form($this->getFormSchema())
                     ->modalWidth('4xl'),
 
+                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\EditAction::make()
                     ->form($this->getFormSchema())
-                    ->modalWidth('4xl'),
+                    ->modalWidth('4xl')
+                    ->action(function (array $data) {
+                        $this->record->update($data);
+                        $this->notify('success', 'Consultation updated successfully.');
+                    }),
 
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

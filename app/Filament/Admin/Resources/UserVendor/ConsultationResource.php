@@ -425,6 +425,8 @@ class ConsultationResource extends Resource
     {
         return [
             'index' => Pages\ListConsultations::route('/'),
+            'view' => Pages\ViewConsultation::route('/{record}'),
+            'edit' => Pages\EditConsultations::route('/{record}/edit'),
         ];
     }
 }
