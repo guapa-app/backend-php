@@ -8,7 +8,10 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Consultation;
 use Filament\Resources\Resource;
+use Filament\Notifications\Notification;
+use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Admin\Resources\UserVendor\ConsultationResource\Pages;
+use App\Filament\Admin\Resources\UserVendor\ConsultationResource\RelationManagers;
 
 class ConsultationResource extends Resource
 {
@@ -22,36 +25,151 @@ class ConsultationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->native(false)
-                    ->relationship('user', 'name')
-                    ->required(),
-                Forms\Components\Select::make('consultant_id')
-                    ->native(false)
-                    ->relationship('consultant', 'name'),
-                Forms\Components\Select::make('consultation_type_id')
-                    ->native(false)
-                    ->relationship('consultationType', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'Pending',
-                        'Completed',
-                        'Canceled',
+                Forms\Components\Section::make('Consultation Details')
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->native(false)
+                            ->relationship('user', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->required()
+                            ->label('Patient')
+                            ->validationMessages([
+                                'required' => 'Please select a patient.',
+                            ]),
+                        Forms\Components\Select::make('vendor_id')
+                            ->native(false)
+                            ->relationship('vendor', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->label('Consultant')
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Please select a consultant.',
+                            ]),
+                        Forms\Components\DatePicker::make('appointment_date')
+                            ->native(false)
+                            ->required()
+                            ->minDate(now()->startOfDay())
+                            ->label('Appointment Date')
+                            ->validationMessages([
+                                'required' => 'Please select an appointment date.',
+                                'min_date' => 'Appointment date cannot be in the past.',
+                            ]),
+                        Forms\Components\TimePicker::make('appointment_time')
+                            ->native(false)
+                            ->required()
+                            ->seconds(false)
+                            ->label('Appointment Time')
+                            ->validationMessages([
+                                'required' => 'Please select an appointment time.',
+                            ]),
+                        Forms\Components\Select::make('type')
+                            ->options([
+                                'general' => 'General',
+                                'specialist' => 'Specialist',
+                                'follow-up' => 'Follow-Up',
+                            ])
+                            ->native(false)
+                            ->required()
+                            ->label('Consultation Type')
+                            ->validationMessages([
+                                'required' => 'Please select a consultation type.',
+                            ]),
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                Consultation::STATUS_PENDING => 'Pending',
+                                Consultation::STATUS_SCHEDULED => 'Scheduled',
+                                Consultation::STATUS_CONFIRMED => 'Confirmed',
+                                Consultation::STATUS_COMPLETED => 'Completed',
+                                Consultation::STATUS_CANCELLED => 'Cancelled',
+                                Consultation::STATUS_REJECTED => 'Rejected',
+                            ])
+                            ->default(Consultation::STATUS_PENDING)
+                            ->native(false)
+                            ->required()
+                            ->disabled(fn ($record) => $record && ($record->status === Consultation::STATUS_CANCELLED || $record->status === Consultation::STATUS_REJECTED))
+                            ->label('Status')
+                            ->validationMessages([
+                                'required' => 'Please select a status.',
+                            ]),
                     ])
-                    ->default('pending')
-                    ->native(false)
-                    ->required(),
-                Forms\Components\DateTimePicker::make('scheduled_at'),
-                Forms\Components\DateTimePicker::make('completed_at'),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('consultant_notes')
-                    ->columnSpanFull(),
+                    ->columns(2),
+                Forms\Components\Section::make('Medical Information')
+                    ->schema([
+                        Forms\Components\Textarea::make('chief_complaint')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Enter the primary reason for the consultation...')
+                            ->label('Chief Complaint')
+                            ->columnSpanFull()
+                            ->validationMessages([
+                                'required' => 'Chief complaint is required.',
+                                'max' => 'Chief complaint cannot exceed 255 characters.',
+                            ]),
+                        Forms\Components\KeyValue::make('medical_history')
+                            ->label('Medical History')
+                            ->keyLabel('Condition')
+                            ->valueLabel('Details')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('consultation_reason')
+                            ->maxLength(500)
+                            ->placeholder('Enter additional details about the consultation...')
+                            ->label('Consultation Reason')
+                            ->columnSpanFull()
+                            ->validationMessages([
+                                'max' => 'Consultation reason cannot exceed 500 characters.',
+                            ]),
+                    ]),
+                Forms\Components\Section::make('Financial Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('consultation_fee')
+                            ->numeric()
+                            ->minValue(0)
+                            ->prefix('$')
+                            ->label('Consultation Fee')
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, $get) {
+                                $fee = floatval($state);
+                                $tax = floatval($get('tax_amount'));
+                                $set('total_amount', $fee + $tax);
+                            }),
+                        Forms\Components\TextInput::make('tax_amount')
+                            ->numeric()
+                            ->minValue(0)
+                            ->prefix('$')
+                            ->label('Tax Amount')
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, $get) {
+                                $tax = floatval($state);
+                                $fee = floatval($get('consultation_fee'));
+                                $set('total_amount', $fee + $tax);
+                            }),
+                        Forms\Components\TextInput::make('total_amount')
+                            ->numeric()
+                            ->minValue(0)
+                            ->prefix('$')
+                            ->label('Total Amount')
+                            ->disabled()
+                            ->dehydrated(false),
+                        Forms\Components\Select::make('payment_status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'paid' => 'Paid',
+                                'failed' => 'Failed',
+                            ])
+                            ->native(false)
+                            ->label('Payment Status'),
+                        Forms\Components\Select::make('payment_method')
+                            ->options([
+                                'credit_card' => 'Credit Card',
+                                'paypal' => 'PayPal',
+                                'bank_transfer' => 'Bank Transfer',
+                            ])
+                            ->native(false)
+                            ->label('Payment Method'),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -62,21 +180,45 @@ class ConsultationResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->sortable()
                     ->searchable()
-                    ->label('Client'),
-                Tables\Columns\TextColumn::make('consultant.name')
+                    ->label('Client')
+                    ->formatStateUsing(fn ($state) => ucwords($state)),
+                Tables\Columns\TextColumn::make('vendor.name')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('consultation_type.name')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('title')
+                    ->searchable()
+                    ->label('Consultant')
+                    ->formatStateUsing(fn ($state) => ucwords($state)),
+                Tables\Columns\TextColumn::make('type')
+                    ->sortable()
+                    ->label('Type')
+                    ->formatStateUsing(fn ($state) => ucfirst($state)),
+                Tables\Columns\TextColumn::make('chief_complaint')
                     ->limit(30)
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Complaint'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('scheduled_at')
-                    ->dateTime()
-                    ->sortable(),
+                    ->searchable()
+                    ->color(fn (string $state): string => match ($state) {
+                        Consultation::STATUS_PENDING => 'warning',
+                        Consultation::STATUS_SCHEDULED => 'info',
+                        Consultation::STATUS_CONFIRMED => 'success',
+                        Consultation::STATUS_COMPLETED => 'success',
+                        Consultation::STATUS_CANCELLED => 'danger',
+                        Consultation::STATUS_REJECTED => 'danger',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('appointment_date')
+                    ->date()
+                    ->sortable()
+                    ->label('Appointment'),
+                Tables\Columns\TextColumn::make('appointment_time')
+                    ->time()
+                    ->sortable()
+                    ->label('Time'),
+                Tables\Columns\TextColumn::make('total_amount')
+                    ->money('USD')
+                    ->sortable()
+                    ->label('Total'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -86,11 +228,85 @@ class ConsultationResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-
-
+            ->filters([
+                SelectFilter::make('status')
+                    ->options([
+                        Consultation::STATUS_PENDING => 'Pending',
+                        Consultation::STATUS_SCHEDULED => 'Scheduled',
+                        Consultation::STATUS_CONFIRMED => 'Confirmed',
+                        Consultation::STATUS_COMPLETED => 'Completed',
+                        Consultation::STATUS_CANCELLED => 'Cancelled',
+                        Consultation::STATUS_REJECTED => 'Rejected',
+                    ])
+                    ->label('Status'),
+                SelectFilter::make('type')
+                    ->options([
+                        'general' => 'General',
+                        'specialist' => 'Specialist',
+                        'follow-up' => 'Follow-Up',
+                    ])
+                    ->label('Type'),
+                Tables\Filters\Filter::make('appointment_date')
+                    ->form([
+                        Forms\Components\DatePicker::make('appointment_from')
+                            ->label('From'),
+                        Forms\Components\DatePicker::make('appointment_to')
+                            ->label('To'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['appointment_from'], fn ($q) => $q->whereDate('appointment_date', '>=', $data['appointment_from']))
+                            ->when($data['appointment_to'], fn ($q) => $q->whereDate('appointment_date', '<=', $data['appointment_to']));
+                    }),
+            ])
+            ->actions([
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('confirm')
+                        ->label('Confirm')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function (Consultation $record) {
+                            $record->update(['status' => Consultation::STATUS_CONFIRMED]);
+                            Notification::make()
+                                ->title('Consultation Confirmed')
+                                ->success()
+                                ->send();
+                        })
+                        ->visible(fn (Consultation $record) => in_array($record->status, [Consultation::STATUS_PENDING, Consultation::STATUS_SCHEDULED])),
+                    Tables\Actions\Action::make('cancel')
+                        ->label('Cancel')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(function (Consultation $record) {
+                            $record->update(['status' => Consultation::STATUS_CANCELLED]);
+                            Notification::make()
+                                ->title('Consultation Cancelled')
+                                ->danger()
+                                ->send();
+                        })
+                        ->visible(fn (Consultation $record) => !in_array($record->status, [Consultation::STATUS_CANCELLED, Consultation::STATUS_REJECTED, Consultation::STATUS_COMPLETED])),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('confirm_selected')
+                        ->label('Confirm Selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function ($records) {
+                            $records->each->update(['status' => Consultation::STATUS_CONFIRMED]);
+                            Notification::make()
+                                ->title('Selected Consultations Confirmed')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }
@@ -98,14 +314,14 @@ class ConsultationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListConsultations::route('/')
+            'index' => Pages\ListConsultations::route('/'),
         ];
     }
 }
