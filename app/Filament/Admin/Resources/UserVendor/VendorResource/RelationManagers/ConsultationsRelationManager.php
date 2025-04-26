@@ -2,11 +2,11 @@
 
 namespace App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
 
-use App\Enums\TransactionType;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Enums\TransactionType;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class ConsultationsRelationManager extends RelationManager
 {

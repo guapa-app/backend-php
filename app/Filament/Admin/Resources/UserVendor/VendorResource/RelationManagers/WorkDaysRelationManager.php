@@ -20,13 +20,24 @@ class WorkDaysRelationManager extends RelationManager
                 Forms\Components\Select::make('day')
                     ->required()
                     ->options(EnumsWorkDay::class),
+                Forms\Components\TimePicker::make('start_time')
+                    ->required()
+                    ->label('Start Time'),
+                Forms\Components\TimePicker::make('end_time')
+                    ->required()
+                    ->label('End Time'),
             ]);
     }
+
     public function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('day'),
+                Tables\Columns\TextColumn::make('start_time')
+                    ->label('Start Time'),
+                Tables\Columns\TextColumn::make('end_time')
+                    ->label('End Time'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

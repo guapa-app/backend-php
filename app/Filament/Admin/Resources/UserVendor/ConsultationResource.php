@@ -4,16 +4,15 @@ namespace App\Filament\Admin\Resources\UserVendor;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Vendor;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Consultation;
-use App\Models\Vendor;
 use Filament\Resources\Resource;
 use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Admin\Resources\UserVendor\ConsultationResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\ConsultationResource\RelationManagers;
-use App\Filament\Admin\Resources\UserVendor\ConsultationResource\Widgets\VendorsOverviewWidget;
 
 class ConsultationResource extends Resource
 {
@@ -313,17 +312,115 @@ class ConsultationResource extends Resource
             ]);
     }
 
+    public static function vendorTable(Table $table): Table
+    {
+        return $table
+            ->query(Vendor::has('consultations'))
+            ->columns([
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('logo')
+                    ->collection('logos')
+                    ->label('Logo')
+                    ->width(50)
+                    ->height(50)
+                    ->defaultImageUrl(url('path/to/default-logo.png')),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable()
+                    ->label('Doctor'),
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable()
+                    ->label('Email'),
+                Tables\Columns\BooleanColumn::make('accept_online_consultation')
+                    ->label('Online Consultation')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle'),
+                Tables\Columns\TextColumn::make('consultations_count')
+                    ->label('Total Consultations')
+                    ->counts('consultations')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('consultation_statuses')
+                    ->label('Consultation Statuses')
+                    ->getStateUsing(function (Vendor $record) {
+                        $statuses = $record->consultations()
+                            ->groupBy('status')
+                            ->selectRaw('status, COUNT(*) as count')
+                            ->pluck('count', 'status')
+                            ->mapWithKeys(function ($count, $status) {
+                                return [$status => $count];
+                            });
+                        return collect([
+                            Consultation::STATUS_PENDING => 0,
+                            Consultation::STATUS_SCHEDULED => 0,
+                            Consultation::STATUS_CONFIRMED => 0,
+                            Consultation::STATUS_COMPLETED => 0,
+                            Consultation::STATUS_CANCELLED => 0,
+                            Consultation::STATUS_REJECTED => 0,
+                        ])->merge($statuses)->map(function ($count, $status) {
+                            return ucfirst(str_replace('_', ' ', $status)) . ': ' . $count;
+                        })->implode(', ');
+                    })
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('about')
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        return $state;
+                    })
+                    ->label('About'),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('accept_online_consultation')
+                    ->options([
+                        0 => 'Disabled',
+                        1 => 'Active',
+                    ])
+                    ->label('Online Consultation'),
+            ])
+            ->actions([
+                Tables\Actions\Action::make('update_details')
+                    ->label('Update Details')
+                    ->icon('heroicon-o-pencil')
+                    ->form([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
+                            ->collection('logos')
+                            ->label('Logo')
+                            ->image()
+                            ->maxSize(2048)
+                            ->imageEditor(),
+                        Forms\Components\Textarea::make('about')
+                            ->label('About')
+                            ->maxLength(1000)
+                            ->rows(4),
+                    ])
+                    ->action(function (Vendor $record, array $data) {
+                        if (isset($data['about'])) {
+                            $record->update(['about' => $data['about']]);
+                        }
+                        if (isset($data['logo'])) {
+                            $record->clearMediaCollection('logos');
+                            $record->addMedia($data['logo'])->toMediaCollection('logos');
+                        }
+                        Notification::make()
+                            ->title('Doctor details updated')
+                            ->success()
+                            ->send();
+                    }),
+                Tables\Actions\ViewAction::make()
+                    ->url(fn (Vendor $record): string => VendorResource::getUrl('view', ['record' => $record])),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->paginated([10, 25, 50])
+            ->defaultSort('name');
+    }
+
     public static function getRelations(): array
     {
         return [
-            
-        ];
-    }
 
-    public static function getWidgets(): array
-    {
-        return [
-            VendorsOverviewWidget::class,
         ];
     }
 
