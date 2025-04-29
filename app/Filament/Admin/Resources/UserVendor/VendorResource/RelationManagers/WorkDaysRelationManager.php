@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
 
 use App\Enums\WorkDay as EnumsWorkDay;
+use App\Enums\WorkType;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -26,6 +27,11 @@ class WorkDaysRelationManager extends RelationManager
                 Forms\Components\TimePicker::make('end_time')
                     ->required()
                     ->label('End Time'),
+                Forms\Components\Select::make('type')
+                    ->required()
+                    ->options(['online' => 'Online', 'offline' => 'Offline'])
+                    ->label('Type')
+                    ->default('offline')
             ]);
     }
 
@@ -38,6 +44,13 @@ class WorkDaysRelationManager extends RelationManager
                     ->label('Start Time'),
                 Tables\Columns\TextColumn::make('end_time')
                     ->label('End Time'),
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'online' => 'success',
+                        'offline' => 'info',
+                        default => 'gray',
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
