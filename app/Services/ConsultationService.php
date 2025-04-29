@@ -186,11 +186,13 @@ class ConsultationService
 
         // Get regular working hours for this day
         $schedule = $vendor->workDays()
-            ->where(function ($query) use ($dayOfWeek) {
-                $query->where('day', $dayOfWeek)
-                    ->orWhere('day', 7); // 7 is for all days
-            })
-            ->first();
+        ->where('type', 'online')
+        ->where('is_active', true)
+        ->where(function ($query) use ($dayOfWeek) {
+            $query->where('day', $dayOfWeek)
+                ->orWhere('day', 7); // 7 is for all days
+        })
+        ->first();
 
         // If no working hours set for this day
         if (!$schedule) {
