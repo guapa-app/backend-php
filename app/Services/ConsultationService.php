@@ -55,10 +55,9 @@ class ConsultationService
             $consultation = Consultation::create($data);
 
             // Attach media if provided
-            if (isset($data['media'])) {
-                $this->updateMedia($consultation, $data);
-            }
+            $this->updateMedia($consultation, $data);
 
+            $consultation->load(relations: 'media');
             DB::commit();
             return $consultation;
         } catch (\Exception $e) {
@@ -187,7 +186,7 @@ class ConsultationService
 
         // Get regular working hours for this day
         $schedule = $vendor->workDays()
-            ->where(function($query) use ($dayOfWeek) {
+            ->where(function ($query) use ($dayOfWeek) {
                 $query->where('day', $dayOfWeek)
                     ->orWhere('day', 7); // 7 is for all days
             })
@@ -240,7 +239,7 @@ class ConsultationService
         $schedule = $vendor->workDays()
             ->where('type', 'online')
             ->where('is_active', true)
-            ->where(function($query) use ($dayOfWeek) {
+            ->where(function ($query) use ($dayOfWeek) {
                 $query->where('day', $dayOfWeek)
                     ->orWhere('day', 7); // 7 is for all days
             })
@@ -317,7 +316,7 @@ class ConsultationService
             if (!empty($data[$mediaKey])) {
                 Media::whereIn('id', $data[$mediaKey])
                     ->update([
-                        'model_type' => 'consultation',
+                        'model_type' => 'App\Models\Consultation',
                         'model_id' => $consultation->id,
                         'collection_name' => $collectionName
                     ]);
