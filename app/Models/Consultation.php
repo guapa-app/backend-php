@@ -40,7 +40,8 @@ class Consultation extends Model implements Listable, HasMedia
         'meeting_provider',
         'session_url',
         'session_password',
-        'meeting_data'
+        'meeting_data',
+        'is_reviewed',
     ];
 
     protected $filterable = [
@@ -126,6 +127,23 @@ class Consultation extends Model implements Listable, HasMedia
 
         return Carbon::now()->lt($sixHoursBefore);
 
+    }
+
+    /**
+     * Check if this consultation has been reviewed
+     *
+     * @return bool
+     */
+    public function hasBeenReviewed()
+    {
+        return $this->is_reviewed ||
+            $this->reviews()->exists();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'reviewable_id')
+            ->where('reviewable_type', Consultation::class);
     }
 
     /**

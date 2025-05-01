@@ -37,7 +37,7 @@ class ConsultationController extends BaseApiController
         $user = Auth::user();
         $request->merge(['user_id', $user->id]);
         $consultations = $this->consultationRepository->all($request);
-
+        $consultations->load('vendor', 'user', 'media' , 'reviews');
         return ConsultationCollection::make($consultations)
             ->additional([
                 'success' => true,
@@ -141,4 +141,29 @@ class ConsultationController extends BaseApiController
             return $this->errorJsonRes([], $e->getMessage());
         }
     }
+
+    // public function storeReview(Request $request, Consultation $consultation)
+    // {
+    //     try {
+    //         $validatedData = $request->validate([
+    //             'rating' => 'required|integer|min:1|max:5',
+    //             'comment' => 'nullable|string|max:1000',
+    //         ]);
+
+    //         $review = $this->consultationService->addReview(
+    //             $consultation,
+    //             $validatedData,
+    //             $request->user()
+    //         );
+
+    //         return response()->json([
+    //             'message' => 'Review submitted successfully',
+    //             'data' => $review
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'message' => $e->getMessage()
+    //         ], $e->getCode() ?: 400);
+    //     }
+    // }
 }
