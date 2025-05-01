@@ -135,7 +135,8 @@ class ConsultationsRelationManager extends RelationManager
                                             Consultation::STATUS_CANCELLED => 'Cancelled',
                                             Consultation::STATUS_REJECTED => 'Rejected',
                                         ])
-                                        ->disabled(fn($record) => $record && in_array($record->status, [Consultation::STATUS_CANCELLED, Consultation::STATUS_REJECTED]))
+                                        // Remove or modify the disabled condition to allow status updates
+                                        // ->disabled(fn($record) => $record && in_array($record->status, [Consultation::STATUS_CANCELLED, Consultation::STATUS_REJECTED]))
                                         ->required(),
                                 ]),
                         ]),
@@ -374,6 +375,20 @@ class ConsultationsRelationManager extends RelationManager
                                 ->body('The consultation has been updated successfully.')
                         ),
                     Tables\Actions\DeleteAction::make(),
+                    // Add a new action specifically for marking as completed
+                    Tables\Actions\Action::make('mark_completed')
+                        ->label('Mark Completed')
+                        ->icon('heroicon-o-check-badge')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function (Consultation $record) {
+                            $record->update(['status' => Consultation::STATUS_COMPLETED]);
+                            Notification::make()
+                                ->title('Consultation Marked as Completed')
+                                ->success()
+                                ->send();
+                        })
+                        ->visible(fn(Consultation $record) => !in_array($record->status, [Consultation::STATUS_COMPLETED, Consultation::STATUS_CANCELLED, Consultation::STATUS_REJECTED])),
                     Tables\Actions\Action::make('confirm')
                         ->label('Confirm')
                         ->icon('heroicon-o-check-circle')
@@ -552,6 +567,20 @@ class ConsultationsRelationManager extends RelationManager
                             $records->each->update(['status' => Consultation::STATUS_CONFIRMED]);
                             Notification::make()
                                 ->title('Selected Consultations Confirmed')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    // Add bulk action for marking consultations as completed
+                    Tables\Actions\BulkAction::make('complete_selected')
+                        ->label('Mark Selected as Completed')
+                        ->icon('heroicon-o-check-badge')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function ($records) {
+                            $records->each->update(['status' => Consultation::STATUS_COMPLETED]);
+                            Notification::make()
+                                ->title('Selected Consultations Marked as Completed')
                                 ->success()
                                 ->send();
                         })
