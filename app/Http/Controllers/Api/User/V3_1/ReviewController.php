@@ -64,7 +64,7 @@ class ReviewController extends BaseApiController
         return ReviewResource::make($result)
             ->additional([
                 'success' => true,
-                'message' => __('api.review_created_successfully'),
+                'message' => __('api.success'),
             ]);
     }
 
@@ -83,7 +83,7 @@ class ReviewController extends BaseApiController
         if (!$review) {
             return response()->json([
                 'success' => false,
-                'message' => __('api.review_not_found')
+                'message' => __('api.not_found')
             ], 404);
         }
         
@@ -101,7 +101,7 @@ class ReviewController extends BaseApiController
         return ReviewResource::make($updatedReview)
             ->additional([
                 'success' => true,
-                'message' => __('api.review_media_updated_successfully'),
+                'message' => __('api.success'),
             ]);
     }
 }
