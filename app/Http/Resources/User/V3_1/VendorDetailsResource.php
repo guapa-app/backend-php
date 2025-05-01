@@ -75,6 +75,9 @@ class VendorDetailsResource extends JsonResource
             'offers' => ProductResource::collection($this->whenLoaded('productsHasOffers')),
             'reviews_count' => $this->reviews_count,
             'rating' => $this->rating,
+            $this->mergeWhen($this->accept_online_consultation, [
+                'consultation_price' => $this->consultation_fees,
+            ]),
         ];
 
         return $returned_arr;
