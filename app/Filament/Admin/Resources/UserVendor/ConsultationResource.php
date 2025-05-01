@@ -67,7 +67,7 @@ class ConsultationResource extends Resource
                             ->options([
                                 'video' => 'Video',
                                 'in-person' => 'In-Person',
-                                'Audio' => 'Audio',
+                                'audio' => 'Audio',
                             ])
                             ->native(false)
                             ->required()
@@ -95,7 +95,7 @@ class ConsultationResource extends Resource
                             ]),
                     ])
                     ->columns(2),
-                    Forms\Components\Section::make('Medical Information')
+                Forms\Components\Section::make('Medical Information')
                     ->schema([
                         Forms\Components\Textarea::make('chief_complaint')
                             ->required()
@@ -107,6 +107,15 @@ class ConsultationResource extends Resource
                                 'required' => 'Chief complaint is required.',
                                 'max' => 'Chief complaint cannot exceed 255 characters.',
                             ]),
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                            ->collection('consultations')
+                            ->multiple()
+                            ->maxFiles(10)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
+                            ->maxSize(5120) // 5MB max file size
+                            ->columnSpanFull()
+                            ->label('Medical Images')
+                            ->helperText('Upload any relevant medical images (max 5MB each)'),
                         Forms\Components\Repeater::make('medical_history')
                             ->label('Medical History')
                             ->schema([
@@ -130,14 +139,6 @@ class ConsultationResource extends Resource
                             ])
                             ->columns(2)
                             ->columnSpanFull(),
-                        // Forms\Components\Textarea::make('consultation_reason')
-                        //     ->maxLength(500)
-                        //     ->placeholder('Enter additional details about the consultation...')
-                        //     ->label('Consultation Reason')
-                        //     ->columnSpanFull()
-                        //     ->validationMessages([
-                        //         'max' => 'Consultation reason cannot exceed 500 characters.',
-                        //     ]),
                     ]),
                 Forms\Components\Section::make('Financial Information')
                     ->schema([
@@ -187,6 +188,7 @@ class ConsultationResource extends Resource
                             ->label('Payment Method'),
                     ])
                     ->columns(2),
+                
             ]);
     }
 
@@ -224,6 +226,10 @@ class ConsultationResource extends Resource
                         Consultation::STATUS_REJECTED => 'danger',
                         default => 'gray',
                     }),
+                Tables\Columns\IconColumn::make('has_images')
+                    ->boolean()
+                    ->label('Images')
+                    ->getStateUsing(fn (Consultation $record): bool => $record->media->count() > 0),
                 Tables\Columns\TextColumn::make('appointment_date')
                     ->date()
                     ->sortable()
@@ -258,11 +264,16 @@ class ConsultationResource extends Resource
                     ->label('Status'),
                 SelectFilter::make('type')
                     ->options([
-                        'general' => 'General',
-                        'specialist' => 'Specialist',
-                        'follow-up' => 'Follow-Up',
+                        'video' => 'Video',
+                        'in-person' => 'In-Person',
+                        'audio' => 'Audio',
                     ])
                     ->label('Type'),
+                Tables\Filters\Filter::make('has_images')
+                    ->label('Has Images')
+                    ->query(function ($query) {
+                        return $query->whereHas('media');
+                    }),
                 Tables\Filters\Filter::make('appointment_date')
                     ->form([
                         Forms\Components\DatePicker::make('appointment_from')
@@ -304,6 +315,69 @@ class ConsultationResource extends Resource
                                 ->send();
                         })
                         ->visible(fn (Consultation $record) => !in_array($record->status, [Consultation::STATUS_CANCELLED, Consultation::STATUS_REJECTED, Consultation::STATUS_COMPLETED])),
+                    Tables\Actions\Action::make('upload_images')
+                        ->label('Upload Images')
+                        ->icon('heroicon-o-photo')
+                        ->form([
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                                ->collection('consultations')
+                                ->multiple()
+                                ->maxFiles(10)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
+                                ->maxSize(5120) // 5MB max file size
+                                ->label('Medical Images'),
+                        ])
+                        ->action(function (Consultation $record, array $data) {
+                            Notification::make()
+                                ->title('Images uploaded successfully')
+                                ->success()
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('view_images')
+                        ->label('View Images')
+                        ->icon('heroicon-o-photo')
+                        ->modalHeading(fn (Consultation $record) => 'Images for consultation #' . $record->id)
+                        ->modalContent(function (Consultation $record) {
+                            $media = $record->media;
+                            
+                            $content = '<div class="space-y-4">';
+                            
+                            if ($media->count() > 0) {
+                                $content .= '<div><h3 class="text-lg font-bold">Medical Images</h3><div class="grid grid-cols-2 gap-4 mt-2">';
+                                foreach ($media as $item) {
+                                    // Generate appropriate URLs based on storage type
+                                    $imageUrl = $item->disk === 's3' ? $item->getTemporaryUrl(now()->addMinutes(20)) : $item->getFullUrl();
+                                    
+                                    // Try to get thumbnail if available, fallback to original
+                                    $thumbUrl = null;
+                                    if ($item->hasGeneratedConversion('small')) {
+                                        $thumbUrl = $item->conversions_disk === 's3' 
+                                            ? $item->getTemporaryUrl(now()->addMinutes(20), 'small') 
+                                            : $item->getFullUrl('small');
+                                    } else {
+                                        $thumbUrl = $imageUrl;
+                                    }
+                                    
+                                    $content .= '<div class="p-2 border rounded">
+                                        <div class="flex flex-col items-center">
+                                            <img src="' . htmlspecialchars($thumbUrl) . '" alt="' . htmlspecialchars($item->file_name) . '" class="object-cover h-48 w-full" />
+                                            <span class="text-gray-700 mt-2">' . htmlspecialchars($item->file_name) . '</span>
+                                            <a href="' . htmlspecialchars($imageUrl) . '" target="_blank" class="mt-1 text-primary-500 hover:underline">View Full Size</a>
+                                        </div>
+                                    </div>';
+                                }
+                                $content .= '</div></div>';
+                            } else {
+                                $content .= '<div class="text-center py-4">No images available for this consultation.</div>';
+                            }
+                            
+                            $content .= '</div>';
+                            
+                            return new \Illuminate\Support\HtmlString($content);
+                        })
+                        ->modalSubmitAction(false)
+                        ->modalCancelAction(false)
+                        ->visible(fn (Consultation $record): bool => $record->media->count() > 0),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),
@@ -328,115 +402,10 @@ class ConsultationResource extends Resource
             ]);
     }
 
-    public static function vendorTable(Table $table): Table
-    {
-        return $table
-            ->query(Vendor::has('consultations'))
-            ->columns([
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('logo')
-                    ->collection('logos')
-                    ->label('Logo')
-                    ->width(50)
-                    ->height(50)
-                    ->defaultImageUrl(url('path/to/default-logo.png')),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable()
-                    ->label('Doctor'),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable()
-                    ->label('Email'),
-                Tables\Columns\BooleanColumn::make('accept_online_consultation')
-                    ->label('Online Consultation')
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle'),
-                Tables\Columns\TextColumn::make('consultations_count')
-                    ->label('Total Consultations')
-                    ->counts('consultations')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('consultation_statuses')
-                    ->label('Consultation Statuses')
-                    ->getStateUsing(function (Vendor $record) {
-                        $statuses = $record->consultations()
-                            ->groupBy('status')
-                            ->selectRaw('status, COUNT(*) as count')
-                            ->pluck('count', 'status')
-                            ->mapWithKeys(function ($count, $status) {
-                                return [$status => $count];
-                            });
-                        return collect([
-                            Consultation::STATUS_PENDING => 0,
-                            Consultation::STATUS_SCHEDULED => 0,
-                            Consultation::STATUS_CONFIRMED => 0,
-                            Consultation::STATUS_COMPLETED => 0,
-                            Consultation::STATUS_CANCELLED => 0,
-                            Consultation::STATUS_REJECTED => 0,
-                        ])->merge($statuses)->map(function ($count, $status) {
-                            return ucfirst(str_replace('_', ' ', $status)) . ': ' . $count;
-                        })->implode(', ');
-                    })
-                    ->wrap(),
-                Tables\Columns\TextColumn::make('about')
-                    ->limit(50)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        return $state;
-                    })
-                    ->label('About'),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('accept_online_consultation')
-                    ->options([
-                        0 => 'Disabled',
-                        1 => 'Active',
-                    ])
-                    ->label('Online Consultation'),
-            ])
-            ->actions([
-                Tables\Actions\Action::make('update_details')
-                    ->label('Update Details')
-                    ->icon('heroicon-o-pencil')
-                    ->form([
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
-                            ->collection('logos')
-                            ->label('Logo')
-                            ->image()
-                            ->maxSize(2048)
-                            ->imageEditor(),
-                        Forms\Components\Textarea::make('about')
-                            ->label('About')
-                            ->maxLength(1000)
-                            ->rows(4),
-                    ])
-                    ->action(function (Vendor $record, array $data) {
-                        if (isset($data['about'])) {
-                            $record->update(['about' => $data['about']]);
-                        }
-                        if (isset($data['logo'])) {
-                            $record->clearMediaCollection('logos');
-                            $record->addMedia($data['logo'])->toMediaCollection('logos');
-                        }
-                        Notification::make()
-                            ->title('Doctor details updated')
-                            ->success()
-                            ->send();
-                    }),
-                Tables\Actions\ViewAction::make()
-                    ->url(fn (Vendor $record): string => VendorResource::getUrl('view', ['record' => $record])),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ])
-            ->paginated([10, 25, 50])
-            ->defaultSort('name');
-    }
-
     public static function getRelations(): array
     {
         return [
-
+            // You can add relation managers here if needed
         ];
     }
 

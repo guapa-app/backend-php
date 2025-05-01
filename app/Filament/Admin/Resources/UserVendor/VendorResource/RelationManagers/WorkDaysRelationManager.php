@@ -31,7 +31,14 @@ class WorkDaysRelationManager extends RelationManager
                     ->required()
                     ->options(['online' => 'Online', 'offline' => 'Offline'])
                     ->label('Type')
-                    ->default('offline')
+                    ->default('offline'),
+                Forms\Components\Select::make(name: 'is_active')
+                    ->required()
+                    ->options([
+                        '1' => 'Active',
+                        '0' => 'Inactive',
+                    ])
+                    ->label('Status'),
             ]);
     }
 
@@ -49,6 +56,14 @@ class WorkDaysRelationManager extends RelationManager
                     ->color(fn (string $state): string => match ($state) {
                         'online' => 'success',
                         'offline' => 'info',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('is_active')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        '1' => 'success',
+                        '0' => 'danger',
                         default => 'gray',
                     }),
             ])
