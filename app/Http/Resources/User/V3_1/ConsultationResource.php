@@ -42,6 +42,7 @@ class ConsultationResource extends JsonResource
             'cancelled_at' => $this->cancelled_at ? $this->cancelled_at->format('Y-m-d H:i:s') : null,
             'rejected_at' => $this->rejected_at ? $this->rejected_at->format('Y-m-d H:i:s') : null,
             'reviews' => ReviewResource::collection($this->whenLoaded('reviews')),
+            'can_review' => $this->can_review,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
