@@ -86,7 +86,6 @@ class ZoomMeetingService implements MeetingServiceInterface
                         'mute_upon_entry' => true,
                         'waiting_room' => true,
                         'auto_recording' => 'none',
-
                     ],
                 ],
             ]);
