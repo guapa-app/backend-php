@@ -191,6 +191,8 @@ class Vendor extends Resource
 
             Boolean::make(__('Accept Appointment'), 'accept_appointment'),
 
+            Boolean::make(__('Accept Consultation'), 'accept_online_consultation'),
+
             BelongsToMany::make('Appointment form', 'appointmentForms', AppointmentForm::class),
 
             DateTime::make(__('created at'), 'created_at')->onlyOnDetail()->readonly(),

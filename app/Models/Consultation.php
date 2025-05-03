@@ -40,7 +40,8 @@ class Consultation extends Model implements Listable, HasMedia
         'meeting_provider',
         'session_url',
         'session_password',
-        'meeting_data'
+        'meeting_data',
+        'is_reviewed',
     ];
 
     protected $filterable = [
@@ -60,6 +61,34 @@ class Consultation extends Model implements Listable, HasMedia
         'cancelled_at' => 'datetime',
         'rejected_at' => 'datetime'
     ];
+
+    protected $appends = [
+        'can_review'
+    ];
+
+    /**
+     * Get the canReview attribute.
+     * A user can review a consultation if:
+     * 1. They are the consultation owner (user_id matches)
+     * 2. The consultation status is completed
+     * 3. They haven't already reviewed it
+     *
+     * @return bool
+     */
+    public function getCanReviewAttribute(): bool
+    {
+        // Check if the authenticated user is the consultation owner
+        $isOwner = auth()->check() && auth()->id() === $this->user_id;
+        // dump(auth()->id());
+
+        // Check if the consultation is completed
+        $isCompleted = $this->status === self::STATUS_COMPLETED;
+
+        // Check if the consultation has not been reviewed yet
+        $notReviewed = !$this->hasBeenReviewed();
+
+        return $isOwner && $isCompleted && $notReviewed;
+    }
 
     /**
      * Register media collections.
@@ -126,6 +155,23 @@ class Consultation extends Model implements Listable, HasMedia
 
         return Carbon::now()->lt($sixHoursBefore);
 
+    }
+
+    /**
+     * Check if this consultation has been reviewed
+     *
+     * @return bool
+     */
+    public function hasBeenReviewed()
+    {
+        return $this->is_reviewed ||
+            $this->reviews()->exists();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'reviewable_id')
+            ->where('reviewable_type', Consultation::class);
     }
 
     /**

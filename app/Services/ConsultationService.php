@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Consultation;
-use App\Models\Vendor;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Media;
+use App\Models\Vendor;
+use App\Models\Consultation;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Services\Meetings\MeetingServiceFactory;
 
 class ConsultationService
@@ -54,10 +55,9 @@ class ConsultationService
             $consultation = Consultation::create($data);
 
             // Attach media if provided
-            if (isset($data['media'])) {
-                $this->updateMedia($consultation, $data);
-            }
+            $this->updateMedia($consultation, $data);
 
+            $consultation->load(relations: 'media');
             DB::commit();
             return $consultation;
         } catch (\Exception $e) {
@@ -186,7 +186,9 @@ class ConsultationService
 
         // Get regular working hours for this day
         $schedule = $vendor->workDays()
-            ->where(function($query) use ($dayOfWeek) {
+            ->where('type', 'online')
+            ->where('is_active', true)
+            ->where(function ($query) use ($dayOfWeek) {
                 $query->where('day', $dayOfWeek)
                     ->orWhere('day', 7); // 7 is for all days
             })
@@ -239,7 +241,7 @@ class ConsultationService
         $schedule = $vendor->workDays()
             ->where('type', 'online')
             ->where('is_active', true)
-            ->where(function($query) use ($dayOfWeek) {
+            ->where(function ($query) use ($dayOfWeek) {
                 $query->where('day', $dayOfWeek)
                     ->orWhere('day', 7); // 7 is for all days
             })
@@ -303,7 +305,25 @@ class ConsultationService
 
     public function updateMedia(Consultation $consultation, array $data): Consultation
     {
-        (new MediaService())->handleMedia($consultation, $data);
+        $keep_media = $data['keep_media'] ?? [];
+        $consultation->media()->whereNotIn('id', $keep_media)->delete();
+
+        $mediaCollections = [
+            'media_ids' => 'consultations',
+            'before_media_ids' => 'before',
+            'after_media_ids' => 'after'
+        ];
+
+        foreach ($mediaCollections as $mediaKey => $collectionName) {
+            if (!empty($data[$mediaKey])) {
+                Media::whereIn('id', $data[$mediaKey])
+                    ->update([
+                        'model_type' => 'App\Models\Consultation',
+                        'model_id' => $consultation->id,
+                        'collection_name' => $collectionName
+                    ]);
+            }
+        }
 
         $consultation->load('media');
 
@@ -466,4 +486,86 @@ class ConsultationService
             \Log::error('Failed to cancel video conference for consultation: ' . $consultation->id);
         }
     }
+
+    // /**
+    //  * Add review for a consultation
+    //  *
+    //  * @param \App\Models\Consultation $consultation
+    //  * @param array $data Contains rating and comment
+    //  * @param \App\Models\User $user
+    //  * @return \App\Models\Review
+    //  * @throws \Exception
+    //  */
+    // public function addReview(Consultation $consultation, array $data, $user)
+    // {
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Check if user is authorized to review this consultation
+    //         if ($user->id !== $consultation->user_id) {
+    //             throw new \Exception(__('Unauthorized'), 403);
+    //         }
+
+    //         // Check if consultation is completed
+    //         if ($consultation->status !== Consultation::STATUS_COMPLETED) {
+    //             throw new \Exception(__('Cannot review a consultation that has not been completed'), 400);
+    //         }
+
+    //         // Check if user has already reviewed this consultation
+    //         if ($consultation->hasBeenReviewed()) {
+    //             throw new \Exception(__('You have already reviewed this consultation'), 400);
+    //         }
+
+    //         // Validate rating
+    //         if ($data['rating'] < 1 || $data['rating'] > 5) {
+    //             throw new \Exception(__('Rating must be between 1 and 5'), 400);
+    //         }
+
+    //         // Create review
+    //         $review = new \App\Models\Review([
+    //             'user_id' => $user->id,
+    //             'vendor_id' => $consultation->vendor_id,
+    //             'consultation_id' => $consultation->id,
+    //             'rating' => $data['rating'],
+    //             'comment' => $data['comment'] ?? null,
+    //         ]);
+    //         $review->save();
+
+    //         // Update consultation as reviewed
+    //         $consultation->is_reviewed = true;
+    //         $consultation->reviewed_at = now();
+    //         $consultation->save();
+
+    //         // Update vendor average rating
+    //         $this->updateVendorRating($consultation->vendor_id);
+
+    //         // Send notification to vendor about new review
+    //         // $consultation->vendor->user->notify(new \App\Notifications\NewReviewNotification($review));
+
+    //         DB::commit();
+    //         return $review;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         throw $e;
+    //     }
+    // }
+
+    // /**
+    //  * Update vendor's average rating
+    //  *
+    //  * @param int $vendorId
+    //  * @return void
+    //  */
+    // protected function updateVendorRating($vendorId)
+    // {
+    //     $vendor = Vendor::findOrFail($vendorId);
+
+    //     // Calculate new average rating
+    //     $averageRating = $vendor->reviews()->avg('rating');
+    //     $reviewCount = $vendor->reviews()->count();
+
+    //     $vendor->average_rating = $averageRating;
+    //     $vendor->review_count = $reviewCount;
+    //     $vendor->save();
+    // }
 }

@@ -5,15 +5,12 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Http\Resources\User\V3_1\ConsultationCollection;
 use App\Http\Resources\User\V3_1\ConsultationResource;
 use App\Models\Consultation;
-use App\Models\Vendor;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ConsultationRequest;
 use App\Contracts\Repositories\ConsultationRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Services\ConsultationService;
-use App\Exceptions\TimeSlotNotAvailableException;
 
 class ConsultationController extends BaseApiController
 {
