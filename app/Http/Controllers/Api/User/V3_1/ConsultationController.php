@@ -127,12 +127,13 @@ class ConsultationController extends BaseApiController
             $user = Auth::user();
 
             // Cancel the consultation
-            $this->consultationService->cancel($consultation, $user);
+            $isCancelled = $this->consultationService->cancel($consultation, $user);
 
             return response()->json([
                 'success' => true,
                 'message' => __('Consultation cancelled successfully'),
-                'data' => $consultation
+                'data' => $isCancelled ? true : false,
+
             ]);
         } catch (\Exception $e) {
             return $this->errorJsonRes([], $e->getMessage());
