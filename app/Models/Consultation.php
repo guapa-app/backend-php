@@ -23,6 +23,7 @@ class Consultation extends Model implements Listable, HasMedia
         'vendor_id',
         'appointment_date',
         'appointment_time',
+        'appointment_end_time', // Added new field for end time
         'type',
         'chief_complaint',
         'medical_history',
@@ -55,6 +56,7 @@ class Consultation extends Model implements Listable, HasMedia
     protected $casts = [
         'appointment_date' => 'date',
         'appointment_time' => 'datetime',
+        'appointment_end_time' => 'datetime', // Cast new field as datetime
         'medical_history' => 'array',
         'total_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
@@ -63,8 +65,30 @@ class Consultation extends Model implements Listable, HasMedia
     ];
 
     protected $appends = [
-        'can_review'
+        'can_review',
+        'appointment_time_period' // Added new accessor
     ];
+
+    /**
+     * Get the appointment time period (start time - end time)
+     *
+     * @return string
+     */
+    public function getAppointmentTimePeriodAttribute(): string
+    {
+        $startTime = $this->appointment_time->format('h:i A');
+        
+        // If end time is set, use it, otherwise calculate from vendor's session duration
+        if (isset($this->appointment_end_time)) {
+            $endTime = $this->appointment_end_time->format('h:i A');
+        } else {
+            // Get session duration from vendor, default to 60 minutes
+            $duration = $this->vendor->session_duration ?? 60;
+            $endTime = $this->appointment_time->copy()->addMinutes($duration)->format('h:i A');
+        }
+        
+        return "$startTime - $endTime";
+    }
 
     /**
      * Get the canReview attribute.
