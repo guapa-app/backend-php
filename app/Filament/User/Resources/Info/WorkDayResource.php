@@ -2,15 +2,15 @@
 
 namespace App\Filament\User\Resources\Info;
 
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\WorkDay;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Traits\FilamentVendorAccess;
 use App\Enums\WorkDay as EnumsWorkDay;
 use App\Filament\User\Resources\Info\WorkDayResource\Pages;
-use App\Models\WorkDay;
-use App\Traits\FilamentVendorAccess;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
 
 class WorkDayResource extends Resource
 {
@@ -29,6 +29,17 @@ class WorkDayResource extends Resource
                 Forms\Components\Select::make('day')
                     ->required()
                     ->options(EnumsWorkDay::class),
+                Forms\Components\Select::make('type')
+                    ->required()
+                    ->options([
+                        'online' => 'online',
+                        'offline' => 'offline',
+
+                    ]),
+                Forms\Components\TimePicker::make('start_time')
+                    ->required(),
+                Forms\Components\TimePicker::make('end_time')
+                    ->required(),
             ]);
     }
 
@@ -37,10 +48,18 @@ class WorkDayResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('day'),
+                Tables\Columns\TextColumn::make('type'),
+                Tables\Columns\TextColumn::make('start_time')
+                    ->time(),
+                Tables\Columns\TextColumn::make('end_time')
+                    ->time(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()->requiresConfirmation(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

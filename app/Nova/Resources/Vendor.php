@@ -154,6 +154,8 @@ class Vendor extends Resource
 
             HasMany::make(__('orders'), 'orders', Order::class),
 
+            HasMany::make(__('offers'), 'offers', Offer::class),
+
             HasManyThrough::make(__('invoices'), 'invoices', Invoice::class),
 
             BelongsToMany::make(__('staff'), 'staff', User::class)->fields(function () {
