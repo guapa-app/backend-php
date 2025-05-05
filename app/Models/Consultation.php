@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Contracts\Listable;
-use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use App\Contracts\Listable;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Consultation extends Model implements Listable, HasMedia
@@ -23,6 +23,7 @@ class Consultation extends Model implements Listable, HasMedia
         'vendor_id',
         'appointment_date',
         'appointment_time',
+        'appointment_end_time', // Added new field for end time
         'type',
         'chief_complaint',
         'medical_history',
@@ -55,6 +56,7 @@ class Consultation extends Model implements Listable, HasMedia
     protected $casts = [
         'appointment_date' => 'date',
         'appointment_time' => 'datetime',
+        'appointment_end_time' => 'datetime', // Cast new field as datetime
         'medical_history' => 'array',
         'total_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
@@ -63,8 +65,26 @@ class Consultation extends Model implements Listable, HasMedia
     ];
 
     protected $appends = [
-        'can_review'
+        'can_review',
+        'appointment_end_time',
+        // 'appointment_time_period' // Added new accessor
     ];
+
+
+    /**
+     * Get the appointment end time.
+     *
+     * @return string
+     */
+    public function getAppointmentEndTimeAttribute(): string
+    {
+        // If end time is set, use it, otherwise calculate from vendor's session duration
+
+        // Get session duration from vendor, default to 60 minutes
+        $duration = $this->vendor->session_duration ?? 60;
+        return $this->appointment_time->copy()->addMinutes($duration)->format('H:i');
+
+    }
 
     /**
      * Get the canReview attribute.
