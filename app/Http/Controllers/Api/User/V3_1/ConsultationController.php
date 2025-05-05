@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Resources\User\V3_1\ConsultationCollection;
-use App\Http\Resources\User\V3_1\ConsultationResource;
 use App\Models\Consultation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ConsultationRequest;
-use App\Contracts\Repositories\ConsultationRepositoryInterface;
-use App\Http\Controllers\Api\BaseApiController;
 use App\Services\ConsultationService;
+use App\Http\Requests\ConsultationRequest;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\User\V3_1\ConsultationResource;
+use App\Http\Resources\User\V3_1\ConsultationCollection;
+use App\Contracts\Repositories\ConsultationRepositoryInterface;
 
 class ConsultationController extends BaseApiController
 {
@@ -33,7 +33,7 @@ class ConsultationController extends BaseApiController
     {
         $request->merge(['user_id' => $this->user->id]);
         $consultations = $this->consultationRepository->all($request);
-        $consultations->load('vendor', 'user', 'media' , 'reviews');
+        $consultations->load('vendor', 'user', 'media', 'reviews', 'vendor.logo', 'vendor.specialties');
 
         return ConsultationCollection::make($consultations)
             ->additional([

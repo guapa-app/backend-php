@@ -36,6 +36,8 @@ class ConsultationResource extends JsonResource
             'meeting_provider' => $this->meeting_provider,
             'can_cancel' => $this->canCancel(),
             'can_join' => $this->canJoin(),
+            'type' => $this->type,
+            'chief_complaint' => $this->chief_complaint,
             'user' => new UserResource($this->whenLoaded('user')),
             'vendor' => new VendorResource($this->whenLoaded('vendor')),
             'media' => MediaResource::collection($this->whenLoaded('media')),
