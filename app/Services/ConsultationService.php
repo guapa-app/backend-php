@@ -407,7 +407,7 @@ class ConsultationService
         $this->cancelVideoConference($consultation);
 
         // Send cancellation notification to the vendor
-        $consultation->vendor->user->notify(new \App\Notifications\ConsultationCancelled($consultation));
+        // $consultation->vendor->user->notify(new \App\Notifications\ConsultationCancelled($consultation));
 
         return $consultation;
     }
@@ -568,4 +568,36 @@ class ConsultationService
     //     $vendor->review_count = $reviewCount;
     //     $vendor->save();
     // }
+    // cancel consultation
+    // public function cancelConsultation($consultation)
+    // {
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Check if the consultation exists
+    //         if (!$consultation) {
+    //             throw new \Exception('Consultation not found');
+    //         }
+
+    //         // Check if the consultation can be cancelled
+    //         if (!$consultation->canCancel()) {
+    //             throw new \Exception('Cannot cancel this consultation. It must be at least 6 hours before the appointment time.');
+    //         }
+
+    //         // Cancel the consultation
+    //         $consultation->status = Consultation::STATUS_CANCELLED;
+    //         $consultation->cancelled_at = now();
+    //         $consultation->save();
+
+    //         // Cancel the video conference
+    //         $this->cancelVideoConference($consultation);
+
+    //         DB::commit();
+    //         return $consultation;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         throw $e;
+    //     }
+    // }
+
 }

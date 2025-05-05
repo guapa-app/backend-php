@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Contracts\Listable;
-use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use App\Contracts\Listable;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Consultation extends Model implements Listable, HasMedia
@@ -66,28 +66,24 @@ class Consultation extends Model implements Listable, HasMedia
 
     protected $appends = [
         'can_review',
-        'appointment_time_period' // Added new accessor
+        'appointment_end_time',
+        // 'appointment_time_period' // Added new accessor
     ];
 
+
     /**
-     * Get the appointment time period (start time - end time)
+     * Get the appointment end time.
      *
      * @return string
      */
-    public function getAppointmentTimePeriodAttribute(): string
+    public function getAppointmentEndTimeAttribute(): string
     {
-        $startTime = $this->appointment_time->format('h:i A');
-        
         // If end time is set, use it, otherwise calculate from vendor's session duration
-        if (isset($this->appointment_end_time)) {
-            $endTime = $this->appointment_end_time->format('h:i A');
-        } else {
-            // Get session duration from vendor, default to 60 minutes
-            $duration = $this->vendor->session_duration ?? 60;
-            $endTime = $this->appointment_time->copy()->addMinutes($duration)->format('h:i A');
-        }
-        
-        return "$startTime - $endTime";
+
+        // Get session duration from vendor, default to 60 minutes
+        $duration = $this->vendor->session_duration ?? 60;
+        return $this->appointment_time->copy()->addMinutes($duration)->format('H:i');
+
     }
 
     /**
