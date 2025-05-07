@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Contracts\Repositories\AdminRepositoryInterface;
-use App\Models\Admin;
-use App\Models\Setting;
 use DB;
 use Exception;
-use Illuminate\Support\Facades\Http;
+use App\Models\Admin;
+use App\Models\Setting;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Http;
+use App\Contracts\Repositories\AdminRepositoryInterface;
 
 /**
  * Authentication service.

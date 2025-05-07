@@ -2,9 +2,9 @@
 
 namespace App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
 
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class StaffRelationManager extends RelationManager
 {
@@ -21,6 +21,8 @@ class StaffRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('pivot.role'),
             ])
             ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\AttachAction::make(),
                 Tables\Actions\DeleteAction::make()->requiresConfirmation(),
             ]);
     }

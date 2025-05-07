@@ -11,8 +11,8 @@ use App\Models\Consultation;
 use Filament\Resources\Resource;
 use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
-use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource\Pages;
 use App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
+use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource\Pages;
 
 class VendorConsultationResource extends Resource
 {
@@ -242,7 +242,6 @@ class VendorConsultationResource extends Resource
         return [
             RelationManagers\WorkDaysRelationManager::class,
             RelationManagers\ConsultationsRelationManager::class,
-
         ];
     }
 
