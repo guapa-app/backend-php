@@ -46,10 +46,11 @@ class UserPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->discoverWidgets(in: app_path('Filament/User/Widgets/GuapaPlus'), for: 'App\\Filament\\User\\Widgets\\GuapaPlus')
+
             ->widgets([
                 Widgets\AccountWidget::class,
                 ContractWidget::class,
-//                Widgets\FilamentInfoWidget::class,
+                //                Widgets\FilamentInfoWidget::class,
             ])
             ->navigationGroups([
                 'Info',

@@ -2,21 +2,21 @@
 
 namespace App\Filament\User\Resources\Shop;
 
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Order;
+use Filament\Actions;
+use Filament\Forms\Form;
 use App\Enums\OrderStatus;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Traits\FilamentVendorAccess;
+use App\Notifications\PushNotification;
+use Illuminate\Database\Eloquent\Model;
 use App\Filament\User\Resources\Shop\OrderResource\Pages;
+use Filament\Notifications\Notification as FilamentNotification;
 use App\Filament\User\Resources\Shop\OrderResource\RelationManagers;
 use App\Filament\User\Resources\Shop\OrderResource\Widgets\OrderStats;
-use App\Models\Order;
-use App\Notifications\PushNotification;
-use App\Traits\FilamentVendorAccess;
-use Filament\Actions;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification as FilamentNotification;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 
 class OrderResource extends Resource
 {
