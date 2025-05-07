@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\UserVendor\VendorConsultationResource\Pag
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource;
+use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource\Widgets\VendorConsultationStatsWidget;
 
 class ListVendorConsultation extends ListRecords
 {

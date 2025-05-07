@@ -8,11 +8,12 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource;
+use App\Filament\Admin\Resources\UserVendor\VendorConsultationResource\Widgets\VendorConsultationStatsWidget;
 
 class ViewVendorConsultation extends ViewRecord
 {
     protected static string $resource = VendorConsultationResource::class;
-    
+
     protected function getHeaderActions(): array
     {
         return [

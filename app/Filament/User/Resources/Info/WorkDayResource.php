@@ -29,17 +29,26 @@ class WorkDayResource extends Resource
                 Forms\Components\Select::make('day')
                     ->required()
                     ->options(EnumsWorkDay::class),
+                    // hours srat and end
+                    Forms\Components\TimePicker::make('start_time')
+                    ->required()
+                    ->label('Start Time'),
+                Forms\Components\TimePicker::make('end_time')
+                    ->required()
+                    ->label('End Time'),
                 Forms\Components\Select::make('type')
                     ->required()
+                    ->options(['online' => 'Online', 'offline' => 'Offline'])
+                    ->label('Type')
+                    ->default('offline'),
+                Forms\Components\Select::make(name: 'is_active')
+                    ->required()
                     ->options([
-                        'online' => 'online',
-                        'offline' => 'offline',
-
-                    ]),
-                Forms\Components\TimePicker::make('start_time')
-                    ->required(),
-                Forms\Components\TimePicker::make('end_time')
-                    ->required(),
+                        '1' => 'Active',
+                        '0' => 'Inactive',
+                    ])
+                    ->label('Status'),
+                
             ]);
     }
 
@@ -48,11 +57,26 @@ class WorkDayResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('day'),
-                Tables\Columns\TextColumn::make('type'),
                 Tables\Columns\TextColumn::make('start_time')
-                    ->time(),
-                Tables\Columns\TextColumn::make('end_time')
-                    ->time(),
+                ->label('Start Time'),
+            Tables\Columns\TextColumn::make('end_time')
+                ->label('End Time'),
+            Tables\Columns\TextColumn::make('type')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'online' => 'success',
+                    'offline' => 'info',
+                    default => 'gray',
+                }),
+            Tables\Columns\TextColumn::make('is_active')
+                ->label('Status')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    '1' => 'success',
+                    '0' => 'danger',
+                    default => 'gray',
+                }),
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -251,6 +251,11 @@ class Consultation extends Model implements Listable, HasMedia
         return $query;
     }
 
+    public function scopeCurrentVendor($query, $vendorId)
+    {
+        return $query->where('vendor_id', $vendorId);
+    }
+
     public function scopeWithSingleRelations(Builder $query): Builder
     {
         $query->with(['media']);

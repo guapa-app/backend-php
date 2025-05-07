@@ -7,13 +7,16 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\Review;
 use Filament\Tables\Table;
+use Flowframe\Trend\Trend;
 use App\Models\Consultation;
+use Flowframe\Trend\TrendValue;
 use Filament\Forms\Components\Tabs;
 use Filament\Tables\Filters\Filter;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Widgets\StatsOverviewWidget\Card;
 use Filament\Resources\RelationManagers\RelationManager;
 
 class ConsultationsRelationManager extends RelationManager
@@ -135,8 +138,6 @@ class ConsultationsRelationManager extends RelationManager
                                             Consultation::STATUS_CANCELLED => 'Cancelled',
                                             Consultation::STATUS_REJECTED => 'Rejected',
                                         ])
-                                        // Remove or modify the disabled condition to allow status updates
-                                        // ->disabled(fn($record) => $record && in_array($record->status, [Consultation::STATUS_CANCELLED, Consultation::STATUS_REJECTED]))
                                         ->required(),
                                 ]),
                         ]),
@@ -375,7 +376,6 @@ class ConsultationsRelationManager extends RelationManager
                                 ->body('The consultation has been updated successfully.')
                         ),
                     Tables\Actions\DeleteAction::make(),
-                    // Add a new action specifically for marking as completed
                     Tables\Actions\Action::make('mark_completed')
                         ->label('Mark Completed')
                         ->icon('heroicon-o-check-badge')
@@ -571,7 +571,6 @@ class ConsultationsRelationManager extends RelationManager
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion(),
-                    // Add bulk action for marking consultations as completed
                     Tables\Actions\BulkAction::make('complete_selected')
                         ->label('Mark Selected as Completed')
                         ->icon('heroicon-o-check-badge')
