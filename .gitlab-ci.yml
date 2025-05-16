@@ -36,7 +36,7 @@ deploy:
     #- echo "$DEPLOY_PUBLIC_KEY" | ssh $SSH_USER_PROD2@$SSH_HOST_PROD2 "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
   script:
     - |
-      ssh -o BatchMode=yes $SSH_USER_PROD2@@$SSH_HOST_PROD2 /bin/bash << 'EOF'
+      ssh -o BatchMode=yes $SSH_USER_PROD2@$SSH_HOST_PROD2 /bin/bash << 'EOF'
       cd /home/ubuntu/stage/src/backend
       git switch production
       git pull 
