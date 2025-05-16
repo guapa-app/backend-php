@@ -33,7 +33,7 @@ deploy:
   script:
     - |
       ssh -o BatchMode=yes $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
-      cd $DEPLOY_PATH
+      cd /home/ubuntu/stage/src/backend
       git pull 
       docker-compose up -d --build
       EOF
