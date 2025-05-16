@@ -34,8 +34,8 @@ deploy:
     - |
       ssh -o BatchMode=yes $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
       cd $DEPLOY_PATH
-      git pull origin $BRANCH_NAME
-      docker compose up -d --build
+      git pull 
+      docker-compose up -d --build
       EOF
   only:
     - staging
