@@ -9,6 +9,7 @@ variables:
   SSH_USER: ubuntu
   SSH_HOST: 84.8.115.110
   BRANCH_NAME: $CI_COMMIT_REF_NAME
+  
 
 
 deploy:
@@ -18,24 +19,23 @@ deploy:
     url: https://stage.guapa.com.sa/
   before_script:
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    # Add static private key
+    - echo "$DEPLOY_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    # Add static public key (optional but recommended)
+    - echo "$DEPLOY_PUBLIC_KEY" > ~/.ssh/id_ed25519.pub
+    # Add server to known_hosts
     - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
-    # Generate new SSH key pair in the container (if needed)
-    - ssh-keygen -t rsa -b 4096 -f ~/.ssh/container_key -N "" -q
-    # Add container's public key to server's authorized_keys
+    # Ensure the public key is on the server (idempotent operation)
     - ssh $SSH_USER@$SSH_HOST "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
-    - cat ~/.ssh/container_key.pub | ssh $SSH_USER@$SSH_HOST "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+    - echo "$DEPLOY_PUBLIC_KEY" | ssh $SSH_USER@$SSH_HOST "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
   script:
-    - | 
-      ssh $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
+    - |
+      ssh -o BatchMode=yes $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
       cd $DEPLOY_PATH
       git pull origin $BRANCH_NAME
       docker compose up -d --build
       EOF
-  after_script:
-    # Optional: Remove the container's public key from server after deployment
-    - ssh $SSH_USER@$SSH_HOST "sed -i '/$(cat ~/.ssh/container_key.pub | cut -d' ' -f1-2)/d' ~/.ssh/authorized_keys"
-    
   only:
     - staging
