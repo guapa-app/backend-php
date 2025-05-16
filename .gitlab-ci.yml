@@ -4,8 +4,6 @@ stages:
   - deploy
 
 variables:
-  DEPLOY_PATH: "/home/ubuntu/stage/src/backend"
-  SSH_PRIVATE_KEY: $Private_key_stg
   SSH_USER: ubuntu
   SSH_HOST: 84.8.115.110
   BRANCH_NAME: $CI_COMMIT_REF_NAME
@@ -29,8 +27,6 @@ deploy:
     # Add server to known_hosts
     - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
     # Ensure the public key is on the server (idempotent operation)
-    - ssh $SSH_USER@$SSH_HOST "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
-    - echo "$DEPLOY_PUBLIC_KEY" | ssh $SSH_USER@$SSH_HOST "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
   script:
     - |
       ssh -o BatchMode=yes $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
