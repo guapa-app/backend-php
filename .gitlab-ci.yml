@@ -30,13 +30,13 @@ deploy:
     # Add static public key (optional but recommended)
     - echo "$DEPLOY_PUBLIC_KEY" > ~/.ssh/id_ed25519.pub
     # Add server to known_hosts
-    - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+    - ssh-keyscan $SSH_HOST_PROD2 >> ~/.ssh/known_hosts
     # Ensure the public key is on the server (idempotent operation)
-    - ssh $SSH_USER@$SSH_HOST "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
-    - echo "$DEPLOY_PUBLIC_KEY" | ssh $SSH_USER@$SSH_HOST "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+    - ssh $SSH_USER_PROD2@$SSH_HOST_PROD2 "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
+    - echo "$DEPLOY_PUBLIC_KEY" | ssh $SSH_USER_PROD2@$SSH_HOST_PROD2 "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
   script:
     - |
-      ssh -o BatchMode=yes $SSH_USER_PROD@@$SSH_HOST_PROD2 /bin/bash << 'EOF'
+      ssh -o BatchMode=yes $SSH_USER_PROD2@@$SSH_HOST_PROD2 /bin/bash << 'EOF'
       cd /home/ubuntu/stage/src/backend
       git switch production
       git pull 
