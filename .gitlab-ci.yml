@@ -1,34 +1,40 @@
 image: lorisleiva/laravel-docker:latest
 
 stages:
-  - build
   - deploy
 
 variables:
   DEPLOY_PATH: "/home/ubuntu/stage/src/backend"
-  SSH_PRIVATE_KEY: $GUAPA_STG_PRIVATE_KEY
+  SSH_PRIVATE_KEY: $Private_key_stg
   SSH_USER: ubuntu
-  SSH_HOST: 3.67.253.208
+  SSH_HOST: 84.8.115.110
   BRANCH_NAME: $CI_COMMIT_REF_NAME
-
-build:
-  stage: build
-  script:
-    - composer update
-    - composer install
-    - npm install
-    - npm run prod
 
 deploy:
   stage: deploy
   environment:
     name: staging
     url: https://stage.guapa.com.sa/
-  script:
+  before_script:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
-    - ssh $SSH_USER@$SSH_HOST
+    # Generate new SSH key pair in the container (if needed)
+    - ssh-keygen -t rsa -b 4096 -f ~/.ssh/container_key -N "" -q
+    # Add container's public key to server's authorized_keys
+    - ssh $SSH_USER@$SSH_HOST "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
+    - cat ~/.ssh/container_key.pub | ssh $SSH_USER@$SSH_HOST "cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+  script:
+    - | 
+      ssh $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
+      cd $DEPLOY_PATH
+      git pull origin $BRANCH_NAME
+      docker compose up -d --build
+      EOF
+  after_script:
+    # Optional: Remove the container's public key from server after deployment
+    - ssh $SSH_USER@$SSH_HOST "sed -i '/$(cat ~/.ssh/container_key.pub | cut -d' ' -f1-2)/d' ~/.ssh/authorized_keys"
+    
   only:
     - staging
