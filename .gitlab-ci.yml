@@ -18,6 +18,7 @@ deploy:
     name: staging
     url: https://stage.guapa.com.sa/
   before_script:
+    - apk add --no-cache openssh-client
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     # Add static private key
