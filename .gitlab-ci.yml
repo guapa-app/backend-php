@@ -4,8 +4,6 @@ stages:
   - deploy
 
 variables:
-  DEPLOY_PATH: "/home/ubuntu/stage/src/backend"
-  SSH_PRIVATE_KEY: $Private_key_stg
   SSH_USER_PROD1: ubuntu
   SSH_USER_PROD2: opc
 
@@ -37,10 +35,10 @@ deploy:
   script:
     - |
       ssh -o BatchMode=yes $SSH_USER_PROD2@$SSH_HOST_PROD2 /bin/bash << 'EOF'
-      cd /home/ubuntu/stage/src/backend
+      cd /home/opc/Prod/stage/src/backend
       git switch production
       git pull 
-      cd /home/ubuntu/stage
+      cd /home/opc/Prod/stage
       sudo docker compose up -d --build
       EOF
   only:
