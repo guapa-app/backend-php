@@ -32,9 +32,11 @@ deploy:
       ssh -o BatchMode=yes $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
       cd /home/ubuntu/stage/src/backend
       # Reset any local changes that might cause conflicts
+      git switch staging
       git reset --hard HEAD
       git clean -fd
       # Pull changes with strategy option to prefer remote changes in case of conflict
+      
       git pull origin staging -X theirs --no-edit
       cd /home/ubuntu/stage
       sudo docker-compose up -d --build
