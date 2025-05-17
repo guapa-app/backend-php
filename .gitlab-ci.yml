@@ -29,7 +29,9 @@ deploy-prod1:
       ssh -o BatchMode=yes $SSH_USER_PROD1@$SSH_HOST_PROD1 /bin/bash << 'EOF'
       cd /home/ubuntu/stage/src/backend  # Update with your actual PROD1 path
       git switch production
-      git pull 
+      git reset --hard HEAD
+      git clean -fd
+      git pull origin production -X theirs --no-edit
       cd /home/ubuntu/stage  # Update with your actual PROD1 path
       sudo docker-compose up -d --build
       EOF
@@ -54,7 +56,9 @@ deploy-prod2:
       ssh -o BatchMode=yes $SSH_USER_PROD2@$SSH_HOST_PROD2 /bin/bash << 'EOF'
       cd /home/opc/Prod/stage/src/backend  # Update with your actual PROD2 path
       git switch production
-      git pull 
+      git reset --hard HEAD
+      git clean -fd
+      git pull origin production -X theirs --no-edit
       cd /home/opc/Prod/stage  # Update with your actual PROD2 path
       sudo docker compose up -d --build
       EOF
