@@ -31,7 +31,7 @@ deploy:
     - |
       ssh -o BatchMode=yes $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
       cd /home/ubuntu/stage/src/backend
-      git pull 
+      git pull  staging --no-edit
       cd /home/ubuntu/stage
       sudo docker-compose up -d --build
       EOF
