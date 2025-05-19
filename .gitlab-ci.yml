@@ -5,9 +5,9 @@ stages:
   - deploy-prod2
 
 variables:
-  SSH_USER_PROD1: ubuntu
+  SSH_USER_PROD1: opc
   SSH_USER_PROD2: opc
-  SSH_HOST_PROD1: 84.8.110.164
+  SSH_HOST_PROD1: 84.8.121.111
   SSH_HOST_PROD2: 84.8.109.10
   BRANCH_NAME: $CI_COMMIT_REF_NAME
 
