@@ -1,13 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('/', [NotificationController::class, 'index']);
-    Route::get('/unread', [NotificationController::class, 'unread']);
-    Route::get('/unread_count', [NotificationController::class, 'unread_count']);
-    Route::get('/types', [NotificationController::class, 'types']);
-    Route::patch('/mark_all_read', [NotificationController::class, 'markAllAsRead']);
-    Route::put('/{id}/mark_read', [NotificationController::class, 'markRead']);
+    Route::post('/send', [NotificationController::class, 'send']);
 });

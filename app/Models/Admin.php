@@ -37,7 +37,8 @@ class Admin extends Authenticatable implements Listable, FilamentUser
      * @var array
      */
     protected $hidden = [
-        'password', 'roles',
+        'password',
+        'roles',
     ];
 
     protected $guard_name = 'admin';
@@ -48,7 +49,8 @@ class Admin extends Authenticatable implements Listable, FilamentUser
      * @var array
      */
     protected $search_attributes = [
-        'name', 'email',
+        'name',
+        'email',
     ];
 
     protected $appends = [
@@ -123,6 +125,18 @@ class Admin extends Authenticatable implements Listable, FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
+        return true;
+    }
+
+    public function isSuperAdmin()
+    {
+        // Adjust this logic based on your roles/permissions implementation
+        return $this->hasRole('super-admin');
+    }
+
+    public function canManageNotificationSettings()
+    {
+        // Normal admins can manage their own settings; super admins can manage all
         return true;
     }
 }

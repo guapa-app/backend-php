@@ -2,148 +2,54 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\NotificationTypeEnum;
-use Carbon\Carbon;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Services\ExternalNotificationService;
+use App\Services\NotificationChannelResolver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @group Notifications
  */
 class NotificationController extends BaseApiController
 {
-    /**
-     * Get user notifications.
-     *
-     * Notification types and corresponding data
-     * new-product, new-service => product_id
-     * new-offer => product_id
-     *
-     * @responseFile 200 responses/notifications/list.json
-     * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
-     *
-     * @queryParam page number for pagination Example: 2
-     * @queryParam perPage Results to fetch per page Example: 15
-     *
-     * @param  Request  $request
-     *
-     * @return LengthAwarePaginator
-     */
-    public function index(Request $request)
+    protected $externalService;
+    protected $channelResolver;
+
+    public function __construct(ExternalNotificationService $externalService, NotificationChannelResolver $channelResolver)
     {
-        $perPage = $request->get('perPage');
-        $notifications = $this->user->notifications()->filter($request->type)->paginate($perPage ?: 15);
-
-        $notifications->getCollection()->transform(function ($notification) {
-            $data = $notification->data;
-
-            if (isset($data['summary'])) {
-                $notification->summary = $data['summary'];
-            } else {
-                $notification->summary = '';
-            }
-
-            return $notification;
-        });
-
-        return $notifications;
+        parent::__construct();
+        $this->externalService = $externalService;
+        $this->channelResolver = $channelResolver;
     }
 
-    /**
-     * Get only unread notifications.
-     *
-     * @responseFile 200 responses/notifications/list.json
-     * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
-     *
-     * @queryParam page number for pagination Example: 2
-     * @queryParam perPage Results to fetch per page Example: 15
-     *
-     * @return LengthAwarePaginator
-     */
-    public function unread(Request $request)
+    // Send notification API
+    public function send(Request $request)
     {
-        $perPage = $request->get('perPage');
-        $notifications = $this->user->unreadNotifications()->paginate($perPage ?: 15);
+        $request->validate([
+            'module' => 'required|string',
+            'title' => 'required|string',
+            'summary' => 'required|string',
+            'data' => 'nullable|array',
+            'recipient_id' => 'required|integer',
+        ]);
 
-        $notifications->getCollection()->transform(function ($notification) {
-            $data = $notification->data;
-            if (isset($data['summary'])) {
-                $notification->summary = $data['summary'];
-            } else {
-                $notification->summary = '';
-            }
+        $adminId = Auth::id();
+        $channels = $this->channelResolver->resolve($request->module, $adminId);
 
-            return $notification;
-        });
+        $payload = [
+            'module' => $request->module,
+            'title' => $request->title,
+            'summary' => $request->summary,
+            'data' => $request->data ?? [],
+            'recipient_id' => $request->recipient_id,
+            'channels' => $channels,
+        ];
 
-        return $notifications;
-    }
+        $success = $this->externalService->send($payload);
 
-    /**
-     * Get unread notifications count.
-     *
-     * @responseFile 200 responses/notifications/unread_count.json
-     * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
-     *
-     * @return int
-     */
-    public function unread_count()
-    {
-        return $this->user->unreadNotifications()->count();
-    }
-
-    /**
-     * Mark all as read.
-     *
-     * @responseFile 200 responses/notifications/mark_read.json
-     * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
-     *
-     * @return int
-     */
-    public function markAllAsRead()
-    {
-        return $this->user->unreadNotifications()
-            ->update(['read_at' => Carbon::now()]);
-    }
-
-    /**
-     * Mark notification as read.
-     *
-     * @urlParam id required Notification id
-     *
-     * @responseFile 200 responses/notifications/mark_read.json
-     * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
-     *
-     * @param $notification_id
-     *
-     * @return int
-     */
-    public function markRead(string $notification_id = '')
-    {
-        return $this->user->unreadNotifications()
-            ->where('id', $notification_id)
-            ->update([
-                'read_at' => Carbon::now(),
-            ]);
-    }
-
-    /**
-     * Show notifications types.
-     *
-     * @responseFile 200 responses/notifications/types.json
-     * @responseFile 401 scenario="Unauthenticated" responses/errors/401.json
-     *
-     * @return array
-     */
-    public function types()
-    {
-        return NotificationTypeEnum::cases();
-    }
-
-    public function delete($id)
-    {
-        $notification = $this->user->notifications()->findOrFail($id);
-
-        return $notification->delete();
+        if ($success) {
+            return response()->json(['success' => true, 'message' => 'Notification sent.']);
+        }
+        return response()->json(['success' => false, 'message' => 'Failed to send notification.'], 500);
     }
 }

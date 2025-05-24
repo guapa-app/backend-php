@@ -16,6 +16,21 @@ class CommentObserver
     public function created(Comment $comment)
     {
         $post = $comment->post;
-        $post->user->notify(new NewCommentNotification($comment));
+        $user = $post->user;
+
+        // Generate comment summary
+        $summary = "تم إضافة تعليق جديد على منشورك من قبل {$comment->user->name}";
+
+        // Send notification via unified service
+        app(\App\Services\UnifiedNotificationService::class)->send(
+            module: 'comments',
+            title: 'New Comment',
+            summary: $summary,
+            recipientId: $user->id,
+            data: [
+                'comment_id' => $comment->id,
+                'post_id' => $post->id,
+            ]
+        );
     }
 }

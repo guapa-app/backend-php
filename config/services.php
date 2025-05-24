@@ -61,4 +61,15 @@ return [
         'default_provider' => env('DEFAULT_MEETING_PROVIDER', 'zoom'),
     ],
 
+    'external_notification' => [
+        'endpoint' => env('EXTERNAL_NOTIFICATION_ENDPOINT', 'https://notification-service.example.com/api/notifications'),
+        'token' => env('EXTERNAL_NOTIFICATION_TOKEN'),
+        'timeout' => env('EXTERNAL_NOTIFICATION_TIMEOUT', 30),
+        'retry_attempts' => env('EXTERNAL_NOTIFICATION_RETRY_ATTEMPTS', 3),
+        'retry_delay' => env('EXTERNAL_NOTIFICATION_RETRY_DELAY', 1000), // milliseconds
+        'verify_ssl' => env('EXTERNAL_NOTIFICATION_VERIFY_SSL', true),
+        'app_id' => env('EXTERNAL_NOTIFICATION_APP_ID', 'guapa-laravel'),
+        'secret_key' => env('EXTERNAL_NOTIFICATION_SECRET_KEY'),
+    ],
+
 ];

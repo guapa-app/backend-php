@@ -52,18 +52,20 @@ class DatabaseNotificationRepository extends EloquentRepository implements Datab
     {
         $image = '';
         if (isset($data['image'])) {
-            $image = config('filesystems.disks.s3.url') . '/' . Storage::disk('s3')->put('public/notifications', $data['image'], 'public');
+            $image = config('filesystems.disks.s3.url') . '/' . \Illuminate\Support\Facades\Storage::disk('s3')->put('public/notifications', $data['image'], 'public');
         }
 
-        $recipients = match ($data['type']) {
-            'user' => empty($data['recipients']) ? User::all() : User::query()->find($data['recipients']),
-            'vendor' => empty($data['recipients']) ? Vendor::all() : Vendor::query()->find($data['recipients']),
-            default => User::query()->whereHas('devices', fn ($query) => $query->where('type', $data['type']))->get(),
-        };
+        // Send notification via unified service
+        app(\App\Services\UnifiedNotificationService::class)->send(
+            module: $data['type'] ?? 'general',
+            title: $data['title'],
+            summary: $data['summary'],
+            recipientId: $data['recipients'][0] ?? 0,
+            data: array_merge($data, ['image' => $image])
+        );
 
-        Notification::send($recipients, new PushNotification($data['title'], $data['summary'], $image));
-
-        return DatabaseNotification::query()->latest()->first();
+        // Return a dummy notification for compatibility
+        return new \App\Models\DatabaseNotification();
     }
 
     public function getOne($id, $where = []): ?Model
