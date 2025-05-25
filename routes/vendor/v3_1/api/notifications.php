@@ -23,16 +23,13 @@ Route::group([
     'middleware' => 'notification.auth'
 ], function () {
     // Receive delivery status updates from external service
-    Route::post('/status', [ExternalNotificationController::class, 'receiveStatus'])
-        ->name('external-notifications.status');
+    Route::post('/status', [ExternalNotificationController::class, 'receiveStatus']);
 
     // Receive general webhooks from external service
-    Route::post('/webhook', [ExternalNotificationController::class, 'receiveWebhook'])
-        ->name('external-notifications.webhook');
+    Route::post('/webhook', [ExternalNotificationController::class, 'receiveWebhook']);
 
     // Test endpoint for external service authentication verification
-    Route::post('/test', [ExternalNotificationController::class, 'test'])
-        ->name('external-notifications.test');
+    Route::post('/test', [ExternalNotificationController::class, 'test']);
 });
 
 // Notification system health checks (internal admin use)
@@ -42,24 +39,19 @@ Route::group([
     'middleware' => 'auth:admin'
 ], function () {
     // Get overall notification system health status
-    Route::get('/status', [NotificationHealthController::class, 'status'])
-        ->name('notifications.health.status');
+    Route::get('/status', [NotificationHealthController::class, 'status']);
 
     // Test connection to external notification service
-    Route::get('/test-connection', [NotificationHealthController::class, 'testConnection'])
-        ->name('notifications.health.test-connection');
+    Route::get('/test-connection', [NotificationHealthController::class, 'testConnection']);
 
     // Validate notification system configuration
-    Route::get('/validate-config', [NotificationHealthController::class, 'validateConfig'])
-        ->name('notifications.health.validate-config');
+    Route::get('/validate-config', [NotificationHealthController::class, 'validateConfig']);
 
     // Send test notification through the system
-    Route::post('/send-test', [NotificationHealthController::class, 'sendTestNotification'])
-        ->name('notifications.health.send-test');
+    Route::post('/send-test', [NotificationHealthController::class, 'sendTestNotification']);
 
     // Get authentication configuration info (for debugging)
-    Route::get('/auth-info', [NotificationHealthController::class, 'authInfo'])
-        ->name('notifications.health.auth-info');
+    Route::get('/auth-info', [NotificationHealthController::class, 'authInfo']);
 });
 
 // Notification management routes (admin use)
@@ -69,8 +61,7 @@ Route::group([
     'middleware' => 'auth:admin'
 ], function () {
     // Send single notification (for testing/manual sending)
-    Route::post('/send', [\App\Http\Controllers\Api\NotificationController::class, 'send'])
-        ->name('notifications.send');
+    Route::post('/send', [\App\Http\Controllers\Api\NotificationController::class, 'send']);
 
     // Send batch notification (for campaigns)
     Route::post('/send-batch', function (\Illuminate\Http\Request $request) {
@@ -98,7 +89,7 @@ Route::group([
             'message' => 'Batch notification processed',
             'results' => $result
         ]);
-    })->name('notifications.send-batch');
+    });
 
     // Get notification statistics and metrics
     Route::get('/stats', function () {
@@ -113,5 +104,5 @@ Route::group([
             ],
             'timestamp' => now()->toISOString()
         ]);
-    })->name('notifications.stats');
+    });
 });

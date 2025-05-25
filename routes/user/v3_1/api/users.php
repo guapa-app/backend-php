@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('referral-code', [UserController::class, 'getReferralCode']);
     Route::get('/profile', [UserController::class, 'single']);
-    Route::post('/update-profile', [UserController::class, 'update'])->name('users.update');
+    Route::post('/update-profile', [UserController::class, 'update']);
     Route::get('/country', [UserController::class, 'getCountry']);
     Route::put('/country', [UserController::class, 'updateCountry']);
 });

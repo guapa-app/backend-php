@@ -5,5 +5,5 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group(['middleware' => 'auth:api', 'as' => 'city.'], function () {
-    Route::get('/',                  [CityController::class, 'index'])->name('index');
+    Route::get('/',                  [CityController::class, 'index']);
 });

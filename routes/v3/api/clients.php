@@ -7,9 +7,9 @@ use App\Http\Controllers\Api\Vendor\V3_1\VendorSocialMediaController;
 
 Route::group(['middleware' => 'auth:api', 'as' => 'clients.'], function () {
 
-    Route::get('/', [VendorClientController::class, 'index'])->name('index');
-    Route::post('/', [VendorClientController::class, 'store'])->name('store');
-    Route::delete('/{client}', [VendorClientController::class, 'destroy'])->name('destroy');
-    Route::get('/{client}/orders', [VendorClientController::class, 'getClientOrders'])->name('orders');
+    Route::get('/', [VendorClientController::class, 'index']);
+    Route::post('/', [VendorClientController::class, 'store']);
+    Route::delete('/{client}', [VendorClientController::class, 'destroy']);
+    Route::get('/{client}/orders', [VendorClientController::class, 'getClientOrders']);
 
 });
