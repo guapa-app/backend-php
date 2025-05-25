@@ -2,6 +2,8 @@
 
 namespace App\Listeners;
 
+use App\Services\NotificationInterceptor;
+
 use App\Events\OfferCreated;
 use App\Models\User;
 use App\Notifications\OfferNotification;
@@ -41,7 +43,7 @@ class OfferCreatedListener
 
         // Send notifications in chunks to avoid timeout
         $usersToNotify->chunk(100)->each(function ($chunk) use ($event) {
-            Notification::send($chunk, new OfferNotification($event->offer));
+            app(\App\Services\NotificationInterceptor::class)->interceptBulk($$chunk, $new OfferNotification($event->offer));
         });
     }
 }

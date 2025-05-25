@@ -2,6 +2,8 @@
 
 namespace App\Listeners;
 
+use App\Services\NotificationInterceptor;
+
 use App\Events\ProductCreated;
 use App\Models\User;
 use App\Notifications\ProductNotification;
@@ -41,7 +43,7 @@ class ProductCreatedListener
 
         // Send notifications in chunks to avoid timeout
         $usersToNotify->chunk(100)->each(function ($chunk) use ($event) {
-            Notification::send($chunk, new ProductNotification($event->product));
+            app(\App\Services\NotificationInterceptor::class)->interceptBulk($$chunk, $new ProductNotification($event->product));
         });
     }
 }

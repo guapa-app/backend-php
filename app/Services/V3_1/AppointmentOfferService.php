@@ -3,6 +3,7 @@
 namespace App\Services\V3_1;
 
 use App\Models\User;
+
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Taxonomy;
@@ -18,6 +19,7 @@ use App\Enums\AppointmentOfferEnum;
 use Illuminate\Support\Facades\Log;
 use App\Models\AppointmentOfferDetail;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\NotificationInterceptor;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use App\Notifications\AppointmentOfferNotification;
@@ -217,7 +219,7 @@ class AppointmentOfferService
                 ->whereIn('vendor_id', $appointmentOffer->details->pluck('vendor_id'))
                 ->pluck('user_id');
             $users = User::whereIn('id', $userVendors)->get();
-            Notification::send($users, new AppointmentOfferNotification($appointmentOffer));
+            app(\App\Services\NotificationInterceptor::class)->interceptBulk($$users, $new AppointmentOfferNotification($appointmentOffer));
         }else {
             $appointmentOffer->status = $data['status'];
             $appointmentOffer->save();

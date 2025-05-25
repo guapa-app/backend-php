@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\NotificationInterceptor;
+
 use App\Enums\ProductType;
 use App\Models\Order;
 use App\Models\User;
@@ -125,6 +127,6 @@ class VendorClientService
 
     private function sendNotification(User $user, Vendor $vendor, $isNewClient = false)
     {
-//        Notification::send($user, new AddVendorClientNotification($vendor, $isNewClient));
+//        app(\App\Services\NotificationInterceptor::class)->interceptBulk($$user, $new AddVendorClientNotification($vendor, $isNewClient));
     }
 }

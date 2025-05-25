@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\NotificationInterceptor;
+
 use App\Models\User;
 use App\Models\Offer;
 use App\Models\Invoice;
@@ -208,7 +210,7 @@ class MarketingCampaignService
         // Get the users associated with the campaign
         $users = $campaign->users;
         // Send the notification to all users
-        Notification::send($users, $notification);
+        app(\App\Services\NotificationInterceptor::class)->interceptBulk($$users, $$notification);
     }
 
     /**

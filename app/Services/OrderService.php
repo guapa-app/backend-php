@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\NotificationInterceptor;
+
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\OrderStatus;
 use App\Models\Appointment;
@@ -182,13 +184,13 @@ class OrderService
         // add the client to vendor client list if the order is used
         if ($data['status'] == (OrderStatus::Used)->value) {
             $vendor->clients()->firstOrCreate(['user_id' => $user->id]);
-            Notification::send($user, new AddVendorClientNotification($vendor, false));
+            app(\App\Services\NotificationInterceptor::class)->interceptBulk($$user, $new AddVendorClientNotification($vendor, false));
         }
         if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
             $this->paymentService->refund($order);
         }
 
-        Notification::send($user, new OrderUpdatedNotification($order));
+        app(\App\Services\NotificationInterceptor::class)->interceptBulk($$user, $new OrderUpdatedNotification($order));
 
         return $order;
     }

@@ -2,6 +2,8 @@
 
 namespace App\Filament\User\Resources\Shop\OrderResource\Pages;
 
+use App\Services\NotificationInterceptor;
+
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Filament\User\Resources\Shop\OrderResource;
@@ -52,7 +54,7 @@ class ViewOrder extends ViewRecord
         $order->status = $status;
         $order->save();
 
-        Notification::send($order->user, new OrderUpdatedNotification($order));
+        app(\App\Services\NotificationInterceptor::class)->interceptSingle($order->user, new OrderUpdatedNotification($order));
 
         $message = $action === 'approve' ? 'Order approved successfully.' : 'Order rejected successfully.';
 

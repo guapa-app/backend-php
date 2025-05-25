@@ -2,6 +2,8 @@
 
 namespace App\Nova\Actions;
 
+use App\Services\NotificationInterceptor;
+
 use App\Notifications\OrderUpdatedNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -27,7 +29,7 @@ class ChangeOrderStatus extends Action
     {
         foreach ($models as $order) {
             $order->update(['status' => $fields->get('status')]);
-            Notification::send($order->user, new OrderUpdatedNotification($order));
+            app(\App\Services\NotificationInterceptor::class)->interceptBulk($$order->user, $new OrderUpdatedNotification($order));
         }
 
         return Action::message('Order Changed Status');

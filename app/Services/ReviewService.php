@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\NotificationInterceptor;
+
 use App\Contracts\Repositories\ReviewRepositoryInterface;
 use App\Http\Requests\GetReviewsRequest;
 use App\Models\Order;
@@ -58,7 +60,7 @@ class ReviewService
         $review->load('order','order.items', 'user', 'imageBefore', 'imageAfter');
 
         // send notification to the vendor
-//        Notification::send($order->vendor, new ReviewNotification($order));
+//        app(\App\Services\NotificationInterceptor::class)->interceptBulk($$order->vendor, $new ReviewNotification($order));
 
         return $review;
     }

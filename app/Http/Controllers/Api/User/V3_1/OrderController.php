@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Services\NotificationInterceptor;
+
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderStatus;
@@ -187,7 +189,7 @@ class OrderController extends BaseApiController
                 ->pluck('user_id');
             $users = User::whereIn('id', $userVendors)->get();
 
-            Notification::send($users, new AppointmentOfferNotification($invoiceable));
+            app(\App\Services\NotificationInterceptor::class)->interceptBulk($$users, $new AppointmentOfferNotification($invoiceable));
         }
 
 //        logger(

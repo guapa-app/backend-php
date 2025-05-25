@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\NotificationInterceptor;
+
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\AppointmentOfferEnum;
 use App\Enums\OrderStatus;
@@ -212,7 +214,7 @@ class OrderController extends BaseApiController
             ->notify(new OrderNotification($order));
 
         // Send email to vendor staff
-        Notification::send($order->vendor->staff, new OrderNotification($order));
+        app(\App\Services\NotificationInterceptor::class)->interceptBulk($$order->vendor->staff, $new OrderNotification($order));
 
         // Send email to customer
         $order->user->notify(new OrderNotification($order));

@@ -2,26 +2,26 @@
 
 namespace App\Models;
 
-use App\Contracts\FcmNotifiable;
-use App\Contracts\Listable;
-use App\Helpers\Common;
-use App\Traits\FcmNotifiable as FcmNotifiableTrait;
-use App\Traits\Listable as ListableTrait;
-use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use App\Helpers\Common;
+use App\Contracts\Listable;
+use Illuminate\Http\Request;
+use App\Contracts\FcmNotifiable;
+use Laravel\Passport\HasApiTokens;
 use Hamedov\Favorites\HasFavorites;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
+use App\Traits\Listable as ListableTrait;
 use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use App\Traits\FcmNotifiable as FcmNotifiableTrait;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Http\Request;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Passport\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class User extends Authenticatable implements Listable, FcmNotifiable, FilamentUser
 {

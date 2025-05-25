@@ -2,6 +2,8 @@
 
 namespace App\Services\V3_1;
 
+use App\Services\NotificationInterceptor;
+
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Admin;
@@ -155,14 +157,14 @@ class OrderService
         // add the client to vendor client list if the order is used
         if ($data['status'] == (OrderStatus::Used)->value) {
             $vendor->clients()->firstOrCreate(['user_id' => $user->id]);
-            Notification::send($user, new AddVendorClientNotification($vendor, false));
+            app(\App\Services\NotificationInterceptor::class)->interceptBulk($$user, $new AddVendorClientNotification($vendor, false));
         }
         if ($data['status'] == (OrderStatus::Canceled)->value && ($order->invoice != null)) {
             $this->paymentService->refund($order);
             $this->loyaltyPointsService->returnPurchasePoints($order);
         }
 
-        Notification::send($user, new OrderUpdatedNotification($order));
+        app(\App\Services\NotificationInterceptor::class)->interceptBulk($$user, $new OrderUpdatedNotification($order));
 
         return $order;
     }
@@ -281,7 +283,7 @@ class OrderService
             ->notify(new OrderNotification($order));
 
         // Send email to vendor staff
-        Notification::send($order->vendor->staff, new OrderNotification($order));
+        app(\App\Services\NotificationInterceptor::class)->interceptBulk($$order->vendor->staff, $new OrderNotification($order));
 
         // Send email to customer
         $order->user->notify(new OrderNotification($order));
