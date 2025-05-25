@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ShareLink;
 use App\Models\ShareLinkClick;
 use App\Models\Vendor;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ShareLinkService
@@ -20,7 +21,7 @@ class ShareLinkService
         $identifier = $this->generateUniqueShortCode();
 
         // Create short link
-//        $link = url("/s/{$identifier}");
+        //        $link = url("/s/{$identifier}");
         $link = config('app.url') . "/s/{$identifier}";
         // Store the link information
         $shareLink = ShareLink::query()->firstOrCreate(
@@ -105,9 +106,11 @@ class ShareLinkService
     {
         switch ($shareLink->shareable_type) {
             case 'product':
-                return route('products.show', ['id' => $shareLink->shareable_id]);
+                // Generate product URL manually since route names were removed
+                return url("api/user/v3.1/products/{$shareLink->shareable_id}");
             case 'vendor':
-                return route('vendors.show', ['id' => $shareLink->shareable_id]);
+                // Generate vendor URL manually since route names were removed
+                return url("api/user/v3.1/vendors/{$shareLink->shareable_id}");
             default:
                 abort(404);
         }
@@ -164,10 +167,10 @@ class ShareLinkService
                 $stats['total']++;
 
                 // Skip if identifier is already short (less than or equal to 8 chars)
-//                if (strlen($shareLink->identifier) <= 8) {
-//                    $stats['skipped']++;
-//                    continue;
-//                }
+                //                if (strlen($shareLink->identifier) <= 8) {
+                //                    $stats['skipped']++;
+                //                    continue;
+                //                }
 
                 try {
                     // Generate new short identifier
@@ -181,7 +184,7 @@ class ShareLinkService
 
                     $stats['updated']++;
                 } catch (\Exception $e) {
-                    \Log::error('Failed to update share link ID: ' . $shareLink->id, [
+                    Log::error('Failed to update share link ID: ' . $shareLink->id, [
                         'error' => $e->getMessage(),
                         'shareLink' => $shareLink->toArray()
                     ]);
