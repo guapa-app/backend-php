@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\FavoriteRequest;
 use App\Notifications\NewLikeNotification;
 use App\Services\FavoritesService;
+use App\Services\NotificationInterceptor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -15,12 +16,16 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class FavoriteController extends BaseApiController
 {
     protected $favoritesService;
+    protected $notificationInterceptor;
 
-    public function __construct(FavoritesService $favoritesService)
-    {
+    public function __construct(
+        FavoritesService $favoritesService,
+        NotificationInterceptor $notificationInterceptor
+    ) {
         parent::__construct();
 
         $this->favoritesService = $favoritesService;
+        $this->notificationInterceptor = $notificationInterceptor;
     }
 
     /**
@@ -62,9 +67,12 @@ class FavoriteController extends BaseApiController
         $model = $this->favoritesService
             ->addFavorite($this->user, $data['type'], $data['id']);
 
-        // send notification if type is post
+        // send notification if type is post using unified service
         if ($data['type'] === 'post') {
-            $model->user->notify(new NewLikeNotification($this->user, $model));
+            $this->notificationInterceptor->interceptSingle(
+                $model->user,
+                new NewLikeNotification($this->user, $model)
+            );
         }
         return $model;
     }
@@ -86,5 +94,4 @@ class FavoriteController extends BaseApiController
     {
         return $this->favoritesService->removeFavorite($this->user, $type, $id);
     }
-
 }

@@ -13,19 +13,21 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\AppointmentOfferEnum;
 use Illuminate\Support\Facades\Log;
 use App\Services\LoyaltyPointsService;
-use App\Notifications\OrderNotification;
-use App\Notifications\InvoiceNotification;
-use Illuminate\Support\Facades\Notification;
+use App\Services\NotificationMigrationHelper;
 use Illuminate\Validation\ValidationException;
-use App\Notifications\AdminInvoiceNotification;
-use App\Notifications\VendorInvoiceNotification;
 
 class OrderPaymentService
 {
+    protected $notificationHelper;
+
+    public function __construct(NotificationMigrationHelper $notificationHelper)
+    {
+        $this->notificationHelper = $notificationHelper;
+    }
+
     public function changeOrderStatus(array $data): void
     {
-        try
-        {
+        try {
             $order = Order::findOrFail($data['id']);
 
             if ($data['status'] == 'paid') {
@@ -42,7 +44,7 @@ class OrderPaymentService
                 if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
                     $amount = $order->total - $order->fees;
-//                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
+                    //                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
                     $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
                 }
 
@@ -69,12 +71,13 @@ class OrderPaymentService
         // Generate invoice if needed
         if (!str_contains($order->invoice_url, '.s3.')) {
             $order->invoice_url = (new PDFService)->addInvoicePDF($order);
-            Notification::send($order->user, new InvoiceNotification($order->invoice_url));
-            Notification::send($order->vendor, new VendorInvoiceNotification($order));
-            Notification::send(['+966566776627','+966554461282'], new AdminInvoiceNotification($order));
+
+            // Send invoice notifications via unified service
+            $this->notificationHelper->sendInvoiceNotification($order, $order->user, 'user');
+            $this->notificationHelper->sendInvoiceNotification($order, $order->vendor, 'vendor');
+            $this->notificationHelper->sendInvoiceNotification($order, 'admin', 'admin');
         }
         $order->save();
-
 
         // Update related records
         $order->invoice->update(['status' => 'paid']);
@@ -103,22 +106,35 @@ class OrderPaymentService
             // Load order notify to handle notification ShouldQueue infinty loop
             $order = OrderNotify::findOrFail($order->id);
 
-            // Send email to admin
-//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-//            Notification::route('mail', $adminEmails)
-//                ->notify(new OrderNotification($order));
+            // Send notification to customer via unified service
+            $this->notificationHelper->sendOrderNotification($order, $order->user, false); // false = customer notification
 
-            // Send email to vendor staff
-//            Notification::send($order->vendor, new OrderNotification($order));
+            // Send notification to vendor staff via unified service
+            if ($order->vendor && $order->vendor->staff) {
+                $this->notificationHelper->sendToMultiple(
+                    module: 'new-order',
+                    title: 'New Order Received',
+                    summary: "New order #{$order->id} from {$order->user->name}",
+                    data: [
+                        'order_id' => $order->id,
+                        'customer_name' => $order->user->name,
+                        'total_amount' => $order->total,
+                        'type' => $order->type
+                    ],
+                    notifiables: $order->vendor->staff
+                );
+            }
 
-            // Send email to customer
-            $order->user->notify(new OrderNotification($order));
+            // Send notification to vendor via unified service
+            $this->notificationHelper->sendOrderNotification($order, $order->vendor, true); // true = vendor notification
+
         } catch (\Exception $e) {
             Log::error('Failed to send order notifications: ' . $e->getMessage(), [
                 'order_id' => $order->id
             ]);
         }
     }
+
     /**
      * Pay Via Wallet
      *

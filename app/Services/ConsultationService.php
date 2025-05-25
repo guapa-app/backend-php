@@ -3,22 +3,34 @@
 namespace App\Services;
 
 use App\Models\Consultation;
+use App\Models\Invoice;
+use App\Models\User;
 use App\Models\Vendor;
+use App\Services\NotificationInterceptor;
+use App\Services\WalletService;
+use App\Services\PaymentService;
+use App\Services\Meetings\MeetingServiceFactory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Services\Meetings\MeetingServiceFactory;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class ConsultationService
 {
     protected $walletService;
     protected $paymentService;
+    protected $notificationInterceptor;
     protected $meetingProvider;
 
-    public function __construct(WalletService $walletService, PaymentService $paymentService)
-    {
+    public function __construct(
+        WalletService $walletService, 
+        PaymentService $paymentService,
+        NotificationInterceptor $notificationInterceptor
+    ) {
         $this->walletService = $walletService;
         $this->paymentService = $paymentService;
+        $this->notificationInterceptor = $notificationInterceptor;
         $this->meetingProvider = config('services.meetings.default_provider', 'zoom');
     }
 
@@ -294,11 +306,16 @@ class ConsultationService
     protected function sendNotifications($consultation)
     {
         // Notify the user
-        $consultation->user->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, false));
+        $this->notificationInterceptor->interceptSingle(
+            $consultation->user, 
+            new \App\Notifications\ConsultationInvitationNotification($consultation, false)
+        );
 
         // Notify the vendor
-        $consultation->vendor->notify(new \App\Notifications\ConsultationInvitationNotification($consultation, true));
-
+        $this->notificationInterceptor->interceptSingle(
+            $consultation->vendor, 
+            new \App\Notifications\ConsultationInvitationNotification($consultation, true)
+        );
     }
 
     public function updateMedia(Consultation $consultation, array $data): Consultation
@@ -346,7 +363,10 @@ class ConsultationService
         $this->cancelVideoConference($consultation);
 
         // Send cancellation notification to the user
-        $consultation->user->notify(new \App\Notifications\ConsultationCancelled($consultation));
+        $this->notificationInterceptor->interceptSingle(
+            $consultation->user, 
+            new \App\Notifications\ConsultationCancelled($consultation)
+        );
 
         return $consultation;
     }
@@ -387,7 +407,10 @@ class ConsultationService
         $this->cancelVideoConference($consultation);
 
         // Send cancellation notification to the vendor
-        $consultation->vendor->user->notify(new \App\Notifications\ConsultationCancelled($consultation));
+        $this->notificationInterceptor->interceptSingle(
+            $consultation->vendor->user, 
+            new \App\Notifications\ConsultationCancelled($consultation)
+        );
 
         return $consultation;
     }

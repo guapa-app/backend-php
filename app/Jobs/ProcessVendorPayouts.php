@@ -11,6 +11,7 @@ use App\Models\Wallet;
 use App\Notifications\PayoutStatusNotification;
 use App\Services\PaymentService;
 use App\Services\WalletService;
+use App\Services\NotificationInterceptor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,7 +19,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 
 class ProcessVendorPayouts implements ShouldQueue
 {
@@ -42,8 +42,11 @@ class ProcessVendorPayouts implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(PaymentService $paymentService, WalletService $walletService)
-    {
+    public function handle(
+        PaymentService $paymentService,
+        WalletService $walletService,
+        NotificationInterceptor $notificationInterceptor
+    ) {
         // Get all vendors with available balance
         $vendorWallets = Wallet::where('vendor_id', '!=', null)
             ->where('balance', '>', 0)
@@ -82,8 +85,11 @@ class ProcessVendorPayouts implements ShouldQueue
                         'transaction_number' => $result['transaction_id']
                     ]);
 
-                    // Send notification to vendor
-                    $wallet->vendor->notify(new PayoutStatusNotification($transaction));
+                    // Send notification to vendor using unified service
+                    $notificationInterceptor->interceptSingle(
+                        $wallet->vendor,
+                        new PayoutStatusNotification($transaction)
+                    );
 
                     DB::commit();
                 } else {
@@ -104,10 +110,15 @@ class ProcessVendorPayouts implements ShouldQueue
                     'error' => $e->getMessage()
                 ]);
 
-                // Notify admins about the failure
-                $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-                Notification::route('mail', $adminEmails)
-                    ->notify(new PayoutStatusNotification($transaction));
+                // Send notification to admins using unified service
+                // Note: For email routing, we need to handle this through the external service
+                $admins = Admin::role('admin')->get();
+                foreach ($admins as $admin) {
+                    $notificationInterceptor->interceptSingle(
+                        $admin,
+                        new PayoutStatusNotification($transaction)
+                    );
+                }
             }
         }
     }

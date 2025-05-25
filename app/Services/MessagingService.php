@@ -4,27 +4,36 @@ namespace App\Services;
 
 use App\Contracts\Repositories\ProductRepositoryInterface;
 use App\Notifications\ChatMessage;
-// use App\Notifications\OfferStatusChanged;
+use App\Notifications\OfferStatusChanged;
 use Carbon\Carbon;
 use Hamedov\Messenger\Models\Conversation;
 use Hamedov\Messenger\Models\Message;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
+use App\Services\NotificationMigrationHelper;
+use Illuminate\Support\Facades\DB;
+use App\Models\Product;
 
 class MessagingService
 {
     protected $productRepository;
+    private $notificationHelper;
 
-    public function __construct(ProductRepositoryInterface $productRepository)
-    {
+    public function __construct(
+        ProductRepositoryInterface $productRepository,
+        NotificationMigrationHelper $notificationHelper
+    ) {
         $this->productRepository = $productRepository;
+        $this->notificationHelper = $notificationHelper;
     }
 
     /**
-     * Send new message.
+     * Send a new message.
+     *
      * @param  \Illuminate\Database\Eloquent\Model  $sender
      * @param  array  $data
+     *
      * @return \Hamedov\Messenger\Models\Message
      */
     public function newMessage(Model $sender, array $data): Message
@@ -46,12 +55,12 @@ class MessagingService
             ])->first();
             $message = $sender->sendMessageTo($conversation, $data['message'], null, $type);
         } else {
-            // Other wise the ad_id must be present
-            // Send the message to the ad provider
-            // and associate the ad with the conversation
+            // Otherwise the product_id must be present
+            // Send the message to the product provider
+            // and associate the product with the conversation
             $product = $this->productRepository->getOne($data['product_id']);
 
-            // Send the message with params (Recepient, Message, Related Model)
+            // Send the message with params (Recipient, Message, Related Model)
             $message = $sender->sendMessageTo($product->vendor, $data['message'], $product, $type);
         }
 
@@ -59,9 +68,11 @@ class MessagingService
         $sender->load('photo');
         $message->participant->setRelation('messageable', $sender);
 
-        // We only have one recepient in this app logic
-        $recepient = $message->recepients()->first()->messageable;
-        $recepient->notify(new ChatMessage($message));
+        // We only have one recipient in this app logic
+        $recipient = $message->recepients()->first()->messageable;
+
+        // Send chat message notification via unified service
+        $this->notificationHelper->sendChatMessageNotification($message, $recipient);
 
         return $message;
     }
@@ -92,8 +103,11 @@ class MessagingService
         $conversations = $messageable->conversations()
             // ->withCount('participants')
             ->with([
-                'relatable', 'lastMessage', 'lastMessage.participant.messageable',
-                'participants', 'participants.messageable',
+                'relatable',
+                'lastMessage',
+                'lastMessage.participant.messageable',
+                'participants',
+                'participants.messageable',
                 'participants.messageable.photo',
             ])->when(isset($filters['product_id']), function ($query) use ($filters) {
                 $query->where('conversations.relatable_id', $filters['product_id']);
@@ -167,7 +181,9 @@ class MessagingService
 
         $perPage = $filters['perPage'] ?? 15;
         $messages = $conversation->messages()->with([
-            'participant', 'participant.messageable', 'media',
+            'participant',
+            'participant.messageable',
+            'media',
             'participant.messageable.photo',
         ])->latest()->paginate($perPage);
 
@@ -225,7 +241,8 @@ class MessagingService
             $message->participant->messageable :
             $message->conversation->relatable->user;
 
-        $notifiable->notify(new OfferStatusChanged($message, $status));
+        // Send offer status change notification via unified service
+        $this->notificationHelper->sendOfferStatusNotification($message, $status, $notifiable);
 
         return $message;
     }
@@ -264,14 +281,18 @@ class MessagingService
         $currentUser = auth()->user();
         $participant = $message->participant;
 
-        if ($newStatus === 'canceled' &&
+        if (
+            $newStatus === 'canceled' &&
             ($participant->messageable_id !== $currentUser->id
-                || $participant->messageable_type !== $currentUser->getMorphClass())) {
+                || $participant->messageable_type !== $currentUser->getMorphClass())
+        ) {
             $error = 'You can\'t cancel this offer';
         }
 
-        if ($newStatus !== 'canceled' &&
-            !$isOfferRecepient = $message->recepients()->messageable($currentUser)->count() === 1) {
+        if (
+            $newStatus !== 'canceled' &&
+            !$isOfferRecepient = $message->recepients()->messageable($currentUser)->count() === 1
+        ) {
             $error = 'You can\'t ' . str_replace('ed', '', $newStatus) . ' this offer';
         }
 
