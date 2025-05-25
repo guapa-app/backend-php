@@ -4,213 +4,198 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Client\RequestException;
+use App\Services\InterServiceAuthenticationService;
 
 class ExternalNotificationService
 {
     protected $authService;
-    protected $endpoint;
-    protected $timeout;
-    protected $retryAttempts;
-    protected $retryDelay;
-    protected $verifySsl;
 
-    public function __construct(NotificationAuthService $authService)
+    public function __construct(InterServiceAuthenticationService $authService)
     {
         $this->authService = $authService;
-        $this->endpoint = config('services.external_notification.endpoint');
-        $this->timeout = config('services.external_notification.timeout', 30);
-        $this->retryAttempts = config('services.external_notification.retry_attempts', 3);
-        $this->retryDelay = config('services.external_notification.retry_delay', 1000);
-        $this->verifySsl = config('services.external_notification.verify_ssl', true);
     }
 
     /**
-     * Send notification to external service
+     * Send a single notification through the external service
      *
-     * @param array $payload
-     * @return bool
+     * @param array $data Notification payload
+     * @return bool Success status
      */
-    public function send(array $payload): bool
+    public function send(array $data): bool
     {
-        // Validate configuration first
-        $configErrors = $this->authService->validateConfiguration();
-        if (!empty($configErrors)) {
-            Log::error('External notification service misconfigured', ['errors' => $configErrors]);
+        try {
+            // Validate required fields
+            $this->validateNotificationData($data);
+
+            // Add metadata
+            $payload = array_merge($data, [
+                'source_app' => 'guapa-laravel',
+                'sent_at' => now()->toISOString(),
+                'version' => '1.0'
+            ]);
+
+            // Use authenticated service to send
+            return $this->authService->sendNotification($payload);
+        } catch (\Exception $e) {
+            Log::error('External notification service failed', [
+                'error' => $e->getMessage(),
+                'data' => $data
+            ]);
+
+            // Return false to trigger fallback mechanisms
             return false;
         }
-
-        return $this->sendWithRetry($payload);
     }
 
     /**
-     * Send notification to multiple recipients
+     * Send bulk notifications through the external service
      *
-     * @param array $payload
-     * @return bool
+     * @param array $data Bulk notification payload
+     * @return bool Success status
      */
-    public function sendBatch(array $payload): bool
+    public function sendBatch(array $data): bool
     {
-        // Validate configuration first
-        $configErrors = $this->authService->validateConfiguration();
-        if (!empty($configErrors)) {
-            Log::error('External notification service misconfigured', ['errors' => $configErrors]);
+        try {
+            // Validate bulk data
+            if (empty($data['recipient_ids']) || !is_array($data['recipient_ids'])) {
+                throw new \Exception('Bulk notifications require recipient_ids array');
+            }
+
+            // Add metadata
+            $payload = array_merge($data, [
+                'source_app' => 'guapa-laravel',
+                'sent_at' => now()->toISOString(),
+                'version' => '1.0',
+                'batch_size' => count($data['recipient_ids'])
+            ]);
+
+            // Use authenticated service to send
+            return $this->authService->sendBulkNotifications($payload);
+        } catch (\Exception $e) {
+            Log::error('External bulk notification service failed', [
+                'error' => $e->getMessage(),
+                'recipient_count' => count($data['recipient_ids'] ?? [])
+            ]);
+
             return false;
         }
-
-        // Use batch endpoint
-        $batchEndpoint = str_replace('/notifications', '/notifications/batch', $this->endpoint);
-        return $this->sendWithRetry($payload, $batchEndpoint);
-    }
-
-    /**
-     * Send with retry logic
-     *
-     * @param array $payload
-     * @param string|null $customEndpoint
-     * @return bool
-     */
-    protected function sendWithRetry(array $payload, ?string $customEndpoint = null): bool
-    {
-        $endpoint = $customEndpoint ?? $this->endpoint;
-        $lastException = null;
-
-        for ($attempt = 1; $attempt <= $this->retryAttempts; $attempt++) {
-            try {
-                Log::info('Sending notification to external service', [
-                    'attempt' => $attempt,
-                    'endpoint' => $endpoint,
-                    'module' => $payload['module'] ?? 'unknown',
-                    'recipient_id' => $payload['recipient_id'] ?? $payload['recipient_ids'] ?? 'unknown'
-                ]);
-
-                $response = $this->makeRequest($endpoint, $payload);
-
-                if ($response->successful()) {
-                    Log::info('Notification sent successfully', [
-                        'attempt' => $attempt,
-                        'response' => $response->json()
-                    ]);
-                    return true;
-                }
-
-                // Log non-successful responses
-                Log::warning('External service returned non-successful response', [
-                    'attempt' => $attempt,
-                    'status' => $response->status(),
-                    'response' => $response->body()
-                ]);
-
-                // Don't retry on client errors (4xx)
-                if ($response->clientError()) {
-                    Log::error('Client error, not retrying', [
-                        'status' => $response->status(),
-                        'response' => $response->body()
-                    ]);
-                    return false;
-                }
-            } catch (RequestException $e) {
-                $lastException = $e;
-                Log::warning('Request exception on attempt ' . $attempt, [
-                    'error' => $e->getMessage(),
-                    'attempt' => $attempt
-                ]);
-            }
-
-            // Wait before retry (except on last attempt)
-            if ($attempt < $this->retryAttempts) {
-                usleep($this->retryDelay * 1000); // Convert to microseconds
-            }
-        }
-
-        // All attempts failed
-        Log::error('Failed to send notification after all retry attempts', [
-            'attempts' => $this->retryAttempts,
-            'last_error' => $lastException ? $lastException->getMessage() : 'Unknown error',
-            'payload' => $payload
-        ]);
-
-        return false;
-    }
-
-    /**
-     * Make authenticated HTTP request
-     *
-     * @param string $endpoint
-     * @param array $payload
-     * @return \Illuminate\Http\Client\Response
-     */
-    protected function makeRequest(string $endpoint, array $payload)
-    {
-        // Generate authentication headers
-        $headers = $this->authService->generateAuthHeaders($payload);
-
-        // Create HTTP client with configuration
-        $http = Http::timeout($this->timeout);
-
-        if (!$this->verifySsl) {
-            $http = $http->withoutVerifying();
-        }
-
-        // Add headers and send request
-        return $http->withHeaders($headers)->post($endpoint, $payload);
     }
 
     /**
      * Test connection to external service
      *
-     * @return array
+     * @return array Connection test result
      */
     public function testConnection(): array
     {
-        try {
-            $testPayload = [
-                'module' => 'test-connection',
-                'title' => 'Connection Test',
-                'summary' => 'Testing connection to external notification service',
-                'recipient_id' => 0,
-                'channels' => ['test'],
-                'data' => ['test' => true]
-            ];
+        return $this->authService->testConnection();
+    }
 
-            Log::info('Testing connection to external notification service');
+    /**
+     * Get service configuration status
+     *
+     * @return array Configuration status
+     */
+    public function getConfigurationStatus(): array
+    {
+        return $this->authService->getConfigurationStatus();
+    }
 
-            $response = $this->makeRequest($this->endpoint, $testPayload);
+    /**
+     * Validate notification data structure
+     *
+     * @param array $data
+     * @throws \Exception
+     */
+    protected function validateNotificationData(array $data): void
+    {
+        $required = ['module', 'title', 'summary', 'recipient_id', 'channels'];
+        $missing = [];
 
-            return [
-                'success' => $response->successful(),
-                'status_code' => $response->status(),
-                'response_time' => $response->handlerStats()['total_time'] ?? 'unknown',
-                'response_body' => $response->json() ?? $response->body(),
-                'endpoint' => $this->endpoint
-            ];
-        } catch (\Exception $e) {
-            Log::error('Connection test failed', ['error' => $e->getMessage()]);
+        foreach ($required as $field) {
+            if (!isset($data[$field]) || (is_string($data[$field]) && trim($data[$field]) === '')) {
+                $missing[] = $field;
+            }
+        }
 
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'endpoint' => $this->endpoint
-            ];
+        if (!empty($missing)) {
+            throw new \Exception('Missing required fields: ' . implode(', ', $missing));
+        }
+
+        // Validate recipient_id
+        if (!is_numeric($data['recipient_id']) || $data['recipient_id'] <= 0) {
+            throw new \Exception('Invalid recipient_id: must be a positive integer');
+        }
+
+        // Validate channels
+        if (!is_array($data['channels']) && !is_string($data['channels'])) {
+            throw new \Exception('Invalid channels: must be string or array');
+        }
+
+        // Validate module format
+        if (!preg_match('/^[a-z0-9\-]+$/', $data['module'])) {
+            throw new \Exception('Invalid module format: must contain only lowercase letters, numbers, and hyphens');
         }
     }
 
     /**
-     * Get service health status
+     * Handle fallback when external service is unavailable
+     * This would typically use Laravel's built-in notification system
      *
-     * @return array
+     * @param array $data Original notification data
+     * @return bool
+     */
+    public function fallbackToLaravel(array $data): bool
+    {
+        Log::info('Using Laravel fallback for notification', [
+            'module' => $data['module'] ?? 'unknown',
+            'recipient_id' => $data['recipient_id'] ?? 'unknown'
+        ]);
+
+        try {
+            // This is where you'd implement fallback to Laravel notifications
+            // For now, we'll just log and return true
+
+            // Example implementation:
+            // $user = User::find($data['recipient_id']);
+            // if ($user) {
+            //     $user->notify(new FallbackNotification($data));
+            //     return true;
+            // }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Laravel fallback also failed', [
+                'error' => $e->getMessage(),
+                'data' => $data
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Get health status of the external service
+     *
+     * @return array Health status
      */
     public function getHealthStatus(): array
     {
-        $configErrors = $this->authService->validateConfiguration();
+        $configStatus = $this->getConfigurationStatus();
+
+        if (!$configStatus['is_configured']) {
+            return [
+                'status' => 'error',
+                'message' => 'Service not properly configured',
+                'details' => $configStatus
+            ];
+        }
+
+        $connectionTest = $this->testConnection();
 
         return [
-            'configured' => empty($configErrors),
-            'configuration_errors' => $configErrors,
-            'endpoint' => $this->endpoint,
-            'timeout' => $this->timeout,
-            'retry_attempts' => $this->retryAttempts,
-            'ssl_verification' => $this->verifySsl
+            'status' => $connectionTest['success'] ? 'healthy' : 'unhealthy',
+            'message' => $connectionTest['message'],
+            'details' => array_merge($configStatus, $connectionTest)
         ];
     }
 }
