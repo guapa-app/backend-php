@@ -77,6 +77,12 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
         Route::post('loyalty-points/convert-points', [LoyaltyPointsController::class, 'convertPoints']);
         Route::post('loyalty-points/calc-convert-points', [LoyaltyPointsController::class, 'calcConvertPointsToCash']);
 
+        // New exchange routes
+        Route::get('loyalty-points/rewards', [LoyaltyPointsController::class, 'getAvailableRewards']);
+        Route::post('loyalty-points/exchange-reward', [LoyaltyPointsController::class, 'exchangePointsForReward']);
+        Route::get('loyalty-points/exchange-history', [LoyaltyPointsController::class, 'getExchangeHistory']);
+        Route::post('loyalty-points/calculate-points-needed', [LoyaltyPointsController::class, 'calculatePointsNeeded']);
+
         // upload temporary media
         Route::post('media/upload-temporary', [MediaController::class, 'uploadTemporaryMedia']);
     });
