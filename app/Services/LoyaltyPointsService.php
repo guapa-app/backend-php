@@ -11,6 +11,8 @@ use App\Models\WheelOfFortune;
 use App\Enums\LoyaltyPointAction;
 use App\Models\LoyaltyPointHistory;
 use App\Models\WalletChargingPackage;
+use App\Models\ExchangeReward;
+use App\Models\ExchangeTransaction;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\LoyaltyPointHistoryResource;
 
@@ -304,5 +306,166 @@ class LoyaltyPointsService
             'action' => LoyaltyPointAction::SYSTEM_DEDUCTION->value,
             'type' => 'subtracted',
         ]);
+    }
+
+    /**
+     * Exchange points for rewards (coupons, gift cards, etc.)
+     *
+     * @param int $userId
+     * @param int $rewardId
+     * @return array
+     */
+    public function exchangePointsForReward(int $userId, int $rewardId)
+    {
+        $reward = ExchangeReward::find($rewardId);
+
+        if (!$reward) {
+            return ['success' => false, 'message' => __('Reward not found')];
+        }
+
+        if (!$reward->canBeUsedByUser($userId)) {
+            return ['success' => false, 'message' => __('Reward is not available or you have reached the usage limit')];
+        }
+
+        $userPoints = $this->getTotalPoints($userId);
+
+        if ($userPoints < $reward->points_required) {
+            return ['success' => false, 'message' => __('Not enough points to exchange for this reward')];
+        }
+
+        // Create exchange transaction
+        $exchangeTransaction = ExchangeTransaction::create([
+            'user_id' => $userId,
+            'exchange_reward_id' => $rewardId,
+            'points_used' => $reward->points_required,
+            'status' => ExchangeTransaction::STATUS_COMPLETED,
+            'exchange_data' => $this->generateExchangeData($reward),
+            'expires_at' => $reward->type === ExchangeReward::TYPE_COUPON ? now()->addDays(30) : null,
+            'redeemed_at' => now()
+        ]);
+
+        // Deduct points from user
+        $user = User::find($userId);
+        $this->subtractPoints($exchangeTransaction, $userId, $reward->points_required, $this->getActionByRewardType($reward->type));
+
+        // Update reward usage count
+        $reward->increment('used_count');
+
+        return [
+            'success' => true,
+            'message' => __('Points exchanged successfully'),
+            'exchange_transaction' => $exchangeTransaction,
+            'exchange_data' => $exchangeTransaction->exchange_data
+        ];
+    }
+
+    /**
+     * Get available rewards for exchange
+     *
+     * @param int $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAvailableRewards(int $userId)
+    {
+        $userPoints = $this->getTotalPoints($userId);
+
+        return ExchangeReward::available()
+            ->where('points_required', '<=', $userPoints)
+            ->get()
+            ->filter(function ($reward) use ($userId) {
+                return $reward->canBeUsedByUser($userId);
+            });
+    }
+
+    /**
+     * Get user's exchange history
+     *
+     * @param int $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getUserExchangeHistory(int $userId)
+    {
+        return ExchangeTransaction::with(['exchangeReward'])
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * Generate exchange data based on reward type
+     *
+     * @param ExchangeReward $reward
+     * @return array
+     */
+    private function generateExchangeData(ExchangeReward $reward): array
+    {
+        switch ($reward->type) {
+            case ExchangeReward::TYPE_COUPON:
+                return [
+                    'coupon_code' => 'POINTS' . strtoupper(uniqid()),
+                    'discount_value' => $reward->value,
+                    'discount_type' => $reward->metadata['discount_type'] ?? 'fixed',
+                    'min_order_amount' => $reward->metadata['min_order_amount'] ?? 0,
+                ];
+
+            case ExchangeReward::TYPE_GIFT_CARD:
+                return [
+                    'gift_card_code' => 'GC' . strtoupper(uniqid()),
+                    'value' => $reward->value,
+                ];
+
+            case ExchangeReward::TYPE_CASH_CREDIT:
+                return [
+                    'credit_amount' => $reward->value,
+                ];
+
+            default:
+                return [
+                    'reward_value' => $reward->value,
+                ];
+        }
+    }
+
+    /**
+     * Get loyalty point action based on reward type
+     *
+     * @param string $rewardType
+     * @return string
+     */
+    private function getActionByRewardType(string $rewardType): string
+    {
+        return match ($rewardType) {
+            ExchangeReward::TYPE_COUPON => LoyaltyPointAction::COUPON_EXCHANGE->value,
+            ExchangeReward::TYPE_GIFT_CARD => LoyaltyPointAction::GIFT_CARD_EXCHANGE->value,
+            ExchangeReward::TYPE_SHIPPING_DISCOUNT => LoyaltyPointAction::SHIPPING_DISCOUNT->value,
+            ExchangeReward::TYPE_PRODUCT_DISCOUNT => LoyaltyPointAction::PRODUCT_DISCOUNT->value,
+            default => LoyaltyPointAction::CONVERSION->value,
+        };
+    }
+
+    /**
+     * Calculate how many points a user would need for a specific reward
+     *
+     * @param int $userId
+     * @param int $rewardId
+     * @return array
+     */
+    public function calculatePointsNeeded(int $userId, int $rewardId)
+    {
+        $reward = ExchangeReward::find($rewardId);
+        $userPoints = $this->getTotalPoints($userId);
+
+        if (!$reward) {
+            return ['error' => __('Reward not found')];
+        }
+
+        $pointsNeeded = max(0, $reward->points_required - $userPoints);
+
+        return [
+            'user_points' => $userPoints,
+            'required_points' => $reward->points_required,
+            'points_needed' => $pointsNeeded,
+            'can_exchange' => $pointsNeeded === 0 && $reward->canBeUsedByUser($userId)
+        ];
     }
 }

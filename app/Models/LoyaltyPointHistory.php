@@ -88,8 +88,18 @@ class LoyaltyPointHistory extends Model
             return __('System Addition');
         } elseif ($this->action == LoyaltyPointAction::SYSTEM_DEDUCTION->value) {
             return __('System Deduction');
+        } elseif ($this->action == LoyaltyPointAction::COUPON_EXCHANGE->value) {
+            return __('Coupon Exchange');
+        } elseif ($this->action == LoyaltyPointAction::GIFT_CARD_EXCHANGE->value) {
+            return __('Gift Card Exchange');
+        } elseif ($this->action == LoyaltyPointAction::PRODUCT_DISCOUNT->value) {
+            return __('Product Discount Exchange');
+        } elseif ($this->action == LoyaltyPointAction::SHIPPING_DISCOUNT->value) {
+            return __('Shipping Discount Exchange');
+        } elseif ($this->action == LoyaltyPointAction::TIER_UPGRADE->value) {
+            return __('Tier Upgrade');
         }
-        
+
         return $this->action;
     }
 }
