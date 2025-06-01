@@ -15,6 +15,7 @@ enum OrderStatus: string implements HasColor, HasLabel
     case Prepare_For_Delivery = 'Prepare for delivery';
     case Shipping = 'Shipping';
     case Delivered = 'Delivered';
+    case Completed = 'Completed';
     case Return_Request = 'Return Request';
     case Returned = 'Returned';
     case Cancel_Request = 'Cancel Request';
@@ -31,6 +32,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Prepare_For_Delivery => 'Prepare for delivery',
             self::Shipping             => 'Shipping',
             self::Delivered           => 'Delivered',
+            self::Completed           => 'Completed',
             self::Return_Request       => 'Return Request',
             self::Returned             => 'Returned',
             self::Cancel_Request       => 'Cancel Request',
@@ -49,6 +51,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Prepare_For_Delivery => 'gray',
             self::Shipping             => 'Shipping',
             self::Delivered           => 'success',
+            self::Completed           => 'success',
             self::Return_Request       => 'black',
             self::Returned             => 'warning',
             self::Cancel_Request       => 'black',
@@ -66,6 +69,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Prepare_For_Delivery,
             self::Shipping,
             self::Delivered,
+            self::Completed,
             self::Return_Request,
             self::Returned,
             self::Cancel_Request,
@@ -83,6 +87,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Prepare_For_Delivery,
             self::Shipping,
             self::Delivered,
+            self::Completed,
             self::Returned,
             self::Canceled,
         ], 'value', 'name');
@@ -95,6 +100,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Expired,
             self::Used,
             self::Delivered,
+            self::Completed,
             self::Return_Request,
             self::Returned,
             self::Canceled,
@@ -108,6 +114,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Expired,
             self::Used,
             self::Delivered,
+            self::Completed,
             self::Return_Request,
             self::Returned,
             self::Cancel_Request,
