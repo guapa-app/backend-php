@@ -24,7 +24,7 @@ return [
     'multi_items_type' => "can't request service and product at the same time",
 
     'error'                 => 'error',
-    'error_occurred'        =>'An error occurred',
+    'error_occurred'        => 'An error occurred',
     'query_error'           => 'Error. The data could not be sent, please check that the data is correct',
     'not_found'             => 'Error. This data could not be accessed, please verify that the data is correct',
     'not_allowed'           => 'Error. Unauthorized, this data cannot be accessed',
@@ -60,6 +60,7 @@ return [
         'Prepare for delivery' => 'Prepare for delivery',
         'Shipping'             => 'Shipping',
         'Delivered'            => 'Delivered',
+        'Completed'            => 'Completed',
         'Return Request'       => 'Return Request',
         'Returned'             => 'Returned',
         'Cancel Request'       => 'Cancel Request',

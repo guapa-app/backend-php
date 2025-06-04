@@ -129,6 +129,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         'status',
         'verified',
         'parent_id',
+        'accept_online_consultation'
     ];
 
     /**
@@ -443,6 +444,11 @@ class Vendor extends Model implements HasMedia, HasReviews
     public function workDays()
     {
         return $this->hasMany(WorkDay::class);
+    }
+
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class);
     }
 
     public function appointments()

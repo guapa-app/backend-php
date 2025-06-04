@@ -7,6 +7,7 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\Vendor;
 use App\Models\Country;
+use App\Models\Taxonomy;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
@@ -63,7 +64,6 @@ class VendorResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('working_hours')
                     ->maxLength(255),
-
                 Forms\Components\Section::make()
                     ->columns([
                         'sm' => 2,
@@ -90,6 +90,18 @@ class VendorResource extends Resource
                 Forms\Components\Textarea::make('about')
                     ->columnSpanFull(),
 
+                // Add the specialties field
+                Forms\Components\Select::make('specialties')
+                    ->label('Specialties')
+                    ->multiple()
+                    ->relationship('specialties', 'title')
+                    ->options(function () {
+                        return Taxonomy::where('type', 'specialty')->pluck('title', 'id');
+                    })
+                    ->preload()
+                    ->searchable()
+                    ->columnSpanFull(),
+
                 Forms\Components\Fieldset::make('Additional Information')->schema([
                     Forms\Components\TextInput::make('tax_number')
                         ->maxLength(255),
@@ -101,6 +113,15 @@ class VendorResource extends Resource
                         ->maxLength(255),
 
                 ]),
+                Forms\Components\Select::make('accept_online_consultation' )
+                    ->options([
+                        0 => 'disabled',
+                        1 => 'active',
+                    ])
+                    ->native(false)
+                    ->default(0)
+                    ->required(),
+
             ]);
     }
 
@@ -127,7 +148,10 @@ class VendorResource extends Resource
                         0 => 'disabled',
                         1 => 'active',
                     ]),
-
+                Tables\Columns\TextColumn::make('specialties.title')
+                    ->badge()
+                    ->label('Specialties')
+                    ->searchable(),
                 Tables\Columns\SelectColumn::make('verified_badge')
                     ->options([
                         0 => 'not verified',
@@ -172,6 +196,7 @@ class VendorResource extends Resource
             RelationManagers\OrdersRelationManager::class,
             RelationManagers\FavoritesRelationManager::class,
             RelationManagers\TransactionsRelationManager::class,
+            RelationManagers\ConsultationsRelationManager::class,
         ];
     }
 

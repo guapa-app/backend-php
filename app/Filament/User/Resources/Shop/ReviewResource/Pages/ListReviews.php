@@ -21,8 +21,8 @@ class ListReviews extends ListRecords
     public function getTabs(): array
     {
         return [
-            'Vendor' => Tab::make()->query(fn ($query) => $query->Vendor()),
-            'Product' => Tab::make()->query(fn ($query) => $query->Product()),
+            'Vendor' => Tab::make()->query(fn ($query) => $query->whereHas('vendor')),
+            'Product' => Tab::make()->query(fn ($query) => $query->whereHas('product')),
         ];
     }
 }

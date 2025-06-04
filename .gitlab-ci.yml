@@ -1,34 +1,45 @@
-image: lorisleiva/laravel-docker:latest
+image: alpine:latest
 
 stages:
-  - build
   - deploy
 
 variables:
-  DEPLOY_PATH: "/home/ubuntu/stage/src/backend"
-  SSH_PRIVATE_KEY: $GUAPA_STG_PRIVATE_KEY
   SSH_USER: ubuntu
-  SSH_HOST: 3.67.253.208
+  SSH_HOST: 84.8.115.110
   BRANCH_NAME: $CI_COMMIT_REF_NAME
+  
 
-build:
-  stage: build
-  script:
-    - composer update
-    - composer install
-    - npm install
-    - npm run prod
 
 deploy:
   stage: deploy
   environment:
     name: staging
     url: https://stage.guapa.com.sa/
-  script:
+  before_script:
+    - apk add --no-cache openssh-client
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    # Add static private key
+    - echo "$DEPLOY_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    # Add static public key (optional but recommended)
+    - echo "$DEPLOY_PUBLIC_KEY" > ~/.ssh/id_ed25519.pub
+    # Add server to known_hosts
     - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
-    - ssh $SSH_USER@$SSH_HOST
+    # Ensure the public key is on the server (idempotent operation)
+  script:
+    - |
+      ssh -o BatchMode=yes $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
+      cd /home/ubuntu/stage/src/backend
+      # Reset any local changes that might cause conflicts
+      git switch staging
+      git reset --hard HEAD
+      git clean -fd
+      # Pull changes with strategy option to prefer remote changes in case of conflict
+      
+      git pull origin staging -X theirs --no-edit
+      cd /home/ubuntu/stage
+      sudo docker-compose up -d --build
+      EOF
   only:
     - staging

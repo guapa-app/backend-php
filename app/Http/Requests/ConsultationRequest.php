@@ -29,8 +29,8 @@ class ConsultationRequest extends FailedValidationRequest
             // Chief complaint directly at top level, not in medical history
             'chief_complaint' => 'required|string|max:500',
 
-            'media' => 'nullable|array|min:1',
-            'media.*' => 'nullable|string',
+            'media_ids' => 'sometimes|array|min:1',
+            'media_ids.*' => 'required|integer|exists:media,id',
         ];
     }
 

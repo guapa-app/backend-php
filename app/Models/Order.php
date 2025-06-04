@@ -91,7 +91,8 @@ class Order extends Model implements Listable
 
     public function getPaidAmountAttribute()
     {
-        return number_format(($this->invoice?->amount - $this->invoice?->taxes),
+        return number_format(
+            ($this->invoice?->amount - $this->invoice?->taxes),
             decimal_separator: '',
             thousands_separator: ''
         );
@@ -147,10 +148,18 @@ class Order extends Model implements Listable
         return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
     }
 
-    public function reviews(): HasMany
+    /**
+     * Get all reviews for the order.
+     */
+    public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->morphMany(Review::class, 'reviewable');
     }
+
+    // public function reviews(): HasMany
+    // {
+    //     return $this->hasMany(Review::class);
+    // }
 
     public function scopeCurrentVendor($query, $value): void
     {
