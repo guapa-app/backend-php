@@ -24,6 +24,11 @@ class VendorConsultationResource extends Resource
 
     protected static ?string $navigationLabel = 'Consultations Vendors Management';
 
+    public static function getSlug(): string
+    {
+        return 'user-vendor/vendor-consultations';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
