@@ -17,8 +17,6 @@ use App\Notifications\OrderNotification;
 use App\Notifications\InvoiceNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
-use App\Notifications\AdminInvoiceNotification;
-use App\Notifications\VendorInvoiceNotification;
 
 class OrderPaymentService
 {
@@ -70,8 +68,6 @@ class OrderPaymentService
         if (!str_contains($order->invoice_url, '.s3.')) {
             $order->invoice_url = (new PDFService)->addInvoicePDF($order);
             Notification::send($order->user, new InvoiceNotification($order->invoice_url));
-            Notification::send($order->vendor, new VendorInvoiceNotification($order));
-            Notification::send(['+966566776627','+966554461282'], new AdminInvoiceNotification($order));
         }
         $order->save();
 

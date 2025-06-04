@@ -112,11 +112,11 @@ class Vendor extends Model implements HasMedia, HasReviews
         'is_liked',
         'views_count',
         'shares_count',
-        //        'work_days',
+//        'work_days',
         'shared_link',
         'staff_id',
         'reviews_count',
-        'rating'
+    'rating'
     ];
 
     /**
@@ -181,21 +181,21 @@ class Vendor extends Model implements HasMedia, HasReviews
     }
 
     // TODO to be removed after make sure no use for it, it effects the relation
-    //    public function getWorkDaysAttribute()
-    //    {
-    //        $relations = $this->getRelations();
-    //
-    //        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
-    //            return $relations['workDays'];
-    //        }
-    //
-    //        $days = isset($relations['workDays']) ?
-    //            $relations['workDays']->pluck('day') :
-    //            [];
-    //        $this->setRelation('workDays', $days);
-    //
-    //        return $days;
-    //    }
+//    public function getWorkDaysAttribute()
+//    {
+//        $relations = $this->getRelations();
+//
+//        if (isset($relations['workDays']) && is_array($relations['workDays'])) {
+//            return $relations['workDays'];
+//        }
+//
+//        $days = isset($relations['workDays']) ?
+//            $relations['workDays']->pluck('day') :
+//            [];
+//        $this->setRelation('workDays', $days);
+//
+//        return $days;
+//    }
 
     // =========== Methods Section ===========
     /**
@@ -277,9 +277,9 @@ class Vendor extends Model implements HasMedia, HasReviews
     }
 
     public function posts(): HasMany
-    {
-        return  $this->hasMany(Post::class)->where('type', 'review');
-    }
+{
+    return  $this->hasMany(Post::class)->where('type', 'review');
+}
 
     public function specialties()
     {
@@ -416,9 +416,8 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function staff(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_vendor', 'vendor_id', 'user_id')
-            ->withPivot('role', 'email')
-            ->withTimestamps();
+        return $this->belongsToMany(User::class)
+            ->withPivot('role', 'email')->withTimestamps();
     }
 
     public function managers(): BelongsToMany
@@ -563,7 +562,7 @@ class Vendor extends Model implements HasMedia, HasReviews
         if ($request->has('parent_id')) {
             $query->whereParentId($request->get('parent_id'));
         }
-        //        dd($query->toSql());
+//        dd($query->toSql());
         return $query;
     }
 
@@ -620,7 +619,7 @@ class Vendor extends Model implements HasMedia, HasReviews
                 'productsHasOffers.media',
                 'productsHasOffers.offer',
                 'productsHasOffers.offer.image',
-                // 'reviews' // Add this to eager-load reviews
+// 'reviews' // Add this to eager-load reviews
             ]);
         }
 
