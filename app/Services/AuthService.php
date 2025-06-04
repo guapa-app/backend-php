@@ -33,7 +33,7 @@ class AuthService
         ], $data);
 
         try {
-            $res = Http::asForm()->post($this->tokenUrl, $data);
+            $res = Http::withoutVerifying()->asForm()->post($this->tokenUrl, $data);
 
             if ($res->status() != 200) {
                 return null;
