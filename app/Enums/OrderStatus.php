@@ -7,19 +7,24 @@ use Filament\Support\Contracts\HasLabel;
 
 enum OrderStatus: string implements HasColor, HasLabel
 {
-    case Pending = 'Pending';
+    // Active Statuses
     case Accepted = 'Accepted';
-    case Rejected = 'Rejected';
-    case Expired = 'Expired';
+
+        // Completed Statuses
     case Used = 'Used';
+    case Delivered = 'Delivered';
+
+        // Inactive Statuses
+    case Canceled = 'Canceled';
+    case Rejected = 'Rejected';
+    case Cancel_Request = 'Cancel Request';
+    case Expired = 'Expired';
     case Prepare_For_Delivery = 'Prepare for delivery';
     case Shipping = 'Shipping';
-    case Delivered = 'Delivered';
-    case Completed = 'Completed';
     case Return_Request = 'Return Request';
     case Returned = 'Returned';
-    case Cancel_Request = 'Cancel Request';
-    case Canceled = 'Canceled';
+    case Pending = 'Pending';
+    case Completed = 'Completed';
 
     public function getLabel(): string
     {
@@ -56,6 +61,30 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Returned             => 'warning',
             self::Cancel_Request       => 'black',
             self::Canceled             => 'danger',
+        };
+    }
+
+    public static function getStatusGroup(int $statusId): array
+    {
+        return match ($statusId) {
+            1 => [ // Active
+                self::Accepted->value,
+            ],
+            2 => [ // Completed
+                self::Used->value,
+                self::Delivered->value,
+            ],
+            3 => [ // Inactive
+                self::Canceled->value,
+                self::Rejected->value,
+                self::Cancel_Request->value,
+                self::Expired->value,
+                self::Prepare_For_Delivery->value,
+                self::Shipping->value,
+                self::Return_Request->value,
+                self::Returned->value,
+            ],
+            default => [],
         };
     }
 
