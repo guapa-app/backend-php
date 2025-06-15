@@ -26,7 +26,7 @@ class VendorConsultationResource extends Resource
 
     public static function getSlug(): string
     {
-        return 'user-vendor/vendor-consultations';
+        return 'vendor-consultations';
     }
 
     public static function form(Form $form): Form
