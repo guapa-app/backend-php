@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api\Vendor\V3_2;
 
 use App\Enums\OrderStatus;
-use App\Http\Controllers\Api\BaseApiController;
+use App\Enums\ProductType;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\BaseApiController;
 
 class OrderController extends BaseApiController
 {
@@ -23,7 +24,7 @@ class OrderController extends BaseApiController
         }
 
         if ($typeId) {
-            $query->where('type_id', $typeId);
+            $query->whereHasProductTypeInt($typeId);
         }
 
         $orders = $query->paginate($perPage, ['*'], 'page', $page);
