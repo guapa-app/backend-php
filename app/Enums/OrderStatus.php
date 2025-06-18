@@ -67,22 +67,24 @@ enum OrderStatus: string implements HasColor, HasLabel
     public static function getStatusGroup(int $statusId): array
     {
         return match ($statusId) {
-            1 => [ // Active
+            1 => [ // Active - Orders that are currently being processed
                 self::Accepted->value,
+                self::Prepare_For_Delivery->value,
+                self::Shipping->value,
             ],
-            2 => [ // Completed
+            2 => [ // Completed - Orders that have been fulfilled
                 self::Used->value,
                 self::Delivered->value,
+                self::Completed->value,
             ],
-            3 => [ // Inactive
+            3 => [ // Inactive - Orders that are cancelled, rejected, or expired
                 self::Canceled->value,
                 self::Rejected->value,
                 self::Cancel_Request->value,
                 self::Expired->value,
-                self::Prepare_For_Delivery->value,
-                self::Shipping->value,
                 self::Return_Request->value,
                 self::Returned->value,
+                // self::Pending->value,
             ],
             default => [],
         };

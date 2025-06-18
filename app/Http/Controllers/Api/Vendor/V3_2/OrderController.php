@@ -6,6 +6,8 @@ use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\Vendor\V3_2\OrderResource;
+use App\Http\Resources\Vendor\V3_2\OrderCollection;
 
 class OrderController extends BaseApiController
 {
@@ -16,32 +18,38 @@ class OrderController extends BaseApiController
         $perPage = $request->query('perPage', 15);
         $typeId = $request->query('type_id');
 
-        $query = auth()->user()->orders();
+        $query = $this->user->orders()->withApiListRelations($request);
 
-        if ($statusId) {
+        // Filter by status group (1=Active, 2=Completed, 3=Inactive)
+        if ($statusId && in_array($statusId, [1, 2, 3])) {
             $statuses = OrderStatus::getStatusGroup($statusId);
             $query->whereIn('status', $statuses);
         }
 
-        if ($typeId) {
-            $query->whereHasProductTypeInt($typeId);
+        // Filter by product type (1=Product, 2=Service)
+        if ($typeId && in_array($typeId, [1, 2])) {
+            $query->hasProductTypeInt($typeId);
         }
 
         $orders = $query->paginate($perPage, ['*'], 'page', $page);
 
-        return response()->json([
-            'status' => true,
-            'data' => $orders
-        ]);
+        return OrderCollection::make($orders)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 
     public function single($id)
     {
-        $order = auth()->user()->orders()->findOrFail($id);
+        $order = $this->user->orders()
+            ->withSingleRelations()
+            ->findOrFail($id);
 
-        return response()->json([
-            'status' => true,
-            'data' => $order
-        ]);
+        return OrderResource::make($order)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
     }
 }
