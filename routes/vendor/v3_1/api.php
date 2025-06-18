@@ -48,3 +48,5 @@ Route::prefix("vendor/v3.1")->group(function () {
 
 
 });
+
+Route::prefix('vendor/v3.2')->group(base_path('routes/vendor/v3_2/api.php'));

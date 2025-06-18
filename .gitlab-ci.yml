@@ -10,6 +10,7 @@ variables:
   SSH_HOST_PROD1: 84.8.121.111
   SSH_HOST_PROD2: 84.8.109.10
   BRANCH_NAME: $CI_COMMIT_REF_NAME
+  
 
 deploy-prod1:
   stage: deploy-prod1

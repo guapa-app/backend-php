@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class MarketerSeeder extends Seeder
 {
@@ -18,7 +18,11 @@ class MarketerSeeder extends Seeder
         DB::beginTransaction();
         try {
             $modules = [
-                'Influencer', 'Coupon', 'ShareLink', 'SocialMedia', 'SupportMessageType',
+                'Influencer',
+                'Coupon',
+                'ShareLink',
+                'SocialMedia',
+                'SupportMessageType',
             ];
             $permissions_arr = ['view_', 'create_', 'update_', 'delete_'];
             $permissions = [];

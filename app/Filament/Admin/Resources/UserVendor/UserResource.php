@@ -2,18 +2,18 @@
 
 namespace App\Filament\Admin\Resources\UserVendor;
 
-use App\Filament\Admin\Resources\UserVendor\UserResource\Actions;
-use App\Filament\Admin\Resources\UserVendor\UserResource\Pages;
-use App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
-use App\Models\User;
 use Filament\Forms;
+use App\Models\User;
+use Filament\Tables;
 use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Infolists\Components;
-
+use Illuminate\Support\Facades\Gate;
+use App\Filament\Admin\Resources\UserVendor\UserResource\Pages;
+use App\Filament\Admin\Resources\UserVendor\UserResource\Actions;
+use App\Filament\Admin\Resources\UserVendor\UserResource\RelationManagers;
 
 class UserResource extends Resource
 {
@@ -51,6 +51,12 @@ class UserResource extends Resource
                         User::STATUS_DELETED => '🗑️ deleted',
                     ])
                     ->required(),
+                Forms\Components\BelongsToManyMultiSelect::make('roles')
+                    ->relationship('roles', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->required()
+                    ->label('Roles'),
             ]);
     }
 
@@ -62,6 +68,9 @@ class UserResource extends Resource
                  Components\TextEntry::make('email'),
                  Components\TextEntry::make('phone'),
                  Components\TextEntry::make('status'),
+                 Components\TextEntry::make('roles.name')
+                     ->listWithLineBreaks()
+                     ->bulleted(),
             ]);
     }
 
@@ -76,6 +85,11 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Roles')
+                    ->badge()
+                    ->separator(',')
+                    ->color('primary'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -98,11 +112,6 @@ class UserResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function canCreate(): bool
-    {
-        return false;
     }
 
     public static function getRelations(): array

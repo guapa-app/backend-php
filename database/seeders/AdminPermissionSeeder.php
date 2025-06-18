@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AdminPermissionSeeder extends Seeder
 {
@@ -15,13 +15,13 @@ class AdminPermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::unprepared(
-            'DELETE FROM model_has_permissions mhp WHERE NOT EXISTS ( SELECT 1 FROM permissions p WHERE mhp.permission_id = p.id);
-                DELETE FROM role_has_permissions rhp WHERE NOT EXISTS ( SELECT 1 FROM permissions p WHERE rhp.permission_id = p.id);
-                SET FOREIGN_KEY_CHECKS=0;
-                TRUNCATE permissions;
-                SET FOREIGN_KEY_CHECKS=1;'
-        );
+        // DB::unprepared(
+        //     'DELETE FROM model_has_permissions mhp WHERE NOT EXISTS ( SELECT 1 FROM permissions p WHERE mhp.permission_id = p.id);
+        //         DELETE FROM role_has_permissions rhp WHERE NOT EXISTS ( SELECT 1 FROM permissions p WHERE rhp.permission_id = p.id);
+        //         SET FOREIGN_KEY_CHECKS=0;
+        //         TRUNCATE permissions;
+        //         SET FOREIGN_KEY_CHECKS=1;'
+        // );
 
         DB::beginTransaction();
 
@@ -59,6 +59,10 @@ class AdminPermissionSeeder extends Seeder
             'Influencer',
             'SocialMedia',
             'SupportMessageType',
+            'Consultation',
+            'Staff',
+            'subVendor'
+            
         ];
 
         $permissions_arr = [
@@ -66,6 +70,10 @@ class AdminPermissionSeeder extends Seeder
             'create_',
             'update_',
             'delete_',
+            'approve_',
+            'reject_',
+            'cancel_',
+            'send_',
         ];
 
         $permissions = [];
