@@ -249,12 +249,27 @@ class Order extends Model implements Listable
         });
     }
 
+    /**
+     * Filter orders by product type using integer values
+     * 1 = Product, 2 = Service
+     *
+     * @param Builder $query
+     * @param int $type 1 for Product, 2 for Service
+     * @return Builder
+     */
     public function scopeHasProductTypeInt(Builder $query, int $type): Builder
     {
-        return $query->whereHas('items.product', function (Builder $query) use ($type) {
-            $query->where('type', $type == 1 ? ProductType::Product : ProductType::Service);
+        $productType = match ($type) {
+            1 => ProductType::Product,
+            2 => ProductType::Service,
+            default => ProductType::Product,
+        };
+
+        return $query->whereHas('items.product', function (Builder $query) use ($productType) {
+            $query->where('type', $productType);
         });
     }
+
     /**
      * Filter user orders to return all product orders
      * And all service orders except pending.
