@@ -18,6 +18,15 @@ class ListOrders extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            Actions\Action::make('clear_filters')
+                ->label('Clear Filters')
+                ->icon('heroicon-o-x-mark')
+                ->color('gray')
+                ->action(function () {
+                    // Clear all table filters by redirecting to the same page without query parameters
+                    $this->redirect(request()->url());
+                })
+                ->visible(fn () => request()->hasAny(['tableFilters.vendor', 'tableFilters.category'])),
         ];
     }
 
