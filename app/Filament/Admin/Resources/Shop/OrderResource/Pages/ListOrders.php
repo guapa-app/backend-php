@@ -11,13 +11,22 @@ use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOrders extends ListRecords
-{
+{ 
     protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),
+            Actions\Action::make('clear_filters')
+                ->label('Clear Filters')
+                ->icon('heroicon-o-x-mark')
+                ->color('gray')
+                ->action(function () {
+                    // Clear all table filters by redirecting to the same page without query parameters
+                    $this->redirect(request()->url());
+                })
+                ->visible(fn () => request()->hasAny(['tableFilters.vendor', 'tableFilters.category'])),
         ];
     }
 

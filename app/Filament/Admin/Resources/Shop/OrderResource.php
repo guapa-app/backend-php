@@ -10,11 +10,15 @@ use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
 use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersStatusChart;
 use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
+use App\Models\Vendor;
+use App\Models\Taxonomy;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms;
 
 class OrderResource extends Resource
 {
@@ -45,6 +49,7 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['vendor', 'user', 'items.product.taxonomies']))
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->searchable()
@@ -79,7 +84,32 @@ class OrderResource extends Resource
             ->defaultPaginationPageOption(10)
             ->paginated([10])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('vendor')
+                    ->label('Vendor')
+                    ->relationship('vendor', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->placeholder('All Vendors'),
+
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->options(
+                        Taxonomy::whereIn('type', ['category', 'specialty'])
+                            ->get()
+                            ->pluck('title_en_ar', 'id')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->placeholder('All Categories')
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['value'])) {
+                            $query->whereHas('items.product.taxonomies', function (Builder $subQuery) use ($data) {
+                                $subQuery->where('taxonomies.id', $data['value']);
+                            });
+                        }
+                        return $query;
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
