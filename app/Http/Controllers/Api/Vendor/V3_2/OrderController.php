@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Resources\Vendor\V3_2\OrderResource;
 use App\Http\Resources\Vendor\V3_2\OrderCollection;
+use App\Models\Order;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends BaseApiController
 {
@@ -18,7 +20,18 @@ class OrderController extends BaseApiController
         $perPage = $request->query('perPage', 15);
         $typeId = $request->query('type_id');
 
-        $query = $this->user->orders()->withApiListRelations($request);
+        // Get vendor ID from the authenticated user
+        $vendorId = $this->user->managerVendorId();
+
+        if (!$vendorId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User is not associated with any vendor',
+            ], 403);
+        }
+
+        // Query orders for this vendor
+        $query = Order::where('vendor_id', $vendorId)->withApiListRelations($request);
 
         // Filter by status group (1=Active, 2=Completed, 3=Inactive)
         if ($statusId && in_array($statusId, [1, 2, 3])) {
@@ -42,7 +55,16 @@ class OrderController extends BaseApiController
 
     public function single($id)
     {
-        $order = $this->user->orders()
+        $vendorId = $this->user->managerVendorId();
+
+        if (!$vendorId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User is not associated with any vendor',
+            ], 403);
+        }
+
+        $order = Order::where('vendor_id', $vendorId)
             ->withSingleRelations()
             ->findOrFail($id);
 

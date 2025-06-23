@@ -256,7 +256,7 @@ class Order extends Model implements Listable
      * @param Builder $query
      * @param int $type 1 for Product, 2 for Service
      * @return Builder
-     */ 
+     */
     public function scopeHasProductTypeInt(Builder $query, int $type): Builder
     {
         $productType = match ($type) {
