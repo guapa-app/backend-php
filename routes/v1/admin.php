@@ -39,5 +39,6 @@ Route::group(['middleware' => 'auth:admin'], function() {
     Route::prefix('messages')->group(base_path('routes/v1/admin/messages.php'));
     Route::prefix('cities')->group(base_path('routes/v1/admin/cities.php'));
     Route::prefix('orders')->group(base_path('routes/v1/admin/orders.php'));
+    Route::prefix('gift-card-backgrounds')->group(base_path('routes/v1/admin/gift-card-backgrounds.php'));
     Route::post('devices', 'DeviceController@addDevice');
 });
