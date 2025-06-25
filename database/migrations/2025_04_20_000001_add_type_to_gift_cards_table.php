@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('gift_cards', function (Blueprint $table) {
-            $table->enum('type', ['product', 'offer'])->default('product')->after('vendor_id');
+            // $table->enum('type', ['product', 'offer'])->default('product')->after('vendor_id');
         });
     }
 
