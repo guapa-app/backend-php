@@ -5,14 +5,15 @@ use App\Http\Middleware\CountryHeader;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\User\V3_1\DataController;
 use App\Http\Controllers\Api\User\V3_1\HomeController;
-use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\MediaController;
 use App\Http\Controllers\Api\User\V3_1\OrderController;
 use App\Http\Controllers\Api\User\V3_1\DeviceController;
 use App\Http\Controllers\Api\User\V3_1\WalletController;
 use App\Http\Controllers\Api\User\V3_1\CountryController;
 use App\Http\Controllers\Api\User\V3_1\PaymentController;
+use App\Http\Controllers\Api\User\V3_1\GiftCardController;
 use App\Http\Controllers\Api\User\V3_1\TransactionController;
+use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
 use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
 
@@ -50,7 +51,7 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::get('vendor_types', [DataController::class, 'vendor_types']);
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
-
+    Route::get('gift-card-options', [DataController::class, 'giftCardOptions']);
 
     Route::middleware('auth:api')->group(function () {
 
@@ -81,5 +82,13 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
 
         // upload temporary media
         Route::post('media/upload-temporary', [MediaController::class, 'uploadTemporaryMedia']);
+
+        // Gift Cards
+        Route::prefix('gift-cards')->group(function () {
+            Route::get('/', [GiftCardController::class, 'index']);
+            Route::post('/', [GiftCardController::class, 'store']);
+            Route::get('/{id}', [GiftCardController::class, 'show']);
+            Route::get('/my', [GiftCardController::class, 'myGiftCards']);
+        });
     });
 });

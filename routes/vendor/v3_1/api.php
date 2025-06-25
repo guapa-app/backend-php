@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\Api\Vendor\V3_1\WalletController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Api\Vendor\V3_1\DataController;
 use App\Http\Controllers\Api\Vendor\V3_1\HomeController;
 use App\Http\Controllers\Api\Vendor\V3_1\DeviceController;
+use App\Http\Controllers\Api\Vendor\V3_1\WalletController;
 use App\Http\Controllers\Api\Vendor\V3_1\CountryController;
+use App\Http\Controllers\Api\Vendor\V3_1\GiftCardController;
 
 Route::prefix("vendor/v3.1")->group(function () {
     Route::get('home', [HomeController::class, 'index'])->middleware('auth:api');
@@ -46,6 +47,10 @@ Route::prefix("vendor/v3.1")->group(function () {
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
 
+    Route::prefix('gift-cards')->middleware('auth:api')->group(function () {
+        Route::get('/', [GiftCardController::class, 'index']);
+        Route::get('/{id}', [GiftCardController::class, 'show']);
+    });
 
 });
 
