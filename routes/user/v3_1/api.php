@@ -88,6 +88,7 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
             Route::get('/', [GiftCardController::class, 'index']);
             Route::post('/', [GiftCardController::class, 'store']);
             Route::get('/{id}', [GiftCardController::class, 'show']);
+            Route::get('/my', [GiftCardController::class, 'myGiftCards']);
         });
     });
 });

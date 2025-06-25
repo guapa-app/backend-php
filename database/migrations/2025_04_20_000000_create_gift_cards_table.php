@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string('recipient_name')->nullable();
             $table->string('recipient_email')->nullable();
             $table->string('recipient_number')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable()->after('recipient_number');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
         });
     }

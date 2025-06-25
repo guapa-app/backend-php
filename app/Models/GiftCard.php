@@ -31,6 +31,7 @@ class GiftCard extends Model implements HasMedia
         'recipient_email',
         'recipient_number',
         'product_type',
+        'created_by',
     ];
 
     // Status constants
