@@ -8,13 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('gift_card_backgrounds')) {
-            Schema::create('gift_card_backgrounds', function (Blueprint $table) {
+        if (!Schema::hasTable('gift_card_settings')) {
+            Schema::create('gift_card_settings', function (Blueprint $table) {
                 $table->id();
-                $table->string('name');
+                $table->string('key')->unique();
+                $table->json('value');
+                $table->enum('type', ['string', 'array', 'boolean', 'integer'])->default('string');
                 $table->text('description')->nullable();
                 $table->boolean('is_active')->default(true);
-                $table->unsignedBigInteger('uploaded_by');
                 $table->timestamps();
             });
         }
@@ -22,6 +23,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('gift_card_backgrounds');
+        Schema::dropIfExists('gift_card_settings');
     }
 };
