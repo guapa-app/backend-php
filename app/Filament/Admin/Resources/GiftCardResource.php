@@ -10,13 +10,17 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Grid;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
 
 class GiftCardResource extends Resource
 {
@@ -29,168 +33,280 @@ class GiftCardResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('code')->label('Gift Card Code')->hidden(),
-            Forms\Components\TextInput::make('amount')->label('Amount')->numeric()->required(),
-            Select::make('currency')
-                ->options([
-                    'SAR' => 'SAR',
-                    'USD' => 'USD',
-                    'EUR' => 'EUR',
+            // Basic Information Section
+            Section::make('Basic Information')
+                ->schema([
+                    Grid::make(2)->schema([
+                        TextInput::make('code')
+                            ->label('Gift Card Code')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText('Auto-generated unique code'),
+
+                        Select::make('gift_type')
+                            ->label('Gift Card Type')
+                            ->options([
+                                GiftCard::GIFT_TYPE_WALLET => 'Wallet Credit',
+                                GiftCard::GIFT_TYPE_ORDER => 'Order',
+                            ])
+                            ->required()
+                            ->reactive()
+                            ->helperText('Choose between wallet credit or specific order'),
+                    ]),
+
+                    Grid::make(2)->schema([
+                        TextInput::make('amount')
+                            ->label('Amount')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1),
+
+                        Select::make('currency')
+                            ->options([
+                                'SAR' => 'SAR',
+                                'USD' => 'USD',
+                                'EUR' => 'EUR',
+                            ])
+                            ->label('Currency')
+                            ->required()
+                            ->default('SAR'),
+                    ]),
+                ]),
+
+            // Order Details Section (only for order type)
+            Section::make('Order Details')
+                ->schema([
+                    Grid::make(2)->schema([
+                        Select::make('vendor_id')
+                            ->label('Vendor')
+                            ->relationship('vendor', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->visible(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER)
+                            ->required(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER),
+
+                        Select::make('product_id')
+                            ->label('Product')
+                            ->relationship('product', 'title')
+                            ->searchable()
+                            ->preload()
+                            ->visible(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER)
+                            ->required(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER),
+                    ]),
+
+                    Select::make('offer_id')
+                        ->label('Offer')
+                        ->relationship('offer', 'title')
+                        ->searchable()
+                        ->preload()
+                        ->visible(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER)
+                        ->required(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER),
                 ])
-                ->label('Currency')
-                ->required(),
-            Select::make('background_color')
-                ->options(array_combine(config('gift_card.colors'), config('gift_card.colors')))
-                ->searchable()
-                ->label('Background Color'),
-            SpatieMediaLibraryFileUpload::make('background_image')
-                ->collection('gift_card_backgrounds')
-                ->label('Background Image')
-                ->maxFiles(1)
-                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml']),
-            Forms\Components\Textarea::make('message')->label('Message'),
-            Select::make('status')
-                ->options([
-                    \App\Models\GiftCard::STATUS_ACTIVE => 'Active',
-                    \App\Models\GiftCard::STATUS_USED => 'Used',
-                    \App\Models\GiftCard::STATUS_EXPIRED => 'Expired',
-                ])
-                ->label('Status')
-                ->required(),
-            Forms\Components\DateTimePicker::make('expires_at')
-                ->label('Expires At')
-                ->required()
-                ->native(false),
-            Forms\Components\DateTimePicker::make('redeemed_at')
-                ->label('Redeemed At')
-                ->native(false),
-            Checkbox::make('create_profile')
-                ->label('Create new user profile?')
-                ->reactive(),
-            Group::make([
-                TextInput::make('profile_name')
-                    ->label('Recipient Name')
-                    ->required(fn($get) => $get('create_profile')),
-                TextInput::make('profile_email')
-                    ->label('Recipient Email')
-                    ->email()
-                    ->required(fn($get) => $get('create_profile')),
-                TextInput::make('profile_phone')
-                    ->label('Recipient Phone')
-                    ->tel()
-                    ->required(fn($get) => $get('create_profile')),
-            ])->visible(fn($get) => $get('create_profile')),
-            Select::make('user_id')
-                ->label('User (if exists)')
-                ->relationship('user', 'name')
-                ->searchable()
-                ->preload()
-                ->nullable()
-                ->visible(fn($get) => !$get('create_profile')),
-            Select::make('vendor_id')
-                ->label('Vendor')
-                ->relationship('vendor', 'name', fn($query) => $query)
-                ->getOptionLabelFromRecordUsing(fn($record) => $record->name . ' (' . $record->id . ', ' . $record->phone . ')')
-                ->searchable()
-                ->preload(),
-            Select::make('type')
-                ->options([
-                    'product' => 'Product',
-                    'offer' => 'Offer',
-                ])
-                ->label('Gift Card Type')
-                ->required()
-                ->reactive(),
-            Select::make('product_type')
-                ->options([
-                    'product' => 'Product',
-                    'service' => 'Service',
-                ])
-                ->label('Product/Service Type')
-                ->required()
-                ->default('product')
-                ->reactive()
-                ->visible(fn($get) => $get('type') === 'product'),
-            Select::make('product_id')
-                ->label('Product/Service')
-                ->relationship('product', 'title', function ($query, $get) {
-                    if ($get('product_type') === 'service') {
-                        $query->where('type', 'service');
-                    } elseif ($get('product_type') === 'product') {
-                        $query->where('type', 'product');
-                    }
-                })
-                ->getOptionLabelFromRecordUsing(fn($record) => $record->title . ' (' . $record->id . ')')
-                ->searchable()
-                ->preload()
-                ->visible(fn($get) => $get('type') === 'product' && $get('product_type')),
-            Select::make('offer_id')
-                ->label('Offer')
-                ->relationship('offer', 'title', fn($query) => $query->whereNotNull('title')->where('title', '!=', ''))
-                ->getOptionLabelFromRecordUsing(fn($record) => $record->title . ' (' . $record->id . ')')
-                ->searchable()
-                ->preload()
-                ->visible(fn($get) => $get('type') === 'offer'),
+                ->visible(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER),
+
+            // Recipient Information Section
+            Section::make('Recipient Information')
+                ->schema([
+                    Grid::make(2)->schema([
+                        TextInput::make('recipient_name')
+                            ->label('Recipient Name')
+                            ->required(),
+
+                        TextInput::make('recipient_email')
+                            ->label('Recipient Email')
+                            ->email(),
+                    ]),
+
+                    TextInput::make('recipient_number')
+                        ->label('Recipient Phone')
+                        ->tel(),
+
+                    Select::make('user_id')
+                        ->label('Existing User (Optional)')
+                        ->relationship('user', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Select existing user or leave empty for new recipient'),
+                ]),
+
+            // Background Customization Section
+            Section::make('Background Customization')
+                ->schema([
+                    Grid::make(2)->schema([
+                        Select::make('background_color')
+                            ->label('Background Color')
+                            ->options(array_combine(config('gift_card.colors'), config('gift_card.colors')))
+                            ->searchable()
+                            ->helperText('Choose a solid color background'),
+
+                        Select::make('background_image_id')
+                            ->label('Background Image')
+                            ->relationship('backgroundImage', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->helperText('Choose from admin-uploaded backgrounds'),
+                    ]),
+
+                    SpatieMediaLibraryFileUpload::make('background_image')
+                        ->collection('gift_card_backgrounds')
+                        ->label('Upload Custom Background')
+                        ->maxFiles(1)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])
+                        ->maxSize(5120)
+                        ->helperText('Upload a custom background image (max 5MB)'),
+                ]),
+
+            // Gift Card Details Section
+            Section::make('Gift Card Details')
+                ->schema([
+                    Textarea::make('message')
+                        ->label('Message')
+                        ->rows(3)
+                        ->maxLength(500)
+                        ->helperText('Personal message for the recipient'),
+
+                    Textarea::make('notes')
+                        ->label('Admin Notes')
+                        ->rows(2)
+                        ->maxLength(1000)
+                        ->helperText('Internal notes (not visible to recipient)'),
+                ]),
+
+            // Status & Expiration Section
+            Section::make('Status & Expiration')
+                ->schema([
+                    Grid::make(2)->schema([
+                        Select::make('status')
+                            ->options([
+                                GiftCard::STATUS_ACTIVE => 'Active',
+                                GiftCard::STATUS_USED => 'Used',
+                                GiftCard::STATUS_EXPIRED => 'Expired',
+                                GiftCard::STATUS_CANCELLED => 'Cancelled',
+                            ])
+                            ->label('Status')
+                            ->required()
+                            ->default(GiftCard::STATUS_ACTIVE),
+
+                        DateTimePicker::make('expires_at')
+                            ->label('Expires At')
+                            ->native(false)
+                            ->helperText('Leave empty for no expiration'),
+                    ]),
+
+                    DateTimePicker::make('redeemed_at')
+                        ->label('Redeemed At')
+                        ->native(false)
+                        ->disabled()
+                        ->helperText('Auto-filled when gift card is redeemed'),
+                ]),
         ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
-            Tables\Columns\TextColumn::make('id')->sortable(),
-            Tables\Columns\TextColumn::make('code')->label('Gift Card Code')->searchable(),
-            Tables\Columns\TextColumn::make('amount')->label('Amount'),
-            Tables\Columns\TextColumn::make('currency')->label('Currency'),
-            Tables\Columns\BadgeColumn::make('status')->label('Status')
-                ->colors([
-                    'success' => 'active',
-                    'danger' => 'expired',
-                    'warning' => 'used',
+        return $table
+            ->columns([
+                TextColumn::make('id')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('code')
+                    ->label('Code')
+                    ->searchable()
+                    ->copyable()
+                    ->fontFamily('mono'),
+
+                BadgeColumn::make('gift_type')
+                    ->label('Type')
+                    ->colors([
+                        'primary' => GiftCard::GIFT_TYPE_WALLET,
+                        'success' => GiftCard::GIFT_TYPE_ORDER,
+                    ])
+                    ->formatStateUsing(fn($state) => $state === GiftCard::GIFT_TYPE_WALLET ? 'Wallet' : 'Order'),
+
+                TextColumn::make('amount')
+                    ->label('Amount')
+                    ->money(fn($record) => $record->currency)
+                    ->sortable(),
+
+                BadgeColumn::make('status')
+                    ->label('Status')
+                    ->colors([
+                        'success' => GiftCard::STATUS_ACTIVE,
+                        'warning' => GiftCard::STATUS_USED,
+                        'danger' => GiftCard::STATUS_EXPIRED,
+                        'secondary' => GiftCard::STATUS_CANCELLED,
+                    ]),
+
+                TextColumn::make('recipient_name')
+                    ->label('Recipient')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('recipient_email')
+                    ->label('Email')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('message')
+                    ->label('Message')
+                    ->limit(30)
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('expires_at')
+                    ->label('Expires')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('gift_type')
+                    ->label('Gift Type')
+                    ->options([
+                        GiftCard::GIFT_TYPE_WALLET => 'Wallet',
+                        GiftCard::GIFT_TYPE_ORDER => 'Order',
+                    ]),
+
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        GiftCard::STATUS_ACTIVE => 'Active',
+                        GiftCard::STATUS_USED => 'Used',
+                        GiftCard::STATUS_EXPIRED => 'Expired',
+                        GiftCard::STATUS_CANCELLED => 'Cancelled',
+                    ]),
+
+                Filter::make('amount_range')
+                    ->form([
+                        TextInput::make('amount_from')->numeric()->label('Amount From'),
+                        TextInput::make('amount_to')->numeric()->label('Amount To'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        if ($data['amount_from']) {
+                            $query->where('amount', '>=', $data['amount_from']);
+                        }
+                        if ($data['amount_to']) {
+                            $query->where('amount', '<=', $data['amount_to']);
+                        }
+                    }),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            Tables\Columns\TextColumn::make('display_name')
-                ->label('Recipient Name')
-                ->sortable()
-                ->searchable(),
-            Tables\Columns\TextColumn::make('display_email')
-                ->label('Recipient Email')
-                ->sortable()
-                ->searchable(),
-            Tables\Columns\TextColumn::make('display_phone')
-                ->label('Recipient Number')
-                ->sortable()
-                ->searchable(),
-            Tables\Columns\TextColumn::make('vendor_id')->label('Vendor ID'),
-            Tables\Columns\TextColumn::make('created_at')->label('Created At')->dateTime()->sortable(),
-            Tables\Columns\TextColumn::make('product_type')
-                ->label('Product/Service Type')
-                ->sortable(),
-        ])->defaultSort('id', 'desc')
-        ->filters([
-            Tables\Filters\SelectFilter::make('type')
-                ->options([
-                    'product' => 'Product',
-                    'offer' => 'Offer',
-                ]),
-            Tables\Filters\SelectFilter::make('vendor_id')
-                ->relationship('vendor', 'name'),
-            Tables\Filters\Filter::make('amount_range')
-                ->form([
-                    Forms\Components\TextInput::make('amount_from')->numeric()->label('Amount From'),
-                    Forms\Components\TextInput::make('amount_to')->numeric()->label('Amount To'),
-                ])
-                ->query(function ($query, array $data) {
-                    if ($data['amount_from']) {
-                        $query->where('amount', '>=', $data['amount_from']);
-                    }
-                    if ($data['amount_to']) {
-                        $query->where('amount', '<=', $data['amount_to']);
-                    }
-                }),
-        ])
-        ->actions([
-            Tables\Actions\EditAction::make(),
-            Tables\Actions\ViewAction::make(),
-        ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array
