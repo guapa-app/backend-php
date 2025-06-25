@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
-use App\Http\Controllers\Api\BaseApiController;
-use App\Http\Resources\Admin\V1\GiftCardBackgroundResource;
-use App\Models\GiftCardBackground;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Models\GiftCardBackground;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\Admin\V1\GiftCardBackgroundResource;
 
 class GiftCardBackgroundController extends BaseApiController
 {
