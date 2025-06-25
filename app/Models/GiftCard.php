@@ -111,7 +111,8 @@ class GiftCard extends Model implements HasMedia
         static::saving(function ($giftCard) {
             // Generate unique code if not set
             if (empty($giftCard->code)) {
-                $giftCard->code = strtoupper(uniqid('GC'));
+                $prefix = \App\Models\GiftCardSetting::getCodePrefix();
+                $giftCard->code = strtoupper(uniqid($prefix));
             }
 
             // Set default status if not set
