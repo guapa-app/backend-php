@@ -138,7 +138,7 @@ class GiftCardController extends BaseApiController
                 'wallet' => 'Wallet Credit',
                 'order' => 'Order',
             ],
-            'background_colors' => config('gift_card.colors'),
+            'background_colors' => \App\Models\GiftCardSetting::getBackgroundColors(),
             'background_images' => GiftCardBackground::active()
                 ->with('media')
                 ->get()
@@ -151,12 +151,11 @@ class GiftCardController extends BaseApiController
                         'thumbnail_url' => $background->thumbnail_url,
                     ];
                 }),
-            'suggested_amounts' => config('gift_card.suggested_amounts', [50, 100, 200, 500, 1000]),
-            'currencies' => [
-                'SAR' => 'Saudi Riyal',
-                'USD' => 'US Dollar',
-                'EUR' => 'Euro',
-            ],
+            'suggested_amounts' => \App\Models\GiftCardSetting::getSuggestedAmounts(),
+            'currencies' => \App\Models\GiftCardSetting::getSupportedCurrencies(),
+            'min_amount' => \App\Models\GiftCardSetting::getMinAmount(),
+            'max_amount' => \App\Models\GiftCardSetting::getMaxAmount(),
+            'default_currency' => \App\Models\GiftCardSetting::getDefaultCurrency(),
         ];
         return response()->json(['success' => true, 'message' => __('api.success'), 'data' => $options]);
     }
