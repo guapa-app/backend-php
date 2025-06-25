@@ -2,25 +2,34 @@
 
 namespace App\Filament\Admin\Resources;
 
-use App\Models\GiftCard;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\GiftCard;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Group;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Actions\Exports\ExportBulkAction;
+use App\Exports\GiftCardExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
 
 class GiftCardResource extends Resource
 {
@@ -135,7 +144,7 @@ class GiftCardResource extends Resource
                     Grid::make(2)->schema([
                         Select::make('background_color')
                             ->label('Background Color')
-                            ->options(array_combine(config('gift_card.colors'), config('gift_card.colors')))
+                            ->options(array_combine(\App\Models\GiftCardSetting::getBackgroundColors(), \App\Models\GiftCardSetting::getBackgroundColors()))
                             ->searchable()
                             ->helperText('Choose a solid color background'),
 
@@ -265,6 +274,32 @@ class GiftCardResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                // Additional columns for better admin view
+                TextColumn::make('redemption_method')
+                    ->label('Redemption')
+                    ->badge()
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'wallet',
+                        'primary' => 'order',
+                    ])
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('redeemed_at')
+                    ->label('Redeemed')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('user.name')
+                    ->label('User')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('vendor.name')
+                    ->label('Vendor')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('gift_type')
@@ -283,6 +318,14 @@ class GiftCardResource extends Resource
                         GiftCard::STATUS_CANCELLED => 'Cancelled',
                     ]),
 
+                SelectFilter::make('redemption_method')
+                    ->label('Redemption Method')
+                    ->options([
+                        'pending' => 'Pending',
+                        'wallet' => 'Wallet',
+                        'order' => 'Order',
+                    ]),
+
                 Filter::make('amount_range')
                     ->form([
                         TextInput::make('amount_from')->numeric()->label('Amount From'),
@@ -296,13 +339,83 @@ class GiftCardResource extends Resource
                             $query->where('amount', '<=', $data['amount_to']);
                         }
                     }),
+
+                Filter::make('date_range')
+                    ->form([
+                        DatePicker::make('date_from')->label('Date From'),
+                        DatePicker::make('date_to')->label('Date To'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        if ($data['date_from']) {
+                            $query->whereDate('created_at', '>=', $data['date_from']);
+                        }
+                        if ($data['date_to']) {
+                            $query->whereDate('created_at', '<=', $data['date_to']);
+                        }
+                    }),
+
+                TernaryFilter::make('is_expired')
+                    ->label('Expired')
+                    ->queries(
+                        true: fn ($query) => $query->where('expires_at', '<', now()),
+                        false: fn ($query) => $query->where('expires_at', '>=', now())->orWhereNull('expires_at'),
+                        blank: fn ($query) => $query,
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
+                Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (GiftCard $record): string => route('filament.admin.resources.gift-cards.preview', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+                BulkActionGroup::make([
+                    BulkAction::make('activate')
+                        ->label('Activate')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function ($records) {
+                            $records->each(function ($record) {
+                                $record->update(['status' => GiftCard::STATUS_ACTIVE]);
+                            });
+                        })
+                        ->requiresConfirmation(),
+
+                    BulkAction::make('expire')
+                        ->label('Mark as Expired')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->action(function ($records) {
+                            $records->each(function ($record) {
+                                $record->update(['status' => GiftCard::STATUS_EXPIRED]);
+                            });
+                        })
+                        ->requiresConfirmation(),
+
+                    BulkAction::make('cancel')
+                        ->label('Cancel')
+                        ->icon('heroicon-o-x-mark')
+                        ->color('secondary')
+                        ->action(function ($records) {
+                            $records->each(function ($record) {
+                                $record->update(['status' => GiftCard::STATUS_CANCELLED]);
+                            });
+                        })
+                        ->requiresConfirmation(),
+
+                    BulkAction::make('export_selected')
+                        ->label('Export Selected')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->action(function ($records) {
+                            return Excel::download(
+                                new GiftCardExport([], null, $records),
+                                'selected-gift-cards-' . now()->format('Y-m-d-H-i-s') . '.xlsx'
+                            );
+                        }),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
@@ -316,6 +429,71 @@ class GiftCardResource extends Resource
             'create' => \App\Filament\Admin\Resources\GiftCardResource\Pages\CreateGiftCard::route('/create'),
             'edit' => \App\Filament\Admin\Resources\GiftCardResource\Pages\EditGiftCard::route('/{record}/edit'),
             'view' => \App\Filament\Admin\Resources\GiftCardResource\Pages\ViewGiftCard::route('/{record}'),
+            'preview' => \App\Filament\Admin\Resources\GiftCardResource\Pages\PreviewGiftCard::route('/{record}/preview'),
+        ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('export')
+                ->label('Export Gift Cards')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->action(function (Request $request) {
+                    $filters = $request->only(['gift_type', 'status', 'redemption_method', 'search', 'vendor_id', 'user_id']);
+                    $dateRange = $request->only(['date_from', 'date_to']);
+
+                    return Excel::download(
+                        new GiftCardExport($filters, $dateRange),
+                        'gift-cards-' . now()->format('Y-m-d-H-i-s') . '.xlsx'
+                    );
+                })
+                ->form([
+                    \Filament\Forms\Components\Select::make('gift_type')
+                        ->label('Gift Type')
+                        ->options([
+                            'wallet' => 'Wallet',
+                            'order' => 'Order',
+                        ])
+                        ->placeholder('All Types'),
+
+                    \Filament\Forms\Components\Select::make('status')
+                        ->label('Status')
+                        ->options([
+                            'active' => 'Active',
+                            'used' => 'Used',
+                            'expired' => 'Expired',
+                            'cancelled' => 'Cancelled',
+                        ])
+                        ->placeholder('All Statuses'),
+
+                    \Filament\Forms\Components\Select::make('redemption_method')
+                        ->label('Redemption Method')
+                        ->options([
+                            'pending' => 'Pending',
+                            'wallet' => 'Wallet',
+                            'order' => 'Order',
+                        ])
+                        ->placeholder('All Methods'),
+
+                    \Filament\Forms\Components\TextInput::make('search')
+                        ->label('Search')
+                        ->placeholder('Search by code, name, or email'),
+
+                    \Filament\Forms\Components\DatePicker::make('date_from')
+                        ->label('Date From'),
+
+                    \Filament\Forms\Components\DatePicker::make('date_to')
+                        ->label('Date To'),
+                ]),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Admin\Widgets\GiftCardStatsWidget::class,
+            \App\Filament\Admin\Widgets\GiftCardTrendsWidget::class,
         ];
     }
 }
