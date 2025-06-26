@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class GiftCardSetting extends Model
 {
@@ -165,6 +165,33 @@ class GiftCardSetting extends Model
         }
 
         return is_array($value) ? $value : [$value];
+    }
+
+    /**
+     * Get allowed file extensions for validation rules
+     */
+    public static function getAllowedFileExtensions()
+    {
+        $allowedTypes = static::getAllowedFileTypes();
+        return array_map(function($type) {
+            return explode('/', $type)[1];
+        }, $allowedTypes);
+    }
+
+    /**
+     * Validate if a file type is allowed
+     */
+    public static function isFileTypeAllowed($mimeType)
+    {
+        return in_array($mimeType, static::getAllowedFileTypes());
+    }
+
+    /**
+     * Validate if a file size is within limits
+     */
+    public static function isFileSizeAllowed($fileSize)
+    {
+        return $fileSize <= static::getMaxFileSize();
     }
 
     // Initialize default settings
