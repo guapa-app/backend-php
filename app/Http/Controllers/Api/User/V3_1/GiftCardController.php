@@ -181,7 +181,14 @@ class GiftCardController extends BaseApiController
                   ->orWhere('user_id', $user->id);
         })
         ->with(['order', 'walletTransaction', 'backgroundImage'])
-        ->findOrFail($id);
+        ->find($id);
+
+        if (!$giftCard) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.gift_card_not_found'),
+            ], 404);
+        }
 
         return GiftCardResource::make($giftCard)
             ->additional(['success' => true, 'message' => __('api.success')]);
@@ -279,7 +286,14 @@ class GiftCardController extends BaseApiController
             $query->where('sender_id', $user->id)
                   ->orWhere('recipient_id', $user->id)
                   ->orWhere('user_id', $user->id);
-        })->findOrFail($id);
+        })->find($id);
+
+        if (!$giftCard) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.gift_card_not_found'),
+            ], 404);
+        }
 
         if (!$giftCard->canBeRedeemed()) {
             return response()->json([
@@ -319,7 +333,14 @@ class GiftCardController extends BaseApiController
             $query->where('sender_id', $user->id)
                   ->orWhere('recipient_id', $user->id)
                   ->orWhere('user_id', $user->id);
-        })->findOrFail($id);
+        })->find($id);
+
+        if (!$giftCard) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.gift_card_not_found'),
+            ], 404);
+        }
 
         if (!$giftCard->canBeRedeemed()) {
             return response()->json([
@@ -343,7 +364,7 @@ class GiftCardController extends BaseApiController
                 'message' => __('api.order_created_from_gift_card'),
                 'data' => [
                     'gift_card' => new GiftCardResource($giftCard->fresh(['order'])),
-                    'order' => $order
+                    'order' => $order,
                 ]
             ]);
         }
@@ -364,7 +385,14 @@ class GiftCardController extends BaseApiController
             $query->where('sender_id', $user->id)
                   ->orWhere('recipient_id', $user->id)
                   ->orWhere('user_id', $user->id);
-        })->findOrFail($id);
+        })->find($id);
+
+        if (!$giftCard) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.gift_card_not_found'),
+            ], 404);
+        }
 
         if (!$giftCard->order) {
             return response()->json([

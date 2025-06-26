@@ -291,9 +291,16 @@ class GiftCard extends Model implements HasMedia
             return false;
         }
 
+        // Ensure we have a valid user_id
+        $userId = $this->user_id ?: $this->recipient_id ?: $this->sender_id;
+
+        if (!$userId) {
+            throw new \InvalidArgumentException('No valid user ID found for wallet redemption');
+        }
+
         // Create wallet transaction
         $transaction = Transaction::create([
-            'user_id' => $this->user_id,
+            'user_id' => $userId,
             'transaction_number' => 'TXN-' . strtoupper(uniqid()),
             'amount' => $this->amount,
             'operation' => 'Deposit',
@@ -319,18 +326,19 @@ class GiftCard extends Model implements HasMedia
             return false;
         }
 
-        // Use recipient_id if available, otherwise sender_id
-        $orderUserId = $this->recipient_id ?: $this->sender_id;
+        // Use recipient_id if available, otherwise user_id, otherwise sender_id
+        $orderUserId = $this->recipient_id ?: $this->user_id ?: $this->sender_id;
+
+        if (!$orderUserId) {
+            throw new \InvalidArgumentException('No valid user ID found for order creation');
+        }
 
         // Create order based on product or offer
         $orderData = [
             'user_id' => $orderUserId,
             'vendor_id' => $this->vendor_id,
-            'total_amount' => $this->amount,
             'total' => $this->amount,
-            'currency' => $this->currency,
-            'status' => \App\Enums\OrderStatus::Pending,
-            'payment_method' => 'gift_card',
+            'status' => \App\Enums\OrderStatus::Pending->value,
             'gift_card_id' => $this->id,
         ];
 
@@ -360,8 +368,8 @@ class GiftCard extends Model implements HasMedia
             return false;
         }
 
-        // Cancel the order
-        $this->order->update(['status' => 'cancelled']);
+        // Cancel the order using the correct enum value
+        $this->order->update(['status' => \App\Enums\OrderStatus::Canceled->value]);
 
         // Redeem to wallet
         return $this->redeemToWallet();

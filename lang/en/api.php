@@ -85,6 +85,7 @@ return [
     'order_cancellation_failed' => 'Failed to cancel order',
     'order_already_cancelled' => 'Order has already been cancelled',
     'order_payment_required' => 'Payment information is required',
+    'order_created_from_gift_card' => 'Order created successfully from gift card',
 
     // Wallet specific messages
     'wallet_transaction_failed' => 'Failed to process wallet transaction',
