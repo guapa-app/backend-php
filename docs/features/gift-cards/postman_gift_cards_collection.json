@@ -436,13 +436,12 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards",
+                            "raw": "{{base_url}}/admin-api/gift-cards",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards"
                             ]
                         }
@@ -460,13 +459,12 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards/1",
+                            "raw": "{{base_url}}/admin-api/gift-cards/1",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards",
                                 "1"
                             ]
@@ -494,13 +492,12 @@
                             "raw": "{\n  \"gift_type\": \"wallet\",\n  \"amount\": 500,\n  \"currency\": \"SAR\",\n  \"background_color\": \"#FFD3B6\",\n  \"message\": \"Admin created gift card\",\n  \"recipient_name\": \"Admin User\",\n  \"recipient_email\": \"admin@example.com\"\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards",
+                            "raw": "{{base_url}}/admin-api/gift-cards",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards"
                             ]
                         }
@@ -527,13 +524,12 @@
                             "raw": "{\n  \"gift_type\": \"wallet\",\n  \"amount\": 600,\n  \"currency\": \"SAR\",\n  \"background_color\": \"#FFD3B6\",\n  \"message\": \"Updated gift card\",\n  \"recipient_name\": \"Updated User\",\n  \"recipient_email\": \"updated@example.com\",\n  \"status\": \"active\"\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards/1",
+                            "raw": "{{base_url}}/admin-api/gift-cards/1",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards",
                                 "1"
                             ]
@@ -552,13 +548,12 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards/1",
+                            "raw": "{{base_url}}/admin-api/gift-cards/1",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards",
                                 "1"
                             ]
@@ -577,13 +572,12 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards/code?code=GC123456",
+                            "raw": "{{base_url}}/admin-api/gift-cards/code?code=GC123456",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards",
                                 "code"
                             ],
@@ -608,13 +602,12 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards/options",
+                            "raw": "{{base_url}}/admin-api/gift-cards/options",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards",
                                 "options"
                             ]
@@ -633,13 +626,12 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards/statistics",
+                            "raw": "{{base_url}}/admin-api/gift-cards/statistics",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
-                                "gift-cards",
                                 "gift-cards",
                                 "statistics"
                             ]
@@ -667,15 +659,229 @@
                             "raw": "{\n  \"gift_card_ids\": [1,2,3],\n  \"status\": \"expired\"\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/gift-cards/bulk-update-status",
+                            "raw": "{{base_url}}/admin-api/gift-cards/bulk-update-status",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "admin-api",
                                 "gift-cards",
-                                "gift-cards",
                                 "bulk-update-status"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin Gift Card Background APIs",
+            "item": [
+                {
+                    "name": "List All Backgrounds",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin-api",
+                                "gift-card-backgrounds"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create New Background",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "Elegant Gold",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "value": "A sophisticated gold gradient background",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "background_image",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "true",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin-api",
+                                "gift-card-backgrounds"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Single Background",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin-api",
+                                "gift-card-backgrounds",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Background",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "Updated Elegant Gold",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "value": "Updated description",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "background_image",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "true",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin-api",
+                                "gift-card-backgrounds",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Background",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin-api",
+                                "gift-card-backgrounds",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Toggle Background Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1/toggle-status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin-api",
+                                "gift-card-backgrounds",
+                                "1",
+                                "toggle-status"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Active Backgrounds (Public)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/active",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin-api",
+                                "gift-card-backgrounds",
+                                "active"
                             ]
                         }
                     }
