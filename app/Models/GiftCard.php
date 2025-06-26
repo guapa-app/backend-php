@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class GiftCard extends Model implements HasMedia
@@ -129,6 +129,24 @@ class GiftCard extends Model implements HasMedia
             // Set default redemption method if not set
             if (empty($giftCard->redemption_method)) {
                 $giftCard->redemption_method = self::REDEMPTION_PENDING;
+            }
+
+            // Set default expiry date if not provided
+            if (empty($giftCard->expires_at)) {
+                $defaultExpirationDays = \App\Models\GiftCardSetting::getDefaultExpirationDays();
+                $giftCard->expires_at = now()->addDays($defaultExpirationDays);
+            }
+
+            // Validate amount against settings
+            $minAmount = \App\Models\GiftCardSetting::getMinAmount();
+            $maxAmount = \App\Models\GiftCardSetting::getMaxAmount();
+
+            if ($giftCard->amount < $minAmount) {
+                throw new \InvalidArgumentException("Amount cannot be less than {$minAmount}");
+            }
+
+            if ($giftCard->amount > $maxAmount) {
+                throw new \InvalidArgumentException("Amount cannot exceed {$maxAmount}");
             }
 
             // Clear conflicting fields based on gift type
