@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V1\Admin;
 
+use App\Models\GiftCardSetting;
 use App\Http\Requests\FailedValidationRequest;
 
 class GiftCardRequest extends FailedValidationRequest
@@ -13,9 +14,14 @@ class GiftCardRequest extends FailedValidationRequest
 
     public function rules()
     {
+        $minAmount = GiftCardSetting::getMinAmount();
+        $maxAmount = GiftCardSetting::getMaxAmount();
+        $maxFileSize = GiftCardSetting::getMaxFileSize();
+        $allowedFileExtensions = GiftCardSetting::getAllowedFileExtensions();
+
         return [
             'gift_type' => 'required|in:wallet,order',
-            'amount' => 'required|numeric|min:1',
+            'amount' => "required|numeric|min:{$minAmount}|max:{$maxAmount}",
             'currency' => 'required|string|size:3',
 
             // For order type gift cards
@@ -26,7 +32,7 @@ class GiftCardRequest extends FailedValidationRequest
             // Background customization
             'background_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
             'background_image_id' => 'nullable|integer|exists:gift_card_backgrounds,id',
-            'background_image' => 'nullable|file|image|max:5120',
+            'background_image' => "nullable|file|mimes:" . implode(',', $allowedFileExtensions) . "|max:" . ($maxFileSize / 1024),
 
             // Gift card details
             'message' => 'nullable|string|max:500',
@@ -52,13 +58,19 @@ class GiftCardRequest extends FailedValidationRequest
 
     public function messages()
     {
+        $minAmount = GiftCardSetting::getMinAmount();
+        $maxAmount = GiftCardSetting::getMaxAmount();
+        $maxFileSize = GiftCardSetting::getMaxFileSize();
+
         return [
             'gift_type.required' => 'Please select the gift card type (wallet or order).',
             'gift_type.in' => 'Gift card type must be either wallet or order.',
             'recipient_name.required' => 'Recipient name is required.',
             'background_color.regex' => 'Background color must be a valid hex color code.',
-            'amount.min' => 'Amount must be at least 1.',
+            'amount.min' => "Amount must be at least {$minAmount}.",
+            'amount.max' => "Amount cannot exceed {$maxAmount}.",
             'currency.size' => 'Currency must be exactly 3 characters.',
+            'background_image.max' => "Background image size cannot exceed " . ($maxFileSize / 1024 / 1024) . "MB.",
         ];
     }
 

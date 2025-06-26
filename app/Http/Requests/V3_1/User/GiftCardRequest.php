@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V3_1\User;
 
 use App\Http\Requests\FailedValidationRequest;
+use App\Models\GiftCardSetting;
 
 class GiftCardRequest extends FailedValidationRequest
 {
@@ -13,9 +14,14 @@ class GiftCardRequest extends FailedValidationRequest
 
     public function rules()
     {
+        $minAmount = GiftCardSetting::getMinAmount();
+        $maxAmount = GiftCardSetting::getMaxAmount();
+        $maxFileSize = GiftCardSetting::getMaxFileSize();
+        $allowedFileTypes = GiftCardSetting::getAllowedFileTypes();
+
         return [
             'gift_type' => 'required|in:wallet,order',
-            'amount' => 'required|numeric|min:1',
+            'amount' => "required|numeric|min:{$minAmount}|max:{$maxAmount}",
             'currency' => 'required|string|size:3',
 
             // For order type gift cards - make both optional but at least one required
@@ -49,6 +55,9 @@ class GiftCardRequest extends FailedValidationRequest
 
     public function messages()
     {
+        $minAmount = GiftCardSetting::getMinAmount();
+        $maxAmount = GiftCardSetting::getMaxAmount();
+
         return [
             'gift_type.required' => 'Please select the gift card type (wallet or order).',
             'gift_type.in' => 'Gift card type must be either wallet or order.',
@@ -57,6 +66,8 @@ class GiftCardRequest extends FailedValidationRequest
             'vendor_id.required_if' => 'Vendor is required for order type gift cards.',
             'recipient_name.required' => 'Recipient name is required.',
             'background_color.regex' => 'Background color must be a valid hex color code.',
+            'amount.min' => "Amount must be at least {$minAmount}.",
+            'amount.max' => "Amount cannot exceed {$maxAmount}.",
         ];
     }
 
