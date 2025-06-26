@@ -138,17 +138,33 @@ class GiftCardController extends BaseApiController
         } elseif ($type === 'received') {
             $query->where(function($q) use ($user) {
                 $q->where('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id)
-                  ->orWhere('recipient_email', $user->email)
-                  ->orWhere('recipient_number', $user->phone);
+                  ->orWhere('user_id', $user->id);
+
+                // Only add email condition if user has email
+                if (!empty($user->email)) {
+                    $q->orWhere('recipient_email', $user->email);
+                }
+
+                // Only add phone condition if user has phone
+                if (!empty($user->phone)) {
+                    $q->orWhere('recipient_number', $user->phone);
+                }
             });
         } else { // all
             $query->where(function($q) use ($user) {
                 $q->where('sender_id', $user->id)
                   ->orWhere('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id)
-                  ->orWhere('recipient_email', $user->email)
-                  ->orWhere('recipient_number', $user->phone);
+                  ->orWhere('user_id', $user->id);
+
+                // Only add email condition if user has email
+                if (!empty($user->email)) {
+                    $q->orWhere('recipient_email', $user->email);
+                }
+
+                // Only add phone condition if user has phone
+                if (!empty($user->phone)) {
+                    $q->orWhere('recipient_number', $user->phone);
+                }
             });
         }
 
