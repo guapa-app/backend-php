@@ -18,9 +18,9 @@ class GiftCardRequest extends FailedValidationRequest
             'amount' => 'required|numeric|min:1',
             'currency' => 'required|string|size:3',
 
-            // For order type gift cards
-            'product_id' => 'required_if:gift_type,order|nullable|exists:products,id',
-            'offer_id' => 'required_if:gift_type,order|nullable|exists:offers,id',
+            // For order type gift cards - make both optional but at least one required
+            'product_id' => 'nullable|exists:products,id',
+            'offer_id' => 'nullable|exists:offers,id',
             'vendor_id' => 'required_if:gift_type,order|nullable|exists:vendors,id',
 
             // Background customization

@@ -34,7 +34,8 @@ class GiftCardResource extends JsonResource
             'offer_id' => $this->offer_id,
             'order_id' => $this->order_id,
             'wallet_transaction_id' => $this->wallet_transaction_id,
-            'created_by' => $this->created_by,
+            'sender_id' => $this->sender_id,
+            'recipient_id' => $this->recipient_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
@@ -100,11 +101,21 @@ class GiftCardResource extends JsonResource
                 ];
             }),
 
-            'created_by_user' => $this->whenLoaded('createdBy', function () {
+            'sender' => $this->whenLoaded('sender', function () {
                 return [
-                    'id' => $this->createdBy->id,
-                    'name' => $this->createdBy->name,
-                    'email' => $this->createdBy->email,
+                    'id' => $this->sender->id,
+                    'name' => $this->sender->name,
+                    'email' => $this->sender->email,
+                    'phone' => $this->sender->phone,
+                ];
+            }),
+
+            'recipient' => $this->whenLoaded('recipient', function () {
+                return [
+                    'id' => $this->recipient->id,
+                    'name' => $this->recipient->name,
+                    'email' => $this->recipient->email,
+                    'phone' => $this->recipient->phone,
                 ];
             }),
 

@@ -34,7 +34,8 @@ class GiftCardResource extends JsonResource
             'offer_id' => $this->offer_id,
             'order_id' => $this->order_id,
             'wallet_transaction_id' => $this->wallet_transaction_id,
-            'created_by' => $this->created_by,
+            'sender_id' => $this->sender_id,
+            'recipient_id' => $this->recipient_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
