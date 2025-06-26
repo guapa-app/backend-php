@@ -258,7 +258,6 @@ class GiftCardSettingResource extends Resource
 
     public static function mutateFormDataBeforeFill(array $data): array
     {
-        // Move the value to the correct field for the UI
         if (isset($data['type'])) {
             switch ($data['type']) {
                 case 'string':
@@ -272,48 +271,53 @@ class GiftCardSettingResource extends Resource
                     break;
                 case 'array':
                     $value = $data['value'] ?? [];
-
+                    // If value is a JSON string, decode it
+                    if (is_string($value)) {
+                        $decoded = json_decode($value, true);
+                        if (is_array($decoded)) {
+                            $value = $decoded;
+                        }
+                    }
                     // Handle special cases for specific setting keys
                     if (isset($data['key'])) {
                         switch ($data['key']) {
                             case GiftCardSetting::BACKGROUND_COLORS:
-                                // Convert array of colors to repeater format
                                 $data['value_background_colors'] = array_map(function($color) {
                                     return ['color' => $color];
                                 }, is_array($value) ? $value : []);
                                 break;
-
                             case GiftCardSetting::SUGGESTED_AMOUNTS:
-                                // Convert array of amounts to repeater format
                                 $data['value_suggested_amounts'] = array_map(function($amount) {
                                     return ['amount' => $amount];
                                 }, is_array($value) ? $value : []);
                                 break;
-
-                            case GiftCardSetting::SUPPORTED_CURRENCIES:
-                                // Handle key-value pairs
-                                $data['value_array_key_value'] = is_array($value) ? $value : [];
-                                break;
-
                             case GiftCardSetting::ALLOWED_FILE_TYPES:
-                                // Convert array to simple repeater format
                                 $data['value_allowed_file_types'] = array_map(function($type) {
                                     return ['type' => $type];
                                 }, is_array($value) ? $value : []);
                                 break;
-
                             default:
-                                // Default array handling
-                                $data['value_array_simple'] = array_map(function($item) {
-                                    return ['item' => $item];
-                                }, is_array($value) ? $value : []);
+                                // Detect associative vs. simple array
+                                if (is_array($value) && count($value) > 0 && array_keys($value) !== range(0, count($value) - 1)) {
+                                    // Associative array (key-value)
+                                    $data['value_array_key_value'] = $value;
+                                } else {
+                                    // Simple/numeric array
+                                    $data['value_array_simple'] = array_map(function($item) {
+                                        return ['item' => $item];
+                                    }, is_array($value) ? $value : []);
+                                }
                                 break;
                         }
                     } else {
                         // Fallback for array type without specific key
-                        $data['value_array_simple'] = array_map(function($item) {
-                            return ['item' => $item];
-                        }, is_array($value) ? $value : []);
+                        if (is_array($value) && count($value) > 0 && array_keys($value) !== range(0, count($value) - 1)) {
+                            $data['value_array_key_value'] = $value;
+                        } else {
+                            $data['value_array_simple'] = array_map(function($item) {
+                                return ['item' => $item];
+                            }, is_array($value) ? $value : []);
+                        }
                     }
                     break;
             }
@@ -323,8 +327,6 @@ class GiftCardSettingResource extends Resource
 
     public static function mutateFormDataBeforeSave(array $data): array
     {
-        Log::info('GiftCardSettingResource: mutateFormDataBeforeSave', $data);
-
         // Move the correct field into value for saving
         switch ($data['type']) {
             case 'string':
@@ -337,51 +339,46 @@ class GiftCardSettingResource extends Resource
                 $data['value'] = $data['value_boolean'] ?? false;
                 break;
             case 'array':
-                // Handle special cases for specific setting keys
                 if (isset($data['key'])) {
                     switch ($data['key']) {
                         case GiftCardSetting::BACKGROUND_COLORS:
-                            // Extract colors from repeater format
                             $data['value'] = array_map(function($item) {
                                 return $item['color'] ?? '';
                             }, $data['value_background_colors'] ?? []);
                             break;
-
                         case GiftCardSetting::SUGGESTED_AMOUNTS:
-                            // Extract amounts from repeater format
                             $data['value'] = array_map(function($item) {
                                 return $item['amount'] ?? 0;
                             }, $data['value_suggested_amounts'] ?? []);
                             break;
-
-                        case GiftCardSetting::SUPPORTED_CURRENCIES:
-                            // Handle key-value pairs
-                            $data['value'] = $data['value_array_key_value'] ?? [];
-                            break;
-
                         case GiftCardSetting::ALLOWED_FILE_TYPES:
-                            // Extract items from simple repeater format
                             $data['value'] = array_map(function($item) {
                                 return $item['type'] ?? '';
                             }, $data['value_allowed_file_types'] ?? []);
                             break;
-
                         default:
-                            // Default array handling
-                            $data['value'] = array_map(function($item) {
-                                return $item['item'] ?? '';
-                            }, $data['value_array_simple'] ?? []);
+                            // If key-value pairs are present, use them
+                            if (!empty($data['value_array_key_value']) && is_array($data['value_array_key_value'])) {
+                                $data['value'] = $data['value_array_key_value'];
+                            } else {
+                                // Otherwise, use simple array
+                                $data['value'] = array_map(function($item) {
+                                    return $item['item'] ?? '';
+                                }, $data['value_array_simple'] ?? []);
+                            }
                             break;
                     }
                 } else {
-                    // Fallback for array type without specific key
-                    $data['value'] = array_map(function($item) {
-                        return $item['item'] ?? '';
-                    }, $data['value_array_simple'] ?? []);
+                    if (!empty($data['value_array_key_value']) && is_array($data['value_array_key_value'])) {
+                        $data['value'] = $data['value_array_key_value'];
+                    } else {
+                        $data['value'] = array_map(function($item) {
+                            return $item['item'] ?? '';
+                        }, $data['value_array_simple'] ?? []);
+                    }
                 }
                 break;
         }
-
         // Clean up UI-only fields
         unset(
             $data['value_string'],
@@ -393,8 +390,6 @@ class GiftCardSettingResource extends Resource
             $data['value_array_key_value'],
             $data['value_allowed_file_types']
         );
-
-        Log::info('GiftCardSettingResource: after mapping', $data);
         return $data;
     }
 }
