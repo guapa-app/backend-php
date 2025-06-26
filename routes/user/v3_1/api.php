@@ -86,14 +86,14 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
         // Gift Cards
         Route::prefix('gift-cards')->group(function () {
             Route::get('/options', [GiftCardController::class, 'options']);
-            Route::get('/', [GiftCardController::class, 'index']);
-            Route::post('/', [GiftCardController::class, 'store']);
-            Route::get('/{id}', [GiftCardController::class, 'show']);
             Route::get('/my', [GiftCardController::class, 'myGiftCards']);
             Route::get('/code', [GiftCardController::class, 'getByCode']);
+            Route::get('/', [GiftCardController::class, 'index']);
+            Route::post('/', [GiftCardController::class, 'store']);
             Route::post('/{id}/redeem-wallet', [GiftCardController::class, 'redeemToWallet']);
             Route::post('/{id}/create-order', [GiftCardController::class, 'createOrder']);
             Route::post('/{id}/cancel-order-redeem-wallet', [GiftCardController::class, 'cancelOrderAndRedeemToWallet']);
+            Route::get('/{id}', [GiftCardController::class, 'show']);
         });
     });
 });
