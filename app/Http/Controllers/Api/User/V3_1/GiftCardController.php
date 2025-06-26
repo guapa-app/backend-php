@@ -35,8 +35,9 @@ class GiftCardController extends BaseApiController
         $media = null;
         $user = $request->user();
 
-        // User selection/creation logic
+        // User selection/creation logic - ensure we always have a valid user_id
         if (!empty($data['create_new_user'])) {
+            // Create a new user for the gift card
             $giftUser = User::firstOrCreate(
                 ['phone' => $data['new_user_phone']],
                 [
@@ -47,14 +48,63 @@ class GiftCardController extends BaseApiController
             );
             $data['user_id'] = $giftUser->id;
         } elseif (!empty($data['user_id'])) {
-            $data['user_id'] = $data['user_id'];
+            // Use existing user ID
+            $existingUser = User::find($data['user_id']);
+            if (!$existingUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selected user not found. Please provide a valid user ID or create a new user.',
+                ], 422);
+            }
+            $data['user_id'] = $existingUser->id;
+        } elseif (!empty($data['recipient_email'])) {
+            // Try to find user by email
+            $existingUser = User::where('email', $data['recipient_email'])->first();
+            if ($existingUser) {
+                $data['user_id'] = $existingUser->id;
+            } else {
+                // Create user from email if not found
+                $giftUser = User::create([
+                    'name' => $data['recipient_name'],
+                    'email' => $data['recipient_email'],
+                    'phone' => $data['recipient_number'] ?? '0000000000', // Default phone if not provided
+                    'status' => User::STATUS_ACTIVE,
+                ]);
+                $data['user_id'] = $giftUser->id;
+            }
+        } elseif (!empty($data['recipient_number'])) {
+            // Try to find user by phone
+            $existingUser = User::where('phone', $data['recipient_number'])->first();
+            if ($existingUser) {
+                $data['user_id'] = $existingUser->id;
+            } else {
+                // Create user from phone if not found
+                $giftUser = User::create([
+                    'name' => $data['recipient_name'],
+                    'email' => $data['recipient_email'] ?? null,
+                    'phone' => $data['recipient_number'],
+                    'status' => User::STATUS_ACTIVE,
+                ]);
+                $data['user_id'] = $giftUser->id;
+            }
         } else {
-            $data['user_id'] = null;
+            // If no user identification provided, return error
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide either a user ID, recipient email, recipient phone number, or create a new user.',
+            ], 422);
         }
 
         // Set sender_id
         if ($user->hasRole('admin') && !empty($data['sender_id'])) {
-            $data['sender_id'] = $data['sender_id'];
+            $sender = User::find($data['sender_id']);
+            if (!$sender) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sender user not found.',
+                ], 422);
+            }
+            $data['sender_id'] = $sender->id;
         } else {
             $data['sender_id'] = $user->id;
         }

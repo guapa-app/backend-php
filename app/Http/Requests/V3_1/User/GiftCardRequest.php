@@ -44,7 +44,7 @@ class GiftCardRequest extends FailedValidationRequest
             'recipient_email' => 'nullable|email|max:255',
             'recipient_number' => 'nullable|string|max:20',
 
-            // User management
+            // User management - at least one user identification method is required
             'user_id' => 'nullable|exists:users,id',
             'create_new_user' => 'nullable|boolean',
             'new_user_name' => 'required_if:create_new_user,true|string|max:255',
@@ -95,6 +95,16 @@ class GiftCardRequest extends FailedValidationRequest
             // If creating new user, ensure user_id is not provided
             if (!empty($data['create_new_user']) && !empty($data['user_id'])) {
                 $validator->errors()->add('user_management', 'You cannot create a new user and select an existing user at the same time.');
+            }
+
+            // Ensure at least one user identification method is provided
+            $hasUserIdentification = !empty($data['user_id']) ||
+                                   !empty($data['create_new_user']) ||
+                                   !empty($data['recipient_email']) ||
+                                   !empty($data['recipient_number']);
+
+            if (!$hasUserIdentification) {
+                $validator->errors()->add('user_management', 'Please provide either a user ID, recipient email, recipient phone number, or create a new user.');
             }
         });
     }
