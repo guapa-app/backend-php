@@ -1,23 +1,32 @@
 {
     "info": {
-        "_postman_id": "gift-cards-collection-001",
+        "_postman_id": "gift-cards-collection-v2",
         "name": "Gift Card API Collection",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-        "description": "All User, Vendor, and Admin Gift Card API endpoints with example requests. Use {{base_url}}, {{token}}, {{vendor_token}}, and {{admin_token}} variables."
+        "description": "Essential Gift Card API endpoints with proper authorization setup. Use Authorization tab for tokens and set Content-Type: application/json in headers."
     },
     "item": [
         {
-            "name": "User Gift Card APIs",
+            "name": "User APIs",
             "item": [
                 {
                     "name": "Get Gift Card Options",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -36,14 +45,23 @@
                     }
                 },
                 {
-                    "name": "List My Gift Cards (All)",
+                    "name": "List My Gift Cards",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -68,108 +86,23 @@
                     }
                 },
                 {
-                    "name": "List My Gift Cards (Sent)",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/user/v3.1/gift-cards/my?type=sent",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "user",
-                                "v3.1",
-                                "gift-cards",
-                                "my"
-                            ],
-                            "query": [
-                                {
-                                    "key": "type",
-                                    "value": "sent"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "List My Gift Cards (Received)",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/user/v3.1/gift-cards/my?type=received",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "user",
-                                "v3.1",
-                                "gift-cards",
-                                "my"
-                            ],
-                            "query": [
-                                {
-                                    "key": "type",
-                                    "value": "received"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "List All Gift Cards",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/user/v3.1/gift-cards",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "user",
-                                "v3.1",
-                                "gift-cards"
-                            ]
-                        }
-                    }
-                },
-                {
                     "name": "Create Gift Card (Wallet)",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "POST",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
-                            },
-                            {
                                 "key": "Content-Type",
-                                "value": "application/json",
-                                "type": "text"
+                                "value": "application/json"
                             }
                         ],
                         "body": {
@@ -193,17 +126,21 @@
                 {
                     "name": "Create Gift Card (Order)",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "POST",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
-                            },
-                            {
                                 "key": "Content-Type",
-                                "value": "application/json",
-                                "type": "text"
+                                "value": "application/json"
                             }
                         ],
                         "body": {
@@ -227,12 +164,21 @@
                 {
                     "name": "Get Gift Card by ID",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -253,12 +199,21 @@
                 {
                     "name": "Get Gift Card by Code",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -285,12 +240,21 @@
                 {
                     "name": "Redeem Gift Card to Wallet",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "POST",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -312,12 +276,21 @@
                 {
                     "name": "Create Order from Gift Card",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "POST",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -335,104 +308,30 @@
                             ]
                         }
                     }
-                },
-                {
-                    "name": "Cancel Order and Redeem to Wallet",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/user/v3.1/gift-cards/1/cancel-order-redeem-wallet",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "user",
-                                "v3.1",
-                                "gift-cards",
-                                "1",
-                                "cancel-order-redeem-wallet"
-                            ]
-                        }
-                    }
                 }
             ]
         },
         {
-            "name": "Vendor Gift Card APIs",
+            "name": "Admin/Vendor APIs",
             "item": [
                 {
-                    "name": "List Vendor Gift Cards",
+                    "name": "List All Gift Cards",
                     "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{vendor_token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/vendor/v3.1/gift-cards",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "vendor",
-                                "v3.1",
-                                "gift-cards"
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Vendor Gift Card by ID",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{vendor_token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/vendor/v3.1/gift-cards/1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "vendor",
-                                "v3.1",
-                                "gift-cards",
-                                "1"
-                            ]
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Admin Gift Card APIs",
-            "item": [
-                {
-                    "name": "List All Gift Cards (Admin)",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -448,14 +347,23 @@
                     }
                 },
                 {
-                    "name": "Get Gift Card by ID (Admin)",
+                    "name": "Get Gift Card by ID",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -472,19 +380,23 @@
                     }
                 },
                 {
-                    "name": "Create Gift Card (Admin)",
+                    "name": "Create Gift Card",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "POST",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            },
-                            {
                                 "key": "Content-Type",
-                                "value": "application/json",
-                                "type": "text"
+                                "value": "application/json"
                             }
                         ],
                         "body": {
@@ -504,19 +416,23 @@
                     }
                 },
                 {
-                    "name": "Update Gift Card (Admin)",
+                    "name": "Update Gift Card",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "PUT",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            },
-                            {
                                 "key": "Content-Type",
-                                "value": "application/json",
-                                "type": "text"
+                                "value": "application/json"
                             }
                         ],
                         "body": {
@@ -537,14 +453,23 @@
                     }
                 },
                 {
-                    "name": "Delete Gift Card (Admin)",
+                    "name": "Delete Gift Card",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "DELETE",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -561,14 +486,23 @@
                     }
                 },
                 {
-                    "name": "Get Gift Card by Code (Admin)",
+                    "name": "Get Gift Card by Code",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -591,14 +525,23 @@
                     }
                 },
                 {
-                    "name": "Get Gift Card Options (Admin)",
+                    "name": "Get Gift Card Options",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -615,14 +558,23 @@
                     }
                 },
                 {
-                    "name": "Get Gift Card Statistics (Admin)",
+                    "name": "Get Gift Card Statistics",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -637,54 +589,30 @@
                             ]
                         }
                     }
-                },
-                {
-                    "name": "Bulk Update Gift Card Status (Admin)",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json",
-                                "type": "text"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"gift_card_ids\": [1,2,3],\n  \"status\": \"expired\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/admin-api/gift-cards/bulk-update-status",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "admin-api",
-                                "gift-cards",
-                                "bulk-update-status"
-                            ]
-                        }
-                    }
                 }
             ]
         },
         {
-            "name": "Admin Gift Card Background APIs",
+            "name": "Background Management",
             "item": [
                 {
                     "name": "List All Backgrounds",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
+                                "key": "Content-Type",
+                                "value": "application/json"
                             }
                         ],
                         "url": {
@@ -700,16 +628,20 @@
                     }
                 },
                 {
-                    "name": "Create New Background",
+                    "name": "Create Background",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            }
-                        ],
+                        "header": [],
                         "body": {
                             "mode": "formdata",
                             "formdata": [
@@ -748,131 +680,15 @@
                     }
                 },
                 {
-                    "name": "Get Single Background",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "admin-api",
-                                "gift-card-backgrounds",
-                                "1"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "Update Background",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "name",
-                                    "value": "Updated Elegant Gold",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "description",
-                                    "value": "Updated description",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "background_image",
-                                    "type": "file",
-                                    "src": []
-                                },
-                                {
-                                    "key": "is_active",
-                                    "value": "true",
-                                    "type": "text"
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "admin-api",
-                                "gift-card-backgrounds",
-                                "1"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "Delete Background",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "admin-api",
-                                "gift-card-backgrounds",
-                                "1"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "Toggle Background Status",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{admin_token}}",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/admin-api/gift-card-backgrounds/1/toggle-status",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "admin-api",
-                                "gift-card-backgrounds",
-                                "1",
-                                "toggle-status"
-                            ]
-                        }
-                    }
-                },
-                {
                     "name": "Get Active Backgrounds (Public)",
                     "request": {
                         "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
                         "url": {
                             "raw": "{{base_url}}/admin-api/gift-card-backgrounds/active",
                             "host": [
@@ -893,19 +709,18 @@
     "variable": [
         {
             "key": "base_url",
-            "value": "http://guapa.test"
+            "value": "http://guapa.test",
+            "type": "string"
         },
         {
-            "key": "token",
-            "value": ""
-        },
-        {
-            "key": "vendor_token",
-            "value": ""
+            "key": "user_token",
+            "value": "",
+            "type": "string"
         },
         {
             "key": "admin_token",
-            "value": ""
+            "value": "",
+            "type": "string"
         }
     ]
 }

@@ -222,6 +222,7 @@ class GiftCardResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['order', 'user', 'vendor', 'product', 'offer']))
             ->columns([
                 TextColumn::make('id')
                     ->sortable()
@@ -308,6 +309,13 @@ class GiftCardResource extends Resource
                     ->label('Vendor')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('order_id')
+                    ->label('Order ID')
+                    ->url(fn ($record): string => $record && $record->order_id ? \App\Filament\Admin\Resources\Shop\OrderResource::getUrl('view', ['record' => $record->order_id]) : '#')
+                    ->visible(fn ($record): bool => $record && $record->order_id !== null && $record->redemption_method === 'order')
+                    ->color('success')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('gift_type')
@@ -377,6 +385,13 @@ class GiftCardResource extends Resource
                     ->label('Preview')
                     ->icon('heroicon-o-eye')
                     ->url(fn (GiftCard $record): string => route('filament.admin.resources.gift-cards.preview', $record))
+                    ->openUrlInNewTab(),
+                Action::make('view_order')
+                    ->label('View Order')
+                    ->icon('heroicon-o-shopping-bag')
+                    ->url(fn ($record): string => $record && $record->order_id ? \App\Filament\Admin\Resources\Shop\OrderResource::getUrl('view', ['record' => $record->order_id]) : '#')
+                    ->visible(fn ($record): bool => $record && $record->order_id !== null && $record->redemption_method === 'order')
+                    ->color('success')
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
