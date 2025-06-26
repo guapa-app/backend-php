@@ -35,7 +35,8 @@ class GiftCard extends Model implements HasMedia
         'recipient_name',
         'recipient_email',
         'recipient_number',
-        'created_by',
+        'sender_id',
+        'recipient_id',
     ];
 
     protected $casts = [
@@ -95,9 +96,14 @@ class GiftCard extends Model implements HasMedia
         return $this->belongsTo(GiftCardBackground::class, 'background_image_id');
     }
 
-    public function createdBy()
+    public function sender()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function recipient()
+    {
+        return $this->belongsTo(User::class, 'recipient_id');
     }
 
     // Register media collections for background image
@@ -164,13 +170,14 @@ class GiftCard extends Model implements HasMedia
 
     public function scopeSentBy($query, $userId)
     {
-        return $query->where('created_by', $userId);
+        return $query->where('sender_id', $userId);
     }
 
     public function scopeReceivedBy($query, $user)
     {
         return $query->where(function($q) use ($user) {
-            $q->where('user_id', $user->id)
+            $q->where('recipient_id', $user->id)
+              ->orWhere('user_id', $user->id)
               ->orWhere('recipient_email', $user->email)
               ->orWhere('recipient_number', $user->phone);
         });
@@ -261,11 +268,13 @@ class GiftCard extends Model implements HasMedia
         // Create wallet transaction
         $transaction = Transaction::create([
             'user_id' => $this->user_id,
+            'transaction_number' => 'TXN-' . strtoupper(uniqid()),
             'amount' => $this->amount,
-            'type' => 'credit',
-            'operation' => 'gift_card_redemption',
-            'description' => "Gift card redemption: {$this->code}",
+            'operation' => 'Deposit',
+            'transaction_type' => 'recharge',
+            'transaction_date' => now(),
             'status' => 'completed',
+            'notes' => "Gift card redemption: {$this->code}",
         ]);
 
         $this->update([
@@ -284,13 +293,17 @@ class GiftCard extends Model implements HasMedia
             return false;
         }
 
+        // Use recipient_id if available, otherwise sender_id
+        $orderUserId = $this->recipient_id ?: $this->sender_id;
+
         // Create order based on product or offer
         $orderData = [
-            'user_id' => $this->user_id,
+            'user_id' => $orderUserId,
             'vendor_id' => $this->vendor_id,
             'total_amount' => $this->amount,
+            'total' => $this->amount,
             'currency' => $this->currency,
-            'status' => 'pending',
+            'status' => \App\Enums\OrderStatus::Pending,
             'payment_method' => 'gift_card',
             'gift_card_id' => $this->id,
         ];

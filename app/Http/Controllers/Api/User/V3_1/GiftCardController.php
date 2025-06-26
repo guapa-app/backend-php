@@ -15,10 +15,15 @@ class GiftCardController extends BaseApiController
 {
     public function index(Request $request)
     {
-        $giftCards = GiftCard::where('user_id', $request->user()->id)
-            ->with(['order', 'walletTransaction', 'backgroundImage'])
-            ->latest()
-            ->paginate(20);
+        $user = $request->user();
+        $giftCards = GiftCard::where(function($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                  ->orWhere('recipient_id', $user->id)
+                  ->orWhere('user_id', $user->id);
+        })
+        ->with(['order', 'walletTransaction', 'backgroundImage'])
+        ->latest()
+        ->paginate(20);
 
         return GiftCardResource::collection($giftCards)
             ->additional(['success' => true, 'message' => __('api.success')]);
@@ -47,11 +52,11 @@ class GiftCardController extends BaseApiController
             $data['user_id'] = null;
         }
 
-        // Set created_by
-        if ($user->hasRole('admin') && !empty($data['created_by'])) {
-            $data['created_by'] = $data['created_by'];
+        // Set sender_id
+        if ($user->hasRole('admin') && !empty($data['sender_id'])) {
+            $data['sender_id'] = $data['sender_id'];
         } else {
-            $data['created_by'] = $user->id;
+            $data['sender_id'] = $user->id;
         }
 
         // Handle background image association
@@ -86,11 +91,16 @@ class GiftCardController extends BaseApiController
             ->additional(['success' => true, 'message' => __('api.created')]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $giftCard = GiftCard::where('user_id', auth()->id())
-            ->with(['order', 'walletTransaction', 'backgroundImage'])
-            ->findOrFail($id);
+        $user = $request->user();
+        $giftCard = GiftCard::where(function($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                  ->orWhere('recipient_id', $user->id)
+                  ->orWhere('user_id', $user->id);
+        })
+        ->with(['order', 'walletTransaction', 'backgroundImage'])
+        ->findOrFail($id);
 
         return GiftCardResource::make($giftCard)
             ->additional(['success' => true, 'message' => __('api.success')]);
@@ -107,16 +117,18 @@ class GiftCardController extends BaseApiController
         $query = GiftCard::with(['order', 'walletTransaction', 'backgroundImage']);
 
         if ($type === 'sent') {
-            $query->where('created_by', $user->id);
+            $query->where('sender_id', $user->id);
         } elseif ($type === 'received') {
             $query->where(function($q) use ($user) {
-                $q->where('user_id', $user->id)
+                $q->where('recipient_id', $user->id)
+                  ->orWhere('user_id', $user->id)
                   ->orWhere('recipient_email', $user->email)
                   ->orWhere('recipient_number', $user->phone);
             });
         } else { // all
             $query->where(function($q) use ($user) {
-                $q->where('created_by', $user->id)
+                $q->where('sender_id', $user->id)
+                  ->orWhere('recipient_id', $user->id)
                   ->orWhere('user_id', $user->id)
                   ->orWhere('recipient_email', $user->email)
                   ->orWhere('recipient_number', $user->phone);
@@ -163,9 +175,14 @@ class GiftCardController extends BaseApiController
     /**
      * Redeem gift card to wallet
      */
-    public function redeemToWallet($id)
+    public function redeemToWallet(Request $request, $id)
     {
-        $giftCard = GiftCard::where('user_id', auth()->id())->findOrFail($id);
+        $user = $request->user();
+        $giftCard = GiftCard::where(function($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                  ->orWhere('recipient_id', $user->id)
+                  ->orWhere('user_id', $user->id);
+        })->findOrFail($id);
 
         if (!$giftCard->canBeRedeemed()) {
             return response()->json([
@@ -198,9 +215,14 @@ class GiftCardController extends BaseApiController
     /**
      * Create order from gift card
      */
-    public function createOrder($id)
+    public function createOrder(Request $request, $id)
     {
-        $giftCard = GiftCard::where('user_id', auth()->id())->findOrFail($id);
+        $user = $request->user();
+        $giftCard = GiftCard::where(function($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                  ->orWhere('recipient_id', $user->id)
+                  ->orWhere('user_id', $user->id);
+        })->findOrFail($id);
 
         if (!$giftCard->canBeRedeemed()) {
             return response()->json([
@@ -238,9 +260,14 @@ class GiftCardController extends BaseApiController
     /**
      * Cancel order and redeem gift card to wallet
      */
-    public function cancelOrderAndRedeemToWallet($id)
+    public function cancelOrderAndRedeemToWallet(Request $request, $id)
     {
-        $giftCard = GiftCard::where('user_id', auth()->id())->findOrFail($id);
+        $user = $request->user();
+        $giftCard = GiftCard::where(function($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                  ->orWhere('recipient_id', $user->id)
+                  ->orWhere('user_id', $user->id);
+        })->findOrFail($id);
 
         if (!$giftCard->order) {
             return response()->json([

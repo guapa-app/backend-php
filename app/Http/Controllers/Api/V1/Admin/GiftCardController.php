@@ -24,7 +24,7 @@ class GiftCardController extends BaseApiController
     {
         $query = GiftCard::with([
             'user', 'vendor', 'product', 'offer', 'order',
-            'walletTransaction', 'backgroundImage', 'createdBy'
+            'walletTransaction', 'backgroundImage', 'sender', 'recipient'
         ]);
 
         // Filter by gift type
@@ -138,7 +138,7 @@ class GiftCardController extends BaseApiController
     {
         $giftCard = GiftCard::with([
             'user', 'vendor', 'product', 'offer', 'order',
-            'walletTransaction', 'backgroundImage', 'createdBy'
+            'walletTransaction', 'backgroundImage', 'sender', 'recipient'
         ])->findOrFail($id);
 
         return GiftCardResource::make($giftCard)
@@ -361,7 +361,7 @@ class GiftCardController extends BaseApiController
         $giftCard = GiftCard::where('code', $request->code)
             ->with([
                 'user', 'vendor', 'product', 'offer', 'order',
-                'walletTransaction', 'backgroundImage', 'createdBy'
+                'walletTransaction', 'backgroundImage', 'sender', 'recipient'
             ])
             ->first();
 
