@@ -7,29 +7,29 @@ use Filament\Tables;
 use App\Models\GiftCard;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Http\Request;
+use App\Exports\GiftCardExport;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Group;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Actions\Exports\ExportBulkAction;
-use App\Exports\GiftCardExport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Http\Request;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class GiftCardResource extends Resource
 {
@@ -68,17 +68,15 @@ class GiftCardResource extends Resource
                             ->label('Amount')
                             ->numeric()
                             ->required()
-                            ->minValue(1),
+                            ->minValue(\App\Models\GiftCardSetting::getMinAmount())
+                            ->maxValue(\App\Models\GiftCardSetting::getMaxAmount())
+                            ->helperText('Amount between ' . \App\Models\GiftCardSetting::getMinAmount() . ' and ' . \App\Models\GiftCardSetting::getMaxAmount()),
 
                         Select::make('currency')
-                            ->options([
-                                'SAR' => 'SAR',
-                                'USD' => 'USD',
-                                'EUR' => 'EUR',
-                            ])
+                            ->options(\App\Models\GiftCardSetting::getSupportedCurrencies())
                             ->label('Currency')
                             ->required()
-                            ->default('SAR'),
+                            ->default(\App\Models\GiftCardSetting::getDefaultCurrency()),
                     ]),
                 ]),
 
@@ -170,9 +168,9 @@ class GiftCardResource extends Resource
                         ->collection('gift_card_backgrounds')
                         ->label('Upload Custom Background')
                         ->maxFiles(1)
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])
-                        ->maxSize(5120)
-                        ->helperText('Upload a custom background image (max 5MB)'),
+                        ->acceptedFileTypes(\App\Models\GiftCardSetting::getAllowedFileTypes())
+                        ->maxSize(\App\Models\GiftCardSetting::getMaxFileSize() / 1024)
+                        ->helperText('Upload a custom background image (max ' . (\App\Models\GiftCardSetting::getMaxFileSize() / 1024 / 1024) . 'MB)'),
                 ]),
 
             // Gift Card Details Section
