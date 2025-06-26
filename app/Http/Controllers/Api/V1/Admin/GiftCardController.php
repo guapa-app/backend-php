@@ -104,6 +104,23 @@ class GiftCardController extends BaseApiController
                 $data['user_id'] = $user->id;
             }
 
+            // Set default expiry if not provided
+            if (empty($data['expires_at'])) {
+                $defaultExpirationDays = \App\Models\GiftCardSetting::getDefaultExpirationDays();
+                $data['expires_at'] = now()->addDays($defaultExpirationDays);
+            }
+
+            // Validate amount against settings
+            $minAmount = \App\Models\GiftCardSetting::getMinAmount();
+            $maxAmount = \App\Models\GiftCardSetting::getMaxAmount();
+
+            if ($data['amount'] < $minAmount || $data['amount'] > $maxAmount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Amount must be between {$minAmount} and {$maxAmount}.",
+                ], 422);
+            }
+
             // Create the gift card
             $giftCard = GiftCard::create($data);
 
@@ -164,6 +181,23 @@ class GiftCardController extends BaseApiController
                     'email' => $data['new_user_email'] ?? null,
                 ]);
                 $data['user_id'] = $user->id;
+            }
+
+            // Set default expiry if not provided
+            if (empty($data['expires_at'])) {
+                $defaultExpirationDays = \App\Models\GiftCardSetting::getDefaultExpirationDays();
+                $data['expires_at'] = now()->addDays($defaultExpirationDays);
+            }
+
+            // Validate amount against settings
+            $minAmount = \App\Models\GiftCardSetting::getMinAmount();
+            $maxAmount = \App\Models\GiftCardSetting::getMaxAmount();
+
+            if ($data['amount'] < $minAmount || $data['amount'] > $maxAmount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Amount must be between {$minAmount} and {$maxAmount}.",
+                ], 422);
             }
 
             $giftCard->update($data);

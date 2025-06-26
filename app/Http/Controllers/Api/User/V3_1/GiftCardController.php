@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Models\User;
 use App\Models\Media;
 use App\Models\GiftCard;
-use App\Models\GiftCardBackground;
 use Illuminate\Http\Request;
+use App\Models\GiftCardBackground;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\GiftCardRequest;
 use App\Http\Resources\User\V3_1\GiftCardResource;
@@ -57,6 +57,23 @@ class GiftCardController extends BaseApiController
             $data['sender_id'] = $data['sender_id'];
         } else {
             $data['sender_id'] = $user->id;
+        }
+
+        // Set default expiry if not provided
+        if (empty($data['expires_at'])) {
+            $defaultExpirationDays = \App\Models\GiftCardSetting::getDefaultExpirationDays();
+            $data['expires_at'] = now()->addDays($defaultExpirationDays);
+        }
+
+        // Validate amount against settings
+        $minAmount = \App\Models\GiftCardSetting::getMinAmount();
+        $maxAmount = \App\Models\GiftCardSetting::getMaxAmount();
+
+        if ($data['amount'] < $minAmount || $data['amount'] > $maxAmount) {
+            return response()->json([
+                'success' => false,
+                'message' => "Amount must be between {$minAmount} and {$maxAmount}.",
+            ], 422);
         }
 
         // Handle background image association
