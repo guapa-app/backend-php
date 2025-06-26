@@ -88,7 +88,9 @@ class GiftCardResource extends Resource
                     Grid::make(2)->schema([
                         Select::make('vendor_id')
                             ->label('Vendor')
-                            ->relationship('vendor', 'name')
+                            ->relationship('vendor', 'name', function ($query) {
+                                return $query->whereNotNull('name')->where('name', '!=', '');
+                            })
                             ->searchable()
                             ->preload()
                             ->visible(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER)
@@ -96,7 +98,9 @@ class GiftCardResource extends Resource
 
                         Select::make('product_id')
                             ->label('Product')
-                            ->relationship('product', 'title')
+                            ->relationship('product', 'title', function ($query) {
+                                return $query->whereNotNull('title')->where('title', '!=', '');
+                            })
                             ->searchable()
                             ->preload()
                             ->visible(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER)
@@ -105,7 +109,9 @@ class GiftCardResource extends Resource
 
                     Select::make('offer_id')
                         ->label('Offer')
-                        ->relationship('offer', 'title')
+                        ->relationship('offer', 'title', function ($query) {
+                            return $query->whereNotNull('title')->where('title', '!=', '');
+                        })
                         ->searchable()
                         ->preload()
                         ->visible(fn($get) => $get('gift_type') === GiftCard::GIFT_TYPE_ORDER)
@@ -132,7 +138,9 @@ class GiftCardResource extends Resource
 
                     Select::make('user_id')
                         ->label('Existing User (Optional)')
-                        ->relationship('user', 'name')
+                        ->relationship('user', 'name', function ($query) {
+                            return $query->whereNotNull('name')->where('name', '!=', '');
+                        })
                         ->searchable()
                         ->preload()
                         ->helperText('Select existing user or leave empty for new recipient'),
@@ -150,7 +158,9 @@ class GiftCardResource extends Resource
 
                         Select::make('background_image_id')
                             ->label('Background Image')
-                            ->relationship('backgroundImage', 'name')
+                            ->relationship('backgroundImage', 'name', function ($query) {
+                                return $query->whereNotNull('name')->where('name', '!=', '');
+                            })
                             ->searchable()
                             ->preload()
                             ->helperText('Choose from admin-uploaded backgrounds'),

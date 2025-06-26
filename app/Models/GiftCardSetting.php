@@ -69,16 +69,32 @@ class GiftCardSetting extends Model
     // Convenience methods for common settings
     public static function getSuggestedAmounts()
     {
-        return static::getValue(self::SUGGESTED_AMOUNTS, [50, 100, 200, 500, 1000]);
+        $value = static::getValue(self::SUGGESTED_AMOUNTS, [50, 100, 200, 500, 1000]);
+
+        // Ensure we return an array
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [$value];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 
     public static function getBackgroundColors()
     {
-        return static::getValue(self::BACKGROUND_COLORS, [
+        $value = static::getValue(self::BACKGROUND_COLORS, [
             '#FF8B85', '#FFB3BA', '#FFD3B6', '#FFEFD1', '#DCEDC8',
             '#B2DFDB', '#B3E5FC', '#E1BEE7', '#F8BBD9', '#C8E6C9',
             '#BBDEFB', '#D1C4E9'
         ]);
+
+        // Ensure we return an array
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [$value];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 
     public static function getDefaultExpirationDays()
@@ -103,11 +119,19 @@ class GiftCardSetting extends Model
 
     public static function getSupportedCurrencies()
     {
-        return static::getValue(self::SUPPORTED_CURRENCIES, [
+        $value = static::getValue(self::SUPPORTED_CURRENCIES, [
             'SAR' => 'Saudi Riyal',
             'USD' => 'US Dollar',
             'EUR' => 'Euro',
         ]);
+
+        // Ensure we return an array
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [$value];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 
     public static function getCodeLength()
@@ -127,12 +151,20 @@ class GiftCardSetting extends Model
 
     public static function getAllowedFileTypes()
     {
-        return static::getValue(self::ALLOWED_FILE_TYPES, [
+        $value = static::getValue(self::ALLOWED_FILE_TYPES, [
             'image/jpeg',
             'image/png',
             'image/gif',
             'image/svg+xml',
         ]);
+
+        // Ensure we return an array
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [$value];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 
     // Initialize default settings
