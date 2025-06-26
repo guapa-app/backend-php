@@ -63,11 +63,18 @@ class GiftCardController extends BaseApiController
             if ($existingUser) {
                 $data['user_id'] = $existingUser->id;
             } else {
+                // Generate a unique placeholder phone if not provided
+                $phone = $data['recipient_number'] ?? null;
+                if (empty($phone)) {
+                    do {
+                        $phone = '000' . rand(1000000, 9999999);
+                    } while (User::where('phone', $phone)->exists());
+                }
                 // Create user from email if not found
                 $giftUser = User::create([
                     'name' => $data['recipient_name'],
                     'email' => $data['recipient_email'],
-                    'phone' => $data['recipient_number'] ?? '0000000000', // Default phone if not provided
+                    'phone' => $phone,
                     'status' => User::STATUS_ACTIVE,
                 ]);
                 $data['user_id'] = $giftUser->id;
@@ -78,11 +85,18 @@ class GiftCardController extends BaseApiController
             if ($existingUser) {
                 $data['user_id'] = $existingUser->id;
             } else {
+                // Generate a unique placeholder phone if not provided
+                $phone = $data['recipient_number'] ?? null;
+                if (empty($phone)) {
+                    do {
+                        $phone = '000' . rand(1000000, 9999999);
+                    } while (User::where('phone', $phone)->exists());
+                }
                 // Create user from phone if not found
                 $giftUser = User::create([
                     'name' => $data['recipient_name'],
                     'email' => $data['recipient_email'] ?? null,
-                    'phone' => $data['recipient_number'],
+                    'phone' => $phone,
                     'status' => User::STATUS_ACTIVE,
                 ]);
                 $data['user_id'] = $giftUser->id;
