@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests\V3_1\User;
 
-use App\Http\Requests\FailedValidationRequest;
 use App\Models\GiftCardSetting;
+use App\Rules\FlexiblePhoneNumber;
+use App\Http\Requests\FailedValidationRequest;
 
 class GiftCardRequest extends FailedValidationRequest
 {
@@ -42,13 +43,13 @@ class GiftCardRequest extends FailedValidationRequest
             // Recipient information
             'recipient_name' => 'required|string|max:255',
             'recipient_email' => 'nullable|email|max:255',
-            'recipient_number' => 'nullable|string|max:20',
+            'recipient_number' => ['nullable', 'string', 'max:20', new FlexiblePhoneNumber],
 
             // User management - at least one user identification method is required
             'user_id' => 'nullable|exists:users,id',
             'create_new_user' => 'nullable|boolean',
             'new_user_name' => 'required_if:create_new_user,true|string|max:255',
-            'new_user_phone' => 'required_if:create_new_user,true|string|max:20',
+            'new_user_phone' => ['required_if:create_new_user,true', 'string', 'max:20', new FlexiblePhoneNumber],
             'new_user_email' => 'nullable|email|max:255',
         ];
     }

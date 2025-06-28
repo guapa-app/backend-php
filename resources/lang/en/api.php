@@ -127,4 +127,9 @@ return [
     'gift_card_settings_key_exists' => 'A setting with this key already exists',
     'gift_card_settings_not_found' => 'Gift card setting not found',
     'order_created_from_gift_card' => 'Order created successfully from gift card',
+
+    // Phone validation messages
+    'invalid_phone_format' => 'Please enter a valid phone number format',
+    'invalid_saudi_mobile_number' => 'Please enter a valid Saudi mobile number (e.g., 9665xxxxxxxx, +9665xxxxxxxx, 05xxxxxxxx, or 5xxxxxxxx)',
+    'not_ksa_number' => 'This is not a Saudi (KSA) mobile number. We recommend using a Saudi number for best experience.',
 ];

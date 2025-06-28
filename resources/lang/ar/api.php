@@ -129,4 +129,9 @@ return [
     'gift_card_settings_invalid_value' => 'قيمة غير صحيحة لإعداد البطاقة',
     'gift_card_settings_key_exists' => 'إعداد بهذا المفتاح موجود بالفعل',
     'gift_card_settings_not_found' => 'إعداد البطاقة غير موجود',
+
+    // Phone validation messages
+    'invalid_phone_format' => 'يرجى إدخال تنسيق رقم هاتف صحيح',
+    'invalid_saudi_mobile_number' => 'يرجى إدخال رقم هاتف سعودي صحيح (مثل 9665xxxxxxxx أو +9665xxxxxxxx أو 05xxxxxxxx أو 5xxxxxxxx)',
+    'not_ksa_number' => 'هذا ليس رقم جوال سعودي. نوصي باستخدام رقم سعودي لتجربة أفضل.',
 ];
