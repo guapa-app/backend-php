@@ -158,8 +158,24 @@ class GiftCard extends Model implements HasMedia
                 // For order type, ensure we have either product_id or offer_id
                 if ($giftCard->product_id) {
                     $giftCard->offer_id = null;
+
+                    // Auto-fill vendor_id from product if not provided
+                    if (empty($giftCard->vendor_id)) {
+                        $product = \App\Models\Product::find($giftCard->product_id);
+                        if ($product) {
+                            $giftCard->vendor_id = $product->vendor_id;
+                        }
+                    }
                 } elseif ($giftCard->offer_id) {
                     $giftCard->product_id = null;
+
+                    // Auto-fill vendor_id from offer's product if not provided
+                    if (empty($giftCard->vendor_id)) {
+                        $offer = \App\Models\Offer::find($giftCard->offer_id);
+                        if ($offer && $offer->product) {
+                            $giftCard->vendor_id = $offer->product->vendor_id;
+                        }
+                    }
                 }
             }
         });
@@ -193,9 +209,9 @@ class GiftCard extends Model implements HasMedia
 
     public function scopeReceivedBy($query, $user)
     {
-        return $query->where(function($q) use ($user) {
+        return $query->where(function ($q) use ($user) {
             $q->where('recipient_id', $user->id)
-              ->orWhere('user_id', $user->id);
+                ->orWhere('user_id', $user->id);
 
             // Only add email condition if user has email
             if (!empty($user->email)) {
@@ -281,8 +297,8 @@ class GiftCard extends Model implements HasMedia
     public function canBeRedeemed()
     {
         return $this->status === self::STATUS_ACTIVE &&
-               !$this->isExpired() &&
-               $this->redemption_method === self::REDEMPTION_PENDING;
+            !$this->isExpired() &&
+            $this->redemption_method === self::REDEMPTION_PENDING;
     }
 
     public function redeemToWallet()
