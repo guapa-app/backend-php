@@ -163,6 +163,10 @@ class InvoiceResource extends Resource
                     ->label('Customer')
                     ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? $record->invoiceable?->user?->name : '-')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('invoiceable.user.phone')
+                    ->label('Customer No')
+                    ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? $record->invoiceable?->user?->phone : '-')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('invoiceable.vendor.name')
                     ->label('Vendor')
                     ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? $record->invoiceable?->vendor?->name : '-')
