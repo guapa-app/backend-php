@@ -27,8 +27,11 @@ class OrderRelationManager extends RelationManager
             ->schema([
                 Components\Section::make('Order Information')
                     ->schema([
-                        Components\TextEntry::make('id')
-                            ->label('Order ID'),
+                        Components\TextEntry::make('order.id')
+                            ->label('Order ID')
+                            ->url(fn ($record) => route('filament.admin.resources.shop.orders.edit', $record->order?->id), shouldOpenInNewTab: true)
+                            ->suffix('Edit')
+                            ->color('primary'),
                         Components\TextEntry::make('hash_id')
                             ->label('Hash ID'),
                         Components\TextEntry::make('total')
@@ -179,6 +182,9 @@ class OrderRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->url(fn ($record) => route('filament.admin.resources.shop.orders.view', $record))
+                    ->openUrlInNewTab(),
+                Tables\Actions\EditAction::make()
+                    ->url(fn ($record) => route('filament.admin.resources.shop.orders.edit', $record))
                     ->openUrlInNewTab(),
             ]);
     }

@@ -2,19 +2,20 @@
 
 namespace App\Filament\Admin\Resources\Shop;
 
-use App\Filament\Admin\Resources\Shop\InvoiceResource\Actions\RefundInvoiceAction;
-use App\Filament\Admin\Resources\Shop\InvoiceResource\Pages;
-use App\Models\AppointmentOffer;
-use App\Models\Invoice;
-use App\Models\MarketingCampaign;
-use App\Models\Order;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Order;
+use App\Models\Invoice;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Infolists\Components;
+use App\Models\AppointmentOffer;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use App\Models\MarketingCampaign;
+use Filament\Infolists\Components;
+use Filament\Infolists\Components\TextEntry;
+use App\Filament\Admin\Resources\Shop\InvoiceResource\Pages;
+use App\Filament\Admin\Resources\Shop\InvoiceResource\Actions\RefundInvoiceAction;
 
 class InvoiceResource extends Resource
 {
@@ -82,6 +83,13 @@ class InvoiceResource extends Resource
                 Components\TextEntry::make('updated_at')
                     ->dateTime()
                     ->label('Updated At'),
+                Components\Actions::make([
+                    Components\Actions\Action::make('edit_order')
+                        ->label('Edit Order')
+                        ->url(fn ($record) => route('filament.admin.resources.shop.orders.edit', $record->order?->id))
+                        ->openUrlInNewTab()
+                        ->visible(fn ($record) => $record->order !== null),
+                ])->columnSpanFull(),
             ]);
     }
 
@@ -89,29 +97,44 @@ class InvoiceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('order_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(12),
+                Forms\Components\TextInput::make('invoice_id')
+                    ->label('Invoice ID')
+                    ->maxLength(255),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'initiated' => 'Initiated',
+                        'pending' => 'Pending',
+                        'paid' => 'Paid',
+                        'refunded' => 'Refunded',
+                    ])
+                    ->required(),
                 Forms\Components\TextInput::make('taxes')
-                    ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->required(),
                 Forms\Components\TextInput::make('amount')
-                    ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->required(),
                 Forms\Components\TextInput::make('currency')
-                    ->required()
-                    ->maxLength(5),
-                Forms\Components\TextInput::make('description')
-                    ->required()
+                    ->maxLength(5)
+                    ->required(),
+                Forms\Components\TextInput::make('amount_format')
+                    ->label('Amount Format')
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(255)
+                    ->required(),
+                Forms\Components\DateTimePicker::make('expired_at')
+                    ->label('Expired At'),
+                Forms\Components\TextInput::make('logo_url')
+                    ->label('Logo URL')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('url')
+                    ->label('Invoice URL')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('callback_url')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('invoice_id')
-                    ->maxLength(255),
+                    ->label('Callback URL')
+                    ->maxLength(255)
+                    ->required(),
             ]);
     }
 
@@ -232,6 +255,7 @@ class InvoiceResource extends Resource
         return [
             'index' => Pages\ListInvoices::route('/'),
             'view' => Pages\ViewInvoice::route('/{record}'),
+            'edit' => Pages\EditInvoice::route('/{record}/edit'),
         ];
     }
 
