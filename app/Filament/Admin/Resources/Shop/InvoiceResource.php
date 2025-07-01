@@ -72,6 +72,8 @@ class InvoiceResource extends Resource
                         'pending' => 'warning',
                         'paid' => 'success',
                         'refunded' => 'danger',
+                        'canceled' => 'danger',
+                        default => 'gray',
                     }),
                 Components\TextEntry::make('currency')
                     ->label('Currency'),
@@ -106,6 +108,7 @@ class InvoiceResource extends Resource
                         'pending' => 'Pending',
                         'paid' => 'Paid',
                         'refunded' => 'Refunded',
+                        'canceled' => 'Canceled',
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('taxes')
@@ -175,6 +178,8 @@ class InvoiceResource extends Resource
                         'pending' => 'warning',
                         'paid' => 'success',
                         'refunded' => 'danger',
+                        'canceled' => 'danger',
+                        default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('invoiceable_type')
                     ->label('Type')
@@ -229,6 +234,7 @@ class InvoiceResource extends Resource
                         'pending' => 'Pending',
                         'paid' => 'Paid',
                         'refunded' => 'Refunded',
+                        'canceled' => 'Canceled',
                     ]),
             ])
             ->actions([
