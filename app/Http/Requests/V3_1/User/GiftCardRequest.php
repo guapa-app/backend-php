@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V3_1\User;
 
 use App\Models\GiftCardSetting;
+use App\Models\Product;
 use App\Rules\FlexiblePhoneNumber;
 use App\Http\Requests\FailedValidationRequest;
 
@@ -28,7 +29,7 @@ class GiftCardRequest extends FailedValidationRequest
             // For order type gift cards - make both optional but at least one required
             'product_id' => 'nullable|exists:products,id',
             'offer_id' => 'nullable|exists:offers,id',
-            'vendor_id' => 'required_if:gift_type,order|nullable|exists:vendors,id',
+            'vendor_id' => 'nullable|exists:vendors,id',
 
             // Background customization
             'background_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
@@ -64,7 +65,6 @@ class GiftCardRequest extends FailedValidationRequest
             'gift_type.in' => 'Gift card type must be either wallet or order.',
             'product_id.required_if' => 'Product is required for order type gift cards.',
             'offer_id.required_if' => 'Offer is required for order type gift cards.',
-            'vendor_id.required_if' => 'Vendor is required for order type gift cards.',
             'recipient_name.required' => 'Recipient name is required.',
             'background_color.regex' => 'Background color must be a valid hex color code.',
             'amount.min' => "Amount must be at least {$minAmount}.",
@@ -86,6 +86,14 @@ class GiftCardRequest extends FailedValidationRequest
                 if (!empty($data['product_id']) && !empty($data['offer_id'])) {
                     $validator->errors()->add('gift_type', 'You cannot specify both product and offer for order type gift cards.');
                 }
+
+                // Auto-fill vendor_id from product_id if not provided
+                if (!empty($data['product_id']) && empty($data['vendor_id'])) {
+                    $product = Product::find($data['product_id']);
+                    if ($product) {
+                        $this->merge(['vendor_id' => $product->vendor_id]);
+                    }
+                }
             }
 
             // Ensure either background_color or background_image_id is provided
@@ -100,9 +108,9 @@ class GiftCardRequest extends FailedValidationRequest
 
             // Ensure at least one user identification method is provided
             $hasUserIdentification = !empty($data['user_id']) ||
-                                   !empty($data['create_new_user']) ||
-                                   !empty($data['recipient_email']) ||
-                                   !empty($data['recipient_number']);
+                !empty($data['create_new_user']) ||
+                !empty($data['recipient_email']) ||
+                !empty($data['recipient_number']);
 
             if (!$hasUserIdentification) {
                 $validator->errors()->add('user_management', 'Please provide either a user ID, recipient email, recipient phone number, or create a new user.');
