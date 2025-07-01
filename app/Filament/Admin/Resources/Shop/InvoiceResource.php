@@ -145,6 +145,7 @@ class InvoiceResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['invoiceable.user', 'invoiceable.vendor', 'invoiceable.address', 'invoiceable.country']))
+            ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()

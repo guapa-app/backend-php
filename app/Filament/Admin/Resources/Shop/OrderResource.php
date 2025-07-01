@@ -50,6 +50,7 @@ class OrderResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['vendor', 'user', 'items.product.taxonomies']))
+            ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->searchable()
