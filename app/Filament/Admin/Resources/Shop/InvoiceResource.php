@@ -144,7 +144,15 @@ class InvoiceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['invoiceable.user', 'invoiceable.vendor', 'invoiceable.address', 'invoiceable.country']))
+            ->modifyQueryUsing(function ($query) {
+                // Only eager load relationships if the invoiceable_type is Order
+                $query->when(
+                    (request('filter')['invoiceable_type'] ?? null) === '\\App\\Models\\Order',
+                    function ($q) {
+                        $q->with(['invoiceable.user', 'invoiceable.vendor', 'invoiceable.address', 'invoiceable.country']);
+                    }
+                );
+            })
             ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
@@ -162,15 +170,27 @@ class InvoiceResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('invoiceable.user.name')
                     ->label('Customer')
-                    ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? $record->invoiceable?->user?->name : '-')
+                    ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? ($record->invoiceable?->user?->name ?? '-') : '-')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('invoiceable.user.phone')
                     ->label('Customer No')
-                    ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? $record->invoiceable?->user?->phone : '-')
+                    ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? ($record->invoiceable?->user?->phone ?? '-') : '-')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('invoiceable.vendor.name')
                     ->label('Vendor')
-                    ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? $record->invoiceable?->vendor?->name : '-')
+                    ->formatStateUsing(fn ($record) => $record->invoiceable_type === Order::class ? ($record->invoiceable?->vendor?->name ?? '-') : '-')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('product_names')
+                    ->label('Product/Procedure Name')
+                    ->formatStateUsing(function ($record) {
+                        if ($record->invoiceable_type === Order::class) {
+                            $items = $record->invoiceable?->items;
+                            if ($items && $items->count()) {
+                                return $items->pluck('product.title')->filter()->unique()->implode(', ');
+                            }
+                        }
+                        return '-';
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->money('SAR')
