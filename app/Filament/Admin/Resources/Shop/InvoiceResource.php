@@ -118,7 +118,7 @@ class InvoiceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['invoiceable.user', 'invoiceable.vendor']))
+            ->modifyQueryUsing(fn ($query) => $query->with(['invoiceable.user', 'invoiceable.vendor', 'invoiceable.address', 'invoiceable.country']))
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
@@ -222,7 +222,8 @@ class InvoiceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Admin\Resources\Shop\InvoiceResource\RelationManagers\OrderRelationManager::class,
+            \App\Filament\Admin\Resources\Shop\InvoiceResource\RelationManagers\OrderItemsRelationManager::class,
         ];
     }
 

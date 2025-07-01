@@ -46,7 +46,7 @@ class Invoice extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class)->withDefault();
+        return $this->belongsTo(Order::class, 'invoiceable_id');
     }
 
     public function marketing_campaign(): BelongsTo
@@ -59,5 +59,17 @@ class Invoice extends Model
         $query->whereHasMorph('invoiceable', [Order::class, MarketingCampaign::class], function ($q) use ($vendorId) {
             $q->where('vendor_id', $vendorId);
         });
+    }
+
+    public function orderItems()
+    {
+        return $this->hasManyThrough(
+            OrderItem::class,
+            Order::class,
+            'id', // Foreign key on orders table
+            'order_id', // Foreign key on order_items table
+            'invoiceable_id', // Local key on invoices table
+            'id' // Local key on orders table
+        );
     }
 }
