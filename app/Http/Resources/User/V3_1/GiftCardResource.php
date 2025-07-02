@@ -86,6 +86,12 @@ class GiftCardResource extends JsonResource
             'is_redeemed' => $this->isRedeemed(),
             'is_expired' => $this->isExpired(),
             'can_be_redeemed' => $this->canBeRedeemed(),
+
+            // QR Code URLs
+            'qr_code_url' => $this->qr_code_url,
+            'qr_code_data_url' => $this->qr_code_data_url,
+            'redemption_url' => $this->buildRedemptionUrl(),
+            'qr_code_media' => $this->qrCode ? new MediaResource($this->qrCode) : null,
         ];
     }
 }

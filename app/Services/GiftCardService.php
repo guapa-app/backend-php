@@ -73,7 +73,11 @@ class GiftCardService
             // Attach media if provided
             $this->updateMedia($giftCard, $data);
 
-            $giftCard->load('media');
+            // Generate QR code synchronously as part of the creation process
+            $giftCard->generateQrCode();
+
+            // Load relationships including QR code
+            $giftCard->load(['media', 'qrCode']);
             DB::commit();
             return $giftCard;
         } catch (\Exception $e) {
@@ -118,6 +122,8 @@ class GiftCardService
             // Send notifications
             $this->sendNotifications($giftCard);
 
+            // Load relationships including QR code
+            $giftCard->load(['media', 'qrCode']);
             DB::commit();
             return $giftCard;
         } catch (\Exception $e) {
@@ -172,6 +178,8 @@ class GiftCardService
             // Send notifications
             $this->sendNotifications($giftCard);
 
+            // Load relationships including QR code
+            $giftCard->load(['media', 'qrCode']);
             DB::commit();
             return $giftCard;
         } catch (\Exception $e) {

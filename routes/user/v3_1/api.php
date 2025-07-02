@@ -94,6 +94,11 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
             Route::post('/{id}/create-order', [GiftCardController::class, 'createOrder']);
             Route::post('/{id}/cancel-order-redeem-wallet', [GiftCardController::class, 'cancelOrderAndRedeemToWallet']);
             Route::get('/{id}', [GiftCardController::class, 'show']);
+
+            // QR Code functionality
+            Route::get('/{id}/qr-code', [GiftCardController::class, 'generateQrCode']);
+            Route::get('/{id}/qr-code/download', [GiftCardController::class, 'downloadQrCode']);
+            Route::post('/verify-qr-code', [GiftCardController::class, 'verifyQrCode']);
         });
     });
 });

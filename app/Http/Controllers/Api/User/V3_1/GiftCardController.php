@@ -8,6 +8,7 @@ use App\Models\GiftCard;
 use Illuminate\Http\Request;
 use App\Models\GiftCardBackground;
 use App\Services\GiftCardService;
+use App\Services\GiftCardQrCodeService;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\GiftCardRequest;
 use App\Http\Resources\User\V3_1\GiftCardResource;
@@ -15,11 +16,13 @@ use App\Http\Resources\User\V3_1\GiftCardResource;
 class GiftCardController extends BaseApiController
 {
     protected $giftCardService;
+    protected $qrCodeService;
 
-    public function __construct(GiftCardService $giftCardService)
+    public function __construct(GiftCardService $giftCardService, GiftCardQrCodeService $qrCodeService)
     {
         parent::__construct();
         $this->giftCardService = $giftCardService;
+        $this->qrCodeService = $qrCodeService;
     }
 
     public function index(Request $request)
@@ -30,7 +33,7 @@ class GiftCardController extends BaseApiController
                 ->orWhere('recipient_id', $user->id)
                 ->orWhere('user_id', $user->id);
         })
-            ->with(['order', 'walletTransaction', 'backgroundImage'])
+            ->with(['order', 'walletTransaction', 'backgroundImage', 'qrCode'])
             ->latest()
             ->paginate(20);
 
@@ -155,7 +158,7 @@ class GiftCardController extends BaseApiController
                 ->orWhere('recipient_id', $user->id)
                 ->orWhere('user_id', $user->id);
         })
-            ->with(['order', 'walletTransaction', 'backgroundImage'])
+            ->with(['order', 'walletTransaction', 'backgroundImage', 'qrCode'])
             ->find($id);
 
         if (!$giftCard) {
@@ -177,7 +180,7 @@ class GiftCardController extends BaseApiController
     {
         $user = $request->user();
         $type = $request->query('type', 'all');
-        $query = GiftCard::with(['order', 'walletTransaction', 'backgroundImage']);
+        $query = GiftCard::with(['order', 'walletTransaction', 'backgroundImage', 'qrCode']);
 
         if ($type === 'sent') {
             $query->where('sender_id', $user->id);
@@ -412,7 +415,7 @@ class GiftCardController extends BaseApiController
         }
 
         $giftCard = GiftCard::where('code', $code)
-            ->with(['order', 'walletTransaction', 'backgroundImage'])
+            ->with(['order', 'walletTransaction', 'backgroundImage', 'qrCode'])
             ->first();
 
         if (!$giftCard) {
@@ -424,5 +427,177 @@ class GiftCardController extends BaseApiController
 
         return GiftCardResource::make($giftCard)
             ->additional(['success' => true, 'message' => __('api.success')]);
+    }
+
+    /**
+     * Generate QR code for gift card
+     */
+    public function generateQrCode(Request $request, $id)
+    {
+        $user = $request->user();
+        $giftCard = GiftCard::where(function ($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                ->orWhere('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
+        })->find($id);
+
+        if (!$giftCard) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.gift_card_not_found'),
+            ], 404);
+        }
+
+        $type = $request->get('type', 'standard'); // standard, sharing, verification
+
+        try {
+            switch ($type) {
+                case 'sharing':
+                    $qrCodeImage = $giftCard->generateSharingQrCode();
+                    break;
+                case 'verification':
+                    $qrCodeImage = $giftCard->generateVerificationQrCode();
+                    break;
+                default:
+                    $giftCard->generateQrCode();
+                    return response()->json([
+                        'success' => true,
+                        'message' => __('api.qr_code_generated'),
+                        'data' => [
+                            'qr_code_url' => $giftCard->qr_code_url,
+                            'gift_card' => new GiftCardResource($giftCard->fresh())
+                        ]
+                    ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => __('api.qr_code_generated'),
+                'data' => [
+                    'qr_code_image' => base64_encode($qrCodeImage),
+                    'type' => $type
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.qr_generation_failed'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Download QR code as image
+     */
+    public function downloadQrCode(Request $request, $id)
+    {
+        $user = $request->user();
+        $giftCard = GiftCard::where(function ($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                ->orWhere('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
+        })->find($id);
+
+        if (!$giftCard) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.gift_card_not_found'),
+            ], 404);
+        }
+
+        if (!$giftCard->qrCode) {
+            $giftCard->generateQrCode();
+        }
+
+        $qrCodeUrl = $giftCard->qr_code_url;
+
+        if (!$qrCodeUrl) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.qr_code_not_available'),
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('api.qr_code_download_url'),
+            'data' => [
+                'download_url' => $qrCodeUrl,
+                'filename' => "gift_card_qr_{$giftCard->code}.png"
+            ]
+        ]);
+    }
+
+    /**
+     * Verify QR code data
+     */
+    public function verifyQrCode(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'qr_data' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.validation_failed'),
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            $qrData = $this->qrCodeService->parseQrCodeData($request->qr_data);
+
+            if (!$qrData) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('api.invalid_qr_data'),
+                ], 400);
+            }
+
+            if (!$this->qrCodeService->validateQrCodeData($qrData)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('api.invalid_qr_format'),
+                ], 400);
+            }
+
+            $giftCard = GiftCard::find($qrData['gift_card_id']);
+
+            if (!$giftCard) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('api.gift_card_not_found'),
+                ], 404);
+            }
+
+            // Verify hash if present
+            if (isset($qrData['verification_hash'])) {
+                if (!$this->qrCodeService->verifyQrCodeHash($giftCard, $qrData['verification_hash'])) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => __('api.verification_failed'),
+                    ], 400);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => __('api.qr_code_verified'),
+                'data' => [
+                    'gift_card' => new GiftCardResource($giftCard->load(['sender', 'recipient', 'user', 'vendor', 'product', 'offer', 'order', 'walletTransaction', 'backgroundImage'])),
+                    'qr_data' => $qrData
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api.verification_failed'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Services\ConsultationService;
 use App\Services\PaymentService;
-use App\Services\V3_1\OrderPaymentService;
-use Illuminate\Support\Facades\Log;
-use App\Services\MarketingCampaignService;
-use App\Services\V3_1\AppointmentOfferService;
 use App\Services\GiftCardService;
+use Illuminate\Support\Facades\Log;
+use App\Services\ConsultationService;
+use App\Services\MarketingCampaignService;
+use App\Services\V3_1\OrderPaymentService;
+use App\Services\V3_1\AppointmentOfferService;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\Common\PayByWalletRequest;
 use App\Http\Requests\V3_1\Common\PaymentStatusRequest;

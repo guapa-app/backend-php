@@ -60,6 +60,17 @@ return [
     'gift_card_settings_key_exists' => 'A setting with this key already exists',
     'gift_card_settings_not_found' => 'Gift card setting not found',
 
+    // QR Code specific messages
+    'qr_code_generated' => 'QR code generated successfully',
+    'qr_generation_failed' => 'Failed to generate QR code',
+    'qr_code_not_available' => 'QR code not available',
+    'qr_code_download_url' => 'QR code download URL provided',
+    'qr_code_verified' => 'QR code verified successfully',
+    'verification_failed' => 'QR code verification failed',
+    'invalid_qr_data' => 'Invalid QR code data',
+    'invalid_qr_format' => 'Invalid QR code format',
+    'validation_failed' => 'Validation failed',
+
     // Background specific messages
     'background_not_found' => 'Background image not found',
     'background_upload_success' => 'Background image uploaded successfully',

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Log;
 
 class GiftCard extends Model implements HasMedia
 {
@@ -122,10 +124,18 @@ class GiftCard extends Model implements HasMedia
         return $this->belongsTo(User::class, 'recipient_id');
     }
 
-    // Register media collections for background image
+    // Register media collections for background image and QR code
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('gift_card_backgrounds')->singleFile();
+        $this->addMediaCollection('gift_card_qr_codes')->singleFile();
+    }
+
+    // QR Code relationship
+    public function qrCode()
+    {
+        return $this->morphOne(Media::class, 'model')
+            ->where('collection_name', 'gift_card_qr_codes');
     }
 
     protected static function booted()
@@ -205,6 +215,65 @@ class GiftCard extends Model implements HasMedia
                 }
             }
         });
+
+        static::created(function ($giftCard) {
+            // Generate QR code automatically when gift card is created
+            Log::info("GiftCard created event triggered for ID: {$giftCard->id}");
+            try {
+                $giftCard->generateQrCode();
+                Log::info("QR code generated successfully for GiftCard ID: {$giftCard->id}");
+            } catch (\Exception $e) {
+                Log::error("Failed to generate QR code for GiftCard ID: {$giftCard->id}. Error: " . $e->getMessage());
+            }
+        });
+
+        static::updated(function ($giftCard) {
+            // Regenerate QR code if important fields changed
+            if ($giftCard->wasChanged(['code', 'amount', 'status', 'payment_status'])) {
+                $giftCard->generateQrCode();
+            }
+        });
+    }
+
+    // QR Code Methods
+    public function generateQrCode()
+    {
+        $qrCodeService = app(\App\Services\GiftCardQrCodeService::class);
+        $qrCodeImage = $qrCodeService->generateForGiftCard($this);
+
+        // Remove existing QR code if exists
+        if ($this->qrCode) {
+            $this->qrCode->delete();
+        }
+
+        // Add new QR code to media collection
+        $this->addMediaFromString($qrCodeImage)
+            ->usingName("Gift Card QR Code - {$this->code}")
+            ->usingFileName("gift_card_qr_{$this->code}.png")
+            ->toMediaCollection('gift_card_qr_codes');
+    }
+
+    public function generateSharingQrCode()
+    {
+        $qrCodeService = app(\App\Services\GiftCardQrCodeService::class);
+        return $qrCodeService->generateSharingQrCode($this);
+    }
+
+    public function generateVerificationQrCode()
+    {
+        $qrCodeService = app(\App\Services\GiftCardQrCodeService::class);
+        return $qrCodeService->generateVerificationQrCode($this);
+    }
+
+    public function buildRedemptionUrl(): string
+    {
+        $baseUrl = config('app.url');
+        return "{$baseUrl}/gift-cards/redeem/{$this->code}";
+    }
+
+    public function getQrCodeUrlAttribute(): ?string
+    {
+        return $this->qrCode?->getUrl();
     }
 
     // Scopes
