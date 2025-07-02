@@ -7,23 +7,32 @@ use App\Models\Media;
 use App\Models\GiftCard;
 use Illuminate\Http\Request;
 use App\Models\GiftCardBackground;
+use App\Services\GiftCardService;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\GiftCardRequest;
 use App\Http\Resources\User\V3_1\GiftCardResource;
 
 class GiftCardController extends BaseApiController
 {
+    protected $giftCardService;
+
+    public function __construct(GiftCardService $giftCardService)
+    {
+        parent::__construct();
+        $this->giftCardService = $giftCardService;
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();
-        $giftCards = GiftCard::where(function($query) use ($user) {
+        $giftCards = GiftCard::where(function ($query) use ($user) {
             $query->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id);
+                ->orWhere('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
         })
-        ->with(['order', 'walletTransaction', 'backgroundImage'])
-        ->latest()
-        ->paginate(20);
+            ->with(['order', 'walletTransaction', 'backgroundImage'])
+            ->latest()
+            ->paginate(20);
 
         return GiftCardResource::collection($giftCards)
             ->additional(['success' => true, 'message' => __('api.success')]);
@@ -31,10 +40,31 @@ class GiftCardController extends BaseApiController
 
     public function store(GiftCardRequest $request)
     {
-        $data = $request->validated();
-        $media = null;
-        $user = $request->user();
+        try {
+            $data = $request->validated();
+            $user = $request->user();
 
+            // Handle user selection/creation logic
+            $data = $this->handleUserSelection($data, $user);
+
+            // Create gift card using service
+            $giftCard = $this->giftCardService->createGiftCard($data, $user);
+
+            return GiftCardResource::make($giftCard)
+                ->additional(['success' => true, 'message' => __('api.created')]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Handle user selection and creation logic
+     */
+    private function handleUserSelection($data, $user)
+    {
         // User selection/creation logic - ensure we always have a valid user_id
         if (!empty($data['create_new_user'])) {
             // Create a new user for the gift card
@@ -51,10 +81,7 @@ class GiftCardController extends BaseApiController
             // Use existing user ID
             $existingUser = User::find($data['user_id']);
             if (!$existingUser) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Selected user not found. Please provide a valid user ID or create a new user.',
-                ], 422);
+                throw new \Exception('Selected user not found. Please provide a valid user ID or create a new user.');
             }
             $data['user_id'] = $existingUser->id;
         } elseif (!empty($data['recipient_email'])) {
@@ -103,85 +130,33 @@ class GiftCardController extends BaseApiController
             }
         } else {
             // If no user identification provided, return error
-            return response()->json([
-                'success' => false,
-                'message' => 'Please provide either a user ID, recipient email, recipient phone number, or create a new user.',
-            ], 422);
+            throw new \Exception('Please provide either a user ID, recipient email, recipient phone number, or create a new user.');
         }
 
         // Set sender_id
         if ($user->hasRole('admin') && !empty($data['sender_id'])) {
             $sender = User::find($data['sender_id']);
             if (!$sender) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Sender user not found.',
-                ], 422);
+                throw new \Exception('Sender user not found.');
             }
             $data['sender_id'] = $sender->id;
         } else {
             $data['sender_id'] = $user->id;
         }
 
-        // Set default expiry if not provided
-        if (empty($data['expires_at'])) {
-            $defaultExpirationDays = \App\Models\GiftCardSetting::getDefaultExpirationDays();
-            $data['expires_at'] = now()->addDays($defaultExpirationDays);
-        }
-
-        // Validate amount against settings
-        $minAmount = \App\Models\GiftCardSetting::getMinAmount();
-        $maxAmount = \App\Models\GiftCardSetting::getMaxAmount();
-
-        if ($data['amount'] < $minAmount || $data['amount'] > $maxAmount) {
-            return response()->json([
-                'success' => false,
-                'message' => "Amount must be between {$minAmount} and {$maxAmount}.",
-            ], 422);
-        }
-
-        // Handle background image association
-        if (!empty($data['background_image_id'])) {
-            // Use admin-uploaded background image
-            $background = GiftCardBackground::find($data['background_image_id']);
-            if ($background && $background->is_active) {
-                $data['background_image_id'] = $background->id;
-            }
-        } elseif (!empty($data['background_image'])) {
-            // Handle temporary upload
-            $mediaId = $data['background_image'];
-            $media = Media::find($mediaId);
-            if ($media && $media->model_type === 'App\\Models\\TemporaryUpload') {
-                $media->model_type = GiftCard::class;
-            }
-        }
-
-        // Create the gift card
-        $giftCard = GiftCard::create($data);
-
-        // Associate uploaded media if exists
-        if (!empty($media) && $media->model_type === GiftCard::class) {
-            $media->model_id = $giftCard->id;
-            $media->collection_name = 'gift_card_backgrounds';
-            $media->save();
-            $giftCard->background_image = $media->getUrl();
-            $giftCard->save();
-        }
-
-        return GiftCardResource::make($giftCard)
-            ->additional(['success' => true, 'message' => __('api.created')]);
+        return $data;
     }
 
     public function show(Request $request, $id)
     {
         $user = $request->user();
-        $giftCard = GiftCard::where(function($query) use ($user) {
+        $giftCard = GiftCard::where(function ($query) use ($user) {
             $query->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id);
+                ->orWhere('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
         })
-        ->with(['order', 'walletTransaction', 'backgroundImage'])
-        ->find($id);
+            ->with(['order', 'walletTransaction', 'backgroundImage'])
+            ->find($id);
 
         if (!$giftCard) {
             return response()->json([
@@ -207,9 +182,9 @@ class GiftCardController extends BaseApiController
         if ($type === 'sent') {
             $query->where('sender_id', $user->id);
         } elseif ($type === 'received') {
-            $query->where(function($q) use ($user) {
+            $query->where(function ($q) use ($user) {
                 $q->where('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id);
+                    ->orWhere('user_id', $user->id);
 
                 // Only add email condition if user has email
                 if (!empty($user->email)) {
@@ -222,10 +197,10 @@ class GiftCardController extends BaseApiController
                 }
             });
         } else { // all
-            $query->where(function($q) use ($user) {
+            $query->where(function ($q) use ($user) {
                 $q->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id);
+                    ->orWhere('recipient_id', $user->id)
+                    ->orWhere('user_id', $user->id);
 
                 // Only add email condition if user has email
                 if (!empty($user->email)) {
@@ -282,10 +257,10 @@ class GiftCardController extends BaseApiController
     public function redeemToWallet(Request $request, $id)
     {
         $user = $request->user();
-        $giftCard = GiftCard::where(function($query) use ($user) {
+        $giftCard = GiftCard::where(function ($query) use ($user) {
             $query->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id);
+                ->orWhere('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
         })->find($id);
 
         if (!$giftCard) {
@@ -329,10 +304,10 @@ class GiftCardController extends BaseApiController
     public function createOrder(Request $request, $id)
     {
         $user = $request->user();
-        $giftCard = GiftCard::where(function($query) use ($user) {
+        $giftCard = GiftCard::where(function ($query) use ($user) {
             $query->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id);
+                ->orWhere('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
         })->find($id);
 
         if (!$giftCard) {
@@ -381,10 +356,10 @@ class GiftCardController extends BaseApiController
     public function cancelOrderAndRedeemToWallet(Request $request, $id)
     {
         $user = $request->user();
-        $giftCard = GiftCard::where(function($query) use ($user) {
+        $giftCard = GiftCard::where(function ($query) use ($user) {
             $query->where('sender_id', $user->id)
-                  ->orWhere('recipient_id', $user->id)
-                  ->orWhere('user_id', $user->id);
+                ->orWhere('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
         })->find($id);
 
         if (!$giftCard) {

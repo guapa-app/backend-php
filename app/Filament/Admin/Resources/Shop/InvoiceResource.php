@@ -145,11 +145,16 @@ class InvoiceResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                // Only eager load relationships if the invoiceable_type is Order
                 $query->when(
-                    (request('filter')['invoiceable_type'] ?? null) === '\\App\\Models\\Order',
+                    (request('filter')['invoiceable_type'] ?? null) === '\\App\\Models\\Order' || !(request('filter')['invoiceable_type'] ?? null),
                     function ($q) {
-                        $q->with(['invoiceable.user', 'invoiceable.vendor', 'invoiceable.address', 'invoiceable.country']);
+                        $q->with([
+                            'invoiceable.user',
+                            'invoiceable.vendor',
+                            'invoiceable.address',
+                            'invoiceable.country',
+                            'invoiceable.items.product',
+                        ]);
                     }
                 );
             })
@@ -186,7 +191,11 @@ class InvoiceResource extends Resource
                         if ($record->invoiceable_type === Order::class) {
                             $items = $record->invoiceable?->items;
                             if ($items && $items->count()) {
-                                return $items->pluck('product.title')->filter()->unique()->implode(', ');
+                                return $items->map(function ($item) {
+                                    return $item->product && $item->product->title
+                                        ? $item->product->title
+                                        : $item->title;
+                                })->filter()->unique()->implode(', ');
                             }
                         }
                         return '-';

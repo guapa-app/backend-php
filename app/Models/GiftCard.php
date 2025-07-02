@@ -23,12 +23,19 @@ class GiftCard extends Model implements HasMedia
         'wallet_transaction_id',
         'amount',
         'currency',
+        'tax_amount',
+        'total_amount',
         'background_color',
         'background_image',
         'background_image_id',
         'message',
         'notes',
         'status',
+        'payment_status',
+        'payment_method',
+        'payment_reference',
+        'payment_gateway',
+        'invoice_url',
         'redemption_method',
         'expires_at',
         'redeemed_at',
@@ -41,15 +48,24 @@ class GiftCard extends Model implements HasMedia
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'total_amount' => 'decimal:2',
         'expires_at' => 'datetime',
         'redeemed_at' => 'datetime',
     ];
 
     // Status constants
+    public const STATUS_PENDING = 'pending';
     public const STATUS_ACTIVE = 'active';
     public const STATUS_USED = 'used';
     public const STATUS_EXPIRED = 'expired';
     public const STATUS_CANCELLED = 'cancelled';
+
+    // Payment status constants
+    public const PAYMENT_STATUS_PENDING = 'pending';
+    public const PAYMENT_STATUS_PAID = 'paid';
+    public const PAYMENT_STATUS_FAILED = 'failed';
+    public const PAYMENT_STATUS_REFUNDED = 'refunded';
 
     // Gift type constants
     public const GIFT_TYPE_WALLET = 'wallet';
@@ -123,12 +139,22 @@ class GiftCard extends Model implements HasMedia
 
             // Set default status if not set
             if (empty($giftCard->status)) {
-                $giftCard->status = self::STATUS_ACTIVE;
+                $giftCard->status = self::STATUS_PENDING;
+            }
+
+            // Set default payment status if not set
+            if (empty($giftCard->payment_status)) {
+                $giftCard->payment_status = self::PAYMENT_STATUS_PENDING;
             }
 
             // Set default redemption method if not set
             if (empty($giftCard->redemption_method)) {
                 $giftCard->redemption_method = self::REDEMPTION_PENDING;
+            }
+
+            // Calculate total amount if not set
+            if (empty($giftCard->total_amount)) {
+                $giftCard->total_amount = $giftCard->amount + ($giftCard->tax_amount ?? 0);
             }
 
             // Set default expiry date if not provided
@@ -265,12 +291,24 @@ class GiftCard extends Model implements HasMedia
     public function getStatusLabelAttribute()
     {
         $labels = [
+            self::STATUS_PENDING => 'Pending',
             self::STATUS_ACTIVE => 'Active',
             self::STATUS_USED => 'Used',
             self::STATUS_EXPIRED => 'Expired',
             self::STATUS_CANCELLED => 'Cancelled',
         ];
         return $labels[$this->status] ?? $this->status;
+    }
+
+    public function getPaymentStatusLabelAttribute()
+    {
+        $labels = [
+            self::PAYMENT_STATUS_PENDING => 'Pending',
+            self::PAYMENT_STATUS_PAID => 'Paid',
+            self::PAYMENT_STATUS_FAILED => 'Failed',
+            self::PAYMENT_STATUS_REFUNDED => 'Refunded',
+        ];
+        return $labels[$this->payment_status] ?? $this->payment_status;
     }
 
     // Methods
@@ -297,8 +335,24 @@ class GiftCard extends Model implements HasMedia
     public function canBeRedeemed()
     {
         return $this->status === self::STATUS_ACTIVE &&
+            $this->payment_status === self::PAYMENT_STATUS_PAID &&
             !$this->isExpired() &&
             $this->redemption_method === self::REDEMPTION_PENDING;
+    }
+
+    public function isPaymentPending()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_PENDING;
+    }
+
+    public function isPaymentPaid()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_PAID;
+    }
+
+    public function isPaymentFailed()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_FAILED;
     }
 
     public function redeemToWallet()

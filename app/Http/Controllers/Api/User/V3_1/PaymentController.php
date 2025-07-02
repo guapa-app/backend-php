@@ -8,6 +8,7 @@ use App\Services\V3_1\OrderPaymentService;
 use Illuminate\Support\Facades\Log;
 use App\Services\MarketingCampaignService;
 use App\Services\V3_1\AppointmentOfferService;
+use App\Services\GiftCardService;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\Common\PayByWalletRequest;
 use App\Http\Requests\V3_1\Common\PaymentStatusRequest;
@@ -19,13 +20,15 @@ class PaymentController extends BaseApiController
     protected $appointmentOfferService;
     protected $paymentService;
     protected $consultationService;
+    protected $giftCardService;
 
     public function __construct(
         OrderPaymentService $orderPaymentService,
         MarketingCampaignService $marketingCampaignService,
         AppointmentOfferService $appointmentOfferService,
         PaymentService $paymentService,
-        ConsultationService $consultationService
+        ConsultationService $consultationService,
+        GiftCardService $giftCardService
     ) {
         parent::__construct();
         $this->orderPaymentService = $orderPaymentService;
@@ -33,6 +36,7 @@ class PaymentController extends BaseApiController
         $this->appointmentOfferService = $appointmentOfferService;
         $this->paymentService = $paymentService;
         $this->consultationService = $consultationService;
+        $this->giftCardService = $giftCardService;
     }
 
     /**
@@ -63,6 +67,9 @@ class PaymentController extends BaseApiController
                         break;
                     case 'consultation':
                         $this->consultationService->changePaymentStatus($data);
+                        break;
+                    case 'gift_card':
+                        $this->giftCardService->changePaymentStatus($data);
                         break;
                     default:
                         return $this->errorJsonRes([], __('api.invalid_type'));
@@ -106,6 +113,9 @@ class PaymentController extends BaseApiController
                 case 'consultation':
                     $this->consultationService->payViaWallet($user, $data);
                     break;
+                case 'gift_card':
+                    $this->giftCardService->payViaWallet($user, $data);
+                    break;
                 default:
                     return $this->errorJsonRes([], __('api.invalid_type'));
             }
@@ -113,7 +123,7 @@ class PaymentController extends BaseApiController
             return $this->successJsonRes([], __('api.paid_successfully'));
         } catch (\Exception $e) {
             Log::error('Error changing payment status: ' . $e->getMessage());
-            return $this->errorJsonRes([], $e->getMessage()?: __('api.error_payment_status'));
+            return $this->errorJsonRes([], $e->getMessage() ?: __('api.error_payment_status'));
         }
     }
 }
