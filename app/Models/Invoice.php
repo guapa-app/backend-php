@@ -36,6 +36,7 @@ class Invoice extends Model
         'order',
         'customer_name',
         'customer_phone',
+        'product_names',
     ];
 
     public function invoiceable(): MorphTo
@@ -83,6 +84,25 @@ class Invoice extends Model
     {
         if ($this->invoiceable_type === Order::class && $this->invoiceable) {
             return $this->invoiceable->user?->phone ?? $this->invoiceable->phone ?? '';
+        }
+        return '';
+    }
+
+    public function getProductNamesAttribute(): string
+    {
+        if ($this->invoiceable_type === Order::class && $this->invoiceable) {
+            $order = $this->invoiceable;
+
+            // Load items with products if not already loaded
+            if (!$order->relationLoaded('items')) {
+                $order->load('items.product');
+            }
+
+            $productNames = $order->items->map(function ($item) {
+                return $item->product?->title ?? $item->title ?? 'Unknown Product';
+            })->filter()->unique()->values();
+
+            return $productNames->implode(', ');
         }
         return '';
     }

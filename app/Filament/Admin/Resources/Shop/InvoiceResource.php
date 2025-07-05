@@ -54,6 +54,8 @@ class InvoiceResource extends Resource
                     ->label('Customer Name'),
                 Components\TextEntry::make('customer_phone')
                     ->label('Customer Phone'),
+                Components\TextEntry::make('product_names')
+                    ->label('Products/Services'),
                 Components\TextEntry::make('amount')
                     ->money('SAR')
                     ->label('Total Amount'),
@@ -146,7 +148,7 @@ class InvoiceResource extends Resource
                 $query->with([
                     'invoiceable' => function ($morphTo) {
                         $morphTo->morphWith([
-                            \App\Models\Order::class => ['user', 'vendor'],
+                            \App\Models\Order::class => ['user', 'vendor', 'items.product'],
                             \App\Models\MarketingCampaign::class => ['users'],
                         ]);
                     }
@@ -172,6 +174,10 @@ class InvoiceResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer_phone')
                     ->label('Customer No')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('product_names')
+                    ->label('Products/Services')
+                    ->limit(50)
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('vendor_name')
