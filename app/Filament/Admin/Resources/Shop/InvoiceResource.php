@@ -50,17 +50,10 @@ class InvoiceResource extends Resource
                     ->label('Vendor Name'),
                 Components\TextEntry::make('vendor_reg_num')
                     ->label('Vendor Reg Number'),
-                Components\TextEntry::make('invoiceable.user.name')
-                    ->label('Customer Name')
-                    ->formatStateUsing(fn($record) => match ($record->invoiceable_type) {
-                        Order::class => $record->invoiceable?->user?->name ?? '-',
-                        MarketingCampaign::class => 'Marketing Campaign',
-                        AppointmentOffer::class => 'Appointment Offer',
-                        default => '-',
-                    }),
-                Components\TextEntry::make('invoiceable.vendor.name')
-                    ->label('Vendor Name')
-                    ->formatStateUsing(fn($record) => $record->invoiceable_type === Order::class ? $record->invoiceable?->vendor?->name : '-'),
+                Components\TextEntry::make('customer_name')
+                    ->label('Customer Name'),
+                Components\TextEntry::make('customer_phone')
+                    ->label('Customer Phone'),
                 Components\TextEntry::make('amount')
                     ->money('SAR')
                     ->label('Total Amount'),
@@ -93,9 +86,9 @@ class InvoiceResource extends Resource
                 Components\Actions::make([
                     Components\Actions\Action::make('edit_order')
                         ->label('Edit Order')
-                        ->url(fn($record) => route('filament.admin.resources.shop.orders.edit', $record->order?->id))
+                        ->url(fn($record) => $record->invoiceable_type === Order::class ? route('filament.admin.resources.shop.orders.edit', $record->invoiceable_id) : null)
                         ->openUrlInNewTab()
-                        ->visible(fn($record) => $record->order !== null),
+                        ->visible(fn($record) => $record->invoiceable_type === Order::class),
                 ])->columnSpanFull(),
             ]);
     }
@@ -150,31 +143,14 @@ class InvoiceResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                $filterType = request('filter')['invoiceable_type'] ?? null;
-
-                if (!$filterType || $filterType === '\\App\\Models\\Order') {
-                    $query->with([
-                        'invoiceable.user',
-                        'invoiceable.vendor',
-                        'invoiceable.address',
-                        'invoiceable.country',
-                        'invoiceable.items.product',
-                    ]);
-                } elseif ($filterType === '\\App\\Models\\MarketingCampaign') {
-                    $query->with([
-                        'invoiceable.vendor',
-                        'invoiceable.users',
-                    ]);
-                } elseif ($filterType === '\\App\\Models\\AppointmentOffer') {
-                    $query->with([
-                        'invoiceable.vendor',
-                    ]);
-                } else {
-                    // Load basic relationships for all types
-                    $query->with([
-                        'invoiceable.vendor',
-                    ]);
-                }
+                $query->with([
+                    'invoiceable' => function ($morphTo) {
+                        $morphTo->morphWith([
+                            \App\Models\Order::class => ['user', 'vendor'],
+                            \App\Models\MarketingCampaign::class => ['users'],
+                        ]);
+                    }
+                ]);
             })
             ->defaultSort('id', 'desc')
             ->columns([
@@ -191,44 +167,23 @@ class InvoiceResource extends Resource
                     ->color('primary')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('invoiceable.user.name')
+                Tables\Columns\TextColumn::make('customer_name')
                     ->label('Customer')
-                    ->formatStateUsing(fn($record) => match ($record->invoiceable_type) {
-                        Order::class => $record->invoiceable?->user?->name ?? '-',
-                        MarketingCampaign::class => 'Marketing Campaign',
-                        AppointmentOffer::class => 'Appointment Offer',
-                        default => '-',
-                    })
                     ->searchable(),
-                Tables\Columns\TextColumn::make('invoiceable.user.phone')
+                Tables\Columns\TextColumn::make('customer_phone')
                     ->label('Customer No')
-                    ->formatStateUsing(fn($record) => match ($record->invoiceable_type) {
-                        Order::class => $record->invoiceable?->user?->phone ?? '-',
-                        MarketingCampaign::class => 'Marketing Campaign',
-                        AppointmentOffer::class => 'Appointment Offer',
-                        default => '-',
-                    })
                     ->searchable(),
-                Tables\Columns\TextColumn::make('invoiceable.vendor.name')
+
+                Tables\Columns\TextColumn::make('vendor_name')
                     ->label('Vendor')
-                    ->formatStateUsing(fn($record) => $record->invoiceable_type === Order::class ? ($record->invoiceable?->vendor?->name ?? '-') : '-')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('product_names')
-                    ->label('Product/Procedure Name')
                     ->formatStateUsing(function ($record) {
-                        if ($record->invoiceable_type === Order::class) {
-                            $items = $record->invoiceable?->items;
-                            if ($items && $items->count()) {
-                                return $items->map(function ($item) {
-                                    return $item->product && $item->product->title
-                                        ? $item->product->title
-                                        : $item->title;
-                                })->filter()->unique()->implode(', ');
-                            }
+                        if ($record->invoiceable && $record->invoiceable->vendor) {
+                            return $record->invoiceable->vendor->name ?? '-';
                         }
                         return '-';
                     })
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('amount')
                     ->money('SAR')
                     ->searchable()
@@ -281,6 +236,7 @@ class InvoiceResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('invoiceable_type')

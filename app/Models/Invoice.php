@@ -12,16 +12,30 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'invoiceable_id', 'invoiceable_type', 'invoice_id', 'status',
-        'amount', 'currency', 'amount_format', 'description',
-        'expired_at', 'logo_url', 'url', 'callback_url', 'taxes',
-        'invoiceable_id', 'invoiceable_type'
+        'invoiceable_id',
+        'invoiceable_type',
+        'invoice_id',
+        'status',
+        'amount',
+        'currency',
+        'amount_format',
+        'description',
+        'expired_at',
+        'logo_url',
+        'url',
+        'callback_url',
+        'taxes',
+        'invoiceable_id',
+        'invoiceable_type'
     ];
 
     protected $appends = [
         'vendor_name',
         'vendor_reg_num',
         'amount_without_taxes',
+        'order',
+        'customer_name',
+        'customer_phone',
     ];
 
     public function invoiceable(): MorphTo
@@ -31,7 +45,10 @@ class Invoice extends Model
 
     public function getVendorNameAttribute(): string
     {
-        return $this->invoiceable?->vendor?->name ?? '';
+        if ($this->invoiceable && $this->invoiceable->vendor) {
+            return $this->invoiceable->vendor->name ?? '';
+        }
+        return '';
     }
 
     public function getVendorRegNumAttribute(): string
@@ -47,6 +64,27 @@ class Invoice extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'invoiceable_id');
+    }
+
+    public function getOrderAttribute()
+    {
+        return $this->invoiceable_type === Order::class ? $this->invoiceable : null;
+    }
+
+    public function getCustomerNameAttribute(): string
+    {
+        if ($this->invoiceable_type === Order::class && $this->invoiceable) {
+            return $this->invoiceable->user?->name ?? $this->invoiceable->name ?? '';
+        }
+        return '';
+    }
+
+    public function getCustomerPhoneAttribute(): string
+    {
+        if ($this->invoiceable_type === Order::class && $this->invoiceable) {
+            return $this->invoiceable->user?->phone ?? $this->invoiceable->phone ?? '';
+        }
+        return '';
     }
 
     public function marketing_campaign(): BelongsTo
