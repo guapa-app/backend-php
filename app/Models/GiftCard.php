@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Services\WalletService;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Illuminate\Support\Facades\Log;
 
 class GiftCard extends Model implements HasMedia
 {
@@ -437,17 +438,16 @@ class GiftCard extends Model implements HasMedia
             throw new \InvalidArgumentException('No valid user ID found for wallet redemption');
         }
 
-        // Create wallet transaction
-        $transaction = Transaction::create([
-            'user_id' => $userId,
-            'transaction_number' => 'TXN-' . strtoupper(uniqid()),
-            'amount' => $this->amount,
-            'operation' => 'Deposit',
-            'transaction_type' => 'recharge',
-            'transaction_date' => now(),
+        $user = auth()->user();
+        $walletService = app(WalletService::class);
+        $charge = $walletService->chargeWallet($user, $this->amount, [
             'status' => 'completed',
-            'notes' => "Gift card redemption: {$this->code}",
+            'notes' => "Gift card redemption: {$this->code}"
         ]);
+        
+        if($charge){
+            $transaction = $walletService->transaction;
+        }
 
         $this->update([
             'status' => self::STATUS_USED,

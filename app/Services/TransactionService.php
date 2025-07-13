@@ -27,10 +27,10 @@ class TransactionService
      * @param string|null $invoiceLink
      * @return Transaction
      */
-    public function createTransaction(int $userId, float $amount, TransactionType $transactionType, TransactionOperation $transactionOperation = TransactionOperation::DEPOSIT): Transaction
+    public function createTransaction(int $userId, float $amount, TransactionType $transactionType, TransactionOperation $transactionOperation = TransactionOperation::DEPOSIT, array $additionalData = []): Transaction
     {
         try {
-//            DB::beginTransaction();
+           DB::beginTransaction();
 
             // Generate a unique transaction number
             $transactionNumber = $this->generateTransactionNumber();
@@ -43,11 +43,11 @@ class TransactionService
                 'operation' => $transactionOperation,
                 'transaction_type' => $transactionType,
                 'transaction_date' => now(),
-            ]);
+            ] + $additionalData);
 
-//             $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
-//             $transaction->invoice_link = $invoiceLink;
-//             $transaction->save();
+            // $invoiceLink = $this->pdfService->addTransactionPDF($transaction);
+            // $transaction->invoice_link = $invoiceLink;
+            $transaction->save();
 
             DB::commit();
 
