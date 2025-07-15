@@ -16,7 +16,7 @@ class EditWalletChargingPackage extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
-            Actions\localeSwitcher::make(),
+            Actions\LocaleSwitcher::make(),
         ];
     }
 }
