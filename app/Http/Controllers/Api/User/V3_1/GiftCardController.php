@@ -181,6 +181,7 @@ class GiftCardController extends BaseApiController
         $user = $request->user();
         $type = $request->query('type', 'all');
         $query = GiftCard::with(['order', 'walletTransaction', 'backgroundImage', 'qrCode']);
+        $query->whereNot('status', GiftCard::STATUS_PENDING);
 
         if ($type === 'sent') {
             $query->where('sender_id', $user->id);
