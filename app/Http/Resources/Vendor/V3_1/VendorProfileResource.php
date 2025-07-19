@@ -63,6 +63,7 @@ class VendorProfileResource extends JsonResource
             'logo'                                     => MediaResource::make($this->whenLoaded('logo')),
             'specialties'                              => TaxonomyResource::collection($this->whenLoaded('specialties')),
             'appointments'                             => AppointmentResource::collection($this->whenLoaded('appointments')),
+            'consultations'                            => ConsultationResource::collection($this->whenLoaded('consultations')),
             'social_media'                             => SocialMediaResource::collection($this->whenLoaded('socialMedia')),
 
             'products'                                => ProductResource::collection($this->whenLoaded('products')),

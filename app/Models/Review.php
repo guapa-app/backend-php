@@ -2,30 +2,34 @@
 
 namespace App\Models;
 
-use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
-class Review extends Model  implements HasMedia
+class Review extends Model implements HasMedia
 {
     use HasFactory, ListableTrait, InteractsWithMedia;
 
     protected $fillable = [
-        'user_id', 'order_id', 'stars', 'comment',
+        'user_id', 'reviewable_id', 'reviewable_type', 'stars', 'comment',
+    ];
+
+    protected $casts = [
+        'stars' => 'decimal:1', // Ensure stars is treated as a decimal with 1 decimal place
     ];
 
     protected $filterable = [
-        'user_id', 'order_id', 'stars', 'show'
+        'user_id', 'reviewable_id', 'reviewable_type', 'stars', 'show'
     ];
 
     protected $search_attributes = [
@@ -70,9 +74,31 @@ class Review extends Model  implements HasMedia
             ->where('collection_name', 'after');
     }
 
-    public function order(): BelongsTo
+    /**
+     * Get the reviewable entity that the review belongs to.
+     */
+    public function reviewable(): MorphTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->morphTo();
+    }
+
+    /**
+     * Get the order if the review is for an order.
+     * This maintains backward compatibility with existing code.
+     */
+    public function order()
+    {
+        return $this->reviewable()
+            ->where('reviewable_type', 'App\\Models\\Order');
+    }
+
+    /**
+     * Get the consultation if the review is for a consultation.
+     */
+    public function consultation()
+    {
+        return $this->reviewable()
+            ->where('reviewable_type', 'App\\Models\\Consultation');
     }
 
     public function user(): BelongsTo
@@ -84,34 +110,48 @@ class Review extends Model  implements HasMedia
     {
         return $this->hasMany(ReviewRating::class);
     }
+
     public function vendor()
     {
+        // For backward compatibility, we need to check if the review is for an order
         return $this->hasOneThrough(
             Vendor::class,
             Order::class,
             'id', // Foreign key on orders table
             'id', // Foreign key on vendors table
-            'order_id', // Local key on reviews table
+            'reviewable_id', // Local key on reviews table (previously order_id)
             'vendor_id' // Local key on orders table
-        );
+        )->where('reviewable_type', 'App\\Models\\Order');
     }
 
     public function products()
     {
+        // For backward compatibility, we need to check if the review is for an order
         return $this->hasManyThrough(
             Product::class,
             OrderItem::class,
             'order_id', // Foreign key on order_items table
             'id', // Foreign key on products table
-            'order_id', // Local key on reviews table
+            'reviewable_id', // Local key on reviews table (previously order_id)
             'product_id' // Local key on order_items table
-        );
+        )->where('reviewable_type', 'App\\Models\\Order');
     }
 
     public function scopeCurrentVendor($query, $value)
     {
-        return $query->whereHas('order', function (Builder $query) use ($value) {
-            $query->where('vendor_id', $value);
+        return $query->where(function($query) use ($value) {
+            // For Order reviews
+            $query->where('reviewable_type', 'App\\Models\\Order')
+                ->whereHas('reviewable', function (Builder $query) use ($value) {
+                    $query->where('vendor_id', $value);
+                });
+            
+            // For Consultation reviews, if consultations have vendor_id
+            // Uncomment and adjust if needed
+            // $query->orWhere('reviewable_type', 'App\\Models\\Consultation')
+            //     ->whereHas('reviewable', function (Builder $query) use ($value) {
+            //         $query->where('vendor_id', $value);
+            //     });
         });
     }
 
@@ -126,6 +166,11 @@ class Review extends Model  implements HasMedia
         $query->searchLike($request);
         $query->applyDirectFilters($request);
 
+        // Add filter for reviewable_type if needed
+        if ($request->has('reviewable_type')) {
+            $query->where('reviewable_type', $request->get('reviewable_type'));
+        }
+
         return $query;
     }
 
@@ -133,9 +178,7 @@ class Review extends Model  implements HasMedia
     {
         $query->with([
             'user',
-            'order',
-            'order.vendor',
-            'order.items.product'
+            'reviewable'
         ]);
 
         return $query;
@@ -143,12 +186,9 @@ class Review extends Model  implements HasMedia
 
     public function scopeWithApiListRelations(Builder $query, Request $request): Builder
     {
-
         $query->with([
             'user',
-            'order',
-            'order.vendor',
-            'order.items.product',
+            'reviewable',
             'imageBefore',
             'imageAfter',
         ]);
@@ -165,9 +205,7 @@ class Review extends Model  implements HasMedia
     {
         $query->with([
             'user',
-            'order',
-            'order.vendor',
-            'order.items.product',
+            'reviewable',
             'imageBefore',
             'imageAfter',
             'ratings'

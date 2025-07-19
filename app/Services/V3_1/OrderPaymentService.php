@@ -17,8 +17,6 @@ use App\Notifications\OrderNotification;
 use App\Notifications\InvoiceNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
-use App\Notifications\AdminInvoiceNotification;
-use App\Notifications\VendorInvoiceNotification;
 
 class OrderPaymentService
 {
@@ -42,7 +40,6 @@ class OrderPaymentService
                 if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
                     $amount = $order->total - $order->fees;
-//                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
                     $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
                 }
 
@@ -70,8 +67,6 @@ class OrderPaymentService
         if (!str_contains($order->invoice_url, '.s3.')) {
             $order->invoice_url = (new PDFService)->addInvoicePDF($order);
             Notification::send($order->user, new InvoiceNotification($order->invoice_url));
-            Notification::send($order->vendor, new VendorInvoiceNotification($order));
-            Notification::send(['+966566776627','+966554461282'], new AdminInvoiceNotification($order));
         }
         $order->save();
 
@@ -104,12 +99,12 @@ class OrderPaymentService
             $order = OrderNotify::findOrFail($order->id);
 
             // Send email to admin
-//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-//            Notification::route('mail', $adminEmails)
-//                ->notify(new OrderNotification($order));
+           $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+           Notification::route('mail', $adminEmails)
+               ->notify(new OrderNotification($order));
 
             // Send email to vendor staff
-//            Notification::send($order->vendor, new OrderNotification($order));
+           Notification::send($order->vendor, new OrderNotification($order));
 
             // Send email to customer
             $order->user->notify(new OrderNotification($order));

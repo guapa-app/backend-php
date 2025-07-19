@@ -27,4 +27,14 @@ class DataController extends BaseApiController
     {
         return $this->successJsonRes(parent::vendor_types(), __('api.success'));
     }
+
+    public function giftCardOptions()
+    {
+        return response()->json([
+            'colors' => config('gift_card.colors'),
+            'background_images' => config('gift_card.background_images'),
+            'success' => true,
+            'message' => __('api.success'),
+        ]);
+    }
 }

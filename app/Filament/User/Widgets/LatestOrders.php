@@ -16,8 +16,10 @@ class LatestOrders extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $vendor = auth()->user()->userVendors->first()->vendor;
+
         return $table
-            ->query(OrderResource::getEloquentQuery())
+            ->query(OrderResource::getEloquentQuery()->where('vendor_id', $vendor->id))
             ->defaultPaginationPageOption(5)
             ->defaultSort('created_at', 'desc')
             ->columns([

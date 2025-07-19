@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\Vendor\V3_1\OrderController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Vendor\V3_1\OrderController;
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/', [OrderController::class, 'index']);

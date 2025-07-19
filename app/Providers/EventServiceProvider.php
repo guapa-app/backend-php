@@ -28,7 +28,7 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         Events\OfferCreated::class => [
-            Listeners\OfferCreatedListener::class,
+            // Listeners\OfferCreatedListener::class,
         ],
     ];
 

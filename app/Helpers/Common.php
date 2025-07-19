@@ -76,7 +76,71 @@ class Common
      */
     public static function phoneValidation(): string
     {
-        return 'numeric|regex:/^966\d{9}$/';
+        return 'numeric|regex:/^9665[0-9]{8}$/';
+    }
+
+    /**
+     * Advanced Saudi mobile number validation with multiple format support.
+     * Validates Saudi mobile numbers in various formats:
+     * - 9665xxxxxxxx (international format)
+     * - +9665xxxxxxxx (with plus)
+     * - 05xxxxxxxx (local format)
+     * - 5xxxxxxxx (without leading zero)
+     *
+     * @param string $phone
+     * @return bool
+     */
+    public static function validateSaudiMobileNumber(string $phone): bool
+    {
+        // Remove all non-digit characters except +
+        $cleanPhone = preg_replace('/[^\d+]/', '', $phone);
+
+        // Patterns for different Saudi mobile number formats
+        $patterns = [
+            '/^9665[0-9]{8}$/',           // 9665xxxxxxxx
+            '/^\+9665[0-9]{8}$/',         // +9665xxxxxxxx
+            '/^05[0-9]{8}$/',             // 05xxxxxxxx
+            '/^5[0-9]{8}$/',              // 5xxxxxxxx
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $cleanPhone)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Normalize Saudi mobile number to international format (9665xxxxxxxx).
+     *
+     * @param string $phone
+     * @return string|null Returns null if invalid format
+     */
+    public static function normalizeSaudiMobileNumber(string $phone): ?string
+    {
+        // Remove all non-digit characters except +
+        $cleanPhone = preg_replace('/[^\d+]/', '', $phone);
+
+        // Handle different formats
+        if (preg_match('/^9665[0-9]{8}$/', $cleanPhone)) {
+            return $cleanPhone; // Already in correct format
+        }
+
+        if (preg_match('/^\+9665[0-9]{8}$/', $cleanPhone)) {
+            return substr($cleanPhone, 1); // Remove + and return
+        }
+
+        if (preg_match('/^05[0-9]{8}$/', $cleanPhone)) {
+            return '966' . substr($cleanPhone, 1); // Remove 0, add 966
+        }
+
+        if (preg_match('/^5[0-9]{8}$/', $cleanPhone)) {
+            return '966' . $cleanPhone; // Add 966 prefix
+        }
+
+        return null; // Invalid format
     }
 
     /**

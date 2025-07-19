@@ -2,15 +2,15 @@
 
 namespace App\Filament\User\Resources\Info;
 
-use App\Filament\User\Resources\Info\AddressResource\Pages;
-use App\Models\Address;
-use App\Models\City;
-use App\Traits\FilamentVendorAccess;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\City;
 use Filament\Tables;
+use App\Models\Address;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Traits\FilamentVendorAccess;
+use App\Filament\User\Resources\Info\AddressResource\Pages;
 
 class AddressResource extends Resource
 {

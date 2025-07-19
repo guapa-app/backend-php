@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
-use App\Enums\AppointmentOfferEnum;
-use App\Enums\OrderStatus;
-use App\Enums\OrderTypeEnum;
-use App\Http\Requests\GetOrdersRequest;
-use App\Http\Requests\OrderRequest;
-use App\Models\Admin;
-use App\Models\Invoice;
-use App\Models\Order;
-use App\Models\Setting;
 use App\Models\User;
-use App\Models\UserVendor;
+use App\Models\Admin;
+use App\Models\Order;
 use App\Models\Vendor;
-use App\Notifications\AppointmentOfferNotification;
-use App\Notifications\OrderNotification;
-use App\Services\OrderService;
+use App\Models\Invoice;
+use App\Models\Setting;
+use App\Enums\OrderStatus;
+use App\Models\UserVendor;
+use App\Enums\OrderTypeEnum;
 use App\Services\PDFService;
 use Illuminate\Http\Request;
+use App\Services\OrderService;
 use Illuminate\Support\Collection;
+use App\Enums\AppointmentOfferEnum;
+use App\Http\Requests\OrderRequest;
+use App\Http\Requests\GetOrdersRequest;
+use App\Notifications\OrderNotification;
 use Illuminate\Support\Facades\Notification;
+use App\Notifications\AppointmentOfferNotification;
+use App\Contracts\Repositories\OrderRepositoryInterface;
 
 class OrderController extends BaseApiController
 {

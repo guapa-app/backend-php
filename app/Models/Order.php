@@ -43,7 +43,10 @@ class Order extends Model implements Listable
         'payment_gateway',
         'payment_id',
         'vendor_wallet',
-        'fees'
+        'fees',
+        'product_id',
+        'offer_id',
+        'gift_card_id'
     ];
 
     /**
@@ -86,20 +89,21 @@ class Order extends Model implements Listable
 
     public function getPaidAmountWithTaxesAttribute()
     {
-        return $this->invoice?->amount ?? 0;
+        return $this->attributes['total'] ?? 0;
     }
 
     public function getPaidAmountAttribute()
     {
-        return number_format(($this->invoice?->amount - $this->invoice?->taxes),
-            decimal_separator: '',
-            thousands_separator: ''
-        );
+        $amount = $this->attributes['total'] ?? 0;
+        $taxes = $this->attributes['taxes'] ?? 0;
+        return number_format(($amount - $taxes), decimal_separator: '', thousands_separator: '');
     }
 
     public function getRemainingAmountAttribute(): float
     {
-        return $this->total - ($this->paid_amount);
+        $total = $this->attributes['total'] ?? 0;
+        $paid = $this->attributes['paid_amount'] ?? 0;
+        return $total - $paid;
     }
 
     public function country()
@@ -147,10 +151,18 @@ class Order extends Model implements Listable
         return $this->belongsTo(Coupon::class)->withDefault()->withTrashed();
     }
 
-    public function reviews(): HasMany
+    /**
+     * Get all reviews for the order.
+     */
+    public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->morphMany(Review::class, 'reviewable');
     }
+
+    // public function reviews(): HasMany
+    // {
+    //     return $this->hasMany(Review::class);
+    // }
 
     public function scopeCurrentVendor($query, $value): void
     {
@@ -237,6 +249,27 @@ class Order extends Model implements Listable
     {
         return $query->whereHas('items.product', function (Builder $query) use ($type) {
             $query->where('type', $type);
+        });
+    }
+
+    /**
+     * Filter orders by product type using integer values
+     * 1 = Product, 2 = Service
+     *
+     * @param Builder $query
+     * @param int $type 1 for Product, 2 for Service
+     * @return Builder
+     */
+    public function scopeHasProductTypeInt(Builder $query, int $type): Builder
+    {
+        $productType = match ($type) {
+            1 => ProductType::Product,
+            2 => ProductType::Service,
+            default => ProductType::Product,
+        };
+
+        return $query->whereHas('items.product', function (Builder $query) use ($productType) {
+            $query->where('type', $productType);
         });
     }
 

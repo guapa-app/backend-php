@@ -85,46 +85,46 @@ class UpdateVendorRequest extends FailedValidationRequest
         $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation();
 
         $rules = [
-            'name'                  => 'sometimes|required|string|min:5|max:150',
-            'email'                 => ['sometimes', 'required', 'email', Rule::unique('vendors', 'email')->ignore($this->user()->managerVendorId())],
-            'about'                 => 'nullable|string|min:10|max:1024',
+            'name' => 'sometimes|required|string|min:5|max:150',
+            'email' => ['sometimes', 'required', 'email', Rule::unique('vendors', 'email')->ignore($this->user()->managerVendorId())],
+            'about' => 'nullable|string|min:10|max:1024',
 
-            'specialty_ids'         => 'sometimes|array|min:1',
-            'specialty_ids.*'       => 'integer|exists:taxonomies,id',
+            'specialty_ids' => 'sometimes|array|min:1',
+            'specialty_ids.*' => 'integer|exists:taxonomies,id',
 
-            'logo'                  => ['nullable', new ImageOrArray(), 'max:10240'],
-            'remove_logo'           => 'sometimes|boolean',
+            'logo' => ['nullable', new ImageOrArray(), 'max:10240'],
+            'remove_logo' => 'sometimes|boolean',
 
-            'whatsapp'              => 'nullable|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
-            'twitter'               => 'nullable|string|max:200',
-            'instagram'             => 'nullable|string|max:200',
-            'snapchat'              => 'nullable|string|max:200',
-            'website_url'           => 'nullable|string|max:200',
-            'known_url'             => 'nullable|string|max:200',
+            'whatsapp' => 'nullable|' . (Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation()),
+            'twitter' => 'nullable|string|max:200',
+            'instagram' => 'nullable|string|max:200',
+            'snapchat' => 'nullable|string|max:200',
+            'website_url' => 'nullable|string|max:200',
+            'known_url' => 'nullable|string|max:200',
 
-            'type'                  => 'sometimes|required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
-            'working_days'          => 'nullable|string',
-            'working_hours'         => 'nullable|string',
+            'type' => 'sometimes|required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
+            'working_days' => 'nullable|string',
+            'working_hours' => 'nullable|string',
 
             // Work days array validation (optional)
-            'work_days'             => 'sometimes|required|array|min:1',
-            'work_days.*.day'           => 'required|integer|min:0|max:7',
+            'work_days' => 'sometimes|required|array|min:1',
+            'work_days.*.day' => 'required|integer|min:0|max:7',
             'work_days.*.start_time' => 'required|date_format:H:i:s',
-            'work_days.*.end_time'   => 'required|date_format:H:i:s',
-            'work_days.*.is_off'     => 'sometimes|boolean',
+            'work_days.*.end_time' => 'required|date_format:H:i:s',
+            'work_days.*.is_off' => 'sometimes|boolean',
 
 
             // Appointments array validation (optional)
-            'accept_appointment'       => 'sometimes|boolean',
+            'accept_appointment' => 'sometimes|boolean',
 
             'accept_online_consultation' => 'sometimes|boolean',
-            'session_duration'         => 'sometimes|integer|min:5|max:60',
-            'consultation_fee'         => 'sometimes|numeric|min:0',
+            'consultation_fee' => 'sometimes|required_if:accept_online_consultation,1|numeric|min:0',
 
-            'appointments'             => 'sometimes|required|array|min:1',
-            'appointments.*'           => 'required|array|min:2',
+            'session_duration' => 'sometimes|integer|min:5|max:60',
+            'appointments' => 'sometimes|required|array|min:1',
+            'appointments.*' => 'required|array|min:2',
             'appointments.*.from_time' => 'required|date_format:H:i:s',
-            'appointments.*.to_time'   => 'required|date_format:H:i:s',
+            'appointments.*.to_time' => 'required|date_format:H:i:s',
         ];
         return $rules;
     }

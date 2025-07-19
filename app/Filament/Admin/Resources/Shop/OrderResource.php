@@ -3,18 +3,22 @@
 namespace App\Filament\Admin\Resources\Shop;
 
 
-use App\Enums\OrderStatus;
-use App\Filament\Admin\Resources\Shop\OrderResource\Actions\SendWhatsAppReminderAction;
-use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
-use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
-use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersStatusChart;
-use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrderStats;
+use Filament\Forms;
+use Filament\Tables;
 use App\Models\Order;
-use Filament\Infolists\Components;
+use App\Models\Vendor;
+use App\Models\Taxonomy;
+use App\Enums\OrderStatus;
+use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Infolists\Components;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Admin\Resources\Shop\OrderResource\Pages;
+use App\Filament\Admin\Resources\Shop\OrderResource\RelationManagers;
+use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrderStats;
+use App\Filament\Admin\Resources\Shop\OrderResource\Widgets\OrdersStatusChart;
+use App\Filament\Admin\Resources\Shop\OrderResource\Actions\SendWhatsAppReminderAction;
 
 class OrderResource extends Resource
 {
@@ -45,6 +49,8 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['vendor', 'user', 'items.product.taxonomies']))
+            ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->searchable()
@@ -79,7 +85,32 @@ class OrderResource extends Resource
             ->defaultPaginationPageOption(10)
             ->paginated([10])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('vendor')
+                    ->label('Vendor')
+                    ->relationship('vendor', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->placeholder('All Vendors'),
+
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->options(
+                        Taxonomy::whereIn('type', ['category', 'specialty'])
+                            ->get()
+                            ->pluck('title_en_ar', 'id')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->placeholder('All Categories')
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['value'])) {
+                            $query->whereHas('items.product.taxonomies', function (Builder $subQuery) use ($data) {
+                                $subQuery->where('taxonomies.id', $data['value']);
+                            });
+                        }
+                        return $query;
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -88,6 +119,48 @@ class OrderResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([]),
+            ]);
+    }
+
+    public static function form(Forms\Form $form): Forms\Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('hash_id')
+                    ->label('Hash ID')
+                    ->required(),
+                Forms\Components\Select::make('vendor_id')
+                    ->label('Vendor')
+                    ->relationship('vendor', 'name')
+                    ->required(),
+                Forms\Components\Select::make('user_id')
+                    ->label('Customer')
+                    ->relationship('user', 'name')
+                    ->required(),
+                Forms\Components\Select::make('address_id')
+                    ->label('Address')
+                    ->relationship('address', 'title')
+                    ->searchable(),
+                Forms\Components\TextInput::make('total')
+                    ->numeric()
+                    ->required(),
+                Forms\Components\Select::make('status')
+                    ->options(collect(\App\Enums\OrderStatus::cases())->mapWithKeys(fn($case) => [$case->value => $case->getLabel()])->toArray())
+                    ->required(),
+                Forms\Components\Textarea::make('note')
+                    ->label('Order Note'),
+                Forms\Components\Textarea::make('cancellation_reason')
+                    ->label('Cancellation Reason'),
+                Forms\Components\Select::make('coupon_id')
+                    ->label('Coupon')
+                    ->relationship('coupon', 'code')
+                    ->searchable(),
+                Forms\Components\TextInput::make('discount_amount')
+                    ->numeric(),
+                Forms\Components\TextInput::make('name')
+                    ->label('Order Name'),
+                Forms\Components\TextInput::make('phone')
+                    ->label('Order Phone'),
             ]);
     }
 
@@ -103,6 +176,7 @@ class OrderResource extends Resource
         return [
             'index' => Pages\ListOrders::route('/'),
             'view' => Pages\ViewOrder::route('/{record}'),
+            'edit' => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
 }

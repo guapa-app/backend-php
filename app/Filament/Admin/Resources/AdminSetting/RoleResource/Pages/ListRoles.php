@@ -2,9 +2,9 @@
 
 namespace App\Filament\Admin\Resources\AdminSetting\RoleResource\Pages;
 
-use App\Filament\Admin\Resources\AdminSetting\RoleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Admin\Resources\AdminSetting\RoleResource;
 
 class ListRoles extends ListRecords
 {

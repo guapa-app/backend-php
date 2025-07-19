@@ -7,14 +7,13 @@ use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Setting;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
 use App\Enums\TransactionType;
 use Illuminate\Support\Facades\DB;
 use App\Enums\TransactionOperation;
-use App\Models\WalletChargingPackage;
 
 class WalletService
 {
+    public  $transaction;
     protected $transactionService;
 
     public function __construct(TransactionService $transactionService)
@@ -25,25 +24,22 @@ class WalletService
     /**
      * Charge the user's wallet with a specific amount of points.
      *
-     * @param int $userId
+     * @param User $user
      * @param int $amount
      * @return Wallet
      */
-    public function chargeWallet(Request $request, int $userId, int $amount)
+    public function chargeWallet(User $user, int $amount, array $additionalData = [])
     {
-        $package = WalletChargingPackage::findOrFail($request->package_id);
-        $wallet = $request->user()->myWallet();
+        $wallet = $user->myWallet();
 
         $transactionType = TransactionType::RECHARGE;
-        $amount = $package->amount;
-        $userId = $request->user()->id;
+        $transactionOperation = TransactionOperation::DEPOSIT;
+        $userId = $user->id;
 
         // Call the service to create the transaction
-        $this->transactionService->createTransaction($userId, $amount, $transactionType);
+        $this->transaction = $this->transactionService->createTransaction($userId, $amount, $transactionType, $transactionOperation, $additionalData);
 
-
-        $wallet->balance += $package->amount;
-        $wallet->points += $package->points;
+        $wallet->balance += $amount;
         $wallet->save();
 
         return $wallet;
@@ -76,7 +72,7 @@ class WalletService
             'sourceable_type' => $sourceableType,
             'sourceable_id' => $sourceableId,
             'status' => TransactionStatus::PENDING,
-        ]); 
+        ]);
 
         $wallet->balance += $amount;
         $wallet->save();
