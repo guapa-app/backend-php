@@ -46,7 +46,7 @@ class OttuService
         $invoice = $this->dataHandler($invoice);
 
         try {
-            $res = Http::withoutVerifying()->asForm()
+            $res = Http::asForm()
                 ->withHeaders(['Authorization' => $this->apiKey])
                 ->acceptJson()
                 ->post("$this->baseUrl/b/checkout/v1/pymt-txn", $invoice);
@@ -69,7 +69,7 @@ class OttuService
         $data = $this->dataHandler($data);
 
         try {
-            $res = Http::withoutVerifying()->asForm()
+            $res = Http::asForm()
                 ->withHeaders(['Authorization' => $this->apiKey])
                 ->acceptJson()
                 ->patch("$this->baseUrl/b/checkout/v1/pymt-txn/$session_id", $data);
@@ -90,7 +90,7 @@ class OttuService
     public function get($session_id): ?array
     {
         try {
-            $res = Http::withoutVerifying()->asForm()
+            $res = Http::asForm()
                 ->withHeaders(['Authorization' => $this->apiKey])
                 ->acceptJson()
                 ->get("$this->baseUrl/b/checkout/v1/pymt-txn/$session_id");
@@ -119,7 +119,7 @@ class OttuService
         ];
 
         try {
-            $res = Http::withoutVerifying()->asForm()
+            $res = Http::asForm()
                 ->withHeaders(['Authorization' => $this->apiKey])
                 ->acceptJson()
                 ->post("$this->baseUrl/b/pbl/v2/operation", $data);

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V2\OrderController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\GiftCardPreviewController;
 use App\Http\Controllers\RegistrationInterestController;
 
 /*
@@ -81,6 +82,8 @@ Route::get('/navigation', function () {
 
 Route::get('/share-link', [\App\Http\Controllers\ShareLinkController::class, 'generateLink'])->name('share.link.generate');
 Route::get('/s/{identifier}', [\App\Http\Controllers\ShareLinkController::class, 'redirectLink'])->name('share.link.redirect');
+
+Route::get('/gift-cards/{id}/preview', [GiftCardPreviewController::class, 'userPreview'])->name('gift-cards.user-preview');
 
 // Load the app for all requests
 Route::any('{any?}', function () {

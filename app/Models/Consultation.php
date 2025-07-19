@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Contracts\Listable;
-use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use App\Contracts\Listable;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Consultation extends Model implements Listable, HasMedia
@@ -23,6 +23,7 @@ class Consultation extends Model implements Listable, HasMedia
         'vendor_id',
         'appointment_date',
         'appointment_time',
+        'appointment_end_time', // Added new field for end time
         'type',
         'chief_complaint',
         'medical_history',
@@ -40,7 +41,8 @@ class Consultation extends Model implements Listable, HasMedia
         'meeting_provider',
         'session_url',
         'session_password',
-        'meeting_data'
+        'meeting_data',
+        'is_reviewed',
     ];
 
     protected $filterable = [
@@ -54,12 +56,59 @@ class Consultation extends Model implements Listable, HasMedia
     protected $casts = [
         'appointment_date' => 'date',
         'appointment_time' => 'datetime',
+        'appointment_end_time' => 'datetime', // Cast new field as datetime
         'medical_history' => 'array',
         'total_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'cancelled_at' => 'datetime',
         'rejected_at' => 'datetime'
     ];
+
+    protected $appends = [
+        'can_review',
+        'appointment_end_time',
+        // 'appointment_time_period' // Added new accessor
+    ];
+
+
+    /**
+     * Get the appointment end time.
+     *
+     * @return string
+     */
+    public function getAppointmentEndTimeAttribute(): string
+    {
+        // If end time is set, use it, otherwise calculate from vendor's session duration
+
+        // Get session duration from vendor, default to 60 minutes
+        $duration = $this->vendor->session_duration ?? 60;
+        return $this->appointment_time->copy()->addMinutes($duration)->format('H:i');
+
+    }
+
+    /**
+     * Get the canReview attribute.
+     * A user can review a consultation if:
+     * 1. They are the consultation owner (user_id matches)
+     * 2. The consultation status is completed
+     * 3. They haven't already reviewed it
+     *
+     * @return bool
+     */
+    public function getCanReviewAttribute(): bool
+    {
+        // Check if the authenticated user is the consultation owner
+        $isOwner = auth()->check() && auth()->id() === $this->user_id;
+        // dump(auth()->id());
+
+        // Check if the consultation is completed
+        $isCompleted = $this->status === self::STATUS_COMPLETED;
+
+        // Check if the consultation has not been reviewed yet
+        $notReviewed = !$this->hasBeenReviewed();
+
+        return $isOwner && $isCompleted && $notReviewed;
+    }
 
     /**
      * Register media collections.
@@ -129,6 +178,23 @@ class Consultation extends Model implements Listable, HasMedia
     }
 
     /**
+     * Check if this consultation has been reviewed
+     *
+     * @return bool
+     */
+    public function hasBeenReviewed()
+    {
+        return $this->is_reviewed ||
+            $this->reviews()->exists();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'reviewable_id')
+            ->where('reviewable_type', Consultation::class);
+    }
+
+    /**
      * Check if the consultation can be cancelled by the user
      *
      * @return bool
@@ -183,6 +249,11 @@ class Consultation extends Model implements Listable, HasMedia
         $query->applyDirectFilters($request);
 
         return $query;
+    }
+
+    public function scopeCurrentVendor($query, $vendorId)
+    {
+        return $query->where('vendor_id', $vendorId);
     }
 
     public function scopeWithSingleRelations(Builder $query): Builder

@@ -113,7 +113,7 @@ class VendorRequest extends FailedValidationRequest
             'name'                  => 'required|string|min:5|max:150',
             'email'                 => 'required|email|unique:vendors,email',
             'phone'                 => 'required|' . $phoneNumbersRule,
-            'about'                 => 'nullable|string|min:10|max:1024',
+            'about'                 => 'required|string|min:10|max:1024',
 
             'specialty_ids'         => 'sometimes|array|min:1',
             'specialty_ids.*'       => 'integer|exists:taxonomies,id',

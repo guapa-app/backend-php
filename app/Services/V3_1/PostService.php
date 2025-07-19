@@ -2,16 +2,16 @@
 
 namespace App\Services\V3_1;
 
-use App\Contracts\Repositories\CommentRepositoryInterface;
-use App\Contracts\Repositories\PostRepositoryInterface;
-use App\Enums\PostType;
-use App\Models\Media;
 use App\Models\Post;
+use App\Models\Media;
+use App\Enums\PostType;
 use App\Models\UserVote;
+use Illuminate\Support\Str;
 use App\Services\MediaService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Contracts\Repositories\PostRepositoryInterface;
+use App\Contracts\Repositories\CommentRepositoryInterface;
 
 class PostService
 {

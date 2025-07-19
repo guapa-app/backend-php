@@ -2,16 +2,16 @@
 
 namespace App\Filament\Admin\Resources\AdminSetting;
 
-use App\Filament\Admin\Resources\AdminSetting\RoleResource\Pages;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Filament\Resources\Resource;
 use Spatie\Permission\Models\Role;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Admin\Resources\AdminSetting\RoleResource\Pages;
 
 class RoleResource extends Resource
 {

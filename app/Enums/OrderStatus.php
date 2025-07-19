@@ -7,18 +7,24 @@ use Filament\Support\Contracts\HasLabel;
 
 enum OrderStatus: string implements HasColor, HasLabel
 {
-    case Pending = 'Pending';
+    // Active Statuses
     case Accepted = 'Accepted';
-    case Rejected = 'Rejected';
-    case Expired = 'Expired';
+
+        // Completed Statuses
     case Used = 'Used';
+    case Delivered = 'Delivered';
+
+        // Inactive Statuses
+    case Canceled = 'Canceled';
+    case Rejected = 'Rejected';
+    case Cancel_Request = 'Cancel Request';
+    case Expired = 'Expired';
     case Prepare_For_Delivery = 'Prepare for delivery';
     case Shipping = 'Shipping';
-    case Delivered = 'Delivered';
     case Return_Request = 'Return Request';
     case Returned = 'Returned';
-    case Cancel_Request = 'Cancel Request';
-    case Canceled = 'Canceled';
+    case Pending = 'Pending';
+    case Completed = 'Completed';
 
     public function getLabel(): string
     {
@@ -31,6 +37,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Prepare_For_Delivery => 'Prepare for delivery',
             self::Shipping             => 'Shipping',
             self::Delivered           => 'Delivered',
+            self::Completed           => 'Completed',
             self::Return_Request       => 'Return Request',
             self::Returned             => 'Returned',
             self::Cancel_Request       => 'Cancel Request',
@@ -47,12 +54,39 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Expired              => 'warning',
             self::Used                 => 'info',
             self::Prepare_For_Delivery => 'gray',
-            self::Shipping             => 'Shipping',
+            self::Shipping             => 'info',
             self::Delivered           => 'success',
-            self::Return_Request       => 'black',
+            self::Completed           => 'success',
+            self::Return_Request       => 'warning',
             self::Returned             => 'warning',
-            self::Cancel_Request       => 'black',
+            self::Cancel_Request       => 'warning',
             self::Canceled             => 'danger',
+        };
+    }
+
+    public static function getStatusGroup(int $statusId): array
+    {
+        return match ($statusId) {
+            1 => [ // Active - Orders that are currently being processed
+                self::Accepted->value,
+                self::Prepare_For_Delivery->value,
+                self::Shipping->value,
+            ],
+            2 => [ // Completed - Orders that have been fulfilled
+                self::Used->value,
+                self::Delivered->value,
+                self::Completed->value,
+            ],
+            3 => [ // Inactive - Orders that are cancelled, rejected, or expired
+                self::Canceled->value,
+                self::Rejected->value,
+                self::Cancel_Request->value,
+                self::Expired->value,
+                self::Return_Request->value,
+                self::Returned->value,
+                // self::Pending->value,
+            ],
+            default => [],
         };
     }
 
@@ -66,6 +100,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Prepare_For_Delivery,
             self::Shipping,
             self::Delivered,
+            self::Completed,
             self::Return_Request,
             self::Returned,
             self::Cancel_Request,
@@ -83,6 +118,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Prepare_For_Delivery,
             self::Shipping,
             self::Delivered,
+            self::Completed,
             self::Returned,
             self::Canceled,
         ], 'value', 'name');
@@ -95,6 +131,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Expired,
             self::Used,
             self::Delivered,
+            self::Completed,
             self::Return_Request,
             self::Returned,
             self::Canceled,
@@ -108,6 +145,7 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Expired,
             self::Used,
             self::Delivered,
+            self::Completed,
             self::Return_Request,
             self::Returned,
             self::Cancel_Request,

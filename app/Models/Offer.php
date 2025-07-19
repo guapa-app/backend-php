@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
-use App\Contracts\Listable;
 use App\Helpers\Common;
 use App\Traits\Likable;
-use App\Traits\Listable as ListableTrait;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use App\Contracts\Listable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Spatie\Image\Exceptions\InvalidManipulation;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\Listable as ListableTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Image\Exceptions\InvalidManipulation;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Offer extends Model implements Listable, HasMedia

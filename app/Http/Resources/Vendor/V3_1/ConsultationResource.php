@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Vendor\V3_1;
 
+use App\Filament\User\Resources\Shop\ReviewResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Vendor\V3_1\UserResource;
 
@@ -37,6 +38,7 @@ class ConsultationResource extends JsonResource
             'can_reject' => $this->canReject(),
             'can_join' => $this->canJoin(),
             'media' => MediaResource::collection($this->whenLoaded('media')),
+            'reviews' => ReviewResource::collection($this->whenLoaded('reviews')),
         ];
     }
 }

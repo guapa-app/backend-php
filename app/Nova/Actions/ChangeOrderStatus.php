@@ -2,15 +2,15 @@
 
 namespace App\Nova\Actions;
 
-use App\Notifications\OrderUpdatedNotification;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Notification;
-use Laravel\Nova\Actions\Action;
-use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Actions\Action;
+use Illuminate\Support\Collection;
+use Laravel\Nova\Fields\ActionFields;
+use Illuminate\Queue\InteractsWithQueue;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\OrderUpdatedNotification;
 
 class ChangeOrderStatus extends Action
 {
@@ -46,6 +46,7 @@ class ChangeOrderStatus extends Action
                 ->options([
                     'Pending' => 'Pending',
                     'Accepted' => 'Accepted',
+                    'Completed' => 'Completed',
                     'Canceled' => 'Canceled',
                     'Rejected' => 'Rejected',
                 ])

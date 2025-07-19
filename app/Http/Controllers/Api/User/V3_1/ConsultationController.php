@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Resources\User\V3_1\ConsultationCollection;
-use App\Http\Resources\User\V3_1\ConsultationResource;
 use App\Models\Consultation;
-use App\Models\Vendor;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ConsultationRequest;
-use App\Contracts\Repositories\ConsultationRepositoryInterface;
-use App\Http\Controllers\Api\BaseApiController;
 use App\Services\ConsultationService;
-use App\Exceptions\TimeSlotNotAvailableException;
+use App\Http\Requests\ConsultationRequest;
+use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Resources\User\V3_1\ConsultationResource;
+use App\Http\Resources\User\V3_1\ConsultationCollection;
+use App\Contracts\Repositories\ConsultationRepositoryInterface;
 
 class ConsultationController extends BaseApiController
 {
@@ -34,9 +31,9 @@ class ConsultationController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
-        $request->merge(['user_id', $user->id]);
+        $request->merge(['user_id' => $this->user->id]);
         $consultations = $this->consultationRepository->all($request);
+        $consultations->load('vendor', 'user', 'media', 'reviews', 'vendor.logo', 'vendor.specialties');
 
         return ConsultationCollection::make($consultations)
             ->additional([
@@ -130,15 +127,41 @@ class ConsultationController extends BaseApiController
             $user = Auth::user();
 
             // Cancel the consultation
-            $this->consultationService->cancel($consultation, $user);
+            $isCancelled = $this->consultationService->cancel($consultation, $user);
 
             return response()->json([
                 'success' => true,
                 'message' => __('Consultation cancelled successfully'),
-                'data' => $consultation
+                'data' => $isCancelled ? true : false,
+
             ]);
         } catch (\Exception $e) {
             return $this->errorJsonRes([], $e->getMessage());
         }
     }
+
+    // public function storeReview(Request $request, Consultation $consultation)
+    // {
+    //     try {
+    //         $validatedData = $request->validate([
+    //             'rating' => 'required|integer|min:1|max:5',
+    //             'comment' => 'nullable|string|max:1000',
+    //         ]);
+
+    //         $review = $this->consultationService->addReview(
+    //             $consultation,
+    //             $validatedData,
+    //             $request->user()
+    //         );
+
+    //         return response()->json([
+    //             'message' => 'Review submitted successfully',
+    //             'data' => $review
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'message' => $e->getMessage()
+    //         ], $e->getCode() ?: 400);
+    //     }
+    // }
 }

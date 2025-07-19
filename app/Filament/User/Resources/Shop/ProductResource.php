@@ -2,18 +2,18 @@
 
 namespace App\Filament\User\Resources\Shop;
 
-use App\Filament\User\Resources\Shop\ProductResource\Pages;
-use App\Filament\User\Resources\Shop\ProductResource\RelationManagers;
+use Filament\Forms;
+use Filament\Tables;
 use App\Helpers\Common;
 use App\Models\Product;
-use App\Traits\FilamentVendorAccess;
-use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Resources\Resource;
+use App\Traits\FilamentVendorAccess;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\User\Resources\Shop\ProductResource\Pages;
+use App\Filament\User\Resources\Shop\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {

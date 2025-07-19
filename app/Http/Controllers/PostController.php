@@ -29,8 +29,17 @@ class PostController extends Controller
             'status' => '1',
         ]);
 
-        $posts = $this->postRepository
-            ->all($request)
+        $categoryId = $request->input('filter.category_id');
+        
+        $query = Post::where('type', 'blog')
+            ->where('status', '1');
+            
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        
+        $posts = $query->latest()
+            ->paginate(12)
             ->appends($request->query());
 
         $currentPage = $posts->currentPage();

@@ -34,5 +34,7 @@
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/lib/jquery.fancybox.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/style.css') }}" />
 
+
+
     @yield('heads')
 </head>
