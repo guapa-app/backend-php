@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Policies\PermissionPolicy;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -21,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
         'App\Models\Product' => 'App\Policies\ProductPolicy',
         'App\Models\Comment' => 'App\Policies\CommentPolicy',
         'App\Models\Offer' => 'App\Policies\OfferPolicy',
+        'App\Models\GiftCardBackground' => 'App\Policies\GiftCardBackgroundPolicy',
     ];
 
     /**

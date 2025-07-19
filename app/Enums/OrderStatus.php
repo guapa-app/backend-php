@@ -54,12 +54,12 @@ enum OrderStatus: string implements HasColor, HasLabel
             self::Expired              => 'warning',
             self::Used                 => 'info',
             self::Prepare_For_Delivery => 'gray',
-            self::Shipping             => 'Shipping',
+            self::Shipping             => 'info',
             self::Delivered           => 'success',
             self::Completed           => 'success',
-            self::Return_Request       => 'black',
+            self::Return_Request       => 'warning',
             self::Returned             => 'warning',
-            self::Cancel_Request       => 'black',
+            self::Cancel_Request       => 'warning',
             self::Canceled             => 'danger',
         };
     }

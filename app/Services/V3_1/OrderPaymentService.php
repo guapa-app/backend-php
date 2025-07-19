@@ -40,7 +40,6 @@ class OrderPaymentService
                 if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
                     $amount = $order->total - $order->fees;
-//                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order->id);
                     $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
                 }
 
@@ -100,12 +99,12 @@ class OrderPaymentService
             $order = OrderNotify::findOrFail($order->id);
 
             // Send email to admin
-//            $adminEmails = Admin::role('admin')->pluck('email')->toArray();
-//            Notification::route('mail', $adminEmails)
-//                ->notify(new OrderNotification($order));
+           $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+           Notification::route('mail', $adminEmails)
+               ->notify(new OrderNotification($order));
 
             // Send email to vendor staff
-//            Notification::send($order->vendor, new OrderNotification($order));
+           Notification::send($order->vendor, new OrderNotification($order));
 
             // Send email to customer
             $order->user->notify(new OrderNotification($order));
