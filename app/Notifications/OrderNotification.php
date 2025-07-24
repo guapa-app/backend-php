@@ -56,7 +56,6 @@ class OrderNotification extends Notification implements ShouldQueue
             'type' => $this->orderType(),
             'title' => 'New Order',
             'image' => '',
-            'invoice_url' => $this->order->invoice_url
         ];
     }
 

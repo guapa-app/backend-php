@@ -63,7 +63,6 @@ class OrderUpdatedNotification extends Notification
             'type' => $this->orderType(),
             'title' => 'Update Order',
             'image' => '',
-            'invoice_url' => $this->order->invoice_url,
         ];
     }
 
