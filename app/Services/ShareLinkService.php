@@ -59,7 +59,7 @@ class ShareLinkService
                 'androidAppLink' => $androidAppLink,
                 'appStoreLink' => $appStoreLink,
                 'playStoreLink' => $playStoreLink,
-                'webUrl' => $this->generateItemUrl($shareLink),
+                'webUrl' => config('app.url'),
             ]);
         }
 
@@ -105,9 +105,9 @@ class ShareLinkService
     {
         switch ($shareLink->shareable_type) {
             case 'product':
-                return route('products.show', ['id' => $shareLink->shareable_id]);
+                return config('app.url') . "/products/{$shareLink->shareable_id}";
             case 'vendor':
-                return route('vendors.show', ['id' => $shareLink->shareable_id]);
+                return config('app.url') . "/vendors/{$shareLink->shareable_id}";
             default:
                 abort(404);
         }
