@@ -82,7 +82,7 @@ class ShareLinkService
         return ShareLink::where('identifier', $identifier)->firstOrFail();
     }
 
-    public function logShareLinkClickd($shareLink)
+    public function logShareLinkClicked($shareLink)
     {
         // Log the click
         $this->logClick($shareLink);
