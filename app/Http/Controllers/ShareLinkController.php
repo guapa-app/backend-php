@@ -29,6 +29,15 @@ class ShareLinkController extends Controller
         return $this->successJsonRes(['link' => $link], __('api.success'));
     }
 
+    public function shortLink($identifier)
+    {
+        $shareLink = $this->linkService->getLinkByIdentifier($identifier);
+        $key = $shareLink->shareable_id;
+        // ref the first char of model name (v or p)
+        $ref = strtolower(substr($shareLink->shareable_type, 0, 1));
+        return redirect("https://guapa.com.sa/s/{$identifier}?ref={$ref}&key={$key}");
+    }
+
     public function redirectLink($identifier)
     {
         $shareLink = $this->linkService->getLinkByIdentifier($identifier);
