@@ -42,7 +42,7 @@ class ShareLinkController extends Controller
             return redirect("https://guapa.com.sa/s/{$identifier}?ref={$ref}&key={$key}");
         }
 
-        $this->linkService->logShareLinkClickd($shareLink);
+        $this->linkService->logShareLinkClicked($shareLink);
 
         // Redirect based on user agent
         return $this->linkService->handleRedirect($shareLink);
