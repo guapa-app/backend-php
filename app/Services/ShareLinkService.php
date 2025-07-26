@@ -81,9 +81,6 @@ class ShareLinkService
         // Find the share link by identifier
         $shareLink = ShareLink::where('identifier', $identifier)->firstOrFail();
 
-        // Log the click
-        $this->logClick($shareLink);
-
         return $shareLink;
     }
 
