@@ -87,6 +87,12 @@ class ShareLinkService
         return $shareLink;
     }
 
+    public function logShareLinkClickd($shareLink)
+    {
+        // Log the click
+        $this->logClick($shareLink);
+    }
+
     private function getModelClass($type)
     {
         $modelClasses = [

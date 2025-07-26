@@ -81,7 +81,6 @@ Route::get('/navigation', function () {
 })->name('navigation');
 
 Route::get('/share-link', [\App\Http\Controllers\ShareLinkController::class, 'generateLink'])->name('share.link.generate');
-Route::get('/t/{identifier}', [\App\Http\Controllers\ShareLinkController::class, 'shortLink'])->name('share.link.shortLink');
 Route::get('/s/{identifier}', [\App\Http\Controllers\ShareLinkController::class, 'redirectLink'])->name('share.link.redirect');
 
 Route::get('/gift-cards/{id}/preview', [GiftCardPreviewController::class, 'userPreview'])->name('gift-cards.user-preview');
