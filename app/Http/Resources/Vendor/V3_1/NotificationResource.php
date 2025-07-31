@@ -14,6 +14,7 @@ class NotificationResource extends JsonResource
             'data'        => (array) $this->data,
             'summary'     => (string) $this->summary,
             'is_read'     => (bool) $this->read_at,
+            'invoice_url' => $this->invoice_url,
             'created_at'  => Carbon::parse($this->created_at)->diffForHumans(),
             'updated_at'  => Carbon::parse($this->updated_at)->diffForHumans(),
         ];
