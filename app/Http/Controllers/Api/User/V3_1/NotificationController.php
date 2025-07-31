@@ -83,6 +83,21 @@ class NotificationController extends BaseApiController
 
             $notification->summary = $data['summary'] ?? '';
 
+
+            // Add invoice URL for order notifications
+            if (isset($data['type']) && str_contains($data['type'], 'order')) {
+                if (isset($data['invoice_url'])) {
+                    $notification->invoice_url = $data['invoice_url'];
+                } else {
+                    $orderId = $data['order_id'] ?? $data['id'] ?? null;
+                    if ($orderId) {
+                        $order = \App\Models\Order::find($orderId);
+                        if ($order && $order->invoice_url) {
+                            $notification->invoice_url = $order->invoice_url;
+                        }
+                    }
+                }
+            }
             return $notification;
         });
     }
