@@ -89,21 +89,20 @@ class Order extends Model implements Listable
 
     public function getPaidAmountWithTaxesAttribute()
     {
-        return $this->attributes['total'] ?? 0;
+        return $this->invoice?->amount ?? 0;
     }
 
     public function getPaidAmountAttribute()
     {
-        $amount = $this->attributes['total'] ?? 0;
-        $taxes = $this->attributes['taxes'] ?? 0;
-        return number_format(($amount - $taxes), decimal_separator: '', thousands_separator: '');
+        $amount = $this->invoice?->amount ?? 0;
+        $taxes = $this->invoice?->taxes ?? 0;
+
+        return number_format($amount - $taxes, decimal_separator: '', thousands_separator: '');
     }
 
     public function getRemainingAmountAttribute(): float
     {
-        $total = $this->attributes['total'] ?? 0;
-        $paid = $this->attributes['paid_amount'] ?? 0;
-        return $total - $paid;
+        return $this->total - ($this->paid_amount);
     }
 
     public function country()
