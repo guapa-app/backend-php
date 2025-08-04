@@ -12,12 +12,12 @@
         window.location = "{{ $iosAppLink }}";
         setTimeout(function () {
             window.location = "{{ $appStoreLink }}";
-        }, 3000);
+        }, 7000);
     } else if (navigator.userAgent.match(/Android/i)) {
         window.location = "{{ $androidAppLink }}";
         setTimeout(function () {
             window.location = "{{ $playStoreLink }}";
-        }, 3000);
+        }, 7000);
     } else {
         window.location = "{{ $webUrl }}";
     }
