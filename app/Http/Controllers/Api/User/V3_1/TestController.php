@@ -126,7 +126,7 @@ class TestController extends BaseApiController
             'payment_id' => 'TEST-PAY-' . time(),
         ]);
 
-        // Create test invoice
+        // Create test invoice with dummy URL
         $invoice = Invoice::create([
             'invoiceable_type' => 'App\Models\Order',
             'invoiceable_id' => $order->id,
@@ -136,15 +136,15 @@ class TestController extends BaseApiController
             'status' => 'paid',
             'currency' => 'SAR',
             'description' => 'Test order invoice for notification testing',
-            'callback_url' => url('/api/test/callback'),
+            'callback_url' => 'https://ax45nhirzfe7.compat.objectstorage.me-riyadh-1.oraclecloud.com/guapa-stg/mpdf/test/callback',
             'amount_format' => '115.00',
-            'url' => url('/test/invoice'),
-            'logo_url' => url('/test/logo'),
+            'url' => 'https://ax45nhirzfe7.compat.objectstorage.me-riyadh-1.oraclecloud.com/guapa-stg/mpdf/invoices/invoice_test_' . $order->id . '.pdf',
+            'logo_url' => 'https://ax45nhirzfe7.compat.objectstorage.me-riyadh-1.oraclecloud.com/guapa-stg/logos/logo.png',
         ]);
 
-        // Update order with invoice URL (using order ID instead of hash_id)
+        // Update order with dummy invoice URL
         $order->update([
-            'invoice_url' => url("/api/user/v3.1/orders/{$order->id}/invoice")
+            'invoice_url' => 'https://ax45nhirzfe7.compat.objectstorage.me-riyadh-1.oraclecloud.com/guapa-stg/mpdf/invoices/invoice_test_' . $order->id . '.pdf'
         ]);
 
         // Create test order item
