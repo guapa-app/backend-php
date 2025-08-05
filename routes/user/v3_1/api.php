@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\User\V3_1\TransactionController;
 use App\Http\Controllers\Api\User\V3_1\LoyaltyPointsController;
 use App\Http\Controllers\Api\User\V3_1\WheelOfFortuneController;
 use App\Http\Controllers\Api\User\V3_1\WalletChargingPackageController;
-use App\Http\Controllers\Api\User\V3_1\TestController;
 
 Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function () {
     Route::get('home', [HomeController::class, 'index']);
@@ -53,13 +52,6 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
     Route::get('gift-card-options', [DataController::class, 'giftCardOptions']);
-
-    // Testing endpoints for order notifications
-    Route::prefix('test')->group(function () {
-        Route::get('basic', [TestController::class, 'testBasic']); // No auth for basic testing
-        Route::post('order-notification', [TestController::class, 'sendTestOrderNotification'])->middleware('auth:api');
-        Route::get('order-details', [TestController::class, 'getTestOrderDetails'])->middleware('auth:api');
-    });
 
     Route::middleware('auth:api')->group(function () {
 
