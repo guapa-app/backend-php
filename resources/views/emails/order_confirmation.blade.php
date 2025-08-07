@@ -80,8 +80,8 @@
             @endforeach
         </p>
         <p><strong>تاريخ الطلب:</strong> {{ $order->created_at }}</p>
-        <p><strong>المبلغ المدفوع:</strong> {{ $order->invoice?->paid_amount_with_taxes  }} SAR</p>
-        <p><strong>المبلغ المتبقي:</strong> {{ $order->total - $order->invoice?->paid_amount }} SAR</p>
+        <p><strong>المبلغ المدفوع:</strong> {{ $order->paid_amount_with_taxes  }} SAR</p>
+        <p><strong>المبلغ المتبقي:</strong> {{ $order->remaining_amount }} SAR</p>
 
         <p>إذا كان لديك أي استفسار أو تحتاج إلى مساعدة إضافية، لا تتردد في التواصل معنا على <a href="mailto:info@guapa.com.sa">info@guapa.com.sa</a> أو الاتصال على <a href="tel:9665314343889">9665314343889</a> أو الاتصال على  <a
                 .</p>

@@ -190,7 +190,7 @@ class LoyaltyPointsService
     public function addPurchasePoints(Order $order)
     {
         $conversionRate = Setting::purchasePointsConversionRate();
-        $paidAmount = $order->invoice?->paid_amount_with_taxes;
+        $paidAmount = $order->paid_amount_with_taxes;
         $points = (int) ($paidAmount * $conversionRate);
 
         $items = $order->items;

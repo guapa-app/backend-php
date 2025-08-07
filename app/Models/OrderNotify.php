@@ -34,7 +34,7 @@ class OrderNotify extends Model
 
     public function getRemainingAmountAttribute(): float
     {
-        return $this->total - ($this->invoice?->paid_amount);
+        return $this->total - ($this->paid_amount);
     }
 
     public function invoice()
