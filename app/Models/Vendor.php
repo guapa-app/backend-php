@@ -167,6 +167,12 @@ class Vendor extends Model implements HasMedia, HasReviews
 
     public function getSharedLinkAttribute()
     {
+        if($this->shareLink){
+            $key = $this->shareLink->shareable_id;
+            // ref the first char of model name (v or p)
+            $ref = strtolower(substr($this->shareLink->shareable_type, 0, 1));
+            return $this->shareLink->link . "?ref={$ref}&key={$key}";
+        }
         return $this->shareLink?->link;
     }
 
