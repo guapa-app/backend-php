@@ -44,7 +44,7 @@ class OrderController extends BaseApiController
             $query->hasProductTypeInt($typeId);
         }
 
-        $orders = $query->orderBy('created_at', 'asc')->paginate($perPage, ['*'], 'page', $page);
+        $orders = $query->with('invoice')->orderBy('created_at', 'asc')->paginate($perPage, ['*'], 'page', $page);
 
         return OrderCollection::make($orders)
             ->additional([
