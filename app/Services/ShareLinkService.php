@@ -48,7 +48,7 @@ class ShareLinkService
             $ref = strtolower(substr($shareLink->shareable_type, 0, 1));
 
             // Android
-            $androidAppLink = "intent://{$shareLink->shareable_type}/{$shareLink->shareable_id}#Intent;scheme=https;package=com.guapanozom.app;end";
+            $androidAppLink = "intent://guapa.com.sa/s?ref={$ref}&key={$key}#Intent;scheme=https;package=com.guapanozom.app;end";
             $playStoreLink = 'https://play.google.com/store/apps/details?id=com.guapanozom.app'; //com.yourapp.package
             // iOS
             $iosAppLink = "guapa://share?ref={$ref}&key={$key}";
@@ -79,12 +79,13 @@ class ShareLinkService
     public function getLinkByIdentifier($identifier)
     {
         // Find the share link by identifier
-        $shareLink = ShareLink::where('identifier', $identifier)->firstOrFail();
+        return ShareLink::where('identifier', $identifier)->firstOrFail();
+    }
 
+    public function logShareLinkClicked($shareLink)
+    {
         // Log the click
         $this->logClick($shareLink);
-
-        return $shareLink;
     }
 
     private function getModelClass($type)

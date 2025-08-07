@@ -144,6 +144,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getSharedLinkAttribute()
     {
+        if($this->shareLink){
+            $key = $this->shareLink->shareable_id;
+            // ref the first char of model name (v or p)
+            $ref = strtolower(substr($this->shareLink->shareable_type, 0, 1));
+            return $this->shareLink->link . "?ref={$ref}&key={$key}";
+        }
         return $this->shareLink?->link;
     }
 
@@ -214,7 +220,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
        try {
         // Fetch the authenticated user
         $user = auth('api')->user();
-        
+
         if ($user) {
             // Use LoyaltyPointsService to get points instead of accessing wallet directly
             $loyaltyPointsService = app(LoyaltyPointsService::class);
