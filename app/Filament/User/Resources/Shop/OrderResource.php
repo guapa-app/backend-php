@@ -43,14 +43,14 @@ class OrderResource extends Resource
                     ->schema([
                         Forms\Components\Placeholder::make('paid_amount')
                             ->label('Paid Amount')
-                            ->content(fn (Order $record): ?string => $record->paid_amount),
+                            ->content(fn (Order $record): ?string => $record->invoice?->paid_amount),
 
                         Forms\Components\Placeholder::make('paid_amount_with_taxes')
                             ->label('Paid Amount with Taxes')
-                            ->content(fn (Order $record): ?string => $record->paid_amount_with_taxes),
+                            ->content(fn (Order $record): ?string => $record->invoice?->paid_amount_with_taxes),
                         Forms\Components\Placeholder::make('remaining_amount')
                             ->label('Remaining Amount')
-                            ->content(fn (Order $record): ?string => $record->remaining_amount),
+                            ->content(fn (Order $record): ?string => $record->total - $record->invoice?->paid_amount),
                     ])
                     ->columnSpan(['lg' => 1])
                     ->hidden(fn (?Order $record) => $record === null),
