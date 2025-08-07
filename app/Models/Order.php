@@ -77,9 +77,9 @@ class Order extends Model implements Listable
     ];
 
     protected $appends = [
-        // 'paid_amount_with_taxes',
-        // 'paid_amount',
-        // 'remaining_amount',
+        'paid_amount_with_taxes',
+        'paid_amount',
+        'remaining_amount',
     ];
 
     protected static function booted()
@@ -87,23 +87,23 @@ class Order extends Model implements Listable
         static::addGlobalScope(new CountryScope());
     }
 
-    // public function getPaidAmountWithTaxesAttribute()
-    // {
-    //     return $this->invoice?->amount ?? 0;
-    // }
+    public function getPaidAmountWithTaxesAttribute()
+    {
+        return $this->invoice?->amount ?? 0;
+    }
 
-    // public function getPaidAmountAttribute()
-    // {
-    //     $amount = $this->invoice?->amount ?? 0;
-    //     $taxes = $this->invoice?->taxes ?? 0;
+    public function getPaidAmountAttribute()
+    {
+        $amount = $this->invoice?->amount ?? 0;
+        $taxes = $this->invoice?->taxes ?? 0;
 
-    //     return number_format($amount - $taxes, decimal_separator: '', thousands_separator: '');
-    // }
+        return number_format($amount - $taxes, decimal_separator: '', thousands_separator: '');
+    }
 
-    // public function getRemainingAmountAttribute(): float
-    // {
-    //     return $this->total - ($this->invoice?->paid_amount);
-    // }
+    public function getRemainingAmountAttribute(): float
+    {
+        return $this->total - ($this->paid_amount);
+    }
 
     public function country()
     {
@@ -196,7 +196,7 @@ class Order extends Model implements Listable
 
     public function scopeWithListRelations(Builder $query, Request $request): Builder
     {
-        $query->with('user', 'vendor','invoice');
+        $query->with('user', 'vendor');
 
         return $query;
     }

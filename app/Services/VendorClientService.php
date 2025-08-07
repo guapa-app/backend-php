@@ -99,9 +99,7 @@ class VendorClientService
     public function getClientOrders($vendor_id, $client_id, ?ProductType $productType = null): Collection
     {
         $query = Order::where('vendor_id', $vendor_id)
-            ->where('user_id', $client_id)
-            ->with('invoice');
-
+            ->where('user_id', $client_id);
         if ($productType) {
             $query->hasProductType($productType);
         }

@@ -436,7 +436,7 @@ class OrderService
         $order = Order::findOrFail($data['id']);
         if ($order->status->value != 'Accepted') {
             $wallet = $user->myWallet();
-            $orderPrice = $order->invoice?->paid_amount_with_taxes;
+            $orderPrice = $order->paid_amount_with_taxes;
             if ($wallet->balance >= $orderPrice) {
                 try {
                     DB::beginTransaction();
