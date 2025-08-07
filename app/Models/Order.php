@@ -77,9 +77,9 @@ class Order extends Model implements Listable
     ];
 
     protected $appends = [
-        'paid_amount_with_taxes',
-        'paid_amount',
-        'remaining_amount',
+        // 'paid_amount_with_taxes',
+        // 'paid_amount',
+        // 'remaining_amount',
     ];
 
     protected static function booted()
