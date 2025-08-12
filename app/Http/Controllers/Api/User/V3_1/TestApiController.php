@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
+use App\Models\AdminEmail;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderNotify;
@@ -70,7 +71,7 @@ class TestApiController extends BaseApiController
                     'notifications_sent_to' => [
                         'customer' => $order->user->email ?? $order->user->phone,
                         'vendor' => $order->vendor->name ?? 'N/A',
-                        'admins' => Admin::role('admin')->pluck('email')->toArray()
+                        'admins' => AdminEmail::pluck('email')->toArray()
                     ]
                 ]
             ], 200);
@@ -182,7 +183,7 @@ class TestApiController extends BaseApiController
         }
 
         // Send notification to admin
-        $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+        $adminEmails = AdminEmail::pluck('email')->toArray();
         if (!empty($adminEmails)) {
             Notification::route('mail', $adminEmails)
                 ->notify(new OrderNotification($orderNotify));
