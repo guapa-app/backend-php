@@ -6,6 +6,7 @@ use App\Enums\TransactionOperation;
 use App\Enums\TransactionStatus;
 use App\Enums\TransactionType;
 use App\Models\Admin;
+use App\Models\AdminEmail;
 use App\Models\Transaction;
 use App\Models\Wallet;
 use App\Notifications\PayoutStatusNotification;
@@ -105,7 +106,7 @@ class ProcessVendorPayouts implements ShouldQueue
                 ]);
 
                 // Notify admins about the failure
-                $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+                $adminEmails = AdminEmail::pluck('email')->toArray();
                 Notification::route('mail', $adminEmails)
                     ->notify(new PayoutStatusNotification($transaction));
             }
