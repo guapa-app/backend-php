@@ -2,6 +2,7 @@
 
 namespace App\Services\V3_1;
 
+use App\Models\AdminEmail;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Order;
@@ -99,7 +100,7 @@ class OrderPaymentService
             $order = OrderNotify::findOrFail($order->id);
 
             // Send email to admin
-           $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+           $adminEmails = AdminEmail::pluck('email')->toArray();
            Notification::route('mail', $adminEmails)
                ->notify(new OrderNotification($order));
 

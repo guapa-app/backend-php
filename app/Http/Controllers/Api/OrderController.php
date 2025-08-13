@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\AdminEmail;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Order;
@@ -207,7 +208,7 @@ class OrderController extends BaseApiController
     protected function sendOrderNotifications(Order $order)
     {
         // Send email to admin
-        $adminEmails = Admin::role('admin')->pluck('email')->toArray();
+        $adminEmails = AdminEmail::pluck('email')->toArray();
         Notification::route('mail', $adminEmails)
             ->notify(new OrderNotification($order));
 
