@@ -37,7 +37,11 @@ class FirebaseService
             $notification = Notification::create($title, $body);
 
             // Create a Cloud Message with the notification
-            $message = CloudMessage::new()->withNotification($notification);
+            $message = CloudMessage::new()->withNotification($notification)
+                    ->withData([
+                        'type' => 'Test type',
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    ]);
 
             // Send the message to multiple device tokens
             $result = $this->messaging->sendMulticast($message, $tokens);
