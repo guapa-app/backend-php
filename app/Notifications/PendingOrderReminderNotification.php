@@ -45,6 +45,10 @@ class PendingOrderReminderNotification extends Notification implements ShouldQue
         return [
             'title' => 'Update order',
             'body' => $this->getSummary(),
+            'data' => [
+                'type' => 'order',
+                'id' => $this->order->id
+            ]
         ];
     }
 
