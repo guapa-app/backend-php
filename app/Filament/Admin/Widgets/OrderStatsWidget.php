@@ -17,7 +17,7 @@ class OrderStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
 
-            Stat::make('Total Amount', Order::sum('total'))
+            Stat::make('Total Amount', number_format(Order::sum('total'), 2))
                 ->description('All time orders amount')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('info'),
@@ -27,7 +27,7 @@ class OrderStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
 
-            Stat::make('Pending Amount', Order::where('status', OrderStatus::Pending->value)->sum('total'))
+            Stat::make('Pending Amount', number_format(Order::where('status', OrderStatus::Pending->value)->sum('total'), 2))
                 ->description('Orders awaiting processing amount')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('warning'),
@@ -37,7 +37,7 @@ class OrderStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('success'),
 
-            Stat::make('Accepted Amount', Order::where('status', OrderStatus::Accepted->value)->sum('total'))
+            Stat::make('Accepted Amount', number_format(Order::where('status', OrderStatus::Accepted->value)->sum('total'), 2))
                 ->description('Accepted Orders amount')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('success'),
@@ -47,7 +47,7 @@ class OrderStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make('Used Amount', Order::where('status',  OrderStatus::Used->value)->sum('total'))
+            Stat::make('Used Amount', number_format(Order::where('status',  OrderStatus::Used->value)->sum('total'), 2))
                 ->description('Completed orders amount')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('success'),
