@@ -31,8 +31,9 @@ class FirebaseChannel
         // Get the device tokens and message content from the notification
         $title = $notification->toFirebase()['title'];
         $body = $notification->toFirebase()['body'];
+        $data = $notification->toFirebase()['data'] ?? [];
 
         // Send the notification via FirebaseService
-        $this->firebaseService->sendNotification($notifiable, $title, $body);
+        $this->firebaseService->sendNotification(notifiable: $notifiable, title: $title, body: $body, data: $data);
     }
 }
