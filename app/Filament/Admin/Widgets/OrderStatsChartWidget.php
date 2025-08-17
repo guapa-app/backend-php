@@ -17,14 +17,42 @@ class OrderStatsChartWidget extends ChartWidget
 
     protected static ?string $maxHeight = '250px';
 
+    // Add year selector filter
+    public function getFilters(): ?array
+    {
+        $currentYear = Carbon::now()->year;
+        $years = [];
+        
+        // Generate years from 2024 to current year
+        for ($year = 2024; $year <= $currentYear; $year++) {
+            $years[(string) $year] = (string) $year;
+        }
+
+        return $years;
+    }
+
+    // Set default filter value
+    public function mount(): void
+    {
+        $this->filter = (string) Carbon::now()->year;
+    }
+
     protected function getType(): string
     {
         return 'bar';
     }
 
+    // Handle filter changes
+    public function updatedFilter(string $filter): void
+    {
+        // The filter property is automatically managed by Filament
+        // No need to manually set selectedYear
+    }
+
     protected function getData(): array
     {
-        $currentYear = Carbon::now()->year;
+        // Use the filter value (which is managed by Filament) or default to current year
+        $selectedYear = $this->filter ?? Carbon::now()->year;
 
         // Fetch data grouped by status and month
         $query = Order::select(
@@ -32,7 +60,7 @@ class OrderStatsChartWidget extends ChartWidget
             DB::raw('MONTH(created_at) as month'),
             'status'
         )
-            ->whereYear('created_at', $currentYear);
+            ->whereYear('created_at', $selectedYear);
 
         $ordersData = $query
             ->groupBy('status', 'month')
@@ -73,14 +101,15 @@ class OrderStatsChartWidget extends ChartWidget
         $datasets = [];
         foreach ($monthlyCounts as $statusValue => $counts) {
             $status = OrderStatus::from($statusValue);
-            $color = $colorMap[$status->getColor()] ?? '#6B7280'; // Default to gray if color not found
+            $label = $status->getLabel();
+            $color = $colorMap[$status->getColor()] ?? '#6B7280';
 
             $datasets[] = [
-                'label' => $status->getLabel(),
+                'label' => $label,
                 'data' => array_values($counts),
-                'backgroundColor' => $color, // Use backgroundColor for bar fill
-                'borderColor' => $color, // Optional: Use borderColor for bar outline
-                'borderWidth' => 1, // Optional: Set border width
+                'backgroundColor' => $color,
+                'borderColor' => $color,
+                'borderWidth' => 1,
             ];
         }
 
