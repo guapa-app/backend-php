@@ -17,14 +17,41 @@ class OrderTotalStatsChartWidget extends ChartWidget
 
     protected static ?string $maxHeight = '250px';
 
+    // Add year selector filter
+    public function getFilters(): ?array
+    {
+        $currentYear = Carbon::now()->year;
+        $years = [];
+        
+        // Generate years from 2024 to current year
+        for ($year = 2024; $year <= $currentYear; $year++) {
+            $years[(string) $year] = (string) $year;
+        }
+
+        return $years;
+    }
+
+    // Set default filter value
+    public function mount(): void
+    {
+        $this->filter = (string) Carbon::now()->year;
+    }
+
     protected function getType(): string
     {
         return 'bar';
     }
 
+    // Handle filter changes
+    public function updatedFilter(string $filter): void
+    {
+        // The filter property is automatically managed by Filament
+    }
+
     protected function getData(): array
     {
-        $currentYear = Carbon::now()->year;
+        // Use the filter value (which is managed by Filament) or default to current year
+        $selectedYear = $this->filter ?? Carbon::now()->year;
 
         // Fetch data grouped by status and month
         $query = Order::select(
@@ -32,7 +59,7 @@ class OrderTotalStatsChartWidget extends ChartWidget
             DB::raw('MONTH(created_at) as month'),
             'status'
         )
-            ->whereYear('created_at', $currentYear);
+            ->whereYear('created_at', $selectedYear);
 
         $ordersData = $query
             ->groupBy('status', 'month')
