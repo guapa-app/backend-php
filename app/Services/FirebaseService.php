@@ -28,7 +28,7 @@ class FirebaseService
      * @param string $title
      * @param string $body
      */
-    public function sendNotification($notifiable, $title, $body)
+    public function sendNotification($notifiable, $title, $body, $data = [])
     {
         $tokens = $this->getTokens($notifiable);
 
@@ -37,7 +37,10 @@ class FirebaseService
             $notification = Notification::create($title, $body);
 
             // Create a Cloud Message with the notification
-            $message = CloudMessage::new()->withNotification($notification);
+            $message = CloudMessage::new()->withNotification($notification)
+                    ->withData(array_merge($data, [
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    ]));
 
             // Send the message to multiple device tokens
             $result = $this->messaging->sendMulticast($message, $tokens);

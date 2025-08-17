@@ -88,6 +88,10 @@ class OrderNotification extends Notification implements ShouldQueue
         return [
             'title' => 'New order',
             'body' => 'New order from ' . $this->order->user->name . ' #' . $this->order->id,
+            'data' => [
+                'type' => 'order',
+                'id' => $this->order->id
+            ]
         ];
     }
 

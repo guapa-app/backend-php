@@ -119,6 +119,10 @@ class OrderUpdatedNotification extends Notification
         return [
             'title' => 'Update order',
             'body' => $this->getSummary(),
+            'data' => [
+                'type' => 'order',
+                'id' => $this->order->id
+            ]
         ];
     }
 
