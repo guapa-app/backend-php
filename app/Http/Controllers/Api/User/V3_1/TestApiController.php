@@ -176,19 +176,19 @@ class TestApiController extends BaseApiController
         $order->user->notify(new OrderNotification($orderNotify));
         Log::info("Sent notification to customer: {$order->user->email}");
 
-        // Send notification to vendor staff
-        if ($order->vendor) {
-            Notification::send($order->vendor, new OrderNotification($orderNotify));
-            Log::info("Sent notification to vendor: {$order->vendor->name}");
-        }
+        // // Send notification to vendor staff
+        // if ($order->vendor) {
+        //     Notification::send($order->vendor, new OrderNotification($orderNotify));
+        //     Log::info("Sent notification to vendor: {$order->vendor->name}");
+        // }
 
-        // Send notification to admin
-        $adminEmails = AdminEmail::pluck('email')->toArray();
-        if (!empty($adminEmails)) {
-            Notification::route('mail', $adminEmails)
-                ->notify(new OrderNotification($orderNotify));
-            Log::info("Sent notification to admins: " . implode(', ', $adminEmails));
-        }
+        // // Send notification to admin
+        // $adminEmails = AdminEmail::pluck('email')->toArray();
+        // if (!empty($adminEmails)) {
+        //     Notification::route('mail', $adminEmails)
+        //         ->notify(new OrderNotification($orderNotify));
+        //     Log::info("Sent notification to admins: " . implode(', ', $adminEmails));
+        // }
     }
 
     /**
