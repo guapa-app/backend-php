@@ -89,7 +89,7 @@ class OrderNotification extends Notification implements ShouldQueue
     public function toFirebase()
     {
         return [
-            'title' => 'New order' . $this->type,
+            'title' => 'New order test' . $this->type,
             'body' => 'New order from ' . $this->order->user->name . ' #' . $this->order->id,
             'data' => [
                 'type' => 'order',
