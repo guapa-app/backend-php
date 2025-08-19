@@ -173,7 +173,7 @@ class TestApiController extends BaseApiController
         Log::info("Sending test notifications for order #{$order->id}");
 
         // Send notification to customer
-        $order->user->notify(new OrderNotification(order: $orderNotify, type: 'test'));
+        $order->user->notify(new OrderNotification($orderNotify));
         Log::info("Sent notification to customer: {$order->user->email}");
 
         // // Send notification to vendor staff
