@@ -23,14 +23,17 @@ class OrderNotification extends Notification implements ShouldQueue
      */
     public $order;
 
+    public $type;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(OrderNotify $order)
+    public function __construct(OrderNotify $order, ?string $type = null)
     {
         $this->order = $order;
+        $this->type = $type;
     }
 
     /**
@@ -86,7 +89,7 @@ class OrderNotification extends Notification implements ShouldQueue
     public function toFirebase()
     {
         return [
-            'title' => 'New order',
+            'title' => 'New order' . $this->type,
             'body' => 'New order from ' . $this->order->user->name . ' #' . $this->order->id,
             'data' => [
                 'type' => 'order',
