@@ -134,4 +134,15 @@ return [
     'invalid_phone_format' => 'يرجى إدخال تنسيق رقم هاتف صحيح',
     'invalid_saudi_mobile_number' => 'يرجى إدخال رقم هاتف سعودي صحيح (مثل 9665xxxxxxxx أو +9665xxxxxxxx أو 05xxxxxxxx أو 5xxxxxxxx)',
     'not_ksa_number' => 'هذا ليس رقم جوال سعودي. نوصي باستخدام رقم سعودي لتجربة أفضل.',
+
+    // Cart messages
+    'cart' => [
+        'product_added_to_cart' => 'تم إضافة المنتج إلى السلة بنجاح',
+        'product_removed_from_cart' => 'تم إزالة المنتج من السلة بنجاح',
+        'cart_empty' => 'السلة فارغة',
+        'cart_not_found' => 'السلة غير موجودة',
+        'quantity_incremented' => 'تم زيادة الكمية بنجاح',
+        'quantity_decremented' => 'تم إنقاص الكمية بنجاح',
+        'cart_cleared' => 'تم مسح السلة بنجاح',
+    ]
 ];

@@ -45,6 +45,8 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::prefix('appointments')->group(base_path('routes/user/v3_1/api/appointments.php'));
     // consultation
     Route::prefix('consultations')->group(base_path('routes/user/v3_1/api/consultations.php'));
+    // cart
+    Route::prefix('cart')->group(base_path('routes/user/v3_1/api/cart.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
@@ -53,6 +55,8 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
     Route::get('gift-card-options', [DataController::class, 'giftCardOptions']);
+
+    
 
     // Testing endpoints for order notifications
     Route::prefix('test')->group(function () {
