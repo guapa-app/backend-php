@@ -132,4 +132,15 @@ return [
     'invalid_phone_format' => 'Please enter a valid phone number format',
     'invalid_saudi_mobile_number' => 'Please enter a valid Saudi mobile number (e.g., 9665xxxxxxxx, +9665xxxxxxxx, 05xxxxxxxx, or 5xxxxxxxx)',
     'not_ksa_number' => 'This is not a Saudi (KSA) mobile number. We recommend using a Saudi number for best experience.',
+
+    // Cart messages
+    'cart' => [
+        'product_added_to_cart' => 'Product added to cart successfully',
+        'product_removed_from_cart' => 'Product removed from cart successfully',
+        'cart_empty' => 'Cart is empty',
+        'cart_not_found' => 'Cart not found',
+        'quantity_incremented' => 'Quantity incremented successfully',
+        'quantity_decremented' => 'Quantity decremented successfully',
+        'cart_cleared' => 'Cart cleared successfully',
+    ]
 ];
