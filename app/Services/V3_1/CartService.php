@@ -2,12 +2,21 @@
 
 namespace App\Services\V3_1;
 
+use App\Http\Resources\User\V3_1\MediaResource;
+use App\Http\Resources\User\V3_1\OrderCollection;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\User;
 
 class CartService
 {
+    protected $productFees;
+    protected $taxesPercentage;
+    public function __construct(){
+        $this->productFees = Setting::getProductFees();
+        $this->taxesPercentage = Setting::getTaxes();
+    }
     public function addToCart(User $user, int $productId, ?int $quantity = 1)
     {
         $cart = Cart::where('user_id', $user->id)->where('product_id', $productId)->first();
@@ -42,13 +51,14 @@ class CartService
                 'sub_price' => $item->product->price,
                 'price' => $item->product->price * $item->quantity,
                 'quantity' => $item->quantity,
+                'images' => MediaResource::collection($item->product->media),
             ];
         });
         return [
             'items' => $items,
             'sub_total' => $subTotal,
-            'taxes' => $subTotal * 0.15,
-            'total' => $subTotal * 1.15,
+            'taxes' => round($subTotal * $this->taxesPercentage / 100, 2),
+            'total' => round($subTotal * (1 + $this->taxesPercentage / 100), 2),
             'total_quantity' => $this->getCartTotalQuantity($user),
         ];
     }
