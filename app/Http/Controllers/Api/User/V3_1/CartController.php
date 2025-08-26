@@ -19,55 +19,38 @@ class CartController extends Controller
     public function addToCart(AddToCartRequest $request): JsonResponse
     {
         $this->cartService->addToCart(user: auth()->user(), productId: $request->product_id, quantity: $request->quantity);
-        return response()->json([
-            'success' => true,
-            'message' => __('api.cart.product_added_to_cart'),
-        ]);
+
+        return $this->successJsonRes(message: __('api.cart.product_added_to_cart'));
     }
 
     public function getCart(): JsonResponse
     {
         $cart = $this->cartService->getCart(user: auth()->user());
-        return response()->json([
-            'success' => true,
-            'message' => __('api.success'),
-            'data' => $cart,
-        ]);
+        return $this->successJsonRes(data: $cart, message: __('api.success'));
+        
     }
 
     public function removeFromCart(RemoveFromCartRequest $request): JsonResponse
     {
         $this->cartService->removeFromCart(user: auth()->user(), productId: $request->product_id);
-        return response()->json([
-            'success' => true,
-            'message' => __('api.cart.product_removed_from_cart'),
-        ]);
+        return $this->successJsonRes(message: __('api.cart.product_removed_from_cart'));
     }
 
     public function clearCart(): JsonResponse
     {
         $this->cartService->clearCart(user: auth()->user());
-        return response()->json([
-            'success' => true,
-            'message' => __('api.cart.cart_cleared'),
-        ]);
+        return $this->successJsonRes(message: __('api.cart.cart_cleared'));
     }
 
     public function incrementQuantity(IncrementOrDecrementQuantityRequest $request): JsonResponse
     {
         $this->cartService->incrementQuantity(user: auth()->user(), productId: $request->product_id, quantity: $request->quantity);
-        return response()->json([
-            'success' => true,
-            'message' => __('api.cart.quantity_incremented'),
-        ]);
+        return $this->successJsonRes(message: __('api.cart.quantity_incremented'));
     }
 
     public function decrementQuantity(IncrementOrDecrementQuantityRequest $request): JsonResponse
     {
         $this->cartService->decrementQuantity(user: auth()->user(), productId: $request->product_id, quantity: $request->quantity);
-        return response()->json([
-            'success' => true,
-            'message' => __('api.cart.quantity_decremented'),
-        ]);
+        return $this->successJsonRes(message: __('api.cart.quantity_decremented'));
     }
 }
