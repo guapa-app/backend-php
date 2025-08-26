@@ -52,6 +52,24 @@ Route::prefix("vendor/v3.1")->group(function () {
         Route::get('/{id}', [GiftCardController::class, 'show']);
     });
 
+    // api for Amr
+    Route::get('list-vendors-data', function(){
+        $vendors = \App\Models\Vendor::with('addresses')->get()->map(function ($vendor){
+            return [
+                'id' => $vendor->id,
+                'name' => $vendor->name,
+                'phone' => $vendor->phone,
+                'email' => $vendor->email,
+                'addresses' => \App\Http\Resources\User\V3_1\AddressResource::collection($vendor->addresses),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Vendors data fetched successfully',
+            'data' => $vendors,
+        ]);
+    });
 });
 
 Route::prefix('')->group(base_path('routes/vendor/v3_2/api.php'));
