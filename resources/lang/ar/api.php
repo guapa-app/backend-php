@@ -144,5 +144,7 @@ return [
         'quantity_incremented' => 'تم زيادة الكمية بنجاح',
         'quantity_decremented' => 'تم إنقاص الكمية بنجاح',
         'cart_cleared' => 'تم مسح السلة بنجاح',
+        'cart_is_empty' => 'السلة فارغة',
+        'service_product_can_not_be_in_cart' => 'لا يمكن إضافة الخدمة في السلة',
     ]
 ];
