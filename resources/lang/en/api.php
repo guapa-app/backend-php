@@ -142,5 +142,7 @@ return [
         'quantity_incremented' => 'Quantity incremented successfully',
         'quantity_decremented' => 'Quantity decremented successfully',
         'cart_cleared' => 'Cart cleared successfully',
+        'cart_is_empty' => 'Cart is empty',
+        'service_product_can_not_be_in_cart' => 'Service product can not be added in the cart',
     ]
 ];

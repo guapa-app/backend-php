@@ -2,10 +2,8 @@
 
 namespace App\Services\V3_1;
 
-use App\Http\Resources\User\V3_1\MediaResource;
-use App\Http\Resources\User\V3_1\OrderCollection;
+use App\Http\Resources\User\V3_1\ProductResource;
 use App\Models\Cart;
-use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
 
@@ -39,26 +37,33 @@ class CartService
     }
 
     public function getCart(User $user){
-        $items = Cart::where('user_id', $user->id)->with('product')->get();
+        $items = Cart::where('user_id', $user->id)->with(['product' => function($query){
+            $query->withSingleRelations();
+        }])->get();
+
         $subTotal = $items->sum(function($item){
-            return $item->quantity * $item->product->price;
+            return $item->quantity * $item->product->payment_details['price_after_discount'];
+        });
+
+        $fees = $items->sum(function($item){
+            return $this->calculateProductFees(
+                product: $item->product, 
+                finalPrice: $item->product->payment_details['price_after_discount'] * $item->quantity
+            );
         });
 
         $items = $items->map(function($item){
             return [
-                'id' => $item->product->id,
-                'title' => $item->product->title,
-                'sub_price' => $item->product->price,
-                'price' => $item->product->price * $item->quantity,
+                'product' => ProductResource::make($item->product),
+                'price' => $item->product->payment_details['price_after_discount'] * $item->quantity,
                 'quantity' => $item->quantity,
-                'images' => MediaResource::collection($item->product->media),
             ];
         });
         return [
             'items' => $items,
             'sub_total' => $subTotal,
-            'taxes' => round($subTotal * $this->taxesPercentage / 100, 2),
-            'total' => round($subTotal * (1 + $this->taxesPercentage / 100), 2),
+            'taxes' => round($fees, 2),
+            'total' => round($subTotal + $fees, 2),
             'total_quantity' => $this->getCartTotalQuantity($user),
         ];
     }
@@ -83,5 +88,18 @@ class CartService
 
     public function getCartTotalQuantity(User $user){
         return Cart::where('user_id', $user->id)->sum('quantity');
+    }
+
+    private function calculateProductFees($product, $finalPrice): float|int
+    {
+        $productCategory = $product->taxonomies()->first();
+
+        if ($productCategory?->fees) {
+            $productFees = $productCategory->fees;
+
+            return ($productFees / 100) * $finalPrice;
+        } else {
+            return $productCategory?->fixed_price ?? 0;
+        }
     }
 }

@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Api\User\V3_1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\Cart\AddToCartRequest;
 use App\Http\Requests\V3_1\User\Cart\IncrementOrDecrementQuantityRequest;
 use App\Http\Requests\V3_1\User\Cart\RemoveFromCartRequest;
 use App\Services\V3_1\CartService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
-class CartController extends Controller
+class CartController extends BaseApiController
 {
     public function __construct(
         private CartService $cartService
-    ) {}
+    ) {
+        parent::__construct();
+    }
 
     public function addToCart(AddToCartRequest $request): JsonResponse
     {
