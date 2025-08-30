@@ -408,7 +408,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         // We need to return only active products owned by active vendors
         // Excluding admins and vendors displaying their own products.
         $currentUserWorksForFilteredVendor = $user && !$user->isAdmin() && $request->has('vendor_id')
-            && $user->hasVendor((int) $request->get('vendor_id'));
+            && $user->hasVendor((int) $request->vendor_id);
         if (
             !$currentUserWorksForFilteredVendor &&
             (!$user || !$user->isAdmin())

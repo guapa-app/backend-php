@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
+
 /**
  * @bodyParam category_id int required Category id for this product.
  * @bodyParam title string required Product title 191 characters max.
@@ -51,6 +53,11 @@ class ProductRequest extends FailedValidationRequest
     {
         // If the id exists this is an edit request
         $id = $this->route('id');
+
+        $product = null;
+        if($id){
+            $product = Product::find($id);
+        }
 
         $rule_name = $id ? 'nullable' : 'required';
 
@@ -112,6 +119,17 @@ class ProductRequest extends FailedValidationRequest
             // But new media must be provided
             $rules['keep_media'] = ($id ? 'nullable' : 'required_without:media').'|array|min:1';
             $rules['keep_media.*'] = "{$rule_name}|integer|exists:media,id";
+        }
+
+        if($this->type == 'product' || $product?->type?->value == 'product')
+        {
+            $rules = array_merge($rules, [
+                'stock' => "{$rule_name}|integer|min:1",
+                'is_shippable' => "{$rule_name}|boolean",
+                'min_quantity_per_user' => "{$rule_name}|integer|min:1|max:100",
+                'max_quantity_per_user' => "{$rule_name}|integer|min:1|max:100|gte:min_quantity_per_user",
+                'days_of_delivery' => "{$rule_name}|integer|min:1|max:100",
+            ]);
         }
 
         return $rules;
