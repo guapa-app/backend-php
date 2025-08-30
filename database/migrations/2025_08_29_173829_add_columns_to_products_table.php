@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            //
+            $table->dropColumn(['stock', 'is_shippable', 'min_quantity_per_user', 'max_quantity_per_user', 'days_of_delivery']);
         });
     }
 };
