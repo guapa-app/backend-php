@@ -144,5 +144,11 @@ return [
         'cart_cleared' => 'Cart cleared successfully',
         'cart_is_empty' => 'Cart is empty',
         'service_product_can_not_be_in_cart' => 'Service product can not be added in the cart',
+        'quantity_is_greater_than_available_in_stock' => 'Quantity is greater than available in stock',
+        'quantity_is_less_than_min_quantity_per_user' => 'Quantity is less than min quantity per user',
+        'quantity_is_greater_than_max_quantity_per_user' => 'Quantity is greater than max quantity per user',
+        'product_can_not_be_shipped' => 'Product can not be shipped',
+        'quantity_is_greater_than_cart_quantity' => 'Quantity is greater than cart quantity',
+        'product_not_found_in_cart' => 'Product not found in cart',
     ]
 ];
