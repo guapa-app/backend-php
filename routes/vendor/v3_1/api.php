@@ -60,6 +60,7 @@ Route::prefix("vendor/v3.1")->group(function () {
                 'name' => $vendor->name,
                 'phone' => $vendor->phone,
                 'email' => $vendor->email,
+                'status' => \App\Models\Vendor::STATUSES[$vendor->status],
                 'addresses' => \App\Http\Resources\User\V3_1\AddressResource::collection($vendor->addresses),
             ];
         });
