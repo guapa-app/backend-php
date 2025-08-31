@@ -42,6 +42,22 @@ class AddToCartRequest extends FormRequest
             if ($product->type == ProductType::Service) {
                 $validator->errors()->add('product_id', __('api.cart.service_product_can_not_be_in_cart'));
             }
+
+            if($this->quantity > $product->stock){
+                $validator->errors()->add('quantity', __('api.cart.quantity_is_greater_than_available_in_stock'));
+            }
+
+            if($this->quantity < $product->min_quantity_per_user){
+                $validator->errors()->add('quantity', __('api.cart.quantity_is_less_than_min_quantity_per_user'));
+            }
+
+            if($this->quantity > $product->max_quantity_per_user){
+                $validator->errors()->add('quantity', __('api.cart.quantity_is_greater_than_max_quantity_per_user'));
+            }
+
+            if($product->is_shippable == false){
+                $validator->errors()->add('product_id', __('api.cart.product_can_not_be_shipped'));
+            }
         });
     }
 }

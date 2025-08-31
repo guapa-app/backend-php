@@ -146,5 +146,11 @@ return [
         'cart_cleared' => 'تم مسح السلة بنجاح',
         'cart_is_empty' => 'السلة فارغة',
         'service_product_can_not_be_in_cart' => 'لا يمكن إضافة الخدمة في السلة',
+        'quantity_is_greater_than_available_in_stock' => 'الكمية أكثر من المتوفر في المخزن',
+        'quantity_is_less_than_min_quantity_per_user' => 'الكمية أقل من الكمية الأدنى للمستخدم',
+        'quantity_is_greater_than_max_quantity_per_user' => 'الكمية أكثر من الكمية الأقصى للمستخدم',
+        'product_can_not_be_shipped' => 'لا يمكن إضافة المنتج للشحن',
+        'quantity_is_greater_than_cart_quantity' => 'الكمية أكثر من الكمية في السلة',
+        'product_not_found_in_cart' => 'المنتج غير موجود في السلة',
     ]
 ];
