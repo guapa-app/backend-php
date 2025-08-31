@@ -21,7 +21,7 @@ class CartService
     {
         $cart = Cart::where('user_id', $user->id)->where('product_id', $productId)->first();
         if($cart){
-            $cart->increment('quantity', $quantity ?? 1);
+            $this->incrementQuantity(user: $user, productId: $productId, quantity: $quantity ?? 1);
         }else{
             Cart::create([
                 'user_id' => $user->id,
