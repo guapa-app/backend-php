@@ -64,14 +64,14 @@ class OrderService
         $this->walletService = $walletService;
     }
 
-    public function create(array $data): Collection
+    public function create(array $data, ?string $type = null): Collection
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data, $type) {
             $productIds = array_column($data['products'], 'id');
             $products = Product::whereIn('id', $productIds)->get();
 
             // get order type from product type
-            $data['type'] = $products->first()->type;
+            $data['type'] = $type ?? $products->first()->type;
             // Apply coupon if provided
             $couponResult = null;
             if (isset($data['coupon_code'])) {

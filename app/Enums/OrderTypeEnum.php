@@ -11,4 +11,5 @@ enum OrderTypeEnum: string
     case Product = 'product';
     case Service = 'service';
     case Appointment = 'appointment';
+    case Cart = 'cart';
 }

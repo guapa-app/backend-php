@@ -10,4 +10,5 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/clear', [CartController::class, 'clearCart'])->name('v3_1.cart.clear');
     Route::post('/increment', [CartController::class, 'incrementQuantity'])->name('v3_1.cart.increment');
     Route::post('/decrement', [CartController::class, 'decrementQuantity'])->name('v3_1.cart.decrement');
+    Route::post('/checkout', [CartController::class, 'checkout'])->name('v3_1.cart.checkout');
 });
