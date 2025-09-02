@@ -114,4 +114,19 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
             Route::post('/verify-qr-code', [GiftCardController::class, 'verifyQrCode']);
         });
     });
+
+    Route::post('/test/send-email', function (\Illuminate\Http\Request $request) {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+            ]);
+            \Mail::raw('This is a test email.', function ($message) use ($request) {
+                $message->to($request->email)
+                    ->subject('Test Email');
+            });
+            return response()->json(['message' => 'Test email sent successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
 });
