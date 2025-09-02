@@ -156,6 +156,10 @@ class OrderPaymentService
 
     protected function processCartOrder(Order $order): void
     {
+        $items = Cart::where('user_id', $order->user_id)->get();
+        foreach($items as $item){
+            $item->product->decrement('stock', $item->quantity);
+        }
         Cart::where('user_id', $order->user_id)->delete();
     }
 }
