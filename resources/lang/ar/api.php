@@ -152,5 +152,7 @@ return [
         'product_can_not_be_shipped' => 'لا يمكن إضافة المنتج للشحن',
         'quantity_is_greater_than_cart_quantity' => 'الكمية أكثر من الكمية في السلة',
         'product_not_found_in_cart' => 'المنتج غير موجود في السلة',
+        'different_vendors_error' => 'لا يمكنك إضافة منتج من مختلف البائعين. يرجى شراء المنتجات الموجودة في السلة أو مسحها أولاً',
+        'checkout_different_vendors_error' => 'لا يمكنك إضافة منتجات من مختلف البائعين في الدفع, يرجى إزالة المنتجات',
     ]
 ];

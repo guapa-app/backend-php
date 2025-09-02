@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V3_1\User\Cart;
 
 use App\Enums\ProductType;
+use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -57,6 +58,11 @@ class AddToCartRequest extends FormRequest
 
             if($product->is_shippable == false){
                 $validator->errors()->add('product_id', __('api.cart.product_can_not_be_shipped'));
+            }
+
+            $existingVendorId = Cart::where('user_id', $this->user()->id)->first()?->product?->vendor_id;
+            if($existingVendorId && $existingVendorId != $product->vendor_id){
+                $validator->errors()->add('product_id', __('api.cart.different_vendors_error'));
             }
         });
     }

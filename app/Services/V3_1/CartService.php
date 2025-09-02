@@ -43,22 +43,33 @@ class CartService
             $query->withSingleRelations();
         }])->get();
 
+        if($items->isEmpty()){
+            return [
+                'items' => [],
+                'sub_total' => 0,
+                'fees' => 0,
+                'total' => 0,
+                'total_quantity' => 0,
+            ];
+        }
+
         $subTotal = $items->sum(function($item){
-            return $item->quantity * $item->product->payment_details['price_after_discount'];
+            return $item->quantity * $item->product->payment_details['fees_with_taxes'];
         });
 
-        $fees = $items->sum(function($item){
+        $fees = $items->sum(function ($item) {
             return $this->calculateProductFees(
-                product: $item->product, 
+                product: $item->product,
                 finalPrice: $item->product->payment_details['price_after_discount'] * $item->quantity
             );
         });
 
-        $items = $items->map(function($item){
-            [$errors, $hasErrors] = $this->checkProductErrors(product: $item->product, quantity: $item->quantity);
+        $existingVendorId = Cart::where('user_id', $user->id)->first()->product->vendor_id;
+        $items = $items->map(function($item) use ($existingVendorId){
+            [$errors, $hasErrors] = $this->checkProductErrors(product: $item->product, quantity: $item->quantity, existingVendorId: $existingVendorId);
             return [
                 'product' => ProductResource::make($item->product),
-                'price' => $item->product->payment_details['price_after_discount'] * $item->quantity,
+                'price' => $item->product->payment_details['fees_with_taxes'] * $item->quantity,
                 'quantity' => $item->quantity,
                 'errors' => $errors,
                 'hasErrors' => $hasErrors,
@@ -67,7 +78,7 @@ class CartService
         return [
             'items' => $items,
             'sub_total' => $subTotal,
-            'taxes' => round($fees, 2),
+            'fees' => $fees,
             'total' => round($subTotal + $fees, 2),
             'total_quantity' => $this->getCartTotalQuantity($user),
         ];
@@ -107,7 +118,41 @@ class CartService
         }
     }
 
-    public function getCartTotalQuantity(User $user){
+    public function checkout(User $user, $orderData)
+    {
+        $items = Cart::where('user_id', $user->id)->with([
+            'product' => function ($query) {
+                $query->withSingleRelations();
+            }
+        ])->get();
+
+        if($items->isEmpty()){
+            abort(422, __('api.cart.cart_is_empty'));
+        }
+
+        $existingVendorId = $items->first()->product->vendor_id;
+        $products = [];
+        $items = $items->map(function($item) use ($existingVendorId, &$products){
+            [$errors, $hasErrors] = $this->checkProductErrors(product: $item->product, quantity: $item->quantity, existingVendorId: $existingVendorId);
+            
+            if($hasErrors){
+                $errorMessage =  "Product {$item->product->title} has errors - ";
+                $errorMessage .= implode(', ', $errors);
+                abort(422, $errorMessage);
+            }
+
+            $products[] = [
+                'id' => $item->product->id,
+                'quantity' => $item->quantity,
+            ];
+        });
+
+        $orderData['products'] = $products;
+
+        return app(OrderService::class)->create(data: $orderData, type: 'cart');
+    }
+
+    private function getCartTotalQuantity(User $user){
         return Cart::where('user_id', $user->id)->sum('quantity');
     }
 
@@ -124,7 +169,7 @@ class CartService
         }
     }
 
-    private function checkProductErrors($product, $quantity)
+    private function checkProductErrors($product, $quantity, $existingVendorId)
     {
         $errors = [];
         $hasErrors = false;
@@ -147,6 +192,10 @@ class CartService
         }
         if($product->is_shippable == false){
             $errors[] = __('api.cart.product_can_not_be_shipped');
+            $hasErrors = true;
+        }
+        if($existingVendorId != $product->vendor_id){
+            $errors[] = __('api.cart.checkout_different_vendors_error');
             $hasErrors = true;
         }
         return [

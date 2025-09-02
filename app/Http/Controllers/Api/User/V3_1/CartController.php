@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Requests\V3_1\User\Cart\AddToCartRequest;
+use App\Http\Requests\V3_1\User\Cart\CartCheckoutRequest;
 use App\Http\Requests\V3_1\User\Cart\IncrementOrDecrementQuantityRequest;
 use App\Http\Requests\V3_1\User\Cart\RemoveFromCartRequest;
+use App\Http\Resources\User\V3_1\OrderCollection;
 use App\Services\V3_1\CartService;
 use Illuminate\Http\JsonResponse;
 
@@ -54,4 +56,18 @@ class CartController extends BaseApiController
         $this->cartService->decrementQuantity(user: auth()->user(), productId: $request->product_id, quantity: $request->quantity);
         return $this->successJsonRes(message: __('api.cart.quantity_decremented'));
     }
+
+    public function checkout(CartCheckoutRequest $request)
+    {
+        $data = $request->validated();
+        $data['user_id'] = $this->user->id;
+
+        $orders = $this->cartService->checkout(user: auth()->user(), orderData: $data);
+        return OrderCollection::make($orders)
+            ->additional([
+                'success' => true,
+                'message' => __('api.success'),
+            ]);
+    }
+
 }
