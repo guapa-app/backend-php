@@ -126,6 +126,10 @@ class CartService
             }
         ])->get();
 
+        if($items->isEmpty()){
+            abort(422, __('api.cart.cart_is_empty'));
+        }
+
         $existingVendorId = $items->first()->product->vendor_id;
         $products = [];
         $items = $items->map(function($item) use ($existingVendorId, &$products){

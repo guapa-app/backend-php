@@ -60,8 +60,8 @@ class AddToCartRequest extends FormRequest
                 $validator->errors()->add('product_id', __('api.cart.product_can_not_be_shipped'));
             }
 
-            $existingVendorId = Cart::where('user_id', $this->user()->id)->first()->product->vendor_id;
-            if($existingVendorId != $product->vendor_id){
+            $existingVendorId = Cart::where('user_id', $this->user()->id)->first()?->product?->vendor_id;
+            if($existingVendorId && $existingVendorId != $product->vendor_id){
                 $validator->errors()->add('product_id', __('api.cart.different_vendors_error'));
             }
         });
