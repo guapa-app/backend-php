@@ -154,5 +154,7 @@ return [
         'product_not_found_in_cart' => 'المنتج غير موجود في السلة',
         'different_vendors_error' => 'لا يمكنك إضافة منتج من مختلف البائعين. يرجى شراء المنتجات الموجودة في السلة أو مسحها أولاً',
         'checkout_different_vendors_error' => 'لا يمكنك إضافة منتجات من مختلف البائعين في الدفع, يرجى إزالة المنتجات',
+        'product_out_of_stock' => 'المنتج :product_title غير متوفر في المخزن',
+        'product_is_unshippable' => 'المنتج :product_title غير قابل للشحن',
     ]
 ];
