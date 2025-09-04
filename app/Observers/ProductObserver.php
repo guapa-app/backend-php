@@ -12,6 +12,7 @@ use App\Notifications\ProductIsUnshippableNotification;
 use App\Notifications\ProductOutOfStockNotification;
 use App\Services\ShareLinkService;
 use Exception;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class ProductObserver
@@ -65,8 +66,11 @@ class ProductObserver
 
             foreach ($users as $user) {
                 // fire notification to all users that has this order in the cart
-                $user->notify(new ProductOutOfStockNotification($product));
+                $user->notify(new ProductOutOfStockNotification(product: $product));
             }
+
+            // notify the vendor
+            Notification::send($product->vendor, new ProductOutOfStockNotification(product: $product, isToUser: false));
             
             // remove the product from the cart
             Cart::where('product_id', $product->id)->delete();
@@ -79,7 +83,7 @@ class ProductObserver
 
             foreach ($users as $user) {
                 // fire notification to all users that has this order in the cart
-                $user->notify(new ProductIsUnshippableNotification($product));
+                $user->notify(new ProductIsUnshippableNotification(product: $product));
             }
 
             // remove the product from the cart
