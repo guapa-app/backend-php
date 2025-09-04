@@ -16,7 +16,7 @@ class ProductOutOfStockNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Product $product)
+    public function __construct(public Product $product , public bool $isToUser = true)
     {
         //
     }
@@ -63,8 +63,8 @@ class ProductOutOfStockNotification extends Notification implements ShouldQueue
             'title' => 'Product Out of Stock',
             'body' => $this->getSummary(),
             'data' => [
-                'type' => 'cart',
-                'id' => null,
+                'type' => $this->isToUser ? 'cart' : 'product',
+                'id' => $this->isToUser ? null : $this->product->id,
             ]
         ];
     }
