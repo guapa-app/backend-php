@@ -152,5 +152,7 @@ return [
         'product_not_found_in_cart' => 'Product not found in cart',
         'different_vendors_error' => 'You can not add product from different vendors. Please buy the products on cart or clear it first',
         'checkout_different_vendors_error' => 'You cant have products from different vendors in the checkout, Please remove the products',
+        'product_out_of_stock' => 'Product :product_title is out of stock',
+        'product_is_unshippable' => 'Product :product_title is unshippable',
     ]
 ];
