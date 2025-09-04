@@ -23,8 +23,6 @@ class CartCheckoutRequest extends FormRequest
     {
         return [
             'note' => 'nullable|string|max:1000',
-            'name' => 'required|string|max:60',
-            'phone' => 'required|string|max:30',
             'address_id' => 'required|integer|exists:addresses,id',
             'coupon_code' => 'sometimes|string|exists:coupons,code',
         ];
