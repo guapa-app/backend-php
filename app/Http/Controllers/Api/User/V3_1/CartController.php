@@ -8,7 +8,6 @@ use App\Http\Requests\V3_1\User\Cart\CartCheckoutRequest;
 use App\Http\Requests\V3_1\User\Cart\IncrementOrDecrementQuantityRequest;
 use App\Http\Requests\V3_1\User\Cart\RemoveFromCartRequest;
 use App\Http\Resources\User\V3_1\OrderCollection;
-use App\Http\Resources\User\V3_1\OrderResource;
 use App\Services\V3_1\CartService;
 use Illuminate\Http\JsonResponse;
 
@@ -66,7 +65,6 @@ class CartController extends BaseApiController
         $data['phone'] = $this->user->phone;
 
         $orders = $this->cartService->checkout(user: auth()->user(), orderData: $data);
-        // return OrderResource::make($orders->first())
         return OrderCollection::make($orders)
             ->additional([
                 'success' => true,
