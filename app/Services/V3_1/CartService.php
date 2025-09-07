@@ -53,15 +53,12 @@ class CartService
             ];
         }
 
-        $subTotal = $items->sum(function($item){
+        $feesWithTaxes = $items->sum(function($item){
             return $item->quantity * $item->product->payment_details['fees_with_taxes'];
         });
 
-        $fees = $items->sum(function ($item) {
-            return $this->calculateProductFees(
-                product: $item->product,
-                finalPrice: $item->product->payment_details['price_after_discount'] * $item->quantity
-            );
+        $priceAfterDiscount = $items->sum(function($item){
+            return $item->quantity * $item->product->payment_details['price_after_discount'];
         });
 
         $existingVendorId = Cart::where('user_id', $user->id)->first()->product->vendor_id;
@@ -77,9 +74,9 @@ class CartService
         });
         return [
             'items' => $items,
-            'sub_total' => round($subTotal, 2),
-            'fees' => round($fees, 2),
-            'total' => round($subTotal + $fees, 2),
+            'fees_with_taxes' => round($feesWithTaxes, 2), // fees_with_taxes
+            'price_after_discount' => round($priceAfterDiscount, 2), // price_after_discount 
+            'total' => round($priceAfterDiscount + $feesWithTaxes, 2), // price_after_discount + fees_with_taxes
             'total_quantity' => $this->getCartTotalQuantity($user),
         ];
     }
