@@ -10,10 +10,10 @@
                 <div class="row">
                     <div class="col-lg-6 col-12">
                         <div class="contain">
-                            <span> عن تطبيق جوابا </span>
+                            <span> عن تطبيق قوابا </span>
 
                             <h1>
-                                تطبيق جوابا لمزودي الخدمة
+                                تطبيق قوابا لمزودي الخدمة
                             </h1>
 
                             <p>
