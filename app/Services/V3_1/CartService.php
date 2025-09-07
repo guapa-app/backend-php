@@ -66,7 +66,7 @@ class CartService
             [$errors, $hasErrors] = $this->checkProductErrors(product: $item->product, quantity: $item->quantity, existingVendorId: $existingVendorId);
             return [
                 'product' => ProductResource::make($item->product),
-                'price' => round($item->product->payment_details['fees_with_taxes'] * $item->quantity, 2),
+                'price' => round($item->product->payment_details['price_after_discount'] * $item->quantity, 2),
                 'quantity' => $item->quantity,
                 'errors' => $errors,
                 'hasErrors' => $hasErrors,
