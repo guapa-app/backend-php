@@ -53,6 +53,15 @@ class CartService
             ];
         }
 
+        $hasDiscount = false; 
+        $items->map(function($item) use (&$hasDiscount){
+            if($item->product->payment_details['discount_percentage'] > 0){
+                $hasDiscount = true;
+            }
+
+            // return $item;
+        });
+
         $feesWithTaxes = $items->sum(function($item){
             return $item->quantity * $item->product->payment_details['fees_with_taxes'];
         });
@@ -60,6 +69,8 @@ class CartService
         $priceAfterDiscount = $items->sum(function($item){
             return $item->quantity * $item->product->payment_details['price_after_discount'];
         });
+
+        
 
         $existingVendorId = Cart::where('user_id', $user->id)->first()->product->vendor_id;
         $items = $items->map(function($item) use ($existingVendorId){
@@ -74,6 +85,7 @@ class CartService
         });
         return [
             'items' => $items,
+            'has_discount' => $hasDiscount,
             'fees_with_taxes' => round($feesWithTaxes, 2), // fees_with_taxes
             'price_after_discount' => round($priceAfterDiscount, 2), // price_after_discount 
             'total' => round($priceAfterDiscount + $feesWithTaxes, 2), // price_after_discount + fees_with_taxes
