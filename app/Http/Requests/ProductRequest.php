@@ -125,10 +125,10 @@ class ProductRequest extends FailedValidationRequest
         {
             $rules = array_merge($rules, [
                 'stock' => "{$rule_name}|integer|min:0",
-                'is_shippable' => "{$rule_name}|boolean",
-                'min_quantity_per_user' => "{$rule_name}|integer|min:1|max:100",
-                'max_quantity_per_user' => "{$rule_name}|integer|min:1|max:100|gte:min_quantity_per_user",
-                'days_of_delivery' => "{$rule_name}|integer|min:1|max:100",
+                // 'is_shippable' => "{$rule_name}|boolean",
+                // 'min_quantity_per_user' => "{$rule_name}|integer|min:1|max:100",
+                // 'max_quantity_per_user' => "{$rule_name}|integer|min:1|max:100|gte:min_quantity_per_user",
+                // 'days_of_delivery' => "{$rule_name}|integer|min:1|max:100",
             ]);
         }
 
