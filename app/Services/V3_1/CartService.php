@@ -46,8 +46,10 @@ class CartService
         if($items->isEmpty()){
             return [
                 'items' => [],
-                'sub_total' => 0,
-                'fees' => 0,
+                'has_discount' => false,
+                'fees_with_taxes' => 0,
+                'remaining' => 0,
+                'price_after_discount' => 0,
                 'total' => 0,
                 'total_quantity' => 0,
             ];
