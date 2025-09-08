@@ -69,13 +69,73 @@ class CouponResource extends Resource
                 Forms\Components\Fieldset::make('Related To')
                     ->columns(1)
                     ->schema([
+                        Forms\Components\Fieldset::make('Product Selection')
+                            ->columns(3)
+                            ->schema([
+                                Forms\Components\Select::make('vendor_filter')
+                                    ->label('Vendor')
+                                    ->searchable()
+                                    ->relationship('Vendors', 'name')
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(function (Forms\Set $set) {
+                                        $set('address_filter', null);
+                                        $set('Products', []);
+                                    }),
+        
+                                Forms\Components\Select::make('address_filter')
+                                    ->label('Sub-Vendor')
+                                    ->searchable()
+                                    ->options(function (Forms\Get $get) {
+                                        $vendorId = $get('vendor_filter');
+                                        if (!$vendorId) {
+                                            return [];
+                                        }
+                                        
+                                        return \App\Models\Address::where('addressable_id', $vendorId)
+                                            ->where('addressable_type', 'vendor')
+                                            ->get()
+                                            ->mapWithKeys(function ($address) {
+                                                $cityName = $address->city?->name ?? 'Unknown City';
+                                                $addressText = $address->address_1 ?? 'No Address';
+                                                return [$address->id => "{$cityName} - {$addressText}"];
+                                            });
+                                    })
+                                    ->live()
+                                    ->afterStateUpdated(function (Forms\Set $set) {
+                                        $set('Products', []);
+                                    })
+                                    ->disabled(fn (Forms\Get $get) => !$get('vendor_filter')),
+        
+                                Forms\Components\Select::make('Products')
+                                    ->relationship('Products', 'title', function (Builder $query, Forms\Get $get) {
+                                        $addressId = $get('address_filter');
+                                        if ($addressId) {
+                                            return $query->whereHas('addresses', function ($q) use ($addressId) {
+                                                $q->where('addresses.id', $addressId);
+                                            });
+                                        }
+                                        return $query->whereRaw('1 = 0'); // Return empty by default
+                                    })
+                                    ->searchable()
+                                    ->preload()
+                                    ->multiple()
+                                    ->disabled(fn (Forms\Get $get) => !$get('address_filter')),
+                            ]),
+
                         Forms\Components\Select::make('Products')
                             ->relationship('Products', 'title')
+                            ->getOptionLabelFromRecordUsing(function (Model $record) {
+                                $vendorName = $record->vendor?->name ?? '';
+                                return "{$record->title}" . ($vendorName ? " - {$vendorName}" : '');
+                            })
                             ->preload()
+                            ->searchable()
                             ->multiple(),
 
                         Forms\Components\Select::make('Vendors')
                             ->relationship('Vendors', 'name')
+                            ->searchable()
                             ->preload()
                             ->multiple(),
 
@@ -83,6 +143,7 @@ class CouponResource extends Resource
                             ->relationship('categories', 'title', function (Builder $query) {
                                 return $query->whereIn('type', ['specialty', 'category']);
                             })
+                            ->searchable()
                             ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->title}")
                             ->preload()
                             ->multiple(),
