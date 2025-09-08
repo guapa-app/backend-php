@@ -452,11 +452,17 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     {
         $query->select('products.*');
 
+        // Join with vendors and only the nearest address for each vendor
         $query->join('vendors', function ($join) {
             $join->on('products.vendor_id', '=', 'vendors.id');
         })
-        ->join('addresses', function ($join) {
-            $join->on('addresses.addressable_id', '=', 'vendors.id');
+        ->join('addresses', function ($join) use ($lat, $lng) {
+            $join->on('addresses.addressable_id', '=', 'vendors.id')
+                 ->whereRaw('(6371 * acos(cos(radians(' . $lat . ')) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians(' . $lng . ')) + sin(radians(' . $lat . ')) * sin(radians(addresses.lat)))) = (
+                     SELECT MIN((6371 * acos(cos(radians(' . $lat . ')) * cos(radians(a2.lat)) * cos(radians(a2.lng) - radians(' . $lng . ')) + sin(radians(' . $lat . ')) * sin(radians(a2.lat)))))
+                     FROM addresses a2 
+                     WHERE a2.addressable_id = vendors.id AND a2.addressable_type = "vendor"
+                 )');
         })
         ->where('addresses.addressable_type', 'vendor');
 
