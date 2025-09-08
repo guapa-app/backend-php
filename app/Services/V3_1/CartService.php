@@ -58,8 +58,6 @@ class CartService
             if($item->product->payment_details['discount_percentage'] > 0){
                 $hasDiscount = true;
             }
-
-            // return $item;
         });
 
         $feesWithTaxes = $items->sum(function($item){
@@ -70,7 +68,9 @@ class CartService
             return $item->quantity * $item->product->payment_details['price_after_discount'];
         });
 
-        
+        $remainingPrice = $items->sum(function($item){
+            return $item->quantity * $item->product->payment_details['remaining'];
+        });
 
         $existingVendorId = Cart::where('user_id', $user->id)->first()->product->vendor_id;
         $items = $items->map(function($item) use ($existingVendorId){
@@ -87,6 +87,7 @@ class CartService
             'items' => $items,
             'has_discount' => $hasDiscount,
             'fees_with_taxes' => round($feesWithTaxes, 2), // fees_with_taxes
+            'remaining' => round($remainingPrice, 2), // remaining
             'price_after_discount' => round($priceAfterDiscount, 2), // price_after_discount 
             'total' => round($priceAfterDiscount + $feesWithTaxes, 2), // price_after_discount + fees_with_taxes
             'total_quantity' => $this->getCartTotalQuantity($user),
