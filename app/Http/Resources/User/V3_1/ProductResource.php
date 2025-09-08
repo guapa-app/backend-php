@@ -22,6 +22,7 @@ class ProductResource extends JsonResource
             'is_liked'                     => (bool) $this->is_liked,
             'likes_count'                  => (int) $this->likes_count,
             'shared_link'                  => $this->shared_link,
+            'distance'                     => $this->distance ? $this->distance .' KM' : null,
 
             'payment_details'              => $this->payment_details,
             'points'                       => $this->calcProductPoints(),
