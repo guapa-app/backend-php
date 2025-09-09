@@ -110,12 +110,18 @@ class CouponResource extends Resource
                                 Forms\Components\Select::make('Products')
                                     ->relationship('Products', 'title', function (Builder $query, Forms\Get $get) {
                                         $addressId = $get('address_filter');
+                                        $vendorId = $get('vendor_filter');
+                                        $query->where('vendor_id', $vendorId);
                                         if ($addressId) {
                                             return $query->whereHas('addresses', function ($q) use ($addressId) {
                                                 $q->where('addresses.id', $addressId);
                                             });
                                         }
                                         return $query->whereRaw('1 = 0'); // Return empty by default
+                                    })
+                                    ->getOptionLabelFromRecordUsing(function (Model $record) {
+                                        $vendorName = $record->vendor?->name ?? '';
+                                        return "{$record->title}" . ($vendorName ? " - {$vendorName}" : '');
                                     })
                                     ->searchable()
                                     ->preload()
