@@ -129,15 +129,15 @@ class CouponResource extends Resource
                                     ->disabled(fn (Forms\Get $get) => !$get('address_filter')),
                             ]),
 
-                        Forms\Components\Select::make('Products')
-                            ->relationship('Products', 'title')
-                            ->getOptionLabelFromRecordUsing(function (Model $record) {
-                                $vendorName = $record->vendor?->name ?? '';
-                                return "{$record->title}" . ($vendorName ? " - {$vendorName}" : '');
-                            })
-                            ->preload()
-                            ->searchable()
-                            ->multiple(),
+                        // Forms\Components\Select::make('Products')
+                        //     ->relationship('Products', 'title')
+                        //     ->getOptionLabelFromRecordUsing(function (Model $record) {
+                        //         $vendorName = $record->vendor?->name ?? '';
+                        //         return "{$record->title}" . ($vendorName ? " - {$vendorName}" : '');
+                        //     })
+                        //     ->preload()
+                        //     ->searchable()
+                        //     ->multiple(),
 
                         Forms\Components\Select::make('Vendors')
                             ->relationship('Vendors', 'name')
