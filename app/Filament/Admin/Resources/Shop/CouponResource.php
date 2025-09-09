@@ -75,7 +75,11 @@ class CouponResource extends Resource
                                 Forms\Components\Select::make('vendor_filter')
                                     ->label('Vendor')
                                     ->searchable()
-                                    ->relationship('Vendors', 'name')
+                                    ->options(function () {
+                                        return \App\Models\Vendor::where('status', '1') // Only active vendors
+                                            ->pluck('name', 'id')
+                                            ->toArray();
+                                    })
                                     ->preload()
                                     ->live()
                                     ->afterStateUpdated(function (Forms\Set $set) {
@@ -140,7 +144,9 @@ class CouponResource extends Resource
                         //     ->multiple(),
 
                         Forms\Components\Select::make('Vendors')
-                            ->relationship('Vendors', 'name')
+                            ->relationship('Vendors', 'name', function (Builder $query) {
+                                return $query->where('status', '1'); // Only active vendors
+                            })
                             ->searchable()
                             ->preload()
                             ->multiple(),
