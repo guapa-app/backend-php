@@ -13,6 +13,7 @@ use Hamedov\Favorites\HasFavorites;
 use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -252,6 +253,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     public function carts(): HasMany
     {
         return $this->hasMany(Cart::class);
+    }
+
+    public function coupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user', 'user_id', 'coupon_id');
     }
 
     public function scopeCurrentVendor($query, $value): void

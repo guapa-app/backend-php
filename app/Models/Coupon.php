@@ -15,8 +15,10 @@ class Coupon extends Model
 
     protected $fillable = [
         'code',
+        'type',
         'discount_percentage',
         'discount_source',
+        'points_expire_at',
         'expires_at',
         'max_uses',
         'single_user_usage',
@@ -38,6 +40,11 @@ class Coupon extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'coupon_products');
+    }
+
+    public function affiliate_market(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'coupon_user', 'coupon_id', 'user_id');
     }
 
     public function vendors(): BelongsToMany
