@@ -53,8 +53,8 @@ Route::prefix("vendor/v3.1")->group(function () {
     });
 
     // api for Amr
-    Route::get('list-vendors-data', function () {
-        $vendors = \App\Models\Vendor::with('addresses')->get()->map(function ($vendor) {
+    Route::get('list-vendors-data', function(){
+        $vendors = \App\Models\Vendor::with('addresses')->get()->map(function ($vendor){
             return [
                 'id' => $vendor->id,
                 'name' => $vendor->name,

@@ -3,6 +3,7 @@
 namespace App\Services\V3_1;
 
 use App\Models\AdminEmail;
+use App\Models\Cart;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Order;
@@ -44,7 +45,12 @@ class OrderPaymentService
                     $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
                 }
 
+
                 $this->sendOrderNotifications($order);
+
+                if($order->type == OrderTypeEnum::Cart->value) {
+                    $this->processCartOrder($order);
+                }
             }
         } catch (\Exception $e) {
             Log::error('Order status change failed: ' . $e->getMessage(), [
@@ -146,5 +152,14 @@ class OrderPaymentService
                 ]);
             }
         }
+    }
+
+    protected function processCartOrder(Order $order): void
+    {
+        $items = Cart::where('user_id', $order->user_id)->get();
+        foreach($items as $item){
+            $item->product->decrement('stock', $item->quantity);
+        }
+        Cart::where('user_id', $order->user_id)->delete();
     }
 }

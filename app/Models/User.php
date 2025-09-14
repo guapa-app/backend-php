@@ -249,6 +249,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->hasMany(AdminUserPointHistory::class);
     }
 
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
+
     public function scopeCurrentVendor($query, $value): void
     {
         $query->whereRelation('userVendors', 'vendor_id', '=', $value);

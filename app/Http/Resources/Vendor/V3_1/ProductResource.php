@@ -28,6 +28,16 @@ class ProductResource extends JsonResource
             'images'                                => MediaResource::collection($this->whenLoaded('media')),
         ];
 
+        if ($this->type->value == 'product') {
+            $returned_arr = array_merge($returned_arr, [
+                'stock' => (int) $this->stock,
+                'is_shippable' => (bool) $this->is_shippable,
+                'min_quantity_per_user' => (int) $this->min_quantity_per_user,
+                'max_quantity_per_user' => (int) $this->max_quantity_per_user,
+                'is_out_of_stock' => (bool) $this->stock < $this->min_quantity_per_user,
+            ]);
+        }
+
         return $returned_arr;
     }
 }

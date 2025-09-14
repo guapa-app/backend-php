@@ -53,6 +53,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         'status',
         'review',
         'type',
+        'stock',
+        'is_shippable',
+        'min_quantity_per_user',
+        'max_quantity_per_user',
+        'days_of_delivery',
         'terms',
         'url',
         'sort_order',
@@ -89,7 +94,6 @@ class Product extends Model implements Listable, HasMedia, HasReviews
     protected $search_attributes = [
         'hash_id',
         'title',
-        'description',
     ];
 
     protected $casts = [
@@ -403,7 +407,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         // We need to return only active products owned by active vendors
         // Excluding admins and vendors displaying their own products.
         $currentUserWorksForFilteredVendor = $user && !$user->isAdmin() && $request->has('vendor_id')
-            && $user->hasVendor((int) $request->get('vendor_id'));
+            && $user->hasVendor((int) $request->vendor_id);
         if (
             !$currentUserWorksForFilteredVendor &&
             (!$user || !$user->isAdmin())
@@ -441,30 +445,36 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      * @param  Builder  $query
      * @param  float  $lat
      * @param  float  $lng
-     * @param  int  $dist
+     * @param  ?int  $dist
      * @return Builder
      */
-    public function scopeNearBy($query, $lat, $lng, $dist = 50)
+    public function scopeNearBy($query, $lat, $lng, $dist = null)
     {
         $query->select('products.*');
 
-        $query->join('product_addresses', function ($join) {
-            $join->on('products.id', '=', 'product_addresses.product_id');
-        });
-
-        if (!isset($dist) || (int) $dist < 1) {
-            $dist = 50;
-        }
+        // Join with vendors and only the nearest address for each vendor
+        $query->join('vendors', function ($join) {
+            $join->on('products.vendor_id', '=', 'vendors.id');
+        })
+        ->join('addresses', function ($join) use ($lat, $lng) {
+            $join->on('addresses.addressable_id', '=', 'vendors.id')
+                 ->whereRaw('(6371 * acos(cos(radians(' . $lat . ')) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians(' . $lng . ')) + sin(radians(' . $lat . ')) * sin(radians(addresses.lat)))) = (
+                     SELECT MIN((6371 * acos(cos(radians(' . $lat . ')) * cos(radians(a2.lat)) * cos(radians(a2.lng) - radians(' . $lng . ')) + sin(radians(' . $lat . ')) * sin(radians(a2.lat)))))
+                     FROM addresses a2 
+                     WHERE a2.addressable_id = vendors.id AND a2.addressable_type = "vendor"
+                 )');
+        })
+        ->where('addresses.addressable_type', 'vendor');
 
         $distance_aggregate = "(6371 * acos(cos(radians($lat)) * cos(radians(addresses.lat)) * cos(radians(addresses.lng) - radians($lng)) + sin(radians($lat)) * sin(radians(addresses.lat))))";
 
         $query->addSelect(DB::raw($distance_aggregate . ' AS distance'));
 
-        $query->join('addresses', function ($join) use ($lat, $lng, $dist) {
-            $join->on('addresses.id', '=', 'product_addresses.address_id');
-        });
+        if($dist){
+            $dist = (int) $dist < 1 ? 50 : $dist;
 
-        $query->havingRaw("distance <= {$dist}");
+            $query->havingRaw("distance <= {$dist}");
+        }
 
         // Need to make sure no order by is provided elsewhere
         $query->orderBy('distance', 'asc');

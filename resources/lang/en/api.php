@@ -132,4 +132,27 @@ return [
     'invalid_phone_format' => 'Please enter a valid phone number format',
     'invalid_saudi_mobile_number' => 'Please enter a valid Saudi mobile number (e.g., 9665xxxxxxxx, +9665xxxxxxxx, 05xxxxxxxx, or 5xxxxxxxx)',
     'not_ksa_number' => 'This is not a Saudi (KSA) mobile number. We recommend using a Saudi number for best experience.',
+
+    // Cart messages
+    'cart' => [
+        'product_added_to_cart' => 'Product added to cart successfully',
+        'product_removed_from_cart' => 'Product removed from cart successfully',
+        'cart_empty' => 'Cart is empty',
+        'cart_not_found' => 'Cart not found',
+        'quantity_incremented' => 'Quantity incremented successfully',
+        'quantity_decremented' => 'Quantity decremented successfully',
+        'cart_cleared' => 'Cart cleared successfully',
+        'cart_is_empty' => 'Cart is empty',
+        'service_product_can_not_be_in_cart' => 'Service product can not be added in the cart',
+        'quantity_is_greater_than_available_in_stock' => 'Quantity is greater than available in stock',
+        'quantity_is_less_than_min_quantity_per_user' => 'Quantity is less than min quantity per user',
+        'quantity_is_greater_than_max_quantity_per_user' => 'Quantity is greater than max quantity per user',
+        'product_can_not_be_shipped' => 'Product can not be shipped',
+        'quantity_is_greater_than_cart_quantity' => 'Quantity is greater than cart quantity',
+        'product_not_found_in_cart' => 'Product not found in cart',
+        'different_vendors_error' => 'You can not add product from different vendors. Please buy the products on cart or clear it first',
+        'checkout_different_vendors_error' => 'You cant have products from different vendors in the checkout, Please remove the products',
+        'product_out_of_stock' => 'Product :product_title is out of stock',
+        'product_is_unshippable' => 'Product :product_title is unshippable',
+    ]
 ];
