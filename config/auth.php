@@ -63,6 +63,11 @@ return [
             'provider' => 'users',
         ],
 
+        'affiliate-marketeer-filament' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
         'admin-filament' => [
             'driver' => 'session',
             'provider' => 'admins',

@@ -57,9 +57,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     protected $fillable = [
         'name',
         'email',
+        'password',
         'phone',
         'status',
         'phone_verified_at',
+        'email_verified_at',
         'country_id'
     ];
 
@@ -354,7 +356,9 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->userVendors->count() && $this->hasVerifiedEmail() && !is_null($this->phone_verified_at);
+        $panelId = $panel->getId();
+        return ($panelId == 'user' && $this->userVendors->count() && $this->hasVerifiedEmail() && !is_null($this->phone_verified_at)) 
+        || ($panelId == 'affiliate-marketeer' && $this->hasRole('affiliate_market'));
     }
 
     /**
