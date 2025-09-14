@@ -134,4 +134,27 @@ return [
     'invalid_phone_format' => 'يرجى إدخال تنسيق رقم هاتف صحيح',
     'invalid_saudi_mobile_number' => 'يرجى إدخال رقم هاتف سعودي صحيح (مثل 9665xxxxxxxx أو +9665xxxxxxxx أو 05xxxxxxxx أو 5xxxxxxxx)',
     'not_ksa_number' => 'هذا ليس رقم جوال سعودي. نوصي باستخدام رقم سعودي لتجربة أفضل.',
+
+    // Cart messages
+    'cart' => [
+        'product_added_to_cart' => 'تم إضافة المنتج إلى السلة بنجاح',
+        'product_removed_from_cart' => 'تم إزالة المنتج من السلة بنجاح',
+        'cart_empty' => 'السلة فارغة',
+        'cart_not_found' => 'السلة غير موجودة',
+        'quantity_incremented' => 'تم زيادة الكمية بنجاح',
+        'quantity_decremented' => 'تم إنقاص الكمية بنجاح',
+        'cart_cleared' => 'تم مسح السلة بنجاح',
+        'cart_is_empty' => 'السلة فارغة',
+        'service_product_can_not_be_in_cart' => 'لا يمكن إضافة الخدمة في السلة',
+        'quantity_is_greater_than_available_in_stock' => 'الكمية أكثر من المتوفر في المخزن',
+        'quantity_is_less_than_min_quantity_per_user' => 'الكمية أقل من الكمية الأدنى للمستخدم',
+        'quantity_is_greater_than_max_quantity_per_user' => 'الكمية أكثر من الكمية الأقصى للمستخدم',
+        'product_can_not_be_shipped' => 'لا يمكن إضافة المنتج للشحن',
+        'quantity_is_greater_than_cart_quantity' => 'الكمية أكثر من الكمية في السلة',
+        'product_not_found_in_cart' => 'المنتج غير موجود في السلة',
+        'different_vendors_error' => 'لا يمكنك إضافة منتج من مختلف البائعين. يرجى شراء المنتجات الموجودة في السلة أو مسحها أولاً',
+        'checkout_different_vendors_error' => 'لا يمكنك إضافة منتجات من مختلف البائعين في الدفع, يرجى إزالة المنتجات',
+        'product_out_of_stock' => 'المنتج :product_title غير متوفر في المخزن',
+        'product_is_unshippable' => 'المنتج :product_title غير قابل للشحن',
+    ]
 ];
