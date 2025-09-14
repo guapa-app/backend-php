@@ -45,6 +45,8 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::prefix('appointments')->group(base_path('routes/user/v3_1/api/appointments.php'));
     // consultation
     Route::prefix('consultations')->group(base_path('routes/user/v3_1/api/consultations.php'));
+    // cart
+    Route::prefix('cart')->group(base_path('routes/user/v3_1/api/cart.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
@@ -53,6 +55,8 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::get('pages', [BaseApiController::class, 'pages']);
     Route::post('invoices/change-status', [OrderController::class, 'changeInvoiceStatus']);
     Route::get('gift-card-options', [DataController::class, 'giftCardOptions']);
+
+    
 
     // Testing endpoints for order notifications
     Route::prefix('test')->group(function () {
@@ -109,5 +113,20 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
             Route::get('/{id}/qr-code/download', [GiftCardController::class, 'downloadQrCode']);
             Route::post('/verify-qr-code', [GiftCardController::class, 'verifyQrCode']);
         });
+    });
+
+    Route::post('/test/send-email', function (\Illuminate\Http\Request $request) {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+            ]);
+            \Mail::raw('This is a test email.', function ($message) use ($request) {
+                $message->to($request->email)
+                    ->subject('Test Email');
+            });
+            return response()->json(['message' => 'Test email sent successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     });
 });

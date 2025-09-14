@@ -3,12 +3,14 @@
 namespace App\Filament\Admin\Resources\Shop;
 
 use Filament\Forms;
+use Filament\Forms\Get;
 use Filament\Tables;
 use App\Models\Vendor;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\Product;
 use Filament\Forms\Form;
+use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use App\Enums\ProductReview;
 use App\Enums\ProductStatus;
@@ -108,6 +110,47 @@ class ProductResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('url')
                     ->maxLength(255),
+
+                // Product only fields
+                Forms\Components\TextInput::make('stock')
+                    ->label('Stock')
+                    ->numeric()
+                    ->visible(fn(Get $get) => ($get('type') ?? request('type')) === 'product')
+                    ->requiredIf('type', 'product')
+                    ->dehydrated(fn(Get $get) => $get('type') === 'product'),
+                Forms\Components\Toggle::make('is_shippable')
+                    ->label('Is Shippable')
+                    ->inline(false)
+                    ->visible(fn(Get $get) => ($get('type') ?? request('type')) === 'product')
+                    ->requiredIf('type', 'product')
+                    ->dehydrated(fn(Get $get) => $get('type') === 'product'),
+
+                Forms\Components\TextInput::make('min_quantity_per_user')
+                    ->label('Min Quantity Per User')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(100)
+                    ->visible(fn(Get $get) => ($get('type') ?? request('type')) === 'product')
+                    ->requiredIf('type', 'product')
+                    ->dehydrated(fn(Get $get) => $get('type') === 'product'),
+
+                Forms\Components\TextInput::make('max_quantity_per_user')
+                    ->label('Max Quantity Per User')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(100)
+                    ->visible(fn(Get $get) => ($get('type') ?? request('type')) === 'product')
+                    ->requiredIf('type', 'product')
+                    ->dehydrated(fn(Get $get) => $get('type') === 'product'),
+
+                Forms\Components\TextInput::make('days_of_delivery')
+                    ->label('Days of Delivery')
+                    ->numeric()
+                    ->visible(fn(Get $get) => ($get('type') ?? request('type')) === 'product')
+                    ->requiredIf('type', 'product')
+                    ->dehydrated(fn(Get $get) => $get('type') === 'product'),
+
+
                 Forms\Components\TextInput::make('description')
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('terms')
@@ -142,6 +185,29 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('review'),
                 Tables\Columns\TextColumn::make('earned_points')
                     ->label('Points'),
+
+                // Product only columns
+                Tables\Columns\TextColumn::make('stock')
+                    ->label('Stock')
+                    ->sortable()
+                    ->visible(fn(HasTable $livewire): bool => $livewire->activeTab === 'Products'),
+                Tables\Columns\ToggleColumn::make('is_shippable')
+                    ->label('Is Shippable')
+                    ->sortable()
+                    ->visible(fn (HasTable $livewire): bool => $livewire->activeTab === 'Products'),
+                Tables\Columns\TextColumn::make('min_quantity_per_user')
+                    ->label('Min Quantity Per User')
+                    ->sortable()
+                    ->visible(fn (HasTable $livewire): bool => $livewire->activeTab === 'Products'),
+                Tables\Columns\TextColumn::make('max_quantity_per_user')
+                    ->label('Max Quantity Per User')
+                    ->sortable()
+                    ->visible(fn (HasTable $livewire): bool => $livewire->activeTab === 'Products'),
+                Tables\Columns\TextColumn::make('days_of_delivery')
+                    ->label('Days of Delivery')
+                    ->sortable()
+                    ->visible(fn (HasTable $livewire): bool => $livewire->activeTab === 'Products'),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

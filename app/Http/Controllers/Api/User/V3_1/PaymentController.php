@@ -52,6 +52,7 @@ class PaymentController extends BaseApiController
     {
         $data = $request->validated();
         $payment_id = $request->payment_id;
+
         if ($this->paymentService->isPaymentPaidSuccessfully($payment_id)) {
             $type = $request->type;
             try {
