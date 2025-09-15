@@ -41,7 +41,7 @@ class OrdersDiscountedAmountChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Orders',
+                    'label' => 'amount',
                     'data' => $monthlyCounts,
                     'fill' => 'start',
                 ],
