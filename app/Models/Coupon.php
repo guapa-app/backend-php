@@ -42,7 +42,7 @@ class Coupon extends Model
         return $this->belongsToMany(Product::class, 'coupon_products');
     }
 
-    public function affiliate_market(): BelongsToMany
+    public function affiliateMarketeers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'coupon_user', 'coupon_id', 'user_id');
     }

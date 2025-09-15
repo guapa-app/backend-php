@@ -358,7 +358,7 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     {
         $panelId = $panel->getId();
         return ($panelId == 'user' && $this->userVendors->count() && $this->hasVerifiedEmail() && !is_null($this->phone_verified_at)) 
-        || ($panelId == 'affiliate-marketeer' && $this->hasRole('affiliate_market'));
+        || ($panelId == 'affiliate-marketeer' && $this->hasRole('affiliate_marketeer'));
     }
 
     /**
