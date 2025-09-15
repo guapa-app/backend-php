@@ -37,7 +37,8 @@ class AffiliateMarketeerResource extends Resource
         return parent::getEloquentQuery()
             ->whereHas('roles', function (Builder $query) {
                 $query->where('name', 'affiliate_market');
-            });
+            })
+            ->withCount('coupons');
     }
 
     public static function form(Form $form): Form
@@ -62,6 +63,9 @@ class AffiliateMarketeerResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('coupons_count')
                     ->searchable()
                     ->sortable(),
             ])
