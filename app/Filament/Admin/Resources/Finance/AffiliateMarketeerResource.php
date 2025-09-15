@@ -36,7 +36,7 @@ class AffiliateMarketeerResource extends Resource
     {
         return parent::getEloquentQuery()
             ->whereHas('roles', function (Builder $query) {
-                $query->where('name', 'affiliate_market');
+                $query->where('name', 'affiliate_marketeer');
             })
             ->withCount('coupons');
     }

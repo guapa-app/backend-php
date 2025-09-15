@@ -3,8 +3,11 @@
 namespace App\Filament\AffiliateMarketeer\Widgets;
 
 use App\Models\Order;
+use Carbon\Carbon;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class OrdersDetailsTable extends BaseWidget
@@ -18,6 +21,44 @@ class OrdersDetailsTable extends BaseWidget
             ->query(
                 Order::whereIn('coupon_id', $userCouponsIds)
             )
+            ->filters([
+                Filter::make('created_at')
+                    ->form([
+                        Forms\Components\Select::make('year')
+                            ->options(
+                                collect(range(now()->year, 2025))
+                                    ->mapWithKeys(fn($year) => [$year => $year])
+                            )
+                            ->label('Year'),
+
+                        Forms\Components\Select::make('month')
+                            ->options([
+                                1 => 'January',
+                                2 => 'February',
+                                3 => 'March',
+                                4 => 'April',
+                                5 => 'May',
+                                6 => 'June',
+                                7 => 'July',
+                                8 => 'August',
+                                9 => 'September',
+                                10 => 'October',
+                                11 => 'November',
+                                12 => 'December',
+                            ])
+                            ->label('Month'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        if (!$data['year'] || !$data['month']) {
+                            return;
+                        }
+
+                        $start = Carbon::create($data['year'], $data['month'], 1)->startOfMonth();
+                        $end = Carbon::create($data['year'], $data['month'], 1)->endOfMonth();
+
+                        $query->whereBetween('created_at', [$start, $end]);
+                    }),
+            ])
             ->defaultPaginationPageOption(5)
             ->paginated([5, 10, 15])
             ->defaultSort('created_at', 'desc')

@@ -7,9 +7,9 @@ use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 use DB;
 
-class OrdersDiscountedAmountChart extends ChartWidget
+class OrdersAmountChart extends ChartWidget
 {
-    protected static ?string $heading = 'Orders Discounted Amount';
+    protected static ?string $heading = 'Orders Amount';
     protected static ?int $sort = 3;
 
     public function getFilters(): ?array
@@ -38,7 +38,7 @@ class OrdersDiscountedAmountChart extends ChartWidget
 
         // Query to get orders discounted amounts per month for the current year
         $ordersCountPerMonth = Order::select(
-            DB::raw('SUM(discount_amount) as total_discounted_amount'),
+            DB::raw('SUM(total) as total_amount'),
             DB::raw('MONTH(created_at) as month')
         )
             ->whereIn('coupon_id', $userCouponsIds)
@@ -53,7 +53,7 @@ class OrdersDiscountedAmountChart extends ChartWidget
 
         // Fill the monthly counts based on the query result
         foreach ($ordersCountPerMonth as $order) {
-            $monthlyCounts[$order->month - 1] = $order->total_discounted_amount; // Adjust index (0-11 for Jan-Dec)
+            $monthlyCounts[$order->month - 1] = $order->total_amount; // Adjust index (0-11 for Jan-Dec)
         }
 
         return [

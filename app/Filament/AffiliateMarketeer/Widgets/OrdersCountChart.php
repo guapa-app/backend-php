@@ -12,24 +12,29 @@ class OrdersCountChart extends ChartWidget
     protected static ?string $heading = 'Orders Count';
     protected static ?int $sort = 3;
 
-    // public function getFilters(): ?array
-    // {
-    //     $currentYear = Carbon::now()->year;
-    //     $years = [];
+    public function getFilters(): ?array
+    {
+        $currentYear = Carbon::now()->year;
+        $years = [];
 
-    //     // Generate years from 2025 to current year
-    //     for ($year = 2025; $year <= $currentYear; $year++) {
-    //         $years[(string) $year] = (string) $year;
-    //     }
+        // Generate years from 2025 to current year
+        for ($year = 2025; $year <= $currentYear; $year++) {
+            $years[(string) $year] = (string) $year;
+        }
 
-    //     return $years;
-    // }
+        return $years;
+    }
+
+    public function mount(): void
+    {
+        $this->filter = (string) Carbon::now()->year;
+    }
 
     protected function getData(): array
     {
         $userCouponsIds = auth()->user()->coupons()->pluck('id')->toArray();
 
-        $currentYear = Carbon::now()->year;
+        $selectedYear = $this->filter ?? Carbon::now()->year;
 
         // Query to get orders count per month for the current year
         $ordersCountPerMonth = Order::select(
@@ -37,7 +42,7 @@ class OrdersCountChart extends ChartWidget
             DB::raw('MONTH(created_at) as month')
         )
             ->whereIn('coupon_id', $userCouponsIds)
-            ->whereYear('created_at', $currentYear)
+            ->whereYear('created_at', $selectedYear)
             ->groupBy('month')
             ->orderBy('month')
             ->get();

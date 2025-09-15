@@ -185,11 +185,11 @@ class CouponResource extends Resource
 
 
                 Forms\Components\Select::make('Assign To')
-                    ->relationship('affiliate_market', 'name')
+                    ->relationship('affiliate_marketeer', 'name')
                     ->searchable()
                     ->options(
                         \App\Models\User::whereHas('roles', function (Builder $query) {
-                            $query->where('name', 'affiliate_market');
+                            $query->where('name', 'affiliate_marketeer');
                         })->pluck('name', 'id')
                     )
                     ->columnSpanFull()
@@ -346,8 +346,8 @@ class CouponResource extends Resource
                                 Infolists\Components\TextEntry::make('title')
                             ]),
 
-                        Infolists\Components\RepeatableEntry::make('affiliate_market')
-                            ->label('Assigned To Affiliate Market')
+                        Infolists\Components\RepeatableEntry::make('affiliate_marketeer')
+                            ->label('Assigned To Affiliate Marketeer')
                             ->schema([
                                 Infolists\Components\TextEntry::make('name')
                             ]),
