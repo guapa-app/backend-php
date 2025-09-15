@@ -35,13 +35,21 @@ class CouponsDetailsTable extends BaseWidget
             ->paginated([5,10,15])
             ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created Date')
-                    ->date()
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('code')
                     ->label('Code')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('type')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('expires_at')
+                    ->dateTime('Y-m-d H:i')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('max_uses')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('single_user_usage')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('accepted_orders_count')
