@@ -13,6 +13,7 @@ use Hamedov\Favorites\HasFavorites;
 use Hamedov\Messenger\Traits\Messageable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -56,9 +57,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
     protected $fillable = [
         'name',
         'email',
+        'password',
         'phone',
         'status',
         'phone_verified_at',
+        'email_verified_at',
         'country_id'
     ];
 
@@ -254,6 +257,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->hasMany(Cart::class);
     }
 
+    public function coupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user', 'user_id', 'coupon_id');
+    }
+
     public function scopeCurrentVendor($query, $value): void
     {
         $query->whereRelation('userVendors', 'vendor_id', '=', $value);
@@ -348,7 +356,9 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->userVendors->count() && $this->hasVerifiedEmail() && !is_null($this->phone_verified_at);
+        $panelId = $panel->getId();
+        return ($panelId == 'user' && $this->userVendors->count() && $this->hasVerifiedEmail() && !is_null($this->phone_verified_at)) 
+        || ($panelId == 'affiliate-marketeer' && $this->hasRole('affiliate_market'));
     }
 
     /**

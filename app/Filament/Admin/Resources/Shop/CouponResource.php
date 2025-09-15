@@ -39,11 +39,6 @@ class CouponResource extends Resource
                                 ->when($record !== null, fn ($query) => $query->ignore($record->id)),
                         ];
                     }),
-                Forms\Components\TextInput::make('discount_percentage')
-                    ->disabled(fn (?Model $record) => $record !== null)
-                    ->rules(['required', 'numeric', 'min:0', 'max:100'])
-                    ->minValue(0)
-                    ->numeric(),
                 Forms\Components\Select::make('discount_source')
                     ->options([
                         'vendor' => 'Vendor',
@@ -51,9 +46,32 @@ class CouponResource extends Resource
                         'both' => 'Both',
                     ])->native(false)
                     ->required(),
+
+                Forms\Components\Select::make('type')
+                    ->native(false)
+                    ->options([
+                        'fixed' => 'Fixed',
+                        'cashback' => 'Cashback',
+                    ])
+                    ->reactive()
+                    ->required(),
+
+                Forms\Components\TextInput::make('discount_percentage')
+                    ->disabled(fn (?Model $record) => $record !== null)
+                    ->rules(['numeric', 'min:0', 'max:100'])
+                    ->required()
+                    ->minValue(0)
+                    ->numeric(),
                 Forms\Components\DateTimePicker::make('expires_at')
                     ->minDate(now())
-                    ->rules('required', 'after:today'),
+                    ->required(fn (Forms\Get $get) => $get('type') === 'fixed')
+                    ->rules( 'after:today'),
+
+                Forms\Components\DateTimePicker::make('points_expire_at')
+                    ->minDate(now())
+                    ->rules( 'after:today')
+                    ->required(fn (Forms\Get $get) => $get('type') === 'cashback'),
+
                 Forms\Components\TextInput::make('max_uses')
                     ->numeric()
                     ->minValue(0)
@@ -164,6 +182,19 @@ class CouponResource extends Resource
                             ->preload()
                             ->multiple(),
                     ]),
+
+
+                Forms\Components\Select::make('Assign To')
+                    ->relationship('affiliate_market', 'name')
+                    ->searchable()
+                    ->options(
+                        \App\Models\User::whereHas('roles', function (Builder $query) {
+                            $query->where('name', 'affiliate_market');
+                        })->pluck('name', 'id')
+                    )
+                    ->columnSpanFull()
+                    ->preload()
+                    ->multiple(),
             ]);
     }
 
@@ -224,10 +255,17 @@ class CouponResource extends Resource
                         Infolists\Components\TextEntry::make('code')
                             ->label('Coupon Code')
                             ->columnSpan(1),
-                        Infolists\Components\TextEntry::make('discount_percentage')
-                            ->label('Discount')
-                            ->suffix('%')
+
+
+                        Infolists\Components\TextEntry::make('type')
+                            ->label('Coupon Type')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'fixed' => 'warning',
+                                'cashback' => 'success',
+                            })
                             ->columnSpan(1),
+
                         Infolists\Components\TextEntry::make('discount_source')
                             ->label('Discount Source')
                             ->badge()
@@ -237,9 +275,28 @@ class CouponResource extends Resource
                                 'both' => 'info',
                             })
                             ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('discount_percentage')
+                            ->label('Discount')
+                            ->suffix('%')
+                            ->columnSpan(1),
+
                         Infolists\Components\TextEntry::make('expires_at')
                             ->label('Expires At')
                             ->dateTime()
+                            ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('points_expire_at')
+                            ->label('Points Expire At')
+                            ->dateTime()
+                            ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('max_uses')
+                            ->label('Max Uses')
+                            ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('single_user_usage')
+                            ->label('Single User Usage')
                             ->columnSpan(1),
                     ])
                     ->columns(4),
@@ -288,8 +345,14 @@ class CouponResource extends Resource
                             ->schema([
                                 Infolists\Components\TextEntry::make('title')
                             ]),
+
+                        Infolists\Components\RepeatableEntry::make('affiliate_market')
+                            ->label('Assigned To Affiliate Market')
+                            ->schema([
+                                Infolists\Components\TextEntry::make('name')
+                            ]),
                     ])
-                    ->columns(3),
+                    ->columns(4),
             ]);
     }
 

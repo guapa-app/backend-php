@@ -43,6 +43,7 @@ class UserResource extends Resource
                 Forms\Components\DateTimePicker::make('phone_verified_at'),
                 Forms\Components\TextInput::make('password')
                     ->password()
+                    ->revealable()
                     ->maxLength(255),
                 Forms\Components\Select::make('status')
                     ->options([
