@@ -100,6 +100,13 @@ class CouponsDetailsTable extends BaseWidget
                     ->dateTime('Y-m-d H:i')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('points')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('points_expire_at')
+                    ->dateTime('Y-m-d H:i')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('max_uses')
                     ->sortable(),
 
