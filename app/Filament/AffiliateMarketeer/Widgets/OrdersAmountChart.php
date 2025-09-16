@@ -3,6 +3,7 @@
 namespace App\Filament\AffiliateMarketeer\Widgets;
 
 use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 use DB;
@@ -11,6 +12,8 @@ class OrdersAmountChart extends ChartWidget
 {
     protected static ?string $heading = 'Orders Amount';
     protected static ?int $sort = 3;
+
+    public ?int $userId = null;
 
     public function getFilters(): ?array
     {
@@ -32,7 +35,8 @@ class OrdersAmountChart extends ChartWidget
 
     protected function getData(): array
     {
-        $userCouponsIds = auth()->user()->coupons()->pluck('id')->toArray();
+        $user = $this->userId ? User::find($this->userId) : auth()->user();
+        $userCouponsIds = $user->coupons()->pluck('id')->toArray();
 
         $selectedYear = $this->filter ?? Carbon::now()->year;
 

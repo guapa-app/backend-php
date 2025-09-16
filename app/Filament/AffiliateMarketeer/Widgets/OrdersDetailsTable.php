@@ -3,6 +3,7 @@
 namespace App\Filament\AffiliateMarketeer\Widgets;
 
 use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,9 +15,12 @@ class OrdersDetailsTable extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
     protected static ?int $sort = 2;
+
+    public ?int $userId = null;
     public function table(Table $table): Table
     {
-        $userCouponsIds = auth()->user()->coupons()->pluck('id')->toArray();
+        $user = $this->userId ? User::find($this->userId) : auth()->user();
+        $userCouponsIds = $user->coupons()->pluck('id')->toArray();
         return $table
             ->query(
                 Order::whereIn('coupon_id', $userCouponsIds)

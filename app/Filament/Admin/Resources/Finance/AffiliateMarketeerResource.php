@@ -74,6 +74,8 @@ class AffiliateMarketeerResource extends Resource
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -93,6 +95,7 @@ class AffiliateMarketeerResource extends Resource
     {
         return [
             'index' => Pages\ListAffiliateMarketeers::route('/'),
+            'view' => Pages\ViewAffiliateMarketeer::route('/{record}'),
             // 'create' => Pages\CreateAffiliateMarketeer::route('/create'),
             // 'edit' => Pages\EditAffiliateMarketeer::route('/{record}/edit'),
         ];
