@@ -23,7 +23,7 @@ class CouponsDetailsTable extends BaseWidget
         return $table
             ->query(
                 query: Coupon::query()
-                    ->whereHas('users', function ($query) {
+                    ->whereHas('affiliateMarketeers', function ($query) {
                         $query->where('user_id', $this->userId ?? auth()->id());
                     })
                     ->withCount([
