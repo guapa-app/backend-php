@@ -185,7 +185,7 @@ class CouponResource extends Resource
 
 
                 Forms\Components\Select::make('Assign To')
-                    ->relationship('affiliate_marketeer', 'name')
+                    ->relationship('affiliateMarketeers', 'name')
                     ->searchable()
                     ->options(
                         \App\Models\User::whereHas('roles', function (Builder $query) {
@@ -194,7 +194,30 @@ class CouponResource extends Resource
                     )
                     ->columnSpanFull()
                     ->preload()
+                    ->reactive()
                     ->multiple(),
+
+
+                Forms\Components\TextInput::make('points')
+                    ->label('Points')
+                    ->numeric()
+                    ->default(0)
+                    ->minValue(0)
+                    ->columnSpanFull()
+                    ->reactive()
+                    ->visible(
+                        fn(Forms\Get $get) =>
+                        $get('type') === 'cashback' && filled($get('Assign To'))
+                    )
+                    ->dehydrated(
+                        fn(Forms\Get $get) =>
+                        $get('type') === 'cashback' && filled($get('Assign To'))
+                    )
+                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                        if (!($get('type') === 'cashback' && filled($get('Assign To')))) {
+                            $set('points', 0); // reset to 0 when hidden
+                        }
+                    }),
             ]);
     }
 
@@ -298,6 +321,10 @@ class CouponResource extends Resource
                         Infolists\Components\TextEntry::make('single_user_usage')
                             ->label('Single User Usage')
                             ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('points')
+                            ->label('Points')
+                            ->columnSpan(1),
                     ])
                     ->columns(4),
 
@@ -346,7 +373,7 @@ class CouponResource extends Resource
                                 Infolists\Components\TextEntry::make('title')
                             ]),
 
-                        Infolists\Components\RepeatableEntry::make('affiliate_marketeer')
+                        Infolists\Components\RepeatableEntry::make('affiliateMarketeers')
                             ->label('Assigned To Affiliate Marketeer')
                             ->schema([
                                 Infolists\Components\TextEntry::make('name')

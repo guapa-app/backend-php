@@ -22,6 +22,7 @@ class Coupon extends Model
         'expires_at',
         'max_uses',
         'single_user_usage',
+        'points',
         'admin_id',
     ];
 
@@ -72,10 +73,10 @@ class Coupon extends Model
         return $this->belongsTo(Admin::class);
     }
 
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'coupon_user',  'coupon_id','user_id');
-    }
+    // public function users(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(User::class, 'coupon_user',  'coupon_id','user_id');
+    // }
 
     public function isActive(): bool
     {
