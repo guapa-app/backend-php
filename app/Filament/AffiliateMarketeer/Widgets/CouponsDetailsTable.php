@@ -15,13 +15,16 @@ class CouponsDetailsTable extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
     protected static ?int $sort = 1;
+
+    public ?int $userId = null;
+
     public function table(Table $table): Table
     {
         return $table
             ->query(
                 query: Coupon::query()
                     ->whereHas('users', function ($query) {
-                        $query->where('user_id', auth()->id());
+                        $query->where('user_id', $this->userId ?? auth()->id());
                     })
                     ->withCount([
                         'orders as accepted_orders_count' => function ($query) {
