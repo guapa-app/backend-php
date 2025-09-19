@@ -165,9 +165,9 @@
                         <tr>
                             <td class="s-custom-font cs-width_2">{{ $item['name'] }} </td>
                             <td class="s-custom-font cs-width_2 cs-text_center cs-primary_color">{{ round($item['price'], 2) }}</td>
-                            <td class="s-custom-font cs-width_2 cs-text_center cs-primary_color">{{ $item['vat'] }}</td>
+                            <td class="s-custom-font cs-width_2 cs-text_center cs-primary_color">{{ round($item['vat'], 2) }}</td>
                             <td class="s-custom-font cs-width_2 cs-text_center cs-primary_color">{{ $item['qty'] }}</td>
-                            <td class="s-custom-font cs-width_2 cs-text_center cs-primary_color">{{ $item['subtotal_with_vat'] }}</td>
+                            <td class="s-custom-font cs-width_2 cs-text_center cs-primary_color">{{ round($item['subtotal_with_vat'], 2) }}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -180,7 +180,7 @@
         <div class="cs-table_responsive">
             <table class="text-in-same-line">
                 <tbody class="s-custom-font">
-                <tr class="cs-table_baseline">
+                {{-- <tr class="cs-table_baseline">
                     <td class="cs-width_5 cs-text_left">
                         <p class="s-custom-font cs-primary_color cs-bold cs-f16 cs-m0">Total Amount (Excluding VAT)</p>
                     </td>
@@ -192,8 +192,8 @@
                         <p class="s-custom-font cs-primary_color cs-bold cs-f16 cs-m0">المبلغ بدون ضريبة القيمة
                             المضافة</p>
                     </td>
-                </tr>
-                <tr class="cs-table_baseline">
+                </tr> --}}
+                {{-- <tr class="cs-table_baseline">
                     <td class="cs-width_5 cs-text_left">
                         <p class="s-custom-font cs-primary_color cs-bold cs-f16 cs-m0">Total VAT</p>
                     </td>
@@ -204,7 +204,7 @@
                     <td class="cs-width_5 cs-text_right">
                         <p class="s-custom-font cs-primary_color cs-bold cs-f16 cs-m0">إجمالي ضريبة القيمة المضافة</p>
                     </td>
-                </tr>
+                </tr> --}}
                 <tr class="cs-table_baseline">
                     <td class="cs-width_5 cs-text_left">
                         <p class="s-custom-font cs-primary_color cs-bold cs-f16 cs-m0">Total Amount</p>
