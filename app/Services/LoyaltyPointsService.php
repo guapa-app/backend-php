@@ -23,11 +23,12 @@ class LoyaltyPointsService
      * @param int $points
      * @param string $action
      */
-    public function addPoints(int $userId, int $points, string $action)
+    public function addPoints($sourceable, int $userId, int $points, string $action, $pointsExpireAt = null)
     {
-        LoyaltyPointHistory::create([
+        $sourceable->loyaltyPointHistories()->create([
             'user_id' => $userId,
             'points' => abs($points), // Store points as positive
+            'points_expire_at' => $pointsExpireAt,
             'action' => $action,
             'type' => 'added',
         ]);

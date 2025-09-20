@@ -37,6 +37,7 @@ class Order extends Model implements Listable
         'cancellation_reason',
         'coupon_id',
         'discount_amount',
+        'cashback_amount',
         'last_reminder_sent',
         'type',
         'staff_id',

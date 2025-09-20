@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\AffiliateMarketeer\Widgets;
+namespace App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets;
 
 use App\Models\Order;
 use App\Models\User;
