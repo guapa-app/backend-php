@@ -26,33 +26,54 @@ class OrderPaymentService
     {
         try
         {
-            $order = Order::findOrFail($data['id']);
+            DB::beginTransaction();
+                $order = Order::with('coupon.affiliateMarketeers')->findOrFail($data['id']);
+                $coupon = $order->coupon;
 
-            if ($data['status'] == 'paid') {
-                $this->processPaidOrder($order, $data);
-            } else {
-                $order->update(['status' => $data['status']]);
-            }
+                if ($data['status'] == 'paid') {
+                    $this->processPaidOrder($order, $data);
+                } else {
+                    $order->update(['status' => $data['status']]);
+                }
 
-            if ($data['status'] == 'paid') {
+                if ($data['status'] == 'paid') {
 
-                $loyaltyPointsService = app(LoyaltyPointsService::class);
-                $loyaltyPointsService->addPurchasePoints($order);
+                    $loyaltyPointsService = app(LoyaltyPointsService::class);
+                    $loyaltyPointsService->addPurchasePoints($order);
 
-                if ($order->vendor_wallet) {
                     $walletService = app(WalletService::class);
-                    $amount = $order->total - $order->fees;
-                    $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
+                    if ($order->vendor_wallet) {
+                        $amount = $order->total - $order->fees;
+                        $walletService->creditVendorWallet($order->vendor_id, $amount, $order);
+                    }
+
+                    if($coupon?->type == 'cashback'){
+                        // charge the order user wallet with the amount of the cashback
+                        $walletService->chargeUserWalletWithCashback(order:$order);
+                    }
+
+                    // add points to affiliateMarketeers
+                    if($coupon?->affiliateMarketeers()->exists()){
+                        foreach($coupon->affiliateMarketeers as $affiliateMarketeer){
+                            $loyaltyPointsService->addPoints(
+                                sourceable: $coupon,
+                                userId: $affiliateMarketeer->id,
+                                points: $coupon->points,
+                                pointsExpireAt: $coupon->points_expire_at,
+                                action: 'coupon_points'
+                            );
+                        }
+                    }
+
+                    $this->sendOrderNotifications($order);
+
+                    if($order->type == OrderTypeEnum::Cart->value) {
+                        $this->processCartOrder($order);
+                    }
                 }
-
-
-                $this->sendOrderNotifications($order);
-
-                if($order->type == OrderTypeEnum::Cart->value) {
-                    $this->processCartOrder($order);
-                }
-            }
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Order status change failed: ' . $e->getMessage(), [
                 'order_id' => $data['id'],
                 'status' => $data['status']

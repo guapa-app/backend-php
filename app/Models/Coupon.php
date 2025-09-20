@@ -73,10 +73,10 @@ class Coupon extends Model
         return $this->belongsTo(Admin::class);
     }
 
-    // public function users(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(User::class, 'coupon_user',  'coupon_id','user_id');
-    // }
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
+    }
 
     public function isActive(): bool
     {

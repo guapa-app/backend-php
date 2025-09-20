@@ -2,15 +2,15 @@
 
 namespace App\Filament\AffiliateMarketeer\Widgets;
 
-use App\Models\Order;
+use App\Models\Coupon;
 use App\Models\User;
 use Carbon\Carbon;
-use Filament\Widgets\ChartWidget;
 use DB;
+use Filament\Widgets\ChartWidget;
 
-class OrdersAmountChart extends ChartWidget
+class TotalPointsChart extends ChartWidget
 {
-    protected static ?string $heading = 'Orders Amount';
+    protected static ?string $heading = 'Orders Points Count';
     protected static ?int $sort = 3;
 
     public ?int $userId = null;
@@ -36,17 +36,14 @@ class OrdersAmountChart extends ChartWidget
     protected function getData(): array
     {
         $user = $this->userId ? User::find($this->userId) : auth()->user();
-        $userCouponsIds = $user->coupons()->pluck('id')->toArray();
-
         $selectedYear = $this->filter ?? Carbon::now()->year;
 
-        // Query to get orders discounted amounts per month for the current year
-        $ordersCountPerMonth = Order::select(
-            DB::raw('SUM(total) as total_amount'),
-            DB::raw('MONTH(created_at) as month')
-        )
-            ->whereIn('coupon_id', $userCouponsIds)
-            ->where('status', 'Accepted')
+        // Query to get points count per month for the current year
+        $pointsCountPerMonth = $user->loyaltyPointHistory()
+            ->select(
+                DB::raw('SUM(points) as points_count'),
+                DB::raw('MONTH(created_at) as month')
+            )
             ->whereYear('created_at', $selectedYear)
             ->groupBy('month')
             ->orderBy('month')
@@ -56,14 +53,14 @@ class OrdersAmountChart extends ChartWidget
         $monthlyCounts = array_fill(0, 12, 0);
 
         // Fill the monthly counts based on the query result
-        foreach ($ordersCountPerMonth as $order) {
-            $monthlyCounts[$order->month - 1] = $order->total_amount; // Adjust index (0-11 for Jan-Dec)
+        foreach ($pointsCountPerMonth as $points) {
+            $monthlyCounts[$points->month - 1] = $points->points_count; // Adjust index (0-11 for Jan-Dec)
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'amount',
+                    'label' => 'Points',
                     'data' => $monthlyCounts,
                     'fill' => 'start',
                 ],
@@ -74,6 +71,6 @@ class OrdersAmountChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'line';
+        return 'bar';
     }
 }

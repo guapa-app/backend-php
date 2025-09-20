@@ -44,15 +44,29 @@ class CouponResource extends Resource
                         'vendor' => 'Vendor',
                         'app' => 'Guapa',
                         'both' => 'Both',
-                    ])->native(false)
+                    ])
+                    ->native(false)
+                    ->afterStateUpdated(function (callable $set) {
+                        // Clear the selected type whenever discount_source changes
+                        $set('type', null);
+                    })
+                    ->reactive()
                     ->required(),
 
                 Forms\Components\Select::make('type')
                     ->native(false)
-                    ->options([
-                        'fixed' => 'Fixed',
-                        'cashback' => 'Cashback',
-                    ])
+                    ->options(function (callable $get) {
+                        if ($get('discount_source') === 'app') {
+                            return [
+                                'fixed' => 'Fixed',
+                                'cashback' => 'Cashback',
+                            ];
+                        }
+
+                        return [
+                            'fixed' => 'Fixed',
+                        ];
+                    })
                     ->reactive()
                     ->required(),
 
@@ -62,15 +76,10 @@ class CouponResource extends Resource
                     ->required()
                     ->minValue(0)
                     ->numeric(),
+
                 Forms\Components\DateTimePicker::make('expires_at')
                     ->minDate(now())
-                    ->required(fn (Forms\Get $get) => $get('type') === 'fixed')
                     ->rules( 'after:today'),
-
-                Forms\Components\DateTimePicker::make('points_expire_at')
-                    ->minDate(now())
-                    ->rules( 'after:today')
-                    ->required(fn (Forms\Get $get) => $get('type') === 'cashback'),
 
                 Forms\Components\TextInput::make('max_uses')
                     ->numeric()
@@ -183,7 +192,6 @@ class CouponResource extends Resource
                             ->multiple(),
                     ]),
 
-
                 Forms\Components\Select::make('Assign To')
                     ->relationship('affiliateMarketeers', 'name')
                     ->searchable()
@@ -197,25 +205,49 @@ class CouponResource extends Resource
                     ->reactive()
                     ->multiple(),
 
-
                 Forms\Components\TextInput::make('points')
                     ->label('Points')
                     ->numeric()
                     ->default(0)
                     ->minValue(0)
-                    ->columnSpanFull()
                     ->reactive()
                     ->visible(
                         fn(Forms\Get $get) =>
-                        $get('type') === 'cashback' && filled($get('Assign To'))
+                        filled($get('Assign To'))
+                    )
+                    ->required(
+                        fn(Forms\Get $get) =>
+                        filled($get('Assign To'))
                     )
                     ->dehydrated(
                         fn(Forms\Get $get) =>
-                        $get('type') === 'cashback' && filled($get('Assign To'))
+                        filled($get('Assign To'))
                     )
                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
-                        if (!($get('type') === 'cashback' && filled($get('Assign To')))) {
+                        if (! filled($get('Assign To'))) {
                             $set('points', 0); // reset to 0 when hidden
+                        }
+                    }),
+
+                Forms\Components\DateTimePicker::make('points_expire_at')
+                    ->minDate(now())
+                    ->rules('after:today')
+                    ->reactive()
+                    ->visible(
+                        fn(Forms\Get $get) =>
+                        filled($get('Assign To'))
+                    )
+                    ->required(
+                        fn(Forms\Get $get) =>
+                        filled($get('Assign To'))
+                    )
+                    ->dehydrated(
+                        fn(Forms\Get $get) =>
+                        filled($get('Assign To'))
+                    )
+                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                        if (!filled($get('Assign To'))) {
+                            $set('points_expire_at', null); // reset to null when hidden
                         }
                     }),
             ]);
@@ -228,6 +260,8 @@ class CouponResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('code')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('type')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('discount_percentage')
                     ->numeric()
@@ -309,11 +343,6 @@ class CouponResource extends Resource
                             ->dateTime()
                             ->columnSpan(1),
 
-                        Infolists\Components\TextEntry::make('points_expire_at')
-                            ->label('Points Expire At')
-                            ->dateTime()
-                            ->columnSpan(1),
-
                         Infolists\Components\TextEntry::make('max_uses')
                             ->label('Max Uses')
                             ->columnSpan(1),
@@ -324,6 +353,11 @@ class CouponResource extends Resource
 
                         Infolists\Components\TextEntry::make('points')
                             ->label('Points')
+                            ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('points_expire_at')
+                            ->label('Points Expire At')
+                            ->dateTime()
                             ->columnSpan(1),
                     ])
                     ->columns(4),

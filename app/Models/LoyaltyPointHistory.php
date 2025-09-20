@@ -13,6 +13,7 @@ class LoyaltyPointHistory extends Model
     protected $fillable = [
         'user_id',
         'points',
+        'points_expire_at',
         'action',
         'type',
         'sourceable_id',

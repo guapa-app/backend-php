@@ -93,14 +93,13 @@ class CouponsDetailsTable extends BaseWidget
                     ->label('Code')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('type')
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('expires_at')
+                    ->visible($this->userId ?? false)
                     ->dateTime('Y-m-d H:i')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('points')
+                    ->label('Coupon Points')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('points_expire_at')
@@ -108,9 +107,11 @@ class CouponsDetailsTable extends BaseWidget
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('max_uses')
+                    ->visible($this->userId ?? false)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('single_user_usage')
+                    ->visible($this->userId ?? false)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('accepted_orders_count')
@@ -118,10 +119,12 @@ class CouponsDetailsTable extends BaseWidget
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('total_amount')
+                    ->visible($this->userId ?? false)
                     ->label('Total Amount')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('total_discounted_amount')
+                    ->visible($this->userId ?? false)
                     ->label('Total Discounted Amount')
                     ->sortable(),
             ]);

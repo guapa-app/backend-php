@@ -9,4 +9,5 @@ enum TransactionType: string
     case DEBIT_FROM_WALLET = 'debit_from_wallet';
     case ORDER_PAYMENT = 'order_payment';
     case VENDOR_PAYOUT = 'vendor_payout';
+    case ORDER_CASHBACK = 'order_cashback';
 }

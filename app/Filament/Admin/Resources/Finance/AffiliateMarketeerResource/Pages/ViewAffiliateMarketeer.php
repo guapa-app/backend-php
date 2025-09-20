@@ -19,10 +19,11 @@ class ViewAffiliateMarketeer extends ViewRecord
     {
         return [
             \App\Filament\AffiliateMarketeer\Widgets\CouponsDetailsTable::make(['userId' => $this->record->id]),
-            \App\Filament\AffiliateMarketeer\Widgets\OrdersDetailsTable::make(['userId' => $this->record->id]),
-            \App\Filament\AffiliateMarketeer\Widgets\OrdersAmountChart::make(['userId' => $this->record->id]),
+            \App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets\OrdersDetailsTable::make(['userId' => $this->record->id]),
+            \App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets\OrdersAmountChart::make(['userId' => $this->record->id]),
             \App\Filament\AffiliateMarketeer\Widgets\OrdersCountChart::make(['userId' => $this->record->id]),
-            \App\Filament\AffiliateMarketeer\Widgets\OrdersDiscountedAmountChart::make(['userId' => $this->record->id]),
+            \App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets\OrdersDiscountedAmountChart::make(['userId' => $this->record->id]),
+            \App\Filament\AffiliateMarketeer\Widgets\TotalPointsChart::make(['userId' => $this->record->id]),
         ];
     }
 }

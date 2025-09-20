@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\AffiliateMarketeer\Widgets;
+namespace App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets;
 
 use App\Models\Order;
 use App\Models\User;
@@ -81,6 +81,10 @@ class OrdersDetailsTable extends BaseWidget
 
                 Tables\Columns\TextColumn::make('discount_amount')
                     ->label('Discount Amount')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('cashback_amount')
+                    ->label('Cashback Amount')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
