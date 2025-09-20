@@ -83,6 +83,10 @@ class OrdersDetailsTable extends BaseWidget
                     ->label('Discount Amount')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('cashback_amount')
+                    ->label('Cashback Amount')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created At')
                     ->date()

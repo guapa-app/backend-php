@@ -23,6 +23,7 @@ class ViewAffiliateMarketeer extends ViewRecord
             \App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets\OrdersAmountChart::make(['userId' => $this->record->id]),
             \App\Filament\AffiliateMarketeer\Widgets\OrdersCountChart::make(['userId' => $this->record->id]),
             \App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets\OrdersDiscountedAmountChart::make(['userId' => $this->record->id]),
+            \App\Filament\AffiliateMarketeer\Widgets\TotalPointsChart::make(['userId' => $this->record->id]),
         ];
     }
 }
