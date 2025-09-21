@@ -98,8 +98,12 @@ class CouponsDetailsTable extends BaseWidget
                     ->dateTime('Y-m-d H:i')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('points')
-                    ->label('Coupon Points')
+                Tables\Columns\TextColumn::make('points_percentage')
+                    ->label('Coupon Points Percentage')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('points_percentage_source')
+                    ->label('Coupon Points Percentage Source')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('points_expire_at')

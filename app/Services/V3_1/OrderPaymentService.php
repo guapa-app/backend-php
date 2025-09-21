@@ -4,6 +4,8 @@ namespace App\Services\V3_1;
 
 use App\Models\AdminEmail;
 use App\Models\Cart;
+use App\Models\Coupon;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Order;
@@ -54,11 +56,12 @@ class OrderPaymentService
 
                     // add points to affiliateMarketeers
                     if($coupon?->affiliateMarketeers()->exists()){
+                        $points = $this->calcAffiliatePoints(coupon: $coupon, order: $order);
                         foreach($coupon->affiliateMarketeers as $affiliateMarketeer){
                             $loyaltyPointsService->addPoints(
                                 sourceable: $coupon,
                                 userId: $affiliateMarketeer->id,
-                                points: $coupon->points,
+                                points: $points,
                                 pointsExpireAt: $coupon->points_expire_at,
                                 action: 'coupon_points'
                             );
@@ -80,6 +83,27 @@ class OrderPaymentService
             ]);
             throw $e;
         }
+    }
+
+    private function calcAffiliatePoints(Coupon $coupon, Order $order)
+    {
+        if($coupon->points_percentage == 0) return 0;
+
+        $pointsPercentageSource = $coupon->points_percentage_source; 
+
+        if($pointsPercentageSource == 'vendor'){
+            $orderAmount = $order->total - $order->fees;
+        }else if($pointsPercentageSource == 'app') { 
+            $orderAmount = $order->fees;
+        }else{
+            $orderAmount = $order->total;
+        }
+        
+        $amount = $coupon->points_percentage * $orderAmount / 100;
+        $pointsConversionRate = Setting::pointsConversionRate();
+        $points = $amount * $pointsConversionRate;
+
+        return round($points);
     }
 
     protected function processPaidOrder(Order $order, array $data): void
