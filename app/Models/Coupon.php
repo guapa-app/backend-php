@@ -22,7 +22,8 @@ class Coupon extends Model
         'expires_at',
         'max_uses',
         'single_user_usage',
-        'points',
+        'points_percentage_source',
+        'points_percentage',
         'admin_id',
     ];
 

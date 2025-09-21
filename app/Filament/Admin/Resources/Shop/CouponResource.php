@@ -205,11 +205,11 @@ class CouponResource extends Resource
                     ->reactive()
                     ->multiple(),
 
-                Forms\Components\TextInput::make('points')
-                    ->label('Points')
+                Forms\Components\TextInput::make('points_percentage')
                     ->numeric()
                     ->default(0)
                     ->minValue(0)
+                    ->maxValue(100)
                     ->reactive()
                     ->visible(
                         fn(Forms\Get $get) =>
@@ -226,6 +226,33 @@ class CouponResource extends Resource
                     ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
                         if (! filled($get('Assign To'))) {
                             $set('points', 0); // reset to 0 when hidden
+                        }
+                    }),
+
+                Forms\Components\Select::make('points_percentage_source')
+                    ->options([
+                        'vendor' => 'Vendor',
+                        'app' => 'Guapa',
+                        'both' => 'Both',
+                    ])
+                    ->native(false)
+                    ->reactive()
+                    ->required()
+                    ->visible(
+                        fn(Forms\Get $get) =>
+                        filled($get('Assign To'))
+                    )
+                    ->required(
+                        fn(Forms\Get $get) =>
+                        filled($get('Assign To'))
+                    )
+                    ->dehydrated(
+                        fn(Forms\Get $get) =>
+                        filled($get('Assign To'))
+                    )
+                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                        if (!filled($get('Assign To'))) {
+                            $set('points_percentage_source', 0); // reset to 0 when hidden
                         }
                     }),
 
@@ -351,8 +378,18 @@ class CouponResource extends Resource
                             ->label('Single User Usage')
                             ->columnSpan(1),
 
-                        Infolists\Components\TextEntry::make('points')
-                            ->label('Points')
+                        Infolists\Components\TextEntry::make('points_percentage')
+                            ->label('Points Percentage')
+                            ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('points_percentage_source')
+                            ->label('Points Percentage Source')
+                            ->badge()
+                            ->color(fn(string $state): string => match ($state) {
+                                'vendor' => 'warning',
+                                'app' => 'success',
+                                'both' => 'info',
+                            })
                             ->columnSpan(1),
 
                         Infolists\Components\TextEntry::make('points_expire_at')
