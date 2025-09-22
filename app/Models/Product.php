@@ -218,57 +218,16 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         $taxes = round(($taxPercentage / 100) * $fees, 2);
         $remaining = round($finalPrice - $fees, 2);
         $feesWithTaxes = round(($this->vendor->activate_wallet ? $finalPrice : $fees) + $taxes, 2);
-
-        $userPoints = 0;
-
-       try {
-        // Fetch the authenticated user
-        $user = auth('api')->user();
-
-        if ($user) {
-            // Use LoyaltyPointsService to get points instead of accessing wallet directly
-            $loyaltyPointsService = app(LoyaltyPointsService::class);
-            $userPoints = $loyaltyPointsService->getTotalPoints($user->id);
-        }
-    } catch (\Exception $e) {
-        $userPoints = 0;
-
-    }
-
-
-        // Get the points-to-cash conversion rate (e.g., 100 points = 1 SR)
-        $exchangeRate = (float) Setting::pointsConversionRate() ?: 100; // Default to 100 if not set
-        $pointsValueInSr = $userPoints / $exchangeRate; // Convert points to SR (e.g., 1000 points = 10 SR, no rounding)
-
-        // Calculate the points-based discount (in SR)
-        $pointsDiscount = min($fees, $pointsValueInSr); // SR amount to discount using points
-        $pointsUsed = (int) ($pointsDiscount * $exchangeRate); // Convert SR back to points as an integer
-        $pointsDiscount = round($pointsDiscount, 2); // Round the SR value for consistency in the response
-
-        // Apply the points discount to the fees
-        $feesAfterPointsDiscount = max(0, $fees - $pointsDiscount); // Ensure fees don't go below 0
-
-        // Recalculate taxes, remaining, and fees_with_taxes based on the adjusted fees
-        $taxesAfterPointsDiscount = round(($taxPercentage / 100) * $feesAfterPointsDiscount, 2);
-        $remainingAfterPointsDiscount = round($finalPrice - $feesAfterPointsDiscount, 2);
-        $feesWithTaxesAfterPointsDiscount = round(($this->vendor->activate_wallet ? $finalPrice : $feesAfterPointsDiscount) + $taxesAfterPointsDiscount, 2);
-
+        $remainingTaxes = $this->type == ProductType::Service ? 0 : round($remaining * ($taxPercentage / 100) , 2);
+        $remainingWithTaxes = round($remaining + $remainingTaxes , 2);
 
         return [
-            'fees' => $this->vendor->activate_wallet ? $finalPrice : $fees, // Original fees before points discount
-            'taxes' => $taxes, // Original taxes before points discount
-            'remaining' => $this->vendor->activate_wallet ? 0 : $remaining, // Original remaining before points discount
-            'fees_with_taxes' => $feesWithTaxes, // Original fees_with_taxes before points discount
-            'tax_percentage' => $taxPercentage,
-            'price_after_discount' => $this->offer ? round($this->offer_price, 2) : round((float) $this->price, 2),
-            'discount_percentage' => round((float) $this->offer?->discount ?? 0.0, 2),
-            // New parameters for points discount
-            'points_discount' => $pointsDiscount, // SR amount discounted using points
-            'points_used' => $pointsUsed, // Number of points used (integer)
-            'fees_after_points_discount' => $this->vendor->activate_wallet ? $finalPrice : $feesAfterPointsDiscount, // Fees after points discount
-            'taxes_after_points_discount' => $taxesAfterPointsDiscount, // Taxes after points discount
-            'remaining_after_points_discount' => $this->vendor->activate_wallet ? 0 : $remainingAfterPointsDiscount, // Remaining after points discount
-            'fees_with_taxes_after_points_discount' => $feesWithTaxesAfterPointsDiscount, // Fees with taxes after points discount
+            'fixed_price' => round((float) $this->price, 2),
+            'fixed_price_with_discount' => $this->offer ? round($this->offer_price, 2) : round((float) $this->price, 2),
+            'guapa_fees' => $this->vendor->activate_wallet ? $finalPrice : $fees,
+            'guapa_fees_with_taxes' => $feesWithTaxes,
+            'vendor_price_with_taxes' => $remainingWithTaxes,
+            'total_amount_with_taxes' => round($remainingWithTaxes + $feesWithTaxes, 2),
         ];
     }
 
@@ -611,7 +570,7 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             return $this->earned_points;
 
         $conversionRate = Setting::purchasePointsConversionRate();
-        $paidAmount = $this->payment_details['fees_with_taxes'];
+        $paidAmount = $this->payment_details['guapa_fees_with_taxes'];
         $points = (int) ($paidAmount * $conversionRate);
         return $points;
     }
