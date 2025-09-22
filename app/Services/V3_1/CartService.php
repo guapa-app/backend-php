@@ -47,9 +47,9 @@ class CartService
             return [
                 'items' => [],
                 'has_discount' => false,
-                'fees_with_taxes' => 0,
-                'remaining' => 0,
-                'price_after_discount' => 0,
+                'guapa_fees_with_taxes' => 0,
+                'vendor_price_with_taxes' => 0,
+                'fixed_price_with_discount' => 0,
                 'total' => 0,
                 'total_quantity' => 0,
             ];
@@ -57,21 +57,21 @@ class CartService
 
         $hasDiscount = false; 
         $items->map(function($item) use (&$hasDiscount){
-            if($item->product->payment_details['discount_percentage'] > 0){
+            if($item->product->payment_details['fixed_price'] != $item->product->payment_details['fixed_price_with_discount']){
                 $hasDiscount = true;
             }
         });
 
-        $feesWithTaxes = $items->sum(function($item){
-            return $item->quantity * $item->product->payment_details['fees_with_taxes'];
+        $guapaFeesWithTaxes = $items->sum(function($item){
+            return $item->quantity * $item->product->payment_details['guapa_fees_with_taxes'];
         });
 
-        $priceAfterDiscount = $items->sum(function($item){
-            return $item->quantity * $item->product->payment_details['price_after_discount'];
+        $fixedPriceAfterDiscount = $items->sum(function($item){
+            return $item->quantity * $item->product->payment_details['fixed_price_with_discount'];
         });
 
-        $remainingPrice = $items->sum(function($item){
-            return $item->quantity * $item->product->payment_details['remaining'];
+        $vendorPriceWithTaxes = $items->sum(function($item){
+            return $item->quantity * $item->product->payment_details['vendor_price_with_taxes'];
         });
 
         $existingVendorId = Cart::where('user_id', $user->id)->first()->product->vendor_id;
@@ -79,7 +79,7 @@ class CartService
             [$errors, $hasErrors] = $this->checkProductErrors(product: $item->product, quantity: $item->quantity, existingVendorId: $existingVendorId);
             return [
                 'product' => ProductResource::make($item->product),
-                'price' => round($item->product->payment_details['price_after_discount'] * $item->quantity, 2),
+                'price' => round($item->product->payment_details['fixed_price_with_discount'] * $item->quantity, 2),
                 'quantity' => $item->quantity,
                 'errors' => $errors,
                 'hasErrors' => $hasErrors,
@@ -88,10 +88,10 @@ class CartService
         return [
             'items' => $items,
             'has_discount' => $hasDiscount,
-            'fees_with_taxes' => round($feesWithTaxes, 2), // fees_with_taxes
-            'remaining' => round($remainingPrice, 2), // remaining
-            'price_after_discount' => round($priceAfterDiscount, 2), // price_after_discount 
-            'total' => round($priceAfterDiscount + $feesWithTaxes, 2), // price_after_discount + fees_with_taxes
+            'guapa_fees_with_taxes' => round($guapaFeesWithTaxes, 2), // guapa_fees_with_taxes
+            'vendor_price_with_taxes' => round($vendorPriceWithTaxes, 2), // vendor_price_with_taxes
+            'fixed_price_with_discount' => round($fixedPriceAfterDiscount, 2), // fixed_price_with_discount 
+            'total_amount_with_taxes' => round($fixedPriceAfterDiscount + $guapaFeesWithTaxes, 2), // fixed_price_with_discount + guapa_fees_with_taxes
             'total_quantity' => $this->getCartTotalQuantity($user),
         ];
     }
