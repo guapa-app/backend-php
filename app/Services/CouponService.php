@@ -108,18 +108,16 @@ class CouponService
             $totalDiscountFees += $discountResult['fees'];
         }
         $taxes = ($this->taxesPercentage / 100) * $totalDiscountFees;
+        $totalAmountWithTaxes = round(($totalAmount - $totalDiscountAmount) * (1+ ($this->taxesPercentage / 100)), 2);
 
         return [
-            'total' => $totalAmount - $totalDiscountAmount,
-            'fees' => $totalDiscountFees,
-            'taxes' => $taxes,
-            'tax_percentage' => $this->taxesPercentage,
-            'fees_with_taxes'=> $totalDiscountFees + $taxes,
-            'remaining' => ($totalAmount - $totalDiscountAmount) - $totalDiscountFees,
-            'discount_amount' => $totalDiscountAmount,
+            'fixed_price' => $totalAmount,
+            'fixed_price_with_discount' => $totalAmount - $totalDiscountAmount,
+            'guapa_fees' => $totalDiscountFees,
+            'guapa_fees_with_taxes' => $totalDiscountFees + $taxes,
+            'vendor_price_with_taxes' => round($totalAmountWithTaxes - ($totalDiscountFees + $taxes),2),
+            'total_amount_with_taxes' => $totalAmountWithTaxes,
             'cashback_amount' => $totalCashbackAmount,
-            'fees_before_discount' => $totalFees,
-            'total_before_discount' => $totalAmount,
             'product_discounts' => $productDiscounts,
         ];
     }
