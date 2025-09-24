@@ -94,7 +94,7 @@ return [
         'name' => env('POWERED_BY_NAME', 'Ahmed Abdelkader'),
     ],
 
-    'available_locales' => ['en', 'ar'],
+    'available_locales' => ['en', 'ar', 'ar-eg', 'ar-sa'],
 
     /*
     |--------------------------------------------------------------------------
