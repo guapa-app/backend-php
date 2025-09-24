@@ -37,6 +37,11 @@ class Localization
             $locale = 'en';
         }
 
+        if(str_contains($locale, 'ar'))
+        {
+            $locale = 'ar';
+        }
+
         $this->app->setLocale($locale);
         $response = $next($request);
         $response->headers->set('Accept-Language', $locale);
