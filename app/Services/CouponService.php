@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\Repositories\CouponRepositoryInterface;
+use App\Enums\ProductType;
 use App\Models\Product;
 use App\Models\Setting;
 use Illuminate\Support\Arr;
@@ -77,6 +78,7 @@ class CouponService
     {
         $totalAmount = 0;
         $totalFees = 0;
+        $remainingTaxes = 0;
         $totalDiscountFees = 0;
         $totalDiscountAmount = 0;
         $totalCashbackAmount = 0;
@@ -103,20 +105,22 @@ class CouponService
                 'cashback_amount' => $discountResult['cashbackAmount'],
             ];
 
+            $remainingTaxes += $product->type == ProductType::Service ? 0 : round(($finalPrice - $productFees) * ($this->taxesPercentage / 100), 2);
             $totalDiscountAmount += $discountResult['discountAmount'];
             $totalCashbackAmount += $discountResult['cashbackAmount'];
             $totalDiscountFees += $discountResult['fees'];
         }
         $taxes = ($this->taxesPercentage / 100) * $totalDiscountFees;
-        $totalAmountWithTaxes = round(($totalAmount - $totalDiscountAmount) * (1+ ($this->taxesPercentage / 100)), 2);
+        $remaining = $totalAmount - $totalFees;
+        $remainingWithTaxes = round($remaining + $remainingTaxes, 2);
 
         return [
             'fixed_price' => $totalAmount,
             'fixed_price_with_discount' => $totalAmount - $totalDiscountAmount,
             'guapa_fees' => $totalDiscountFees,
             'guapa_fees_with_taxes' => $totalDiscountFees + $taxes,
-            'vendor_price_with_taxes' => round($totalAmountWithTaxes - ($totalDiscountFees + $taxes),2),
-            'total_amount_with_taxes' => $totalAmountWithTaxes,
+            'vendor_price_with_taxes' => $remainingWithTaxes,
+            'total_amount_with_taxes' => round($remainingWithTaxes + $totalDiscountFees + $taxes , 2),
             'cashback_amount' => $totalCashbackAmount,
             'product_discounts' => $productDiscounts,
         ];
