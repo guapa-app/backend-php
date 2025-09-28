@@ -2,8 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Finance;
 
+use App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Actions\RedeemUserPointAction;
 use App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Pages;
 use App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\RelationManagers;
+use App\Filament\Admin\Resources\UserVendor\UserResource\Actions\ManageUserPointAction;
 use App\Models\Finance\AffiliateMarketeer;
 use App\Models\User;
 use Filament\Forms;
@@ -75,6 +77,8 @@ class AffiliateMarketeerResource extends Resource
             ->actions([
                 // Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
+                ManageUserPointAction::make('manage-points'),
+                RedeemUserPointAction::make('redeem-points'),
                 
             ])
             ->bulkActions([

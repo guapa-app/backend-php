@@ -74,6 +74,19 @@ class Setting extends Model
         return $record->s_value;
     }
 
+    public static function affiliateMarketerPointsConversionRate()
+    {
+        $record = static::firstOrCreate(['s_key' => 'affiliate_marketer_points_conversion_rate'], [
+            's_value'           => 100,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Points to cash conversion rate (example: 100 points = 1 riyal)',
+        ]);
+
+        return $record->s_value;
+    }
+
     public static function purchasePointsConversionRate()
     {
         $record = static::firstOrCreate(['s_key' => 'purchase_points_conversion_rate'], [

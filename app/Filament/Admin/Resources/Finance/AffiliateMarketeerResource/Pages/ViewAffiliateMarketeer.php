@@ -18,7 +18,9 @@ class ViewAffiliateMarketeer extends ViewRecord
     protected function getHeaderWidgets(): array
     {
         return [
+            \App\Filament\AffiliateMarketeer\Widgets\AffiliateStateWidgets::make(['userId' => $this->record->id]),
             \App\Filament\AffiliateMarketeer\Widgets\CouponsDetailsTable::make(['userId' => $this->record->id]),
+            \App\Filament\AffiliateMarketeer\Widgets\RedemptionHistoryTable::make(['userId' => $this->record->id]),
             \App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets\OrdersDetailsTable::make(['userId' => $this->record->id]),
             \App\Filament\Admin\Resources\Finance\AffiliateMarketeerResource\Widgets\OrdersAmountChart::make(['userId' => $this->record->id]),
             \App\Filament\AffiliateMarketeer\Widgets\OrdersCountChart::make(['userId' => $this->record->id]),

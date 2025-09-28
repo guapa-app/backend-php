@@ -13,6 +13,7 @@ use App\Models\LoyaltyPointHistory;
 use App\Models\WalletChargingPackage;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\LoyaltyPointHistoryResource;
+use Carbon\Carbon;
 
 class LoyaltyPointsService
 {
@@ -58,9 +59,9 @@ class LoyaltyPointsService
      * @param int $points
      * @return Transaction
      */
-    public function convertPointsToBalance(int $userId, int $points)
+    public function convertPointsToBalance(int $userId, int $points, bool $isAffiliate = false)
     {
-        $conversionRate = Setting::pointsConversionRate();
+        $conversionRate = $isAffiliate ? Setting::affiliateMarketerPointsConversionRate() : Setting::pointsConversionRate();
 
         $totalPoints = $this->getTotalPoints($userId);
 
@@ -108,7 +109,10 @@ class LoyaltyPointsService
     public function getTotalPoints(int $userId)
     {
         // Sum points: positive values for addition and negative for subtraction
-        return LoyaltyPointHistory::where('user_id', $userId)->sum('points');
+        return LoyaltyPointHistory::where('user_id', $userId)->where(function ($query) {
+            $query->whereNull('points_expire_at')
+                ->orWhere('points_expire_at', '>', Carbon::today()); // get the points with nullable points_expire_at or not expired ones
+        })->sum('points');
     }
 
     /**

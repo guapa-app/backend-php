@@ -100,7 +100,7 @@ class OrderPaymentService
         }
         
         $amount = $coupon->points_percentage * $orderAmount / 100;
-        $pointsConversionRate = Setting::pointsConversionRate();
+        $pointsConversionRate = Setting::affiliateMarketerPointsConversionRate();
         $points = $amount * $pointsConversionRate;
 
         return round($points);
