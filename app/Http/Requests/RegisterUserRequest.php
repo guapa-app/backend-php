@@ -44,6 +44,7 @@ class RegisterUserRequest extends FormRequest
             'lastname'                 => 'required|string|min:3|max:32',
             'email'                    => 'required|email|unique:users,email',
             'phone'                    => 'required|unique:users,phone|' . $phoneNumbersRule,
+            'is_affiliate'             => 'nullable',
             'terms'                    => 'required',
         ];
 

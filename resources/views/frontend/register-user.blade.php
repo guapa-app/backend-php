@@ -95,6 +95,15 @@
 
                             </div>
 
+                            <div class="wrapper mb-2">
+                                <input type="checkbox" name="is_affiliate" id="is_affiliate" class="radio-check" />
+
+                                <label class="radio-title" for="is_affiliate">
+                                    التسجيل كانفلونسر ؟
+                                </label>
+
+                            </div>
+
                             <div class="wrapper">
                                 <input type="checkbox" name="terms" id="terms" class="radio-check" />
 
