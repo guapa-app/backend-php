@@ -35,13 +35,13 @@ class UserService
      * @param array $data
      * @return User
      */
-    public function create(array $data, bool $isAffiliate = false): User
+    public function create(array $data): User
     {
         // Create user
         $user = $this->userRepository->create($data);
 
         // Assign patient role
-        $role = $isAffiliate ? 'affiliate_marketeer' : 'patient';
+        $role = isset($data['role']) ? $data['role'] : 'patient';
         $user->assignRole($role);
 
         // Update profile

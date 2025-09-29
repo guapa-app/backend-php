@@ -40,9 +40,7 @@ class RegistrationInterestController extends BaseApiController
                     ],
                 ];
 
-                $isAffiliate = isset($data['is_affiliate']) ? true : false;
-
-                $user = $this->userService->create(data: $user_data, isAffiliate: $isAffiliate);
+                $user = $this->userService->create($user_data);
 
                 Auth::login($user);
 
