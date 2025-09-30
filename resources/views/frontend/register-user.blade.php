@@ -97,13 +97,11 @@
 
 
                                 <div class="form-group">
-                                    <div class="form-icon">
-                                        <img src="{{ asset('interest/assets/images/forms/user.svg') }}" loading="lazy" class="icon" />
-                                        <select class="form-control" name="role" id="role">
-                                            <option value="patient">مستخدم</option>
-                                            <option value="affiliate_marketeer">منسق</option>
-                                        </select>                                    
-                                    </div>
+
+                                    <select class="form-control select2" name="role" id="role">
+                                        <option value="patient">مستخدم</option>
+                                        <option value="affiliate_marketeer">منسق</option>
+                                    </select>                                    
 
                                     @error('role')
                                         <small class="error">{{ $message }}</small>
