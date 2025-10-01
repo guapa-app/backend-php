@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\UserVendor;
 
 use App\Filament\Admin\Resources\UserVendor\VendorResource\Widgets\TotalActiveWalletsWidget;
 use Filament\Forms;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Tables;
 use App\Models\Vendor;
 use App\Models\Country;
@@ -16,6 +17,8 @@ use App\Filament\Admin\Resources\UserVendor\VendorResource\RelationManagers;
 
 class VendorResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Vendor::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
