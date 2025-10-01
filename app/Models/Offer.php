@@ -19,10 +19,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use Spatie\Translatable\HasTranslations;
 
 class Offer extends Model implements Listable, HasMedia
 {
-    use HasFactory, ListableTrait, InteractsWithMedia, Likable;
+    use HasFactory, ListableTrait, InteractsWithMedia, Likable, HasTranslations;
+
+    protected $translatable = [
+        'title',
+        'description',
+        'terms',
+    ];
 
     protected $fillable = [
         'product_id',
@@ -101,10 +108,10 @@ class Offer extends Model implements Listable, HasMedia
         return round($this->product->price * (1 - ($this->discount / 100)), 1);
     }
 
-    public function getDescriptionAttribute()
-    {
-        return nl2br($this->attributes['description'] ?? '');
-    }
+    // public function getDescriptionAttribute()
+    // {
+    //     return nl2br($this->attributes['description'] ?? '');
+    // }
 
     public function setDescriptionAttribute($value)
     {
