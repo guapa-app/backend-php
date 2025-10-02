@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 use App\Services\LoyaltyPointsService;
+use Spatie\Translatable\HasTranslations;
 
 class Product extends Model implements Listable, HasMedia, HasReviews
 {
@@ -40,7 +41,14 @@ class Product extends Model implements Listable, HasMedia, HasReviews
         Reviewable,
         Likable,
         Relatable,
+        HasTranslations,
         SoftDeletes;
+
+    protected $translatable = [
+        'title',
+        'description',
+        'terms',
+    ];
 
     protected $fillable = [
         'country_id',

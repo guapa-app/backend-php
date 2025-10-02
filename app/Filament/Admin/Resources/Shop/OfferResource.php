@@ -9,9 +9,11 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Resources\Concerns\Translatable;
 
 class OfferResource extends Resource
 {
+    use Translatable;
     protected static ?string $model = Offer::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-fire';
@@ -37,9 +39,9 @@ class OfferResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('title')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('description')
+                Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('terms')
+                Forms\Components\Textarea::make('terms')
                     ->columnSpanFull(),
                 Forms\Components\DateTimePicker::make('starts_at'),
                 Forms\Components\DateTimePicker::make('expires_at'),
