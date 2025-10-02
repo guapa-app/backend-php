@@ -25,19 +25,24 @@ return new class extends Migration
         });
 
         // Step 3: Migrate existing data into JSON
-        Vendor::withTrashed()->get()->each(function ($vendor) {
-            $vendor->name = [
-                'en' => $vendor->name_old,
-                'ar' => $vendor->name_old,
-            ];
-
-            $vendor->about = [
-                'en' => $vendor->about_old,
-                'ar' => $vendor->about_old,
-            ];
-
-            $vendor->save();
-        });
+        DB::table('vendors')
+            ->orderBy('id')
+            ->chunkById(100, function ($vendors) {
+                foreach ($vendors as $vendor) {
+                    DB::table('vendors')
+                        ->where('id', $vendor->id)
+                        ->update([
+                                'name' => json_encode([
+                                    'en' => $vendor->name_old,
+                                    'ar' => $vendor->name_old,
+                                ]),
+                                'about' => json_encode([
+                                    'en' => $vendor->about_old,
+                                    'ar' => $vendor->about_old,
+                                ]),
+                            ]);
+                }
+            });
 
         // Step 4: Drop old columns
         Schema::table('vendors', function (Blueprint $table) {

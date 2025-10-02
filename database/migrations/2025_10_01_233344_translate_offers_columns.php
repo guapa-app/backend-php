@@ -27,25 +27,28 @@ return new class extends Migration
         });
 
         // Step 3: Migrate existing data into JSON
-        Offer::all()->each(function ($offer) {
-            $offer->title = [
-                'en' => $offer->title_old,
-                'ar' => $offer->title_old,
-            ];
-
-            $offer->description = [
-                'en' => $offer->description_old,
-                'ar' => $offer->description_old,
-            ];
-
-            $offer->terms = [
-                'en' => $offer->terms_old,
-                'ar' => $offer->terms_old,
-            ];
-
-
-            $offer->save();
-        });
+        DB::table('offers')
+            ->orderBy('id')
+            ->chunkById(100, function ($offers) {
+                foreach ($offers as $offer) {
+                    DB::table('offers')
+                        ->where('id', $offer->id)
+                        ->update([
+                                'title' => json_encode([
+                                    'en' => $offer->title_old,
+                                    'ar' => $offer->title_old,
+                                ]),
+                                'description' => json_encode([
+                                    'en' => $offer->description_old,
+                                    'ar' => $offer->description_old,
+                                ]),
+                                'terms' => json_encode([
+                                    'en' => $offer->terms_old,
+                                    'ar' => $offer->terms_old,
+                                ]),
+                            ]);
+                }
+            });
 
         // Step 4: Drop old columns
         Schema::table('offers', function (Blueprint $table) {
