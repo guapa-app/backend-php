@@ -9,11 +9,13 @@ use Filament\Resources\Pages\ListRecords;
 
 class ListProducts extends ListRecords
 {
+    use ListRecords\Concerns\Translatable;
     protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            Actions\LocaleSwitcher::make(),
             Actions\CreateAction::make()->label('New Product')
                 ->url(route('filament.admin.resources.shop.products.create') . '?type=product'),
             Actions\CreateAction::make()->label('New Procedure')

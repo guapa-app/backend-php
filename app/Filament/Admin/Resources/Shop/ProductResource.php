@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Shop;
 
 use Filament\Forms;
 use Filament\Forms\Get;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Tables;
 use App\Models\Vendor;
 use App\Helpers\Common;
@@ -23,6 +24,7 @@ use App\Filament\Admin\Resources\Shop\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
+    use Translatable;
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-s-squares-plus';
@@ -151,9 +153,9 @@ class ProductResource extends Resource
                     ->dehydrated(fn(Get $get) => $get('type') === 'product'),
 
 
-                Forms\Components\TextInput::make('description')
+                Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('terms')
+                Forms\Components\Textarea::make('terms')
                     ->columnSpanFull(),
             ]);
     }
