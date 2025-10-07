@@ -71,8 +71,10 @@ class ProductRequest extends FailedValidationRequest
 
         $rules = [
 //            'vendor_id' => "{$rule_name}|integer|exists:vendors,id",
-            'title' => "{$rule_name}|string|max:200",
-            'description' => 'nullable|string|max:5000',
+            'title.en' => "{$rule_name}|string|max:200",
+            'title.ar' => "{$rule_name}|string|max:200",
+            'description.en' => 'nullable|string|max:5000',
+            'description.ar' => 'nullable|string|max:5000',
             'price' => "{$rule_name}|numeric|max:100000000",
             'status' => "{$rule_name}|string|in:Published,Draft",
             'category_ids' => 'sometimes|array|min:1',
@@ -81,7 +83,8 @@ class ProductRequest extends FailedValidationRequest
             'address_ids.*' => 'integer|exists:addresses,id',
             'media' => ($id ? 'nullable' : 'required_without:keep_media').'|array|min:1',
             'media.*' => "{$rule_name}|image|max:10240",
-            'terms' => 'nullable|string|max:5000',
+            'terms.en' => 'nullable|string|max:5000',
+            'terms.ar' => 'nullable|string|max:5000',
             'type' => "{$rule_name}|in:product,service",
             // Admin only attributes
             'review' => "{$rule_name}|string|in:Approved,Blocked,Pending",
