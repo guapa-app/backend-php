@@ -70,14 +70,14 @@ class LoyaltyPointsService
         }
 
         $pointsToConvert = min($points, $totalPoints);
-        $cashAmount = $pointsToConvert / $conversionRate;
+        $cashAmount = round($pointsToConvert / $conversionRate, 2);
 
         if ($pointsToConvert > 0) {
 
             // Check if the amount is a multiple of the conversion rate
-            if (!$this->canConvertPoints($points)) {
-                return response()->json(['message' => __('The points count must be a multiple of the conversion rate (:paypal).', ['paypal' => $conversionRate])], 400);
-            }
+            // if (!$this->canConvertPoints($points)) {
+            //     return response()->json(['message' => __('The points count must be a multiple of the conversion rate (:paypal).', ['paypal' => $conversionRate])], 400);
+            // }
 
             $transactionType = TransactionType::POINTS_TRANSFER;
             $amount = $cashAmount;
