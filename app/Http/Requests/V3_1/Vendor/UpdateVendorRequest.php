@@ -85,9 +85,11 @@ class UpdateVendorRequest extends FailedValidationRequest
         $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation();
 
         $rules = [
-            'name' => 'sometimes|required|string|min:5|max:150',
+            'name.en' => 'sometimes|required|string|min:5|max:150',
+            'name.ar' => 'sometimes|required|string|min:5|max:150',
             'email' => ['sometimes', 'required', 'email', Rule::unique('vendors', 'email')->ignore($this->user()->managerVendorId())],
-            'about' => 'nullable|string|min:10|max:1024',
+            'about.en' => 'nullable|string|min:10|max:1024',
+            'about.ar' => 'nullable|string|min:10|max:1024',
 
             'specialty_ids' => 'sometimes|array|min:1',
             'specialty_ids.*' => 'integer|exists:taxonomies,id',
