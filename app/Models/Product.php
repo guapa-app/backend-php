@@ -341,12 +341,12 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
         $query->applyDirectFilters($request);
 
-        if ($request->has('category_ids')) {
-            $query->hasAnyTaxonomy((array) $request->get('category_ids'));
+        if ($request->has('vendor_ids')) {
+            $query->whereIn('vendor_id', $request->vendor_ids);
         }
 
-        if ($request->has('category_id')) {
-            $query->hasAnyTaxonomy([$request->get('category_id')]);
+        if ($request->has('category_ids')) {
+            $query->hasAnyTaxonomy((array) $request->get('category_ids'));
         }
 
         // Filter by price range
@@ -354,22 +354,24 @@ class Product extends Model implements Listable, HasMedia, HasReviews
             $query->priceRange($request->get('min_price'), $request->get('max_price'));
         }
 
-        if ($request->has('city_id')) {
-            $cityId = (int) $request->get('city_id');
-            $query->whereHas('addresses', function ($q) use ($cityId) {
-                $q->where('city_id', $cityId);
+        if ($request->has('city_ids')) {
+            $cityIds = $request->get('city_ids');
+            $query->whereHas('vendor.addresses', function ($q) use ($cityIds) {
+                $q->whereIn('city_id', $cityIds);
             });
         }
 
-        // Get products nearby specific location by specific distance
+        // Get products nearby specific location by specific distance and filter by distance range 
         if ($request->has('lat') && $request->has('lng')) {
-            $query->nearBy($request->get('lat'), $request->get('lng'), $request->get('distance'));
+            $query->nearBy($request->get('lat'), $request->get('lng'), $request->get('distance'), $request->get('min_distance'), $request->get('max_distance'));
         }
 
-        // Get best selling products
-        if ($request->has('best_selling') && $request->get('best_selling')) {
-            $query->bestSelling();
-        }
+
+        // // Get best selling products
+        // if ($request->has('best_selling') && $request->get('best_selling')) {
+        //     $query->bestSelling();
+        // }
+
         $user = app('cosmo')->user();
         // We need to return only active products owned by active vendors
         // Excluding admins and vendors displaying their own products.
@@ -413,9 +415,11 @@ class Product extends Model implements Listable, HasMedia, HasReviews
      * @param  float  $lat
      * @param  float  $lng
      * @param  ?int  $dist
+     * @param  ?float  $minDistance
+     * @param  ?float  $maxDistance
      * @return Builder
      */
-    public function scopeNearBy($query, $lat, $lng, $dist = null)
+    public function scopeNearBy($query, $lat, $lng, $dist = null, ?float $minDistance = null, ?float $maxDistance = null)
     {
         $query->select('products.*');
 
@@ -442,6 +446,9 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
             $query->havingRaw("distance <= {$dist}");
         }
+
+        $query->when($minDistance, fn($query) => $query->havingRaw("distance >= {$minDistance}"))
+            ->when($maxDistance, fn($query) => $query->havingRaw("distance <= {$maxDistance}"));
 
         // Need to make sure no order by is provided elsewhere
         $query->orderBy('distance', 'asc');
