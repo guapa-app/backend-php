@@ -103,7 +103,7 @@ class Order extends Model implements Listable
 
     public function getRemainingAmountAttribute(): float
     {
-        return $this->total - ($this->paid_amount);
+        return round($this->total - ($this->paid_amount), 2);
     }
 
     public function country()
