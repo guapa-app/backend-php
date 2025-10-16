@@ -105,22 +105,24 @@ class CouponService
                 'cashback_amount' => $discountResult['cashbackAmount'],
             ];
 
-            $remainingTaxes += $product->type == ProductType::Service ? 0 : round(($finalPrice - $productFees) * ($this->taxesPercentage / 100), 2);
+            $remainingTaxes += $product->type == ProductType::Service ? 0 : round(($discountResult['total'] - $discountResult['fees']) * ($this->taxesPercentage / 100), 2);
             $totalDiscountAmount += $discountResult['discountAmount'];
             $totalCashbackAmount += $discountResult['cashbackAmount'];
             $totalDiscountFees += $discountResult['fees'];
         }
+        $totalPriceAfterDiscount = $totalAmount - $totalDiscountAmount;
         $taxes = ($this->taxesPercentage / 100) * $totalDiscountFees;
-        $remaining = $totalAmount - $totalFees;
+        $totalGuapaWithFees = $totalDiscountFees + $taxes;
+        $remaining = $totalPriceAfterDiscount - $totalDiscountFees;
         $remainingWithTaxes = round($remaining + $remainingTaxes, 2);
 
         return [
             'fixed_price' => $totalAmount,
-            'fixed_price_with_discount' => $totalAmount - $totalDiscountAmount,
+            'fixed_price_with_discount' => $totalPriceAfterDiscount,
             'guapa_fees' => $totalDiscountFees,
-            'guapa_fees_with_taxes' => $totalDiscountFees + $taxes,
+            'guapa_fees_with_taxes' => $totalGuapaWithFees,
             'vendor_price_with_taxes' => $remainingWithTaxes,
-            'total_amount_with_taxes' => round($remainingWithTaxes + $totalDiscountFees + $taxes , 2),
+            'total_amount_with_taxes' => round($remainingWithTaxes + $totalGuapaWithFees , 2),
             'cashback_amount' => $totalCashbackAmount,
             'product_discounts' => $productDiscounts,
         ];
