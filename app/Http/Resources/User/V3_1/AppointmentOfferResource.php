@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Resources\User\V3_1;
+
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class AppointmentOfferResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'taxonomy' => TaxonomyResource::make($this->whenLoaded('taxonomy')),
+            'status' => $this->status,
+            'notes' => $this->notes,
+            'invoice_url' => $this->invoice_url,
+            'application_fees' => (float) $this->application_fees,
+            'details' => AppointmentOfferDetailsResource::collection($this->whenLoaded('details')),
+            'appointment_form' => AppointmentOfferFormResource::collection($this->whenLoaded('appointmentForms')),
+            'images' => MediaResource::collection($this->whenLoaded('media')),
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+        ];
+    }
+}

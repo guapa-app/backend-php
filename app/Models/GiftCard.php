@@ -1,0 +1,516 @@
+<?php
+
+namespace App\Models;
+
+use App\Services\WalletService;
+use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+
+class GiftCard extends Model implements HasMedia
+{
+    use HasFactory, InteractsWithMedia;
+
+    protected $fillable = [
+        'code',
+        'user_id',
+        'vendor_id',
+        'gift_type', // wallet or order
+        'product_id',
+        'offer_id',
+        'order_id',
+        'wallet_transaction_id',
+        'amount',
+        'currency',
+        'tax_amount',
+        'total_amount',
+        'background_color',
+        'background_image',
+        'background_image_id',
+        'message',
+        'notes',
+        'status',
+        'payment_status',
+        'payment_method',
+        'payment_reference',
+        'payment_gateway',
+        'invoice_url',
+        'redemption_method',
+        'expires_at',
+        'redeemed_at',
+        'recipient_name',
+        'recipient_email',
+        'recipient_number',
+        'sender_id',
+        'recipient_id',
+    ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+        'expires_at' => 'datetime',
+        'redeemed_at' => 'datetime',
+    ];
+
+    // Status constants
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_USED = 'used';
+    public const STATUS_EXPIRED = 'expired';
+    public const STATUS_CANCELLED = 'cancelled';
+
+    // Payment status constants
+    public const PAYMENT_STATUS_PENDING = 'pending';
+    public const PAYMENT_STATUS_PAID = 'paid';
+    public const PAYMENT_STATUS_FAILED = 'failed';
+    public const PAYMENT_STATUS_REFUNDED = 'refunded';
+
+    // Gift type constants
+    public const GIFT_TYPE_WALLET = 'wallet';
+    public const GIFT_TYPE_ORDER = 'order';
+
+    // Redemption method constants
+    public const REDEMPTION_PENDING = 'pending';
+    public const REDEMPTION_WALLET = 'wallet';
+    public const REDEMPTION_ORDER = 'order';
+
+    // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function offer()
+    {
+        return $this->belongsTo(Offer::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function walletTransaction()
+    {
+        return $this->belongsTo(Transaction::class, 'wallet_transaction_id');
+    }
+
+    public function backgroundImage()
+    {
+        return $this->belongsTo(GiftCardBackground::class, 'background_image_id');
+    }
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function recipient()
+    {
+        return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    // Register media collections for background image and QR code
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('gift_card_backgrounds')->singleFile();
+        $this->addMediaCollection('gift_card_qr_codes')->singleFile();
+    }
+
+    // QR Code relationship
+    public function qrCode()
+    {
+        return $this->morphOne(Media::class, 'model')
+            ->where('collection_name', 'gift_card_qr_codes');
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($giftCard) {
+            // Generate unique code if not set
+            if (empty($giftCard->code)) {
+                $prefix = \App\Models\GiftCardSetting::getCodePrefix();
+                $giftCard->code = strtoupper(uniqid($prefix));
+            }
+
+            // Set default status if not set
+            if (empty($giftCard->status)) {
+                $giftCard->status = self::STATUS_PENDING;
+            }
+
+            // Set default payment status if not set
+            if (empty($giftCard->payment_status)) {
+                $giftCard->payment_status = self::PAYMENT_STATUS_PENDING;
+            }
+
+            // Set default redemption method if not set
+            if (empty($giftCard->redemption_method)) {
+                $giftCard->redemption_method = self::REDEMPTION_PENDING;
+            }
+
+            // Calculate total amount if not set
+            if (empty($giftCard->total_amount)) {
+                $giftCard->total_amount = $giftCard->amount + ($giftCard->tax_amount ?? 0);
+            }
+
+            // Set default expiry date if not provided
+            if (empty($giftCard->expires_at)) {
+                $defaultExpirationDays = \App\Models\GiftCardSetting::getDefaultExpirationDays();
+                $giftCard->expires_at = now()->addDays($defaultExpirationDays);
+            }
+
+            // Validate amount against settings
+            $minAmount = \App\Models\GiftCardSetting::getMinAmount();
+            $maxAmount = \App\Models\GiftCardSetting::getMaxAmount();
+
+            if ($giftCard->amount < $minAmount) {
+                throw new \InvalidArgumentException("Amount cannot be less than {$minAmount}");
+            }
+
+            if ($giftCard->amount > $maxAmount) {
+                throw new \InvalidArgumentException("Amount cannot exceed {$maxAmount}");
+            }
+
+            // Clear conflicting fields based on gift type
+            if ($giftCard->gift_type === self::GIFT_TYPE_WALLET) {
+                $giftCard->product_id = null;
+                $giftCard->offer_id = null;
+                $giftCard->vendor_id = null;
+            } elseif ($giftCard->gift_type === self::GIFT_TYPE_ORDER) {
+                // For order type, ensure we have either product_id or offer_id
+                if ($giftCard->product_id) {
+                    $giftCard->offer_id = null;
+
+                    // Auto-fill vendor_id from product if not provided
+                    if (empty($giftCard->vendor_id)) {
+                        $product = \App\Models\Product::find($giftCard->product_id);
+                        if ($product) {
+                            $giftCard->vendor_id = $product->vendor_id;
+                        }
+                    }
+                } elseif ($giftCard->offer_id) {
+                    $giftCard->product_id = null;
+
+                    // Auto-fill vendor_id from offer's product if not provided
+                    if (empty($giftCard->vendor_id)) {
+                        $offer = \App\Models\Offer::find($giftCard->offer_id);
+                        if ($offer && $offer->product) {
+                            $giftCard->vendor_id = $offer->product->vendor_id;
+                        }
+                    }
+                }
+            }
+        });
+
+        static::created(function ($giftCard) {
+            // Generate QR code automatically when gift card is created
+            Log::info("GiftCard created event triggered for ID: {$giftCard->id}");
+            try {
+                $giftCard->generateQrCode();
+                Log::info("QR code generated successfully for GiftCard ID: {$giftCard->id}");
+            } catch (\Exception $e) {
+                Log::error("Failed to generate QR code for GiftCard ID: {$giftCard->id}. Error: " . $e->getMessage());
+            }
+        });
+
+        static::updated(function ($giftCard) {
+            // Regenerate QR code if important fields changed
+            if ($giftCard->wasChanged(['code', 'amount', 'status', 'payment_status'])) {
+                $giftCard->generateQrCode();
+            }
+        });
+    }
+
+    // QR Code Methods
+    public function generateQrCode()
+    {
+        $qrCodeService = app(\App\Services\GiftCardQrCodeService::class);
+        $qrCodeImage = $qrCodeService->generateForGiftCard($this);
+
+        // Remove existing QR code if exists
+        if ($this->qrCode) {
+            $this->qrCode->delete();
+        }
+
+        // Add new QR code to media collection
+        $this->addMediaFromString($qrCodeImage)
+            ->usingName("Gift Card QR Code - {$this->code}")
+            ->usingFileName("gift_card_qr_{$this->code}.png")
+            ->toMediaCollection('gift_card_qr_codes');
+    }
+
+    public function generateSharingQrCode()
+    {
+        $qrCodeService = app(\App\Services\GiftCardQrCodeService::class);
+        return $qrCodeService->generateSharingQrCode($this);
+    }
+
+    public function generateVerificationQrCode()
+    {
+        $qrCodeService = app(\App\Services\GiftCardQrCodeService::class);
+        return $qrCodeService->generateVerificationQrCode($this);
+    }
+
+    public function buildRedemptionUrl(): string
+    {
+        $baseUrl = config('app.url');
+        return "{$baseUrl}/gift-cards/redeem/{$this->code}";
+    }
+
+    public function getQrCodeUrlAttribute(): ?string
+    {
+        return $this->qrCode?->getUrl();
+    }
+
+    // Scopes
+    public function scopeWalletType($query)
+    {
+        return $query->where('gift_type', self::GIFT_TYPE_WALLET);
+    }
+
+    public function scopeOrderType($query)
+    {
+        return $query->where('gift_type', self::GIFT_TYPE_ORDER);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::STATUS_ACTIVE);
+    }
+
+    public function scopePendingRedemption($query)
+    {
+        return $query->where('redemption_method', self::REDEMPTION_PENDING);
+    }
+
+    public function scopeSentBy($query, $userId)
+    {
+        return $query->where('sender_id', $userId);
+    }
+
+    public function scopeReceivedBy($query, $user)
+    {
+        return $query->where(function ($q) use ($user) {
+            $q->where('recipient_id', $user->id)
+                ->orWhere('user_id', $user->id);
+
+            // Only add email condition if user has email
+            if (!empty($user->email)) {
+                $q->orWhere('recipient_email', $user->email);
+            }
+
+            // Only add phone condition if user has phone
+            if (!empty($user->phone)) {
+                $q->orWhere('recipient_number', $user->phone);
+            }
+        });
+    }
+
+    // Accessors for display fields
+    public function getDisplayNameAttribute()
+    {
+        return $this->user ? $this->user->name : $this->recipient_name;
+    }
+
+    public function getDisplayEmailAttribute()
+    {
+        return $this->user ? $this->user->email : $this->recipient_email;
+    }
+
+    public function getDisplayPhoneAttribute()
+    {
+        return $this->user ? $this->user->phone : $this->recipient_number;
+    }
+
+    public function getBackgroundImageUrlAttribute()
+    {
+        if ($this->background_image_id && $this->backgroundImage) {
+            return $this->backgroundImage->image_url;
+        }
+        return $this->background_image;
+    }
+
+    public function getBackgroundThumbnailUrlAttribute()
+    {
+        if ($this->background_image_id && $this->backgroundImage) {
+            return $this->backgroundImage->thumbnail_url;
+        }
+        return $this->background_image;
+    }
+
+    public function getGiftTypeLabelAttribute()
+    {
+        return $this->gift_type === self::GIFT_TYPE_WALLET ? 'Wallet Credit' : 'Order';
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        $labels = [
+            self::STATUS_PENDING => 'Pending',
+            self::STATUS_ACTIVE => 'Active',
+            self::STATUS_USED => 'Used',
+            self::STATUS_EXPIRED => 'Expired',
+            self::STATUS_CANCELLED => 'Cancelled',
+        ];
+        return $labels[$this->status] ?? $this->status;
+    }
+
+    public function getPaymentStatusLabelAttribute()
+    {
+        $labels = [
+            self::PAYMENT_STATUS_PENDING => 'Pending',
+            self::PAYMENT_STATUS_PAID => 'Paid',
+            self::PAYMENT_STATUS_FAILED => 'Failed',
+            self::PAYMENT_STATUS_REFUNDED => 'Refunded',
+        ];
+        return $labels[$this->payment_status] ?? $this->payment_status;
+    }
+
+    // Methods
+    public function isWalletType()
+    {
+        return $this->gift_type === self::GIFT_TYPE_WALLET;
+    }
+
+    public function isOrderType()
+    {
+        return $this->gift_type === self::GIFT_TYPE_ORDER;
+    }
+
+    public function isRedeemed()
+    {
+        return $this->status === self::STATUS_USED;
+    }
+
+    public function isExpired()
+    {
+        return $this->expires_at && $this->expires_at->isPast();
+    }
+
+    public function canBeRedeemed()
+    {
+        return $this->status === self::STATUS_ACTIVE &&
+            $this->payment_status === self::PAYMENT_STATUS_PAID &&
+            !$this->isExpired() &&
+            $this->redemption_method === self::REDEMPTION_PENDING;
+    }
+
+    public function isPaymentPending()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_PENDING;
+    }
+
+    public function isPaymentPaid()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_PAID;
+    }
+
+    public function isPaymentFailed()
+    {
+        return $this->payment_status === self::PAYMENT_STATUS_FAILED;
+    }
+
+    public function redeemToWallet()
+    {
+        if (!$this->canBeRedeemed() || !$this->isWalletType()) {
+            return false;
+        }
+
+        // Ensure we have a valid user_id
+        $userId = $this->user_id ?: $this->recipient_id ?: $this->sender_id;
+
+        if (!$userId) {
+            throw new \InvalidArgumentException('No valid user ID found for wallet redemption');
+        }
+
+        $user = auth()->user();
+        $walletService = app(WalletService::class);
+        $charge = $walletService->chargeWallet($user, $this->amount, [
+            'status' => 'completed',
+            'notes' => "Gift card redemption: {$this->code}"
+        ]);
+        
+        if($charge){
+            $transaction = $walletService->transaction;
+        }
+
+        $this->update([
+            'status' => self::STATUS_USED,
+            'redemption_method' => self::REDEMPTION_WALLET,
+            'wallet_transaction_id' => $transaction->id,
+            'redeemed_at' => now(),
+        ]);
+
+        return true;
+    }
+
+    public function createOrder()
+    {
+        if (!$this->canBeRedeemed() || !$this->isOrderType()) {
+            return false;
+        }
+
+        // Use recipient_id if available, otherwise user_id, otherwise sender_id
+        $orderUserId = $this->recipient_id ?: $this->user_id ?: $this->sender_id;
+
+        if (!$orderUserId) {
+            throw new \InvalidArgumentException('No valid user ID found for order creation');
+        }
+
+        // Create order based on product or offer
+        $orderData = [
+            'user_id' => $orderUserId,
+            'vendor_id' => $this->vendor_id,
+            'total' => $this->amount,
+            'status' => \App\Enums\OrderStatus::Pending->value,
+            'gift_card_id' => $this->id,
+        ];
+
+        if ($this->product_id) {
+            $orderData['product_id'] = $this->product_id;
+            $orderData['type'] = 'product';
+        } elseif ($this->offer_id) {
+            $orderData['offer_id'] = $this->offer_id;
+            $orderData['type'] = 'offer';
+        }
+
+        $order = Order::create($orderData);
+
+        $this->update([
+            'status' => self::STATUS_USED,
+            'redemption_method' => self::REDEMPTION_ORDER,
+            'order_id' => $order->id,
+            'redeemed_at' => now(),
+        ]);
+
+        return $order;
+    }
+
+    public function cancelOrderAndRedeemToWallet()
+    {
+        if (!$this->order || $this->redemption_method !== self::REDEMPTION_ORDER) {
+            return false;
+        }
+
+        // Cancel the order using the correct enum value
+        $this->order->update(['status' => \App\Enums\OrderStatus::Canceled->value]);
+
+        // Redeem to wallet
+        return $this->redeemToWallet();
+    }
+}

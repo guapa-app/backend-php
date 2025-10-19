@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Notifications;
+
+use App\Channels\FirebaseChannel;
+use Benwilkins\FCM\FcmMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Notification;
+
+class AddVendorClientNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    protected $vendor;
+    protected $isNewClient;
+
+    public function __construct($vendor, $isNewClient)
+    {
+        $this->vendor = $vendor;
+        $this->isNewClient = $isNewClient;
+    }
+
+    public function via($notifiable)
+    {
+        if ($this->isNewClient) {
+            return ['whatsapp'];
+        } else {
+            return [
+                'database',
+                FirebaseChannel::class,
+            ];
+        }
+    }
+
+    public function toFirebase()
+    {
+        return [
+            'title'        => 'تمت إضافتك كعميل',
+            'body'         => $this->getSummary(),
+        ];
+    }
+
+    public function toFcm($notifiable): FcmMessage
+    {
+        $message = new FcmMessage();
+        $message->content([
+            'title'        => 'تمت إضافتك كعميل',
+            'body'         => $this->getSummary(),
+            'sound'        => 'default', // Optional
+            'icon'         => '', // Optional
+            'click_action' => '', // Optional
+        ]);
+
+        return $message;
+    }
+
+    public function toWhatsApp($notifiable)
+    {
+    }
+
+    public function getSummary()
+    {
+        return " تمت إضافتك كعميل إلى {$this->vendor->name}";
+    }
+}

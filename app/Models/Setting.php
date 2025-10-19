@@ -1,0 +1,250 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Setting extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        's_key',
+        's_value',
+        's_unit',
+        's_validation',
+        's_validation_type',
+        'instructions',
+    ];
+
+    protected $casts = [
+        's_validation' => 'array',
+    ];
+
+    public static function getTaxes()
+    {
+        $record = static::firstOrCreate(['s_key' => 'taxes'], [
+            's_value'           => 15.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Taxes are a percentage of the service (example: 10% of 150 riyals = 15 riyals)',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function getProductFees()
+    {
+        $record = static::firstOrCreate(['s_key' => 'product_fees'], [
+            's_value'           => 0.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Fees are a percentage of the product (example: 10% of 150 riyals = 15 riyals)',
+        ]);
+
+        return $record->s_value;
+    }
+    public static function getOnlineConsultationFee()
+    {
+        $record = static::firstOrCreate(['s_key' => 'online_consultation_fees'], [
+            's_value'           => 0.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Fees are a percentage of the vendor fees (example: 10% of 150 riyals = 15 riyals)',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function pointsConversionRate()
+    {
+        $record = static::firstOrCreate(['s_key' => 'points_conversion_rate'], [
+            's_value'           => 100,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Points to cash conversion rate (example: 100 points = 1 riyal)',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function purchasePointsConversionRate()
+    {
+        $record = static::firstOrCreate(['s_key' => 'purchase_points_conversion_rate'], [
+            's_value'           => 100,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 100],
+            'instructions'      => 'Purchase points conversion rate (example: 1 point per riyal)',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function inviterEarndPoints()
+    {
+        $record = static::firstOrCreate(['s_key' => 'inviter_earnd_points'], [
+            's_value'           => 100,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 10000],
+            'instructions'      => 'Points earned for the inviter',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function inviteeEarndPoints()
+    {
+        $record = static::firstOrCreate(['s_key' => 'invitee_earnd_points'], [
+            's_value'           => 100,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 10000],
+            'instructions'      => 'Points earned for the invitee',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function getMessageCost()
+    {
+        $record = static::firstOrCreate(['s_key' => 'message_cost'], [
+            's_value'           => 1.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 1000],
+            'instructions'      => 'The cost of sending a message to the customer',
+        ]);
+
+        return $record->s_value;
+    }
+
+    public static function getCampaignAvailableCustomers()
+    {
+        $record = static::firstOrCreate(['s_key' => 'campaign_available_customers'], [
+            's_value'           => '50,100,150,200',
+            's_unit'            => 'string',
+            's_validation_type' => 'string',
+            's_validation'      => null,
+            'instructions'      => 'the count of available customers that will receive the campaign(set , separated values)',
+        ]);
+
+        return explode(',', $record->s_value);
+    }
+
+    public static function checkTestingMode()
+    {
+        $record = static::firstOrCreate(['s_key' => 'is_testing_mode_enabled'], [
+            's_value'           => config('app.env') === 'production' ? false : true,
+            's_unit'            => 'bool',
+            's_validation_type' => 'boolean',
+            's_validation'      => null,
+            'instructions'      => 'This mode is enabled ONLY for testing environment',
+        ]);
+
+        return (bool) $record->s_value;
+    }
+
+    public static function getPaymentGatewayMethod()
+    {
+        $record = static::firstOrCreate(['s_key' => 'payment_gateway'], [
+            's_value'           => 'ottu',
+            's_unit'            => 'string',
+            's_validation_type' => 'options',
+            's_validation'      => ['moyasar', 'ottu'],
+            'instructions'      => 'Available Payment Gateway To Use moyasar or ottu only. anything else \'ll get error.',
+        ]);
+
+        return (string) $record->s_value;
+    }
+
+    public static function getSmsService()
+    {
+        $record = static::firstOrCreate(['s_key' => 'sms_service'], [
+            's_value'           => 'twilio',
+            's_unit'            => 'string',
+            's_validation_type' => 'options',
+            's_validation'      => ['twilio', 'sinch', 'connectsaudi'],
+            'instructions'      => 'Available SMS Services To Use (Twilio,Sinch,Connectsaudi) only. anything else \'ll get error.',
+        ]);
+
+        return (string) $record->s_value;
+    }
+
+    public static function getSeviceExpiredAfter()
+    {
+        $record = static::firstOrCreate(['s_key' => 'service_expired_after'], [
+            's_value'           => 60,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 365],
+            'instructions'      => 'Orders that have services (procedures) should expired after (numer) of days. if user does not use it before',
+        ]);
+
+        return (int) $record->s_value;
+    }
+
+    public static function getOrderReminderAfter()
+    {
+        $record = static::firstOrCreate(['s_key' => 'order_reminder_after'], [
+            's_value'           => 12,
+            's_unit'            => 'integer',
+            's_validation_type' => 'number',
+            's_validation'      => ['min'=> 1, 'max'=> 10000],
+            'instructions'      => 'send reminder to user for bending orders after (number) of hours from order created',
+        ]);
+
+        return (int) $record->s_value;
+    }
+
+    public static function isAllMobileNumsAccepted()
+    {
+        $record = static::firstOrCreate(['s_key' => 'is_all_mob_nums_accepted'], [
+            's_value'           => false,
+            's_unit'            => 'bool',
+            's_validation_type' => 'boolean',
+            's_validation'      => [],
+            'instructions'      => 'This setting used to accept all mobile numbers to text sms service in any environment',
+        ]);
+
+        return (int) $record->s_value;
+    }
+
+    public static function getMinSupportedVersion()
+    {
+        $record = static::firstOrCreate(['s_key' => 'min_supported_version'], [
+            's_value' => 0,
+            's_unit' => 'float',
+            's_validation_type' => 'number',
+            's_validation' => ['min' => 0, 'max' => 30],
+            'instructions' => "0 to prevent version check, Please be careful when changing the app version. Ensure that any changes are aligned with the mobile team's requirements to avoid breaking the app. Forcing app updates can impact user experience, so proceed with caution.",
+        ]);
+
+        return (float) $record->s_value;
+    }
+
+    public static function getTestingPhoneNum()
+    {
+        $record = static::firstOrCreate(['s_key' => 'testing_phone_num'], [
+            's_value'           => '531437350,566776627',
+            's_unit'            => 'string',
+            's_validation_type' => 'string',
+            's_validation'      => null,
+            'instructions'      => 'testing phone numbers should seperated be comma (,)',
+        ]);
+
+        return explode(',', $record->s_value);
+    }
+
+    public function scopeByKey(Builder $query, string $key = ''): Builder
+    {
+        return $query->where('s_key', $key);
+    }
+}

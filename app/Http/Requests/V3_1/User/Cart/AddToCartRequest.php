@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Http\Requests\V3_1\User\Cart;
+
+use App\Enums\ProductType;
+use App\Models\Cart;
+use App\Models\Product;
+use Illuminate\Foundation\Http\FormRequest;
+
+class AddToCartRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'nullable|integer|min:1',
+        ];
+    }
+
+    public function withValidator($validator)
+    {
+        
+
+        if (!$validator->passes() || $this->user()->isAdmin()) {
+            return;
+        }
+
+        $validator->after(function ($validator) {
+            $product = Product::find($this->product_id);
+            if ($product->type == ProductType::Service) {
+                $validator->errors()->add('product_id', __('api.cart.service_product_can_not_be_in_cart'));
+            }
+
+            if($this->quantity > $product->stock){
+                $validator->errors()->add('quantity', __('api.cart.quantity_is_greater_than_available_in_stock'));
+            }
+
+            if($this->quantity < $product->min_quantity_per_user){
+                $validator->errors()->add('quantity', __('api.cart.quantity_is_less_than_min_quantity_per_user'));
+            }
+
+            if($this->quantity > $product->max_quantity_per_user){
+                $validator->errors()->add('quantity', __('api.cart.quantity_is_greater_than_max_quantity_per_user'));
+            }
+
+            if($product->is_shippable == false){
+                $validator->errors()->add('product_id', __('api.cart.product_can_not_be_shipped'));
+            }
+
+            $existingVendorId = Cart::where('user_id', $this->user()->id)->first()?->product?->vendor_id;
+            if($existingVendorId && $existingVendorId != $product->vendor_id){
+                $validator->errors()->add('product_id', __('api.cart.different_vendors_error'));
+            }
+        });
+    }
+}

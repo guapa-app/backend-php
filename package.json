@@ -1,0 +1,47 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "watch-poll": "npm run watch -- --watch-poll",
+        "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "prod": "npm run production",
+        "production": "mix --production"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.11.6",
+        "@babel/plugin-proposal-class-properties": "^7.10.4",
+        "@babel/preset-env": "^7.11.5",
+        "@babel/preset-react": "^7.10.4",
+        "bootstrap": "^4.5.2",
+        "browser-sync": "^2.26.12",
+        "browser-sync-webpack-plugin": "^2.2.2",
+        "cross-env": "^7.0.2",
+        "jquery": "^3.5",
+        "laravel-mix": "^6.0.41",
+        "popper.js": "^1.16",
+        "resolve-url-loader": "^5.0.0",
+        "sass": "^1.26.11",
+        "sass-loader": "^10.0.2",
+        "typescript": "^4.0.3",
+        "vue-template-compiler": "^2.6.12"
+    },
+    "dependencies": {
+        "@date-io/moment": "^2.10.6",
+        "@fonticonpicker/react-fonticonpicker": "^1.2.0",
+        "axios": "^0.25.0",
+        "date-fns": "^2.16.1",
+        "google-map-react": "^2.1.5",
+        "lodash": "^4.17.20",
+        "material-ui-rating": "^4.2.0",
+        "moment": "^2.29.0",
+        "ra-input-rich-text": "^3.8.3",
+        "react": "^16.13.1",
+        "react-admin": "^3.8.5",
+        "react-admin-date-inputs": "git+https://github.com/Mohamed-Hamed/react-admin-date-inputs.git#react-admin-v3",
+        "react-dom": "^16.13.1",
+        "react-transition-group": "^4.4.2",
+        "webpack": "^5.67.0"
+    }
+}

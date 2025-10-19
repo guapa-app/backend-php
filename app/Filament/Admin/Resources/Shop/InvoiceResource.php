@@ -1,0 +1,296 @@
+<?php
+
+namespace App\Filament\Admin\Resources\Shop;
+
+use Filament\Forms;
+use Filament\Tables;
+use App\Models\Order;
+use App\Models\Invoice;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use App\Models\AppointmentOffer;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use App\Models\MarketingCampaign;
+use Filament\Infolists\Components;
+use Filament\Infolists\Components\TextEntry;
+use App\Filament\Admin\Resources\Shop\InvoiceResource\Pages;
+use App\Filament\Admin\Resources\Shop\InvoiceResource\Actions\RefundInvoiceAction;
+
+class InvoiceResource extends Resource
+{
+    protected static ?string $model = Invoice::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-receipt-percent';
+
+    protected static ?string $navigationGroup = 'Shop';
+
+    public static function infolist(Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                Components\TextEntry::make('id')
+                    ->label('Invoice ID'),
+                Components\TextEntry::make('invoice_id')
+                    ->label('Payment Invoice ID'),
+                Components\TextEntry::make('invoiceable_id')
+                    ->label('Order ID')
+                    ->formatStateUsing(fn($record) => $record->invoiceable_type === Order::class ? $record->invoiceable_id : '-')
+                    ->url(fn($record) => $record->invoiceable_type === Order::class ? route('filament.admin.resources.shop.orders.view', $record->invoiceable_id) : null, shouldOpenInNewTab: true)
+                    ->color('primary'),
+                Components\TextEntry::make('invoiceable_type')
+                    ->label('Type')
+                    ->formatStateUsing(fn($record) => match ($record->invoiceable_type) {
+                        Order::class => 'Order',
+                        MarketingCampaign::class => 'Marketing Campaign',
+                        AppointmentOffer::class => 'Appointment Offer',
+                        default => '-',
+                    }),
+                Components\TextEntry::make('vendor_name')
+                    ->label('Vendor Name'),
+                Components\TextEntry::make('vendor_reg_num')
+                    ->label('Vendor Reg Number'),
+                Components\TextEntry::make('customer_name')
+                    ->label('Customer Name'),
+                Components\TextEntry::make('customer_phone')
+                    ->label('Customer Phone'),
+                Components\TextEntry::make('product_names')
+                    ->label('Products/Services'),
+                Components\TextEntry::make('amount')
+                    ->money('SAR')
+                    ->label('Total Amount'),
+                Components\TextEntry::make('taxes')
+                    ->money('SAR')
+                    ->label('Taxes'),
+                Components\TextEntry::make('amount_without_taxes')
+                    ->money('SAR')
+                    ->label('Amount Without Taxes'),
+                Components\TextEntry::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'initiated' => 'gray',
+                        'pending' => 'warning',
+                        'paid' => 'success',
+                        'refunded' => 'danger',
+                        'canceled' => 'danger',
+                        default => 'gray',
+                    }),
+                Components\TextEntry::make('currency')
+                    ->label('Currency'),
+                Components\TextEntry::make('description')
+                    ->label('Description'),
+                Components\TextEntry::make('created_at')
+                    ->dateTime()
+                    ->label('Created At'),
+                Components\TextEntry::make('updated_at')
+                    ->dateTime()
+                    ->label('Updated At'),
+                Components\Actions::make([
+                    Components\Actions\Action::make('edit_order')
+                        ->label('Edit Order')
+                        ->url(fn($record) => $record->invoiceable_type === Order::class ? route('filament.admin.resources.shop.orders.edit', $record->invoiceable_id) : null)
+                        ->openUrlInNewTab()
+                        ->visible(fn($record) => $record->invoiceable_type === Order::class),
+                ])->columnSpanFull(),
+            ]);
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('invoice_id')
+                    ->label('Invoice ID')
+                    ->maxLength(255),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'initiated' => 'Initiated',
+                        'pending' => 'Pending',
+                        'paid' => 'Paid',
+                        'refunded' => 'Refunded',
+                        'canceled' => 'Canceled',
+                    ])
+                    ->required(),
+                Forms\Components\TextInput::make('taxes')
+                    ->numeric()
+                    ->required(),
+                Forms\Components\TextInput::make('amount')
+                    ->numeric()
+                    ->required(),
+                Forms\Components\TextInput::make('currency')
+                    ->maxLength(5)
+                    ->required(),
+                Forms\Components\TextInput::make('amount_format')
+                    ->label('Amount Format')
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(255)
+                    ->required(),
+                Forms\Components\DateTimePicker::make('expired_at')
+                    ->label('Expired At'),
+                Forms\Components\TextInput::make('logo_url')
+                    ->label('Logo URL')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('url')
+                    ->label('Invoice URL')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('callback_url')
+                    ->label('Callback URL')
+                    ->maxLength(255)
+                    ->required(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->modifyQueryUsing(function ($query) {
+                $query->with([
+                    'invoiceable' => function ($morphTo) {
+                        $morphTo->morphWith([
+                            \App\Models\Order::class => ['user', 'vendor', 'items.product'],
+                            \App\Models\MarketingCampaign::class => ['users'],
+                        ]);
+                    }
+                ]);
+            })
+            ->defaultSort('id', 'desc')
+            ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('invoice_id')
+                    ->searchable()
+                    ->label('Invoice ID'),
+                Tables\Columns\TextColumn::make('invoiceable_id')
+                    ->label('Order ID')
+                    ->formatStateUsing(fn($record) => $record->invoiceable_type === Order::class ? $record->invoiceable_id : '-')
+                    ->url(fn($record) => $record->invoiceable_type === Order::class ? route('filament.admin.resources.shop.orders.view', $record->invoiceable_id) : null, shouldOpenInNewTab: true)
+                    ->color('primary')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('customer_name')
+                    ->label('Customer')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('customer_phone')
+                    ->label('Customer No')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('product_names')
+                    ->label('Products/Services')
+                    ->limit(50)
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('vendor_name')
+                    ->label('Vendor')
+                    ->formatStateUsing(function ($record) {
+                        if ($record->invoiceable && $record->invoiceable->vendor) {
+                            return $record->invoiceable->vendor->name ?? '-';
+                        }
+                        return '-';
+                    })
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('amount')
+                    ->money('SAR')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'initiated' => 'gray',
+                        'pending' => 'warning',
+                        'paid' => 'success',
+                        'refunded' => 'danger',
+                        'canceled' => 'danger',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('invoiceable_type')
+                    ->label('Type')
+                    ->formatStateUsing(fn($record) => match ($record->invoiceable_type) {
+                        Order::class => 'Order',
+                        MarketingCampaign::class => 'Marketing Campaign',
+                        AppointmentOffer::class => 'Appointment Offer',
+                        default => '-',
+                    })
+                    ->badge()
+                    ->color(fn($record) => match ($record->invoiceable_type) {
+                        Order::class => 'primary',
+                        MarketingCampaign::class => 'warning',
+                        AppointmentOffer::class => 'info',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('taxes')
+                    ->money('SAR')
+                    ->label('Taxes')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('amount_without_taxes')
+                    ->money('SAR')
+                    ->label('Amount (No Tax)')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('currency')
+                    ->label('Currency')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Description')
+                    ->limit(50)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('invoiceable_type')
+                    ->label('Type')
+                    ->options([
+                        Order::class => 'Order',
+                        MarketingCampaign::class => 'Marketing Campaign',
+                        AppointmentOffer::class => 'Appointment Offer',
+                    ]),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'initiated' => 'Initiated',
+                        'pending' => 'Pending',
+                        'paid' => 'Paid',
+                        'refunded' => 'Refunded',
+                        'canceled' => 'Canceled',
+                    ]),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                RefundInvoiceAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            \App\Filament\Admin\Resources\Shop\InvoiceResource\RelationManagers\OrderRelationManager::class,
+            \App\Filament\Admin\Resources\Shop\InvoiceResource\RelationManagers\OrderItemsRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListInvoices::route('/'),
+            'view' => Pages\ViewInvoice::route('/{record}'),
+            'edit' => Pages\EditInvoice::route('/{record}/edit'),
+        ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+}

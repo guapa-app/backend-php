@@ -1,0 +1,267 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Exceptions\ApiException;
+use App\Exceptions\PhoneNotVerifiedException;
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
+use App\Services\AuthService;
+use App\Services\UserService;
+use Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
+/**
+ * @group Authentication
+ */
+class AuthController extends BaseApiController
+{
+    protected $authService;
+    protected $userService;
+    protected $userRepository;
+
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        AuthService $authService,
+        UserService $userService
+    ) {
+        parent::__construct();
+
+        $this->authService = $authService;
+        $this->userService = $userService;
+        $this->userRepository = $userRepository;
+    }
+
+    /**
+     * Signup.
+     *
+     * @unauthenticated
+     *
+     * @responseFile 200 responses/auth/register.json
+     * @responseFile 422 scenario="Validation errors" responses/errors/422.json
+     *
+     * @param RegisterRequest $request
+     */
+    public function register(RegisterRequest $request)
+    {
+        $data = $request->validated();
+
+        $token = null;
+
+        if (isset($data['firebase_jwt_token']) || isset($data['otp'])) {
+            $grantType = isset($data['firebase_jwt_token']) ? 'firebase_phone' : 'otp_verify';
+            $isFirebase = $grantType === 'firebase_phone';
+            $requestPayload = [
+                'grant_type'   => $grantType,
+                'phone_number' => $data['phone'],
+                'scope'        => '*',
+            ];
+
+            if ($isFirebase) {
+                $requestPayload['jwt_token'] = $data['firebase_jwt_token'];
+            } else {
+                $requestPayload['otp'] = $data['otp'];
+            }
+
+            $token = $this->authService->authenticate($requestPayload);
+        }
+
+        $userData = [
+            'name'          => $data['name'] ?? $data['firstname'] . ' ' . $data['lastname'],
+            'email'         => $data['email'] ?? null,
+            'phone'         => $data['phone'],
+            'profile'       => [
+                'firstname'     => $data['firstname'] ?? null,
+                'lastname'      => $data['lastname'] ?? null,
+                'gender'        => $data['gender'] ?? null,
+            ],
+        ];
+
+        if ($token != null) {
+            $user = $this->userRepository->getByPhone($data['phone']);
+            $user = $this->userService->update($user, $userData);
+        } else {
+            $user = $this->userService->create($userData);
+        }
+
+        $user->password = Hash::make($data['password']);
+        $user->save();
+
+        if ($token == null) {
+            $token = $this->authService->authenticate([
+                'grant_type' => 'password',
+                'username'   => $data['email'] ?? null,
+                'password'   => $data['password'],
+                'scope'      => '*',
+            ]);
+        }
+
+        event(new Registered($user));
+
+        return [$token, $user];
+    }
+
+    /**
+     * Login.
+     *
+     * @unauthenticated
+     *
+     * @responseFile 200 responses/auth/login.json
+     * @responseFile 422 scenario="Validation errors" responses/errors/422.json
+     * @responseFile 401 scenario="Invalid username or password" responses/auth/invalid-credentials.json
+     * @responseFile 401 scenario="Phone not verified" responses/auth/login-phone-not-verified.json
+     *
+     * @bodyParam username string required  Email address or phone number
+     * @bodyParam password string required  Password
+     *
+     * @param Request $request
+     */
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            'username' => 'required|string',
+            'password' => 'required|max:100',
+        ]);
+
+        $token = $this->authService->authenticate([
+            'grant_type' => 'password',
+            'username'   => $request->get('username'),
+            'password'   => $request->get('password'),
+            'guard'      => 'api',
+            'scope'      => '*',
+        ]);
+
+        $this->checkUserCredentials($token);
+
+        $username = $request->get('username');
+        $user = $this->userRepository->getByUsername($username);
+
+        $this->checkUserVerified($user->phone_verified_at, $username);
+        $this->checkIfUserDeleted($user->status);
+
+        $user->loadProfileFields();
+        $user->append('user_vendors_ids');
+
+        return [$token, $user];
+    }
+
+    private function checkUserCredentials($token)
+    {
+        if ($token == null) {
+            throw new ApiException(__('api.invalid_credentials'), 401);
+        }
+    }
+
+    private function checkUserVerified($phone_verified_at, $username)
+    {
+        if ($phone_verified_at == null && strpos($username, '@') === false) {
+            throw new PhoneNotVerifiedException();
+        }
+    }
+
+    protected function checkIfUserDeleted($status)
+    {
+        if ($status == User::STATUS_DELETED) {
+            throw new ApiException(__('api.account_deleted'), 401);
+        }
+    }
+
+    /**
+     * Get logged in user.
+     *
+     * @authenticated
+     *
+     * @responseFile 200 responses/auth/current-user.json
+     * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
+     */
+    public function user()
+    {
+        $this->user->loadProfileFields();
+
+        $this->checkIfUserDeleted($this->user->status);
+
+        $this->user->append('user_vendors_ids');
+
+        return $this->user;
+    }
+
+    /**
+     * Refresh access token.
+     *
+     * @unauthenticated
+     *
+     * @responseFile 200 responses/auth/refresh-token.json
+     * @responseFile 422 scenario="Validation errors" responses/errors/422.json
+     * @responseFile 401 scenario="Invalid refresh token" responses/auth/invalid-credentials.json
+     *
+     * @bodyParam refresh_token string required Refersh token obtained during login
+     */
+    public function refreshToken(Request $request)
+    {
+        $this->validate($request, [
+            'refresh_token' => 'required|string',
+        ]);
+
+        // Get access token from oauth server
+        $res = $this->authService->authenticate([
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $request->get('refresh_token'),
+            'scope' => '*',
+        ]);
+
+        if ($res == null) {
+            throw new ApiException(__('api.invalid_refresh_token'), 401);
+        }
+
+        return $res;
+    }
+
+    /**
+     * Logout.
+     *
+     * @responseFile 200 responses/auth/logout.json
+     * @responseFile 401 scenario="Unauthorized" responses/errors/401.json
+     *
+     * @param Request $request
+     */
+    public function logout(Request $request)
+    {
+        $this->authService->logout($this->user);
+
+        return true;
+    }
+
+    /**
+     * Delete Account.
+     *
+     * @param Request $request
+     */
+    public function deleteAccount(Request $request)
+    {
+        $this->userService->deleteAccount($this->user->getKey());
+
+        return $this->logout($request);
+    }
+
+    /**
+     * Check if phone or email exists.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam phone string required Phone number
+     *
+     * @param Request $request
+     * @throws ValidationException
+     */
+    public function checkIfPhoneExist(Request $request)
+    {
+        $data = $this->validate($request, [
+            'phone' => 'required|string|max:40',
+        ]);
+
+        return $this->userRepository->getByPhone($data['phone']);
+    }
+}

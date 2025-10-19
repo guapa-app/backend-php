@@ -1,0 +1,163 @@
+<?php
+
+namespace App\Enums;
+
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum OrderStatus: string implements HasColor, HasLabel
+{
+    // Active Statuses
+    case Accepted = 'Accepted';
+
+        // Completed Statuses
+    case Used = 'Used';
+    case Delivered = 'Delivered';
+
+        // Inactive Statuses
+    case Canceled = 'Canceled';
+    case Rejected = 'Rejected';
+    case Cancel_Request = 'Cancel Request';
+    case Expired = 'Expired';
+    case Prepare_For_Delivery = 'Prepare for delivery';
+    case Shipping = 'Shipping';
+    case Return_Request = 'Return Request';
+    case Returned = 'Returned';
+    case Pending = 'Pending';
+    case Completed = 'Completed';
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::Pending              => 'Pending',
+            self::Accepted             => 'Accepted',
+            self::Rejected             => 'Rejected',
+            self::Expired              => 'Expired',
+            self::Used                 => 'Used',
+            self::Prepare_For_Delivery => 'Prepare for delivery',
+            self::Shipping             => 'Shipping',
+            self::Delivered           => 'Delivered',
+            self::Completed           => 'Completed',
+            self::Return_Request       => 'Return Request',
+            self::Returned             => 'Returned',
+            self::Cancel_Request       => 'Cancel Request',
+            self::Canceled             => 'Canceled',
+        };
+    }
+
+    public function getColor(): string | array | null
+    {
+        return match ($this) {
+            self::Pending              => 'gray',
+            self::Accepted             => 'success',
+            self::Rejected             => 'primary',
+            self::Expired              => 'warning',
+            self::Used                 => 'info',
+            self::Prepare_For_Delivery => 'gray',
+            self::Shipping             => 'info',
+            self::Delivered           => 'success',
+            self::Completed           => 'success',
+            self::Return_Request       => 'warning',
+            self::Returned             => 'warning',
+            self::Cancel_Request       => 'warning',
+            self::Canceled             => 'danger',
+        };
+    }
+
+    public static function getStatusGroup(int $statusId): array
+    {
+        return match ($statusId) {
+            1 => [ // Active - Orders that are currently being processed
+                self::Accepted->value,
+                self::Prepare_For_Delivery->value,
+                self::Shipping->value,
+            ],
+            2 => [ // Completed - Orders that have been fulfilled
+                self::Used->value,
+                self::Delivered->value,
+                self::Completed->value,
+            ],
+            3 => [ // Inactive - Orders that are cancelled, rejected, or expired
+                self::Canceled->value,
+                self::Rejected->value,
+                self::Cancel_Request->value,
+                self::Expired->value,
+                self::Return_Request->value,
+                self::Returned->value,
+                // self::Pending->value,
+            ],
+            default => [],
+        };
+    }
+
+    public static function availableForUpdate(): array
+    {
+        return array_column([
+            self::Accepted,
+            self::Rejected,
+            self::Expired,
+            self::Used,
+            self::Prepare_For_Delivery,
+            self::Shipping,
+            self::Delivered,
+            self::Completed,
+            self::Return_Request,
+            self::Returned,
+            self::Cancel_Request,
+            self::Canceled,
+        ], 'value', 'name');
+    }
+
+    public static function availableForUpdateByVendor(): array
+    {
+        return array_column([
+            self::Accepted,
+            self::Rejected,
+            self::Expired,
+            self::Used,
+            self::Prepare_For_Delivery,
+            self::Shipping,
+            self::Delivered,
+            self::Completed,
+            self::Returned,
+            self::Canceled,
+        ], 'value', 'name');
+    }
+
+    public static function notAvailableForCancle(): array
+    {
+        return array_column([
+            self::Rejected,
+            self::Expired,
+            self::Used,
+            self::Delivered,
+            self::Completed,
+            self::Return_Request,
+            self::Returned,
+            self::Canceled,
+        ], 'value', 'name');
+    }
+
+    public static function notAvailableForExpire(): array
+    {
+        return array_column([
+            self::Rejected,
+            self::Expired,
+            self::Used,
+            self::Delivered,
+            self::Completed,
+            self::Return_Request,
+            self::Returned,
+            self::Cancel_Request,
+            self::Canceled,
+        ], 'value', 'name');
+    }
+
+    public static function notAvailableShowInvoice(): array
+    {
+        return array_column([
+            self::Pending,
+            self::Rejected,
+        ], 'value', 'name');
+    }
+}
