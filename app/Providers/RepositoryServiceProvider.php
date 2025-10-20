@@ -44,6 +44,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(Repositories\WalletChargingPackageInterface::class, Eloquent\WalletChargingPackageRepository::class);
         $this->app->bind(Repositories\WheelOfFortuneInterface::class, Eloquent\WheelOfFortuneRepository::class);
         $this->app->bind(Repositories\ConsultationRepositoryInterface::class, Eloquent\ConsultationRepository::class);
+        $this->app->bind(Repositories\V3_1\BkamConsultationRepositoryInterface::class, Eloquent\V3_1\BkamConsultationRepository::class);
 
         $this->app->singleton('cosmo', function ($app) {
             return new Cosmo;

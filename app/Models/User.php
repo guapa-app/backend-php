@@ -262,6 +262,11 @@ class User extends Authenticatable implements Listable, FcmNotifiable, FilamentU
         return $this->belongsToMany(Coupon::class, 'coupon_user', 'user_id', 'coupon_id');
     }
 
+    public function bkamConsultations(): HasMany
+    {
+        return $this->hasMany(BkamConsultation::class);
+    }
+
     public function scopeCurrentVendor($query, $value): void
     {
         $query->whereRelation('userVendors', 'vendor_id', '=', $value);

@@ -45,6 +45,7 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::prefix('appointments')->group(base_path('routes/user/v3_1/api/appointments.php'));
     // consultation
     Route::prefix('consultations')->group(base_path('routes/user/v3_1/api/consultations.php'));
+    Route::prefix('bkam-consultations')->group(base_path('routes/user/v3_1/api/bkam_consultations.php'));
     // cart
     Route::prefix('cart')->group(base_path('routes/user/v3_1/api/cart.php'));
 

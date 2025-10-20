@@ -60,6 +60,18 @@ class Setting extends Model
 
         return $record->s_value;
     }
+    public static function getBkamConsultationFee()
+    {
+        $record = static::firstOrCreate(['s_key' => 'bkam_consultation_fees'], [
+            's_value'           => 50.00,
+            's_unit'            => 'float',
+            's_validation_type' => 'number',
+            's_validation'      => ['min' => 0, 'max' => 1000],
+            'instructions'      => 'Fees are fees of create AI Bkam Consultation (example: 50.00 riyals)',
+        ]);
+
+        return $record->s_value;
+    }
 
     public static function pointsConversionRate()
     {
