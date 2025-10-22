@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use Spatie\Translatable\HasTranslations;
 
 class Vendor extends Model implements HasMedia, HasReviews
 {
@@ -39,7 +40,14 @@ class Vendor extends Model implements HasMedia, HasReviews
         Reviewable,
         Likable,
         Notifiable,
-        SoftDeletes;
+        HasTranslations,
+        SoftDeletes
+        ;
+
+    public $translatable = [
+        'name',
+        'about',
+    ];
 
     public const TYPES = [
         0 => 'hospital',

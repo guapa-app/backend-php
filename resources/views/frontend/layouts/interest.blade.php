@@ -21,6 +21,11 @@
     <link rel="stylesheet" href="{{ asset('interest/assets/css/lib/jquery.fancybox.css') }}"/>
     <link rel="stylesheet" href="{{ asset('interest/assets/css/style.css') }}"/>
 
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" /> --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" /> <!-- If RTL -->
+
   </head>
   <body>
 
@@ -33,6 +38,12 @@
     <script src="{{ asset('interest/js/lib/swiper-bundle.min.js') }}"></script>
     <script src="{{ asset('interest/js/lib/jquery.fancybox.js') }}"></script>
     <script src="{{ asset('interest/js/main.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+    <script>
+      $('select').select2({
+        theme: 'bootstrap-5'
+      });
+    </script>
 
   </body>
 </html>

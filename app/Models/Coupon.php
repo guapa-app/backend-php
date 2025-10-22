@@ -15,11 +15,15 @@ class Coupon extends Model
 
     protected $fillable = [
         'code',
+        'type',
         'discount_percentage',
         'discount_source',
+        'points_expire_at',
         'expires_at',
         'max_uses',
         'single_user_usage',
+        'points_percentage_source',
+        'points_percentage',
         'admin_id',
     ];
 
@@ -38,6 +42,11 @@ class Coupon extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'coupon_products');
+    }
+
+    public function affiliateMarketeers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'coupon_user', 'coupon_id', 'user_id');
     }
 
     public function vendors(): BelongsToMany
@@ -63,6 +72,11 @@ class Coupon extends Model
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
+    }
+
+    public function loyaltyPointHistories()
+    {
+        return $this->morphMany(LoyaltyPointHistory::class, 'sourceable');
     }
 
     public function isActive(): bool

@@ -41,7 +41,8 @@ class UserService
         $user = $this->userRepository->create($data);
 
         // Assign patient role
-        $user->assignRole('patient');
+        $role = isset($data['role']) ? $data['role'] : 'patient';
+        $user->assignRole($role);
 
         // Update profile
         if (isset($data['profile'])) {

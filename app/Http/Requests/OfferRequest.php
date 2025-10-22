@@ -35,12 +35,15 @@ class OfferRequest extends FailedValidationRequest
         $id = $this->route('id');
 
         $rules = [
-            'product_id'    => 'required|integer|exists:products,id',
-            'discount'      => 'required|integer|min:1|max:99',
-            'title'         => 'nullable|string|max:200',
-            'description'   => 'nullable|max:1000',
-            'terms'         => 'nullable',
-            'image'         => ['nullable', new ImageOrArray(), 'max:10240'],
+            'product_id'       => 'required|integer|exists:products,id',
+            'discount'         => 'required|integer|min:1|max:99',
+            'title.en'         => 'nullable|string|max:200',
+            'title.ar'         => 'nullable|string|max:200',
+            'description.en'   => 'nullable|max:1000',
+            'description.ar'   => 'nullable|max:1000',
+            'terms.en'         => 'nullable|max:1000',
+            'terms.ar'         => 'nullable|max:1000',
+            'image'            => ['nullable', new ImageOrArray(), 'max:10240'],
         ];
 
         if (is_numeric($id)) {

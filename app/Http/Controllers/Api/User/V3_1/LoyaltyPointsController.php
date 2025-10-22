@@ -61,13 +61,13 @@ class LoyaltyPointsController extends BaseApiController
         }
 
         $pointsToConvert = min($request->points, $totalPoints);
-        $cashAmount = $pointsToConvert / $conversionRate;
+        $cashAmount = round($pointsToConvert / $conversionRate,2);
 
         if ($pointsToConvert > 0) {
             // Check if the amount is a multiple of the conversion rate
-            if (!$this->loyaltyPointsService->canConvertPoints($request->points)) {
-                return response()->json(['message' => __('The points count must be a multiple of the conversion rate (:paypal).', ['paypal' => $conversionRate])], 400);
-            }
+            // if (!$this->loyaltyPointsService->canConvertPoints($request->points)) {
+            //     return response()->json(['message' => __('The points count must be a multiple of the conversion rate (:paypal).', ['paypal' => $conversionRate])], 400);
+            // }
 
             $amount = $cashAmount;
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\Repositories\CouponRepositoryInterface;
+use App\Enums\ProductType;
 use App\Models\Product;
 use App\Models\Setting;
 use Illuminate\Support\Arr;
@@ -61,6 +62,7 @@ class CouponService
                 'coupon_id' => $coupon->id,
                 'discount_percentage' => $coupon->discount_percentage,
                 'discount_source' => $coupon->discount_source,
+                'type' => $coupon->type,
                 'valid_products' => $validProducts->pluck('id'),
             ],
         ];
@@ -76,8 +78,10 @@ class CouponService
     {
         $totalAmount = 0;
         $totalFees = 0;
+        $remainingTaxes = 0;
         $totalDiscountFees = 0;
         $totalDiscountAmount = 0;
+        $totalCashbackAmount = 0;
         $productDiscounts = [];
 
         foreach ($products as $product) {
@@ -92,31 +96,35 @@ class CouponService
             $totalFees += $productFees;
 
             // Calculate discount for this product
-            $discountResult = $this->applyDiscount($finalPrice, $coupon->discount_percentage, $coupon->discount_source, $productFees);
+            $discountResult = $this->applyDiscount(totalAmount: $finalPrice, discountPercentage: $coupon->discount_percentage, discountSource: $coupon->discount_source, fees: $productFees, couponType: $coupon->type);
 
             $productDiscounts[$product->id] = [
                 'total' => $discountResult['total'],
                 'fees' => $discountResult['fees'],
                 'discount_amount' => $discountResult['discountAmount'],
+                'cashback_amount' => $discountResult['cashbackAmount'],
             ];
 
+            $remainingTaxes += $product->type == ProductType::Service ? 0 : round(($discountResult['total'] - $discountResult['fees']) * ($this->taxesPercentage / 100), 2);
             $totalDiscountAmount += $discountResult['discountAmount'];
+            $totalCashbackAmount += $discountResult['cashbackAmount'];
             $totalDiscountFees += $discountResult['fees'];
         }
+        $totalPriceAfterDiscount = $totalAmount - $totalDiscountAmount;
         $taxes = ($this->taxesPercentage / 100) * $totalDiscountFees;
+        $totalGuapaWithFees = $totalDiscountFees + $taxes;
+        $remaining = $totalPriceAfterDiscount - $totalDiscountFees;
+        $remainingWithTaxes = round($remaining + $remainingTaxes, 2);
 
         return [
-            'total' => $totalAmount - $totalDiscountAmount,
-            'fees' => $totalDiscountFees,
-            'taxes' => $taxes,
-            'tax_percentage' => $this->taxesPercentage,
-            'fees_with_taxes'=> $totalDiscountFees + $taxes,
-            'remaining' => ($totalAmount - $totalDiscountAmount) - $totalDiscountFees,
-            'discount_amount' => $totalDiscountAmount,
-            'fees_before_discount' => $totalFees,
-            'total_before_discount' => $totalAmount,
+            'fixed_price' => $totalAmount,
+            'fixed_price_with_discount' => $totalPriceAfterDiscount,
+            'guapa_fees' => $totalDiscountFees,
+            'guapa_fees_with_taxes' => $totalGuapaWithFees,
+            'vendor_price_with_taxes' => $remainingWithTaxes,
+            'total_amount_with_taxes' => round($remainingWithTaxes + $totalGuapaWithFees , 2),
+            'cashback_amount' => $totalCashbackAmount,
             'product_discounts' => $productDiscounts,
-
         ];
     }
 
@@ -144,11 +152,12 @@ class CouponService
         }
     }
 
-    public function applyDiscount($totalAmount, $discountPercentage, $discountSource, $fees)
+    public function applyDiscount($totalAmount, $discountPercentage, $discountSource, $fees, $couponType)
     {
         $newTotal = $totalAmount;
         $newFees = $fees;
         $discountAmount = 0;
+        $cashbackAmount = 0;
 
         switch ($discountSource) {
             case 'vendor':
@@ -158,9 +167,13 @@ class CouponService
                 break;
             case 'app':
                 if ($newFees > 0) {
-                    $discountAmount = ($newFees * $discountPercentage) / 100;
-                    $newFees -= $discountAmount;
-                    $newTotal -= $discountAmount;
+                    if($couponType == 'fixed'){
+                        $discountAmount = ($newFees * $discountPercentage) / 100;
+                        $newFees -= $discountAmount;
+                        $newTotal -= $discountAmount;
+                    } else {
+                        $cashbackAmount = ($newFees * $discountPercentage) / 100;
+                    }
                 }
                 break;
             case 'both':
@@ -174,6 +187,7 @@ class CouponService
             'total' => $newTotal,
             'fees' => $newFees,
             'discountAmount' => $discountAmount,
+            'cashbackAmount' => $cashbackAmount,
         ];
     }
 
