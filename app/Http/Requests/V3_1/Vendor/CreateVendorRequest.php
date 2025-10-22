@@ -62,10 +62,12 @@ class CreateVendorRequest extends FailedValidationRequest
         $phoneNumbersRule = Setting::isAllMobileNumsAccepted() ? '' : Common::phoneValidation();
 
         $rules = [
-            'name' => 'required|string|min:5|max:150',
+            'name.en' => 'required|string|min:5|max:150',
+            'name.ar' => 'required|string|min:5|max:150',
             'email' => 'sometimes|email|unique:vendors,email',
             'phone' => 'sometimes|' . $phoneNumbersRule,
-            'about' => 'nullable|string|min:10|max:1024',
+            'about.en' => 'nullable|string|min:10|max:1024',
+            'about.ar' => 'nullable|string|min:10|max:1024',
             'logo' => ['nullable', new ImageOrArray(), 'max:10240'],
             'type' => 'required|integer|in:' . implode(',', array_keys(Vendor::TYPES)),
             'tax_number' => 'nullable|string|max:200',

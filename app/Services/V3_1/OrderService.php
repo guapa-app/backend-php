@@ -100,7 +100,7 @@ class OrderService
                 $items = $this->createOrderItems($vendorProducts, $data, $order, $now, $vendorId, $couponResult);
 
                 // Check that provided user ids belong to vendor
-                $userIds = $items->pluck('user_id')->filter()->all();
+                $userIds = $items->pluck(value: 'user_id')->filter()->all();
 
                 if (!$this->checkVendorUsers($vendorId, $userIds)) {
                     abort(400, 'Invalid staff provided for vendor');
@@ -300,6 +300,7 @@ class OrderService
         $orderData['total'] = 0;
         $orderData['fees'] = 0;
         $orderData['discount_amount'] = 0;
+        $orderData['cashback_amount'] = 0;
         // is vendor wallet activated
         $orderData['vendor_wallet'] = $vendorProducts->first()->vendor->activate_wallet;
 
@@ -315,6 +316,7 @@ class OrderService
                 $orderData['total'] += $discountedProduct['total'];
                 $orderData['fees'] += $discountedProduct['fees'];
                 $orderData['discount_amount'] += $discountedProduct['discount_amount'];
+                $orderData['cashback_amount'] += $discountedProduct['cashback_amount'];
             } else {
                 // Use regular pricing for non-eligible products
                 $price = $this->getDiscountedPrice($product);

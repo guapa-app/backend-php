@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\TransactionStatus;
+use App\Models\Order;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Setting;
@@ -167,5 +168,25 @@ class WalletService
     public function getTransactionHistory(int $userId)
     {
         return Wallet::find($userId)->transactions()->get();
+    }
+
+
+    public function chargeUserWalletWithCashback(Order $order, array $additionalData = [])
+    {
+        $user = $order->user;
+        $wallet = $user->myWallet();
+        $amount = $order->cashback_amount;
+
+        $transactionType = TransactionType::ORDER_CASHBACK;
+        $transactionOperation = TransactionOperation::DEPOSIT;
+        $userId = $user->id;
+
+        // Call the service to create the transaction
+        $this->transaction = $this->transactionService->createTransaction(userId: $userId, amount: $amount, transactionType: $transactionType, transactionOperation: $transactionOperation, additionalData: $additionalData);
+
+        $wallet->balance += $amount;
+        $wallet->save();
+
+        return $wallet;
     }
 }

@@ -191,6 +191,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\Filament\UserPanelProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
+        App\Providers\Filament\AffiliateMarketeerPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\TelescopeServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,

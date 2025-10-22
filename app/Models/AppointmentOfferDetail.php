@@ -12,12 +12,17 @@ use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use Spatie\Translatable\HasTranslations;
 
 class AppointmentOfferDetail extends Model  implements HasMedia
 {
-    use  InteractsWithMedia;
+    use  InteractsWithMedia, HasTranslations;
 
     protected $guarded = ['id'];
+
+    protected $translatable = [
+        'terms'
+    ];
 
     protected $casts = [
         'status' => AppointmentOfferEnum::class,

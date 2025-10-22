@@ -33,6 +33,10 @@ class Localization
             $locale = $this->app->config->get('app.locale');
         }
 
+        if (str_contains($locale, 'ar')) {
+            $locale = 'ar';
+        }
+
         if (!in_array($locale, $this->app->config->get('app.available_locales'))) {
             $locale = 'en';
         }

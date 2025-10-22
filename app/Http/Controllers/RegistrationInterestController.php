@@ -51,6 +51,7 @@ class RegistrationInterestController extends BaseApiController
 
             return back()->with('success', __('Your account has been successfully registered. Please log in from the application and activate the account.'));
         } catch (Exception $exception) {
+            dd($exception->getMessage());
             $this->logReq($exception->getMessage());
 
             return back()->with('error', 'something went wrong, please contact support');

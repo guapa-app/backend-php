@@ -31,7 +31,7 @@ class AddressRequest extends FailedValidationRequest
             'addressable_type'  => 'required|string|in:user',
             'addressable_id'    => 'required|integer',
             'title'             => 'nullable|string|max:150',
-            'city_id'           => 'sometimes|required|integer|exists:cities,id',
+            'city_id'           => 'nullable|integer|exists:cities,id',
             'address_1'         => 'required|string|max:250',
             'address_2'         => 'nullable|string|max:250',
             'postal_code'       => 'nullable|string',

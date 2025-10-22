@@ -37,6 +37,7 @@ class Order extends Model implements Listable
         'cancellation_reason',
         'coupon_id',
         'discount_amount',
+        'cashback_amount',
         'last_reminder_sent',
         'type',
         'staff_id',
@@ -102,7 +103,7 @@ class Order extends Model implements Listable
 
     public function getRemainingAmountAttribute(): float
     {
-        return $this->total - ($this->paid_amount);
+        return round($this->total - ($this->paid_amount), 2);
     }
 
     public function country()
