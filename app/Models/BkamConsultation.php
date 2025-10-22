@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
@@ -26,6 +27,7 @@ class BkamConsultation extends Model implements Listable, HasMedia
         'taxonomy_id',
         'status',
         'consultation_fee',
+        'taxes',
         'payment_status',
         'payment_method',
         'payment_reference',
@@ -91,6 +93,11 @@ class BkamConsultation extends Model implements Listable, HasMedia
         return $this->belongsTo(Taxonomy::class);
     }
 
+    public function invoice(): MorphOne
+    {
+        return $this->morphOne(Invoice::class, 'invoiceable');
+    }
+
     /**
      * Check if the bkam consultation can be cancelled by the user
      *
@@ -98,12 +105,12 @@ class BkamConsultation extends Model implements Listable, HasMedia
      */
     public function canCancel(): bool
     {
-        if ($this->status === BkamConsultationStatus::STATUS_CANCELLED || $this->status === BkamConsultationStatus::STATUS_REJECTED) {
+        if ($this->status === BkamConsultaionStatus::Rejected) {
             return false;
         }
 
         // Can't cancel if already completed
-        if ($this->status === BkamConsultationStatus::STATUS_COMPLETED) {
+        if ($this->status === BkamConsultaionStatus::Approved) {
             return false;
         }
 

@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('taxonomy_id')->constrained()->onDelete('cascade');
 
             $table->string('status')->default('pending');            
-            $table->decimal('consultation_fee', 10, 2);
+            $table->decimal('consultation_fee', 10, 2)->default(0);
+            $table->decimal('taxes', 10, 2)->default(0);
             $table->string('payment_status')->default('pending');
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();

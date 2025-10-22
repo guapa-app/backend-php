@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 
 use App\Services\PaymentService;
 use App\Services\GiftCardService;
+use App\Services\V3_1\BkamConsultationService;
 use Illuminate\Support\Facades\Log;
 use App\Services\ConsultationService;
 use App\Services\MarketingCampaignService;
@@ -21,14 +22,15 @@ class PaymentController extends BaseApiController
     protected $paymentService;
     protected $consultationService;
     protected $giftCardService;
-
+    protected $bkamConsultationService;
     public function __construct(
         OrderPaymentService $orderPaymentService,
         MarketingCampaignService $marketingCampaignService,
         AppointmentOfferService $appointmentOfferService,
         PaymentService $paymentService,
         ConsultationService $consultationService,
-        GiftCardService $giftCardService
+        GiftCardService $giftCardService,
+        BkamConsultationService $bkamConsultationService
     ) {
         parent::__construct();
         $this->orderPaymentService = $orderPaymentService;
@@ -37,6 +39,7 @@ class PaymentController extends BaseApiController
         $this->paymentService = $paymentService;
         $this->consultationService = $consultationService;
         $this->giftCardService = $giftCardService;
+        $this->bkamConsultationService = $bkamConsultationService;
     }
 
     /**
@@ -71,6 +74,9 @@ class PaymentController extends BaseApiController
                         break;
                     case 'gift_card':
                         $this->giftCardService->changePaymentStatus($data);
+                        break;
+                    case 'bkam_consultation':
+                        $this->bkamConsultationService->changePaymentStatus($data);
                         break;
                     default:
                         return $this->errorJsonRes([], __('api.invalid_type'));
@@ -116,6 +122,9 @@ class PaymentController extends BaseApiController
                     break;
                 case 'gift_card':
                     $this->giftCardService->payViaWallet($user, $data);
+                    break;
+                case 'bkam_consultation':
+                    $this->bkamConsultationService->payViaWallet($user, $data);
                     break;
                 default:
                     return $this->errorJsonRes([], __('api.invalid_type'));

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AppointmentOffer;
+use App\Models\BkamConsultation;
 use App\Models\Invoice;
 use App\Models\MarketingCampaign;
 use App\Models\Order;
@@ -55,6 +56,8 @@ class PaymentService
             $invoiceData['description'] = "Marketing Campaign Invoice: \n" . $description;
         } elseif ($invoiceable instanceof AppointmentOffer) {
             $invoiceData['callback_url'] = config('app.url').'/api/user/v3.1/invoices/change-status';
+        } elseif ($invoiceable instanceof BkamConsultation) {
+            $invoiceData['callback_url'] = config('app.url').'/api/user/v3.1/bkam-consultations/change-invoice-status';
         } else {
             throw new InvalidArgumentException(__('Unsupported invoice type'));
         }

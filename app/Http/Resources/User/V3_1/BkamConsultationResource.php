@@ -22,6 +22,8 @@ class BkamConsultationResource extends JsonResource
             'consultation_reason' => $this->consultation_reason,
             'medical_history' => $this->medical_history,
             'consultation_fee' => (float) $this->consultation_fee,
+            'taxes' => (float) $this->taxes,
+            'invoice_url' => $this->invoice_url,
             'payment_status' => $this->payment_status,
             'payment_method' => $this->payment_method,
             'payment_reference' => $this->payment_reference,

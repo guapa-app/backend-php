@@ -2,14 +2,25 @@
 
 namespace App\Services\V3_1;
 
-use App\Enums\BkamConsultationStatus;
+use App\Enums\BkamConsultaionStatus;
 use App\Models\BkamConsultation;
 use App\Models\Media;
 use App\Models\Setting;
+use App\Services\PaymentService;
+use App\Services\QrCodeService;
+use App\Services\WalletService;
 use DB;
 
 class BkamConsultationService
 {
+    protected $paymentService;
+    protected $meetingProvider;
+
+    public function __construct(WalletService $walletService, PaymentService $paymentService)
+    {
+        $this->walletService = $walletService;
+        $this->paymentService = $paymentService;
+    }
 
     /**
      * Create a new bkam consultation
@@ -20,24 +31,89 @@ class BkamConsultationService
      */
     public function createConsultation(array $data, $user)
     {
-        DB::beginTransaction();
-
         try {
+            DB::beginTransaction();
             // Add user ID to data
             $data['user_id'] = $user->id;
+            $fees = Setting::getBkamConsultationFee();
+            $taxes = 0; // no Taxes for Bkam Consultation
 
             // Set initial status as pending
-            $data['status'] = BkamConsultationStatus::STATUS_PENDING;
-            $data['consultation_fees'] = Setting::getBkamConsultationFee();
+            $data['status'] = BkamConsultaionStatus::Pending;
+            $data['consultation_fee'] = $fees;
+            $data['taxes'] = 0;
             $data['payment_status'] = 'pending';
 
             // Create consultation
             $consultation = BkamConsultation::create($data);
 
+            // Generate invoice for the order
+            $invoice = $this->paymentService->generateInvoice($consultation, "Bkam Consultation Invoice", 50, 0);
+            $consultation->invoice_url = $invoice->url;
+            $consultation->save();
+
             // Attach media if provided
             $this->updateMedia($consultation, $data);
 
             $consultation->load(relations: 'media');
+            DB::commit();
+            return $consultation;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function changePaymentStatus(array $data)
+    {
+        try {
+            DB::beginTransaction();
+            $consultation = BkamConsultation::findOrFail($data['id']);
+
+            if ($consultation->payment_status === 'paid') {
+                throw new \Exception('Payment already processed for this consultation');
+            }
+
+            // Update payment data
+            $consultation->payment_status = 'paid';
+            $consultation->payment_reference = $data['payment_id'];
+            $consultation->payment_method = 'credit_card';
+
+            $consultation->save();
+            DB::commit();
+            return $consultation;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function payViaWallet($user, array $data)
+    {
+        try {
+            DB::beginTransaction();
+            $consultation = BkamConsultation::findOrFail($data['id']);
+
+            if ($consultation->payment_status === 'paid') {
+                throw new \Exception('Payment already processed for this consultation');
+            }
+
+            // Check wallet balance
+            $walletAmount = $user->myWallet()->balance;
+            if ($walletAmount < $consultation->total_amount) {
+                throw new \Exception('Insufficient wallet balance');
+            }
+
+            // Deduct from wallet
+            $transaction = $this->walletService->debit($user, $consultation->consultation_fee);
+
+            // Update payment data
+            $consultation->payment_status = 'paid';
+            $consultation->payment_reference = $transaction->transaction_number;
+            $consultation->payment_method = 'wallet';
+
+            // update status to scheduled
+            $consultation->save();
             DB::commit();
             return $consultation;
         } catch (\Exception $e) {

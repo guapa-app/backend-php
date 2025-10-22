@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User\V3_1;
 use App\Contracts\Repositories\V3_1\BkamConsultationRepositoryInterface;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V3_1\User\BkamConsultationRequest;
 use App\Http\Resources\User\V3_1\BkamConsultationCollection;
 use App\Http\Resources\User\V3_1\BkamConsultationResource;
 use App\Services\V3_1\BkamConsultationService;
@@ -67,13 +68,13 @@ class BkamConsultationController extends BaseApiController
     /**
      * Store a newly created consultation in storage.
      *
-     * @param ConsultationRequest $request
+     * @param BkamConsultationRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(ConsultationRequest $request)
+    public function store(BkamConsultationRequest $request)
     {
         try {
-            $user = Auth::user();
+            $user = $this->user;
             $consultation = $this->bkamConsultationService->createConsultation($request->validated(), $user);
 
             return BkamConsultationResource::make($consultation)
