@@ -50,16 +50,16 @@ class BkamConsultationController extends BaseApiController
     public function show($id)
     {
         try {
-            $consultation = $this->bkamConsultationRepository->find($id);
+            $consultation = $this->bkamConsultationRepository->getOneWithRelations($id);
             if (!$consultation) {
                 return $this->errorJsonRes([], __('Consultation not found'), 404);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => __('Consultation fetched successfully'),
-                'data' => $consultation
-            ]);
+            return BkamConsultationResource::make($consultation)
+                ->additional([
+                    'success' => true,
+                    'message' => __('api.success'),
+                ]);
         } catch (\Exception $e) {
             return $this->errorJsonRes([], $e->getMessage());
         }
@@ -86,6 +86,18 @@ class BkamConsultationController extends BaseApiController
             return $this->errorJsonRes([], $e->getMessage(), 400);
         } catch (\Exception $e) {
             return $this->errorJsonRes([], __('Error processing request: ') . $e->getMessage(), 500);
+        }
+    }
+
+
+    public function delete($id)
+    {
+        try {
+            $this->bkamConsultationService->delete(id: $id, userId: $this->user->id);
+            return $this->successJsonRes([], __('api.success'));
+        }
+        catch (\Exception $e) {
+            return $this->errorJsonRes([], $e->getMessage());
         }
     }
 }

@@ -28,7 +28,6 @@ class BkamConsultationResource extends JsonResource
             'payment_method' => $this->payment_method,
             'payment_reference' => $this->payment_reference,
             'can_cancel' => $this->canCancel(),
-            'user' => new UserResource($this->whenLoaded('user')),
             'media' => MediaResource::collection($this->whenLoaded('media')),
             'cancelled_at' => $this->cancelled_at ? $this->cancelled_at->format('Y-m-d H:i:s') : null,
             'rejected_at' => $this->rejected_at ? $this->rejected_at->format('Y-m-d H:i:s') : null,

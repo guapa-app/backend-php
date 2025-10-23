@@ -2,6 +2,7 @@
 
 namespace App\Services\V3_1;
 
+use App\Contracts\Repositories\V3_1\BkamConsultationRepositoryInterface;
 use App\Enums\BkamConsultaionStatus;
 use App\Models\BkamConsultation;
 use App\Models\Media;
@@ -15,11 +16,12 @@ class BkamConsultationService
 {
     protected $paymentService;
     protected $meetingProvider;
-
-    public function __construct(WalletService $walletService, PaymentService $paymentService)
+    protected $bkamConsultationRepository;
+    public function __construct(WalletService $walletService, PaymentService $paymentService, BkamConsultationRepositoryInterface $bkamConsultationRepository)
     {
         $this->walletService = $walletService;
         $this->paymentService = $paymentService;
+        $this->bkamConsultationRepository = $bkamConsultationRepository;
     }
 
     /**
@@ -45,7 +47,7 @@ class BkamConsultationService
             $data['payment_status'] = 'pending';
 
             // Create consultation
-            $consultation = BkamConsultation::create($data);
+            $consultation = $this->bkamConsultationRepository->create($data);
 
             // Generate invoice for the order
             $invoice = $this->paymentService->generateInvoice($consultation, "Bkam Consultation Invoice", 50, 0);
@@ -147,5 +149,14 @@ class BkamConsultationService
         $bkamConsultation->load('media');
 
         return $bkamConsultation;
+    }
+
+    public function delete($id, $userId)
+    {
+        $consultation = $this->bkamConsultationRepository->getOneOrFail($id);
+        if ($consultation->user_id !== $userId) {
+            abort(403, 'You are not authorized to delete this consultation');
+        }
+        $this->bkamConsultationRepository->delete($id);
     }
 }
