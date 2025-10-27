@@ -49,6 +49,8 @@ class CartService
                 'has_discount' => false,
                 'fixed_price' => 0,
                 'fixed_price_with_discount' => 0,
+                'fixed_price_with_taxes' => 0,
+                'fixed_price_with_discount_with_taxes' => 0,
                 'guapa_fees' => 0,
                 'guapa_fees_with_taxes' => 0,
                 'vendor_price_with_taxes' => 0,
@@ -70,6 +72,14 @@ class CartService
 
         $fixedPriceAfterDiscount = $items->sum(function($item){
             return $item->quantity * $item->product->payment_details['fixed_price_with_discount'];
+        });
+
+        $fixedPriceWithTaxes = $items->sum(function($item){
+            return $item->quantity * $item->product->payment_details['fixed_price_with_taxes'];
+        });
+
+        $fixedPriceWithDiscountWithTaxes = $items->sum(function($item){
+            return $item->quantity * $item->product->payment_details['fixed_price_with_discount_with_taxes'];
         });
 
         $guapaFees = $items->sum(function($item){
@@ -104,6 +114,8 @@ class CartService
             'has_discount' => $hasDiscount,
             'fixed_price' => round($fixedPrice, 2), // fixed_price
             'fixed_price_with_discount' => round($fixedPriceAfterDiscount, 2), // fixed_price_with_discount 
+            'fixed_price_with_taxes' => round($fixedPriceWithTaxes, 2), // fixed_price_with_taxes
+            'fixed_price_with_discount_with_taxes' => round($fixedPriceWithDiscountWithTaxes, 2), // fixed_price_with_discount_with_taxes
             'guapa_fees' => round($guapaFees, 2), // guapa_fees
             'guapa_fees_with_taxes' => round($guapaFeesWithTaxes, 2), // guapa_fees_with_taxes
             'vendor_price_with_taxes' => round($vendorPriceWithTaxes, 2), // vendor_price_with_taxes

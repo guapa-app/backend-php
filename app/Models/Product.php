@@ -220,18 +220,26 @@ class Product extends Model implements Listable, HasMedia, HasReviews
 
     public function getPaymentDetailsAttribute()
     {
+        $isService = $this->type == ProductType::Service;
         $finalPrice = round((float) $this->offer_price, 2); // Use the getOfferPriceAttribute method
         $fees = round((float) $this->calculateProductFees($finalPrice), 2);
         $taxPercentage = (float) Setting::getTaxes(); // Tax percentage (default: 15%)
         $taxes = round(($taxPercentage / 100) * $fees, 2);
         $remaining = round($finalPrice - $fees, 2);
         $feesWithTaxes = round(($this->vendor->activate_wallet ? $finalPrice : $fees) + $taxes, 2);
-        $remainingTaxes = $this->type == ProductType::Service ? 0 : round($remaining * ($taxPercentage / 100) , 2);
+        $remainingTaxes = $isService ? 0 : round($remaining * ($taxPercentage / 100) , 2);
         $remainingWithTaxes = round($remaining + $remainingTaxes , 2);
 
+        $fixedPrice = round((float) $this->price, 2);
+        $fixedPriceWithDiscount = $this->offer ? round($this->offer_price, 2) : $fixedPrice;
+        $fixedPriceWithTaxes = $isService ? $fixedPrice : $fixedPrice + round($fixedPrice * ($taxPercentage / 100), 2);
+        $fixedPriceWithDiscountWithTaxes = $isService ? $fixedPriceWithDiscount : $fixedPriceWithDiscount + round($fixedPriceWithDiscount * ($taxPercentage / 100), 2);
+        
         return [
-            'fixed_price' => round((float) $this->price, 2),
-            'fixed_price_with_discount' => $this->offer ? round($this->offer_price, 2) : round((float) $this->price, 2),
+            'fixed_price' => $fixedPrice,
+            'fixed_price_with_discount' => $fixedPriceWithDiscount,
+            'fixed_price_with_taxes' => $fixedPriceWithTaxes,
+            'fixed_price_with_discount_with_taxes' => $fixedPriceWithDiscountWithTaxes,
             'guapa_fees' => $this->vendor->activate_wallet ? $finalPrice : $fees,
             'guapa_fees_with_taxes' => $feesWithTaxes,
             'vendor_price_with_taxes' => $remainingWithTaxes,
