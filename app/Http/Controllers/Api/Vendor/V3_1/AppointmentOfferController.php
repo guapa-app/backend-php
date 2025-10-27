@@ -46,6 +46,14 @@ class AppointmentOfferController extends BaseApiController
     public function approveAppointmentOffer(AcceptAppointmentRequest $request): AppointmentOfferDetailsResource
     {
         $data = $request->validated();
+        // temporary fix for the terms translation
+        if(isset($data['terms'])){
+            $data['terms'] = [
+                'en' => $data['terms'],
+                'ar' => $data['terms'],
+            ];
+        }
+
         return AppointmentOfferDetailsResource::make($this->appointmentOfferService->approveAppointmentOffer($data))
             ->additional([
                 'success' => true,

@@ -51,6 +51,26 @@ class ProductController extends BaseApiController
     public function create(ProductRequest $request)
     {
         $data = $request->validated();
+        // temporary fix for the title, description, and terms translations
+        if(isset($data['title'])){
+            $data['title'] = [
+                'en' => $data['title'],
+                'ar' => $data['title'],
+            ];
+        }
+        if(isset($data['description'])){
+            $data['description'] = [
+                'en' => $data['description'],
+                'ar' => $data['description'],
+            ];
+        }
+        if(isset($data['terms'])){
+            $data['terms'] = [
+                'en' => $data['terms'],
+                'ar' => $data['terms'],
+            ];
+        }
+
         $data['vendor_id'] = $this->user->managerVendorId();
         $data['country_id'] = auth()->user()->country_id;
         
@@ -65,7 +85,28 @@ class ProductController extends BaseApiController
 
     public function update($id, ProductRequest $request)
     {
-        $item = $this->productService->update($id, $request->validated());
+        $data = $request->validated();
+        // temporary fix for the title, description, and terms translations
+        if (isset($data['title'])) {
+            $data['title'] = [
+                'en' => $data['title'],
+                'ar' => $data['title'],
+            ];
+        }
+        if (isset($data['description'])) {
+            $data['description'] = [
+                'en' => $data['description'],
+                'ar' => $data['description'],
+            ];
+        }
+        if (isset($data['terms'])) {
+            $data['terms'] = [
+                'en' => $data['terms'],
+                'ar' => $data['terms'],
+            ];
+        }
+
+        $item = $this->productService->update($id, $data);
 
         return ProductResource::make($item)
             ->additional([
