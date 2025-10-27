@@ -47,7 +47,27 @@ class OfferController extends BaseApiController
 
     public function create(OfferRequest $request)
     {
-        $offer = $this->offerService->create($request->validated());
+        $data = $request->validated();
+        // temporary fix for the title, description, and terms translations
+        if(isset($data['title'])){
+            $data['title'] = [
+                'en' => $data['title'],
+                'ar' => $data['title'],
+            ];
+        }
+        if(isset($data['description'])){
+            $data['description'] = [
+                'en' => $data['description'],
+                'ar' => $data['description'],
+            ];
+        }
+        if(isset($data['terms'])){
+            $data['terms'] = [
+                'en' => $data['terms'],
+                'ar' => $data['terms'],
+            ];
+        }
+        $offer = $this->offerService->create($data);
         return OfferResource::make($offer)
             ->additional([
                 'success' => true,
@@ -57,7 +77,28 @@ class OfferController extends BaseApiController
 
     public function update(OfferRequest $request, $id)
     {
-        $offer = $this->offerService->update($id, $request->validated());
+        $data = $request->validated();
+        // temporary fix for the title, description, and terms translations
+        if(isset($data['title'])){
+            $data['title'] = [
+                'en' => $data['title'],
+                'ar' => $data['title'],
+            ];
+        }
+        if(isset($data['description'])){
+            $data['description'] = [
+                'en' => $data['description'],
+                'ar' => $data['description'],
+            ];
+        }
+        if(isset($data['terms'])){
+            $data['terms'] = [
+                'en' => $data['terms'],
+                'ar' => $data['terms'],
+            ];
+        }
+
+        $offer = $this->offerService->update($id, $data);
         return OfferResource::make($offer)
             ->additional([
                 'success' => true,
