@@ -31,7 +31,22 @@ class VendorController extends BaseApiController
     public function create(CreateVendorRequest $request)
     {
         try {
-            $vendor = $this->vendorService->create($request->validated());
+            $data = $request->validated();
+            // temporary fix for the name and about translations
+            if(isset($data['name'])){
+                $data['name'] = [
+                    'en' => $data['name'],
+                    'ar' => $data['name'],
+                ];
+            }
+            if(isset($data['about'])){
+                $data['about'] = [
+                    'en' => $data['about'],
+                    'ar' => $data['about'],
+                ];
+            }
+
+            $vendor = $this->vendorService->create($data);
 
             return VendorProfileResource::make($vendor)
                 ->additional([
@@ -49,7 +64,21 @@ class VendorController extends BaseApiController
     {
         // Complete and update vendor data
         $id = $this->user->managerVendorId();
-        $record = $this->vendorService->update($id, $request->validated());
+        $data = $request->validated();
+        // temporary fix for the name and about translations
+        if(isset($data['name'])){
+            $data['name'] = [
+                'en' => $data['name'],
+                'ar' => $data['name'],
+            ];
+        }
+        if(isset($data['about'])){
+            $data['about'] = [
+                'en' => $data['about'],
+                'ar' => $data['about'],
+            ];
+        }
+        $record = $this->vendorService->update($id, $data);
 
         return VendorProfileResource::make($record)
             ->additional([
