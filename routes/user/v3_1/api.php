@@ -48,6 +48,7 @@ Route::prefix("user/v3.1")->middleware([CountryHeader::class])->group(function (
     Route::prefix('bkam-consultations')->group(base_path('routes/user/v3_1/api/bkam_consultations.php'));
     // cart
     Route::prefix('cart')->group(base_path('routes/user/v3_1/api/cart.php'));
+    Route::prefix('diseases')->group(base_path('routes/user/v3_1/api/diseases.php'));
 
     Route::post('devices', [DeviceController::class, 'addDevice'])->middleware('auth:api');
     Route::get('data', [DataController::class, 'data']);
